@@ -1,4 +1,2 @@
 ISGCI-JGraphX-Integration
 =========================
-
-Description:
