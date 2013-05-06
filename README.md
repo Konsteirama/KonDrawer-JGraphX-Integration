@@ -1,2 +1,2 @@
-ISGCI-JGraphX-Integration
-=========================
+KonDrawer-JGraphX-Integration
+=============================
