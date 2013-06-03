@@ -10,6 +10,7 @@
 
 package teo.isgci.gui;
 
+import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.Font;
@@ -142,7 +143,20 @@ public class ISGCIMainFrame extends JFrame
         */
 
         setJMenuBar(createMenus());
-        getContentPane().add("Center", createCanvasPanel());
+        
+        // Create and add new toolbar
+        ISGCIToolBar toolbar = new ISGCIToolBar();
+        getContentPane().add(toolbar, BorderLayout.PAGE_START);
+        
+        // Create and add tabbed interface for canvas
+        // TODO: should not add a canvaspanel on creation; 
+        // instead there should be a startpage of some sort 
+        ISGCITabbedPane tabbedpane = new ISGCITabbedPane();
+        tabbedpane.addTab("Welcome", createCanvasPanel()); 
+        getContentPane().add(tabbedpane, BorderLayout.CENTER);
+        
+        
+        //getContentPane().add("Center", createCanvasPanel());
         registerListeners();
         setLocation(20, 20);
         pack();
@@ -293,7 +307,6 @@ public class ISGCIMainFrame extends JFrame
         
         return drawingPane;
     }
-
 
     /**
      * Center the canvas on the given point.
