@@ -14,13 +14,16 @@
 
     <property name="data.dir" location="data" />
     <property name="build.data.dir" location="${build.dir}/data" />
-    <property name="smallgraphs.xml.in" location="${data.dir}/smallgraphs.xml" />
-    <property name="smallgraphs.xml.out" location="${build.data.dir}/smallgraphs.xml" />
+    <property name="smallgraphs.xml.in"
+              location="${data.dir}/smallgraphs.xml" />
+    <property name="smallgraphs.xml.out"
+              location="${build.data.dir}/smallgraphs.xml" />
     <property name="isgci.xml.in" location="${data.dir}/masterdata.xml" />
     <property name="isgci.xml.out" location="${build.data.dir}/isgci.xml" />
     <property name="isgci.full.xml.out" location="${build.data.dir}/full.xml" />
     <property name="isgci.sage.xml.rel" value="isgci_sage.xml" />
-    <property name="isgci.sage.xml.out" location="${build.data.dir}/${isgci.sage.xml.rel}" />
+    <property name="isgci.sage.xml.out"
+              location="${build.data.dir}/${isgci.sage.xml.rel}" />
     <property name="autocache.txt" location="autocache.txt" />
     <property name="generate.trace" location="generate.trace" />
     <property name="relations.trace" location="relations.trace" />
@@ -54,11 +57,14 @@
     <property name="web.classes.dir" location="${web.dir}/${web.classes.rel}" />
     <property name="web.keys.dir" location="${web.dir}/Keys" />
     <property name="web.images.dir" location="${web.dir}/${web.images.rel}" />
-    <property name="smallgraphs.html.out" location="${web.dir}/smallgraphs.html" />
+    <property name="smallgraphs.html.out"
+              location="${web.dir}/smallgraphs.html" />
     <property name="smallgraphs.url" value="${home.url}/smallgraphs.html" />
-    <property name="graphlinks.xml.out" location="${build.data.dir}/graphlinks.xml" />
+    <property name="graphlinks.xml.out"
+              location="${build.data.dir}/graphlinks.xml" />
     <property name="search.cgi.in" location="${data.dir}/searchhead.cgi" />
-    <property name="search.cgi.data" location="${build.data.dir}/searchtail.cgi" />
+    <property name="search.cgi.data"
+              location="${build.data.dir}/searchtail.cgi" />
     <property name="search.cgi.out" location="${web.dir}/search.cgi" />
     <property name="refs.xml.in" location="${data.dir}/refs.xml" />
     <property name="isgci.jar" location="${web.dir}/ISGCI.jar" />
@@ -88,7 +94,9 @@
     </target>
 
 
-    <target name="init.web" depends="init" description="Installs basic web files">
+    <target name="init.web"
+            depends="init"
+            description="Installs basic web files">
 
         <mkdir dir="${web.dir}" />
         <mkdir dir="${web.classes.dir}" />
@@ -107,7 +115,8 @@
     </target>
 
 
-    <target name="clean.compile" description="Deletes all created class/jar files">
+    <target name="clean.compile"
+            description="Deletes all created class/jar files">
 
         <delete dir="${build.classes.dir}" />
         <mkdir dir="${build.classes.dir}" />
@@ -131,7 +140,9 @@
 
     <target name="iqparser" description="Compile the iq parser">
 
-        <java classname="mouse.Generate" fork="true" classpathref="run.classpath">
+        <java classname="mouse.Generate"
+              fork="true"
+              classpathref="run.classpath">
             <arg value="-G" />
             <arg value="${iq.dir}/iq.peg" />
             <arg value="-D" />
@@ -147,7 +158,8 @@
     </target>
 
 
-    <target name="iqparser.full" description="Compile the iq parser, if outofdate">
+    <target name="iqparser.full"
+            description="Compile the iq parser, if outofdate">
 
         <outofdate>
             <sourcefiles>
@@ -162,9 +174,14 @@
         </outofdate>
     </target>
 
-    <target name="compile" description="Compile the java classes" depends="iqparser.full">
+    <target name="compile"
+            description="Compile the java classes"
+            depends="iqparser.full">
 
-        <javac srcdir="." destdir="${build.classes.dir}" includeantruntime="false" debug="yes">
+        <javac srcdir="."
+               destdir="${build.classes.dir}"
+               includeantruntime="false"
+               debug="yes">
             <classpath refid="compile.classpath" />
             <include name="**/*.java" />
             <exclude name="IQ.java" />
@@ -190,7 +207,8 @@
     </target>
 
 
-    <target name="jar" description="Create a jar file containing the ISGCI application">
+    <target name="jar"
+            description="Create a jar file containing the ISGCI application">
 
         <delete file="${isgci.jar}" />
         <jar destfile="${isgci.jar}" index="false">
@@ -223,8 +241,15 @@
                 <include name="images/*.gif" />
             </fileset>
         </jar>
-        <signjar alias="isgci" jar="${isgci.jar}" keystore="${data.dir}/keystore" storepass="graphclasses.org" />
-        <signjar alias="isgci" jar="${jgrapht.jar}" signedjar="${web.dir}/jgrapht.jar" keystore="${data.dir}/keystore" storepass="graphclasses.org" />
+        <signjar alias="isgci"
+                 jar="${isgci.jar}"
+                 keystore="${data.dir}/keystore"
+                 storepass="graphclasses.org" />
+        <signjar alias="isgci"
+                 jar="${jgrapht.jar}"
+                 signedjar="${web.dir}/jgrapht.jar"
+                 keystore="${data.dir}/keystore"
+                 storepass="graphclasses.org" />
         <!-- <signjar alias="isgci"
      jar="${isgci.jar}"
      keystore="${data.dir}/keystore"
@@ -232,7 +257,9 @@
     </target>
 
 
-    <target name="jar.full" depends="compile, deductions.full" description="jar, with full dependency handling">
+    <target name="jar.full"
+            depends="compile, deductions.full"
+            description="jar, with full dependency handling">
 
         <outofdate>
             <sourcefiles>
@@ -253,7 +280,9 @@
 
     <target name="smallgraphs" description="Deduce smallgraph relations">
 
-        <java classname="teo.isg.FindISG" fork="true" classpathref="run.classpath">
+        <java classname="teo.isg.FindISG"
+              fork="true"
+              classpathref="run.classpath">
             <arg file="${smallgraphs.xml.in}" />
             <arg file="${smallgraphs.xml.out}" />
         </java>
@@ -262,7 +291,9 @@
         </copy>
     </target>
 
-    <target name="smallgraphs.full" depends="compile" description="smallgraphs, with full dependency handling">
+    <target name="smallgraphs.full"
+            depends="compile"
+            description="smallgraphs, with full dependency handling">
 
         <outofdate>
             <sourcefiles>
@@ -277,7 +308,8 @@
         </outofdate>
     </target>
 
-    <target name="smallgraphs.touch" description="touches the smallgraphs output files">
+    <target name="smallgraphs.touch"
+            description="touches the smallgraphs output files">
 
         <touch file="${smallgraphs.xml.out}" />
     </target>
@@ -285,7 +317,10 @@
 
     <target name="deductions" description="Deduce graphclass relations">
 
-        <java classname="Generate" fork="true" maxmemory="2500M" classpathref="run.classpath">
+        <java classname="Generate"
+              fork="true"
+              maxmemory="2500M"
+              classpathref="run.classpath">
             <!-- <jvmarg value="-agentlib:hprof=cpu=samples,depth=8,interval=100"/> -->
             <!-- <arg value="-C"/> -->
             <!-- <arg value="-x"/> -->
@@ -316,7 +351,9 @@
     </target>
 
 
-    <target name="deductions.full" depends="smallgraphs.full, compile" description="deductions, with full dependency handling">
+    <target name="deductions.full"
+            depends="smallgraphs.full, compile"
+            description="deductions, with full dependency handling">
 
         <outofdate>
             <sourcefiles>
@@ -334,7 +371,8 @@
     </target>
 
 
-    <target name="deductions.touch" description="touches the deductions output files">
+    <target name="deductions.touch"
+            description="touches the deductions output files">
 
         <touch file="${isgci.xml.out}" />
         <touch file="${isgci.full.xml.out}" />
@@ -350,20 +388,26 @@
     </target>
 
 
-    <target name="maps.full" depends="compile, init.web, deductions.full, jar.full" description="maps, with full dependency handling">
+    <target name="maps.full"
+            depends="compile, init.web, deductions.full, jar.full"
+            description="maps, with full dependency handling">
 
         <antcall target="maps" />
     </target>
 
 
 
-    <target name="smallgraphs.html" description="Create smallgraphs html and gif files">
+    <target name="smallgraphs.html"
+            description="Create smallgraphs html and gif files">
 
         <delete>
             <fileset dir="${web.images.dir}" includes="g_*" />
             <fileset file="${graphlinks.xml.out}" />
         </delete>
-        <xslt style="graphlinks.xsl" in="${smallgraphs.xml.in}" out="${graphlinks.xml.out}" force="true">
+        <xslt style="graphlinks.xsl"
+              in="${smallgraphs.xml.in}"
+              out="${graphlinks.xml.out}"
+              force="true">
             <classpath refid="run.classpath" />
             <factory name="net.sf.saxon.TransformerFactoryImpl" />
             <param name="homeurl" expression="${home.url}" />
@@ -371,7 +415,10 @@
             <param name="rooturl" expression="${root.url}" />
             <param name="imagedir" expression="${web.images.rel}" />
         </xslt>
-        <xslt style="smallgraphs.xsl" in="${smallgraphs.xml.in}" out="/dev/null" force="true">
+        <xslt style="smallgraphs.xsl"
+              in="${smallgraphs.xml.in}"
+              out="/dev/null"
+              force="true">
             <classpath refid="run.classpath" />
             <factory name="net.sf.saxon.TransformerFactoryImpl" />
             <param name="homeurl" expression="${home.url}" />
@@ -383,7 +430,9 @@
     </target>
 
 
-    <target name="smallgraphs.html.full" depends="compile, init.web, smallgraphs.full" description="smallgraphs.html, with full dependency handling">
+    <target name="smallgraphs.html.full"
+            depends="compile, init.web, smallgraphs.full"
+            description="smallgraphs.html, with full dependency handling">
 
         <outofdate>
             <sourcefiles>
@@ -408,7 +457,10 @@
             <fileset dir="${web.classes.dir}" includes="*.html" />
             <fileset dir="${web.keys.dir}" includes="*" />
         </delete>
-        <xslt style="isgci.xsl" in="${isgci.full.xml.out}" out="${search.cgi.data}" force="true">
+        <xslt style="isgci.xsl"
+              in="${isgci.full.xml.out}"
+              out="${search.cgi.data}"
+              force="true">
             <classpath refid="run.classpath" />
             <factory name="net.sf.saxon.TransformerFactoryImpl" />
             <param name="homeurl" expression="${home.url}" />
@@ -424,7 +476,10 @@
             <fileset file="${search.cgi.data}" />
         </concat>
         <chmod perm="ugo+x" file="${search.cgi.out}" />
-        <xslt style="isgci.xsl" in="${refs.xml.in}" out="/dev/null" force="true">
+        <xslt style="isgci.xsl"
+              in="${refs.xml.in}"
+              out="/dev/null"
+              force="true">
             <classpath refid="run.classpath" />
             <factory name="net.sf.saxon.TransformerFactoryImpl" />
             <param name="homeurl" expression="${home.url}" />
@@ -432,7 +487,10 @@
             <param name="rooturl" expression="${root.url}" />
             <param name="classesdir" expression="${web.classes.rel}" />
         </xslt>
-        <xslt style="mkkeywords.xsl" in="${isgci.full.xml.out}" out="/dev/null" force="true">
+        <xslt style="mkkeywords.xsl"
+              in="${isgci.full.xml.out}"
+              out="/dev/null"
+              force="true">
             <classpath refid="run.classpath" />
             <factory name="net.sf.saxon.TransformerFactoryImpl" />
             <param name="dir" expression="${web.keys.dir}" />
@@ -442,8 +500,10 @@
     </target>
 
 
-    <target name="classes.html.full" depends="compile, init.web, smallgraphs.full, smallgraphs.html.full,
-     deductions.full" description="classes.html, with full dependency handling">
+    <target name="classes.html.full"
+            depends="compile, init.web, smallgraphs.full, smallgraphs.html.full,
+     deductions.full"
+            description="classes.html, with full dependency handling">
 
         <outofdate>
             <sourcefiles>
@@ -464,7 +524,8 @@
     </target>
 
 
-    <target name="static.html" description="Creates all web data other than classes/smallgraphs">
+    <target name="static.html"
+            description="Creates all web data other than classes/smallgraphs">
 
         <copy todir="${web.dir}" file="${data.dir}/isgci.jnlp" overwrite="yes">
             <filterset>
@@ -479,7 +540,10 @@
             <fileset dir="${web.dir}" includes="*.cgi" />
         </chmod>
 
-        <exec executable="xpath" input="${data.dir}/new.html.3" output="${build.data.dir}/news.inc" error="/dev/null">
+        <exec executable="xpath"
+              input="${data.dir}/new.html.3"
+              output="${build.data.dir}/news.inc"
+              error="/dev/null">
             <arg value="//li[position() &lt; 4]" />
         </exec>
         <concat force="yes" destfile="${build.data.dir}/static.4">
@@ -556,7 +620,9 @@
     </target>
 
 
-    <target name="static.html.full" depends="init.web, smallgraphs.html.full, classes.html.full" description="static.html, with full dependency handling">
+    <target name="static.html.full"
+            depends="init.web, smallgraphs.html.full, classes.html.full"
+            description="static.html, with full dependency handling">
 
         <antcall target="static.html" />
     </target>
@@ -570,114 +636,116 @@
             <arg value="${web.dir}" />
             <arg value="${distrib.dir}" />
         </exec>
-        <copy todir="${distrib.dir}" file="${data.dir}/isgci.jnlp" overwrite="yes">
+        <copy todir="${distrib.dir}"
+              file="${data.dir}/isgci.jnlp"
+              overwrite="yes">
             <filterset>
                 <filter token="HOMEURL" value="${home.url}/" />
             </filterset>
         </copy>
         <zip destfile="${distrib.dir}/data.zip">
             <fileset dir="${build.data.dir}">
-                <include name="${isgci.sage.xml.rel}"/>
-                <include name="isgci.dtd"/>
+                <include name="${isgci.sage.xml.rel}" />
+                <include name="isgci.dtd" />
             </fileset>
         </zip>
         <exec executable="tar">
-            <arg value="czf"/>
-            <arg value="${distrib.tar}"/>
-            <arg value="-C"/>
-            <arg value="${distrib.dir}"/>
-            <arg value="."/>
+            <arg value="czf" />
+            <arg value="${distrib.tar}" />
+            <arg value="-C" />
+            <arg value="${distrib.dir}" />
+            <arg value="." />
         </exec>
         <exec executable="bash">
-            <arg value="-c"/>
+            <arg value="-c" />
             <arg value="(cat ${autocache.txt}; cat ${names.txt} | grep '^AUTO_') |
      sort -u > ${autocache.txt}.new;
-     mv ${autocache.txt}.new ${autocache.txt}"/>
+     mv ${autocache.txt}.new ${autocache.txt}" />
         </exec>
     </target>
 
 
     <target name="web.full"
-   depends="maps.full, smallgraphs.html.full, classes.html.full,
+            depends="maps.full, smallgraphs.html.full, classes.html.full,
      static.html.full"
-   description="All the *.html.full targets">
+            description="All the *.html.full targets">
     </target>
 
 
     <target name="distrib.full"
-   depends="jar.full, web.full"
-   description="distrib, with full dependency handling">
+            depends="jar.full, web.full"
+            description="distrib, with full dependency handling">
 
         <outofdate>
             <sourcefiles>
-                <pathelement path="${isgci.jar}"/>
-                <pathelement path="${build.dir}/smallgraphs.html.timestamp"/>
-                <pathelement path="${build.dir}/classes.html.timestamp"/>
-                <fileset dir="${web.dir}"/>
+                <pathelement path="${isgci.jar}" />
+                <pathelement path="${build.dir}/smallgraphs.html.timestamp" />
+                <pathelement path="${build.dir}/classes.html.timestamp" />
+                <fileset dir="${web.dir}" />
             </sourcefiles>
             <targetfiles>
-                <pathelement path="${distrib.tar}"/>
+                <pathelement path="${distrib.tar}" />
             </targetfiles>
             <sequential>
-                <antcall target="distrib"/>
+                <antcall target="distrib" />
             </sequential>
         </outofdate>
     </target>
 
-    <target name="run"
-   description="Run isgci">
+    <target name="run" description="Run isgci">
 
         <java jar="${isgci.jar}" fork="true">
-            <arg value="file://${web.dir}/"/>
+            <arg value="file://${web.dir}/" />
         </java>
     </target>
 
-    <target name="debug"
-   description="Debug isgci">
+    <target name="debug" description="Debug isgci">
 
         <java jar="${isgci.jar}" fork="true">
-            <arg value="file://${web.dir}/"/>
+            <arg value="file://${web.dir}/" />
             <jvmarg value="-Xdebug" />
-            <jvmarg value="-Xrunjdwp:transport=dt_socket,server=y,suspend=y,address=5432" />
+            <jvmarg value="-Xrunjdwp:transport=dt_socket,
+                server=y,suspend=y,address=7718" />
         </java>
     </target>
 
     <target name="testforbidden"
-   description="Manually test forbidden subgraphs">
+            description="Manually test forbidden subgraphs">
 
-        <java classname="teo.isgci.gc.ForbiddenClass" fork="true"
-      classpathref="run.classpath">
-            <arg file="${smallgraphs.xml.out}"/>
+        <java classname="teo.isgci.gc.ForbiddenClass"
+              fork="true"
+              classpathref="run.classpath">
+            <arg file="${smallgraphs.xml.out}" />
         </java>
     </target>
 
 
-    <target name="iq"
-   description="ISGCI Query">
-
-        <java classname="teo.isgci.iq.IQ" fork="true"
-      classpathref="run.classpath">
-            <arg value="file://${build.dir}/"/>
+    <target name="iq" description="ISGCI Query">
+        
+        <java classname="teo.isgci.iq.IQ"
+              fork="true"
+              classpathref="run.classpath">
+            <arg value="file://${build.dir}/" />
         </java>
     </target>
 
     <target name="test">
 
-        <java classname="teo.isgci.xml.SmallGraphReader" fork="true"
-      classpathref="run.classpath">
-            <arg file="test.xml"/>
+        <java classname="teo.isgci.xml.SmallGraphReader"
+              fork="true"
+              classpathref="run.classpath">
+            <arg file="test.xml" />
         </java>
     </target>
 
-    <target name="families.graphml"
-   description="Create graphML for families">
+    <target name="families.graphml" description="Create graphML for families">
 
         <xslt style="smallgraphs-yed.xsl"
-      in="${smallgraphs.xml.in}"
-      out="families.graphml"
-      force="true">
-            <classpath refid="run.classpath"/>
-            <factory name="net.sf.saxon.TransformerFactoryImpl"/>
+              in="${smallgraphs.xml.in}"
+              out="families.graphml"
+              force="true">
+            <classpath refid="run.classpath" />
+            <factory name="net.sf.saxon.TransformerFactoryImpl" />
         </xslt>
     </target>
 
