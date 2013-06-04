@@ -38,6 +38,7 @@ public class InclusionResultDialog extends JDialog implements ActionListener {
     protected JButton okButton;
     protected JButton drawButton;
     protected JButton refButton;
+    protected JButton drawNewTabButton;
     protected GridBagLayout gridbag;
     protected GridBagConstraints constraints;
     protected Container content;
@@ -246,20 +247,25 @@ public class InclusionResultDialog extends JDialog implements ActionListener {
         JPanel p = new JPanel();
         refButton = new JButton("View references");
         drawButton = new JButton("Draw");
+        drawNewTabButton = new JButton("Draw in new Tab");
         okButton = new JButton("OK");
         p.add(refButton);
         p.add(drawButton);
+        p.add(drawNewTabButton);
         p.add(okButton);
         constraints.weightx = 0;
         constraints.weighty = 0;
         gridbag.setConstraints(p, constraints);
         content.add(p);
-        if (upper == null  ||  lower == null)
+        if (upper == null  ||  lower == null){
             drawButton.setEnabled(false);
+            drawNewTabButton.setEnabled(false);
+        }
 
         // Add listeners
         okButton.addActionListener(this);
         drawButton.addActionListener(this);
+        drawNewTabButton.addActionListener(this);
         refButton.addActionListener(this);
         setDefaultCloseOperation(DISPOSE_ON_CLOSE);
     }
@@ -549,25 +555,36 @@ public class InclusionResultDialog extends JDialog implements ActionListener {
             closeDialog();
             return;
         } else if (source == drawButton) {
-            Cursor oldcursor = parent.getCursor();
-            setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
-            parent.getActiveCanvas().drawHierarchy(Algo.nodesBetween(upper, lower));
-
-            NodeView node1 = parent.getActiveCanvas().findNode(
-                    DataSet.getClass(nodeName1));
-            NodeView node2 = parent.getActiveCanvas().findNode(
-                    DataSet.getClass(nodeName2));
-            if (node1 != null  && node2 != null) {
-                node1.setNameAndLabel(nodeName1);
-                node2.setNameAndLabel(nodeName2);
-            }
-            
-            setCursor(oldcursor);
-            closeDialog();
-            parent.getActiveCanvas().repaint();
+        	newDrawing(parent.getActiveCanvas());
+        } else if (source == drawNewTabButton) {
+        	newDrawing(parent.getNewCanvas());
         } else if (source == refButton) {
             parent.loader.showDocument("classes/refs00.html");
         }
+    }
+    
+    
+    /**
+     * Draws the selected Graph on a Canvas.
+     * @param canvas The canvas to be drawn on.
+     */
+    private void newDrawing(ISGCIGraphCanvas canvas){
+        Cursor oldcursor = parent.getCursor();
+        setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
+        canvas.drawHierarchy(Algo.nodesBetween(upper, lower));
+
+        NodeView node1 = canvas.findNode(
+                DataSet.getClass(nodeName1));
+        NodeView node2 = canvas.findNode(
+                DataSet.getClass(nodeName2));
+        if (node1 != null  && node2 != null) {
+            node1.setNameAndLabel(nodeName1);
+            node2.setNameAndLabel(nodeName2);
+        }
+        
+        setCursor(oldcursor);
+        closeDialog();
+        canvas.repaint();    	
     }
 
 
