@@ -704,8 +704,7 @@
         <java jar="${isgci.jar}" fork="true">
             <arg value="file://${web.dir}/" />
             <jvmarg value="-Xdebug" />
-            <jvmarg value="-Xrunjdwp:transport=dt_socket,
-                server=y,suspend=y,address=7718" />
+            <jvmarg value="-Xrunjdwp:transport=dt_socket,server=y,suspend=y,address=7718" />
         </java>
     </target>
 
