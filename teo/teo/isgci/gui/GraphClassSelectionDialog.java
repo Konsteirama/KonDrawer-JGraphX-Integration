@@ -36,7 +36,8 @@ public class GraphClassSelectionDialog extends JDialog
     protected ISGCIMainFrame parent;
     protected NodeList classesList;
     protected JCheckBox superCheck, subCheck;
-    protected JButton addButton, removeButton, newButton, cancelButton;
+    protected JButton addButton, removeButton, newButton, cancelButton
+    				, newTabButton;
     protected WebSearch search;
 
     public GraphClassSelectionDialog(ISGCIMainFrame parent) {
@@ -101,11 +102,13 @@ public class GraphClassSelectionDialog extends JDialog
 
         JPanel buttonPanel = new JPanel();
         newButton = new JButton("New drawing");
+        newTabButton = new JButton("Draw in new Tab");
         addButton = new JButton("Add to drawing");
         removeButton = new JButton("Remove from drawing");
         cancelButton = new JButton("Cancel");
         
         buttonPanel.add(newButton);
+        buttonPanel.add(newTabButton);
         //buttonPanel.add(addButton);
         //buttonPanel.add(removeButton);
         buttonPanel.add(cancelButton);
@@ -127,6 +130,7 @@ public class GraphClassSelectionDialog extends JDialog
         addButton.addActionListener(this);
         removeButton.addActionListener(this);
         cancelButton.addActionListener(this);
+        newTabButton.addActionListener(this);
     }
 
     protected void closeDialog() {
@@ -146,23 +150,33 @@ public class GraphClassSelectionDialog extends JDialog
         if (source == cancelButton) {
             closeDialog();
         } else if (source == newButton) {
-            Cursor oldcursor = parent.getCursor();
-            setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
-            parent.getActiveCanvas().drawHierarchy(getNodes());
-            
-            for (Object o : classesList.getSelectedValues()) {
-                GraphClass gc = (GraphClass) o;
-                NodeView v = parent.getActiveCanvas().findNode(gc);
-                if (v != null)
-                    v.setNameAndLabel(gc.toString());
-            }
-            parent.getActiveCanvas().updateBounds();
-            
-            setCursor(oldcursor);
-            closeDialog();
+        	newDrawing(parent.getActiveCanvas());
         } else if (source == search) {
             search.setListData(parent, classesList);
-        } 
+        } else if (source == newTabButton){        	
+        	newDrawing(parent.getNewCanvas());                 
+        }
+    }
+    
+    /**
+     * Draws the selected Graph on a Canvas.
+     * @param canvas The canvas to be drawn on.
+     */
+    private void newDrawing(ISGCIGraphCanvas canvas){
+        Cursor oldcursor = parent.getCursor();
+        setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
+        canvas.drawHierarchy(getNodes());
+        
+        for (Object o : classesList.getSelectedValuesList()) {
+            GraphClass gc = (GraphClass) o;
+            NodeView v = parent.getActiveCanvas().findNode(gc);
+            if (v != null)
+                v.setNameAndLabel(gc.toString());
+        }
+        canvas.updateBounds();
+        
+        setCursor(oldcursor);
+        closeDialog();      	
     }
     
     
@@ -175,7 +189,7 @@ public class GraphClassSelectionDialog extends JDialog
         boolean doSuper = superCheck.isSelected(),
                 doSub = subCheck.isSelected();
        
-        for (Object o : classesList.getSelectedValues()) {
+        for (Object o : classesList.getSelectedValuesList()) {
             GraphClass gc = (GraphClass) o;
             result.add(gc);
             if (doSuper) {
