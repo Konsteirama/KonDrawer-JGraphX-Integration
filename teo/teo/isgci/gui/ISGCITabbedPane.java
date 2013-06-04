@@ -10,16 +10,42 @@
 
 package teo.isgci.gui;
 
+import javax.swing.JPanel;
 import javax.swing.JTabbedPane;
 
 public class ISGCITabbedPane extends JTabbedPane {
 
-    
+    private boolean startpageActive = false;
+    private JPanel startpage;
+	
     public ISGCITabbedPane() {
-        
+    	addStartpage();
     }
     
+    /**
+     * Adds a Startpage to the ISGCITabbedPane.
+     * Should only be called in the Constructor.
+     */
+    private void addStartpage(){
+    	if(startpageActive) return;
+    	startpageActive = true;
+    	startpage = new JPanel();
+        addTab("Welcome", startpage);     	
+    }
     
+    /**
+     * Removes the startpage from the ISGCITabbedPane.
+     */
+    public void removeStartpage(){
+    	remove(startpage);
+    }
+    
+    /**
+     * @return true if the startpage is active, else false
+     */
+    public boolean startpageIsActive(){
+    	return startpageActive;
+    }
 }
 
 /* EOF */

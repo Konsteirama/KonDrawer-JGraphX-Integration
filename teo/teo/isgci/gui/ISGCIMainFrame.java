@@ -154,7 +154,6 @@ public class ISGCIMainFrame extends JFrame
         // TODO: should not add a canvaspanel on creation; 
         // instead there should be a startpage of some sort 
         tabbedPane = new ISGCITabbedPane();
-        tabbedPane.addTab("Welcome", new JPanel()); 
         
         getContentPane().add(tabbedPane, BorderLayout.CENTER);
         
@@ -177,6 +176,16 @@ public class ISGCIMainFrame extends JFrame
             tabbedPane.addTab("Test", createCanvasPanel());
             return (ISGCIGraphCanvas) tabbedPane.getSelectedComponent();
         }
+    }
+    
+    public ISGCIGraphCanvas getNewCanvas(){
+    	if(tabbedPane.startpageIsActive()){
+    		tabbedPane.removeStartpage();
+    	}
+    	ISGCIGraphCanvas panel = createCanvasPanel();
+        tabbedPane.addTab("Test", panel);
+        tabbedPane.setSelectedComponent(panel);
+        return (ISGCIGraphCanvas) tabbedPane.getSelectedComponent();
     }
     
     /**
