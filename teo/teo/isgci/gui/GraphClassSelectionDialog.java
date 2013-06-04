@@ -104,6 +104,7 @@ public class GraphClassSelectionDialog extends JDialog
         addButton = new JButton("Add to drawing");
         removeButton = new JButton("Remove from drawing");
         cancelButton = new JButton("Cancel");
+        
         buttonPanel.add(newButton);
         //buttonPanel.add(addButton);
         //buttonPanel.add(removeButton);
@@ -147,22 +148,21 @@ public class GraphClassSelectionDialog extends JDialog
         } else if (source == newButton) {
             Cursor oldcursor = parent.getCursor();
             setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
-            parent.graphCanvas.drawHierarchy(getNodes());
+            parent.getActiveCanvas().drawHierarchy(getNodes());
             
             for (Object o : classesList.getSelectedValues()) {
                 GraphClass gc = (GraphClass) o;
-                NodeView v = parent.graphCanvas.findNode(gc);
+                NodeView v = parent.getActiveCanvas().findNode(gc);
                 if (v != null)
                     v.setNameAndLabel(gc.toString());
             }
-            parent.graphCanvas.updateBounds();
+            parent.getActiveCanvas().updateBounds();
             
             setCursor(oldcursor);
             closeDialog();
         } else if (source == search) {
             search.setListData(parent, classesList);
-        }
-
+        } 
     }
     
     

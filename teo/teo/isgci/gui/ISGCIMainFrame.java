@@ -61,7 +61,9 @@ public class ISGCIMainFrame extends JFrame
 
     // This is where the drawing goes.
     protected JScrollPane drawingPane;
-    public ISGCIGraphCanvas graphCanvas;
+    // TEST
+    //public ISGCIGraphCanvas graphCanvas;
+    private ISGCITabbedPane tabbedPane;
 
 
     /** Creates the frame.
@@ -151,10 +153,10 @@ public class ISGCIMainFrame extends JFrame
         // Create and add tabbed interface for canvas
         // TODO: should not add a canvaspanel on creation; 
         // instead there should be a startpage of some sort 
-        ISGCITabbedPane tabbedpane = new ISGCITabbedPane();
-        tabbedpane.addTab("Welcome", createCanvasPanel()); 
-        getContentPane().add(tabbedpane, BorderLayout.CENTER);
+        tabbedPane = new ISGCITabbedPane();
+        tabbedPane.addTab("Welcome", new JPanel()); 
         
+        getContentPane().add(tabbedPane, BorderLayout.CENTER);
         
         //getContentPane().add("Center", createCanvasPanel());
         registerListeners();
@@ -163,7 +165,20 @@ public class ISGCIMainFrame extends JFrame
         setVisible(true);
     }
 
-
+    
+    public ISGCIGraphCanvas getActiveCanvas() {
+        if (tabbedPane.getSelectedComponent() instanceof ISGCIGraphCanvas) {
+            return (ISGCIGraphCanvas) tabbedPane.getSelectedComponent();
+        } else {
+            System.out.println("Creating new Tab");
+            // remove current tab as it should be the startpage
+            tabbedPane.remove(tabbedPane.getSelectedIndex());
+            // create and return the new canvaspanel
+            tabbedPane.addTab("Test", createCanvasPanel());
+            return (ISGCIGraphCanvas) tabbedPane.getSelectedComponent();
+        }
+    }
+    
     /**
      * Write the entire database in GraphML to isgcifull.graphml.
      */
@@ -296,16 +311,17 @@ public class ISGCIMainFrame extends JFrame
      * right.
      * @return the panel
      */
-    protected JComponent createCanvasPanel() {
-        graphCanvas = new ISGCIGraphCanvas(this);
-        drawingPane = new JScrollPane(graphCanvas,
-                JScrollPane.VERTICAL_SCROLLBAR_ALWAYS,
-                JScrollPane.HORIZONTAL_SCROLLBAR_ALWAYS);
-        
-        drawingPane.getHorizontalScrollBar().setUnitIncrement(100);
-        drawingPane.getVerticalScrollBar().setUnitIncrement(100);
-        
-        return drawingPane;
+    protected ISGCIGraphCanvas createCanvasPanel() {
+        ISGCIGraphCanvas graphCanvas = new ISGCIGraphCanvas(this);
+        return graphCanvas;
+//        drawingPane = new JScrollPane(graphCanvas,
+//                JScrollPane.VERTICAL_SCROLLBAR_ALWAYS,
+//                JScrollPane.HORIZONTAL_SCROLLBAR_ALWAYS);
+//        
+//        drawingPane.getHorizontalScrollBar().setUnitIncrement(100);
+//        drawingPane.getVerticalScrollBar().setUnitIncrement(100);
+//        
+//        return drawingPane;
     }
 
     /**
@@ -425,7 +441,7 @@ public class ISGCIMainFrame extends JFrame
         Object object = event.getSource();
 
         if (object == miDrawUnproper) {
-            graphCanvas.setDrawUnproper(
+            getActiveCanvas().setDrawUnproper(
                     ((JCheckBoxMenuItem) object).getState());
         }
     }

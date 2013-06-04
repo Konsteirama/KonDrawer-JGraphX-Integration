@@ -370,7 +370,7 @@ public class ExportDialog extends JDialog implements ActionListener {
                     fittopage.isSelected(), keepsideratio.isSelected(),
                     rotate.isSelected(), color.isSelected());
 
-            parent.graphCanvas.forcePaint(g);
+            parent.getActiveCanvas().forcePaint(g);
             outstr = g.getContent();
             g.dispose();
             out.writeBytes(outstr);
@@ -397,11 +397,11 @@ public class ExportDialog extends JDialog implements ActionListener {
             GraphMLWriter w = new GraphMLWriter(out,
                     gmlYed.isSelected() ?
                         GraphMLWriter.MODE_YED : GraphMLWriter.MODE_PLAIN,
-                    parent.graphCanvas.getDrawUnproper(),
+                    parent.getActiveCanvas().getDrawUnproper(),
                     gmlHtml.isSelected());
 
             w.startDocument();
-            parent.graphCanvas.write(w);
+            parent.getActiveCanvas().write(w);
             w.endDocument();
         } catch (IOException ex)  {
             res = ex;
@@ -425,7 +425,7 @@ public class ExportDialog extends JDialog implements ActionListener {
         try {
             out = new OutputStreamWriter(f, "UTF-8");
             SVGGraphics g = new SVGGraphics();
-            parent.graphCanvas.forcePaint(g);
+            parent.getActiveCanvas().forcePaint(g);
             outstr = g.getContent();
             g.dispose();
             out.write(outstr, 0, outstr.length());

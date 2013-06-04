@@ -40,9 +40,9 @@ public class EdgePopup extends JPopupMenu implements ActionListener {
         if (source == infoItem) {
             JDialog d = InclusionResultDialog.newInstance(parent,
                 DataSet.getClass(
-                    parent.graphCanvas.getView(view.getFrom()).getFullName()),
+                    parent.getActiveCanvas().getView(view.getFrom()).getFullName()),
                 DataSet.getClass(
-                    parent.graphCanvas.getView(view.getTo()).getFullName()));
+                    parent.getActiveCanvas().getView(view.getTo()).getFullName()));
             d.setLocation(50, 50);
             d.pack();
             d.setVisible(true);

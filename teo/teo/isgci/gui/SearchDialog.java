@@ -34,7 +34,7 @@ public class SearchDialog extends JDialog implements ActionListener {
         super(parent, "Search for a graphclass", true);
         this.parent = parent;
         group = new ButtonGroup();
-        Algo.NamePref mode = parent.graphCanvas.getNamingPref();
+        Algo.NamePref mode = parent.getActiveCanvas().getNamingPref();
         Container content = getContentPane();
 
         GridBagLayout gridbag = new GridBagLayout();
@@ -72,7 +72,7 @@ public class SearchDialog extends JDialog implements ActionListener {
         cancelButton.addActionListener(this);
         setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
     
-        List<GraphClass> names = parent.graphCanvas.getClasses();
+        List<GraphClass> names = parent.getActiveCanvas().getClasses();
         if (!names.isEmpty()) {
             Collections.sort(names, new LessLatex());
             classesList.setListData(names);
@@ -93,10 +93,10 @@ public class SearchDialog extends JDialog implements ActionListener {
         if (source == cancelButton) {
             closeDialog();
         } else if (source == searchButton) {
-            NodeView view = parent.graphCanvas.findNode(
+            NodeView view = parent.getActiveCanvas().findNode(
                             classesList.getSelectedNode());
-            parent.graphCanvas.markOnly(view);
-            parent.graphCanvas.centerNode(view);
+            parent.getActiveCanvas().markOnly(view);
+            parent.getActiveCanvas().centerNode(view);
             closeDialog();
         }
     }

@@ -48,7 +48,7 @@ public class ProblemsMenu extends JMenu implements ActionListener {
     }
 
     public void actionPerformed(ActionEvent event) {
-        parent.graphCanvas.setProblem(
+        parent.getActiveCanvas().setProblem(
                 DataSet.getProblem(event.getActionCommand()));
     }
 }

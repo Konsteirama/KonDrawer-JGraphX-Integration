@@ -551,11 +551,11 @@ public class InclusionResultDialog extends JDialog implements ActionListener {
         } else if (source == drawButton) {
             Cursor oldcursor = parent.getCursor();
             setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
-            parent.graphCanvas.drawHierarchy(Algo.nodesBetween(upper, lower));
+            parent.getActiveCanvas().drawHierarchy(Algo.nodesBetween(upper, lower));
 
-            NodeView node1 = parent.graphCanvas.findNode(
+            NodeView node1 = parent.getActiveCanvas().findNode(
                     DataSet.getClass(nodeName1));
-            NodeView node2 = parent.graphCanvas.findNode(
+            NodeView node2 = parent.getActiveCanvas().findNode(
                     DataSet.getClass(nodeName2));
             if (node1 != null  && node2 != null) {
                 node1.setNameAndLabel(nodeName1);
@@ -564,7 +564,7 @@ public class InclusionResultDialog extends JDialog implements ActionListener {
             
             setCursor(oldcursor);
             closeDialog();
-            parent.graphCanvas.repaint();
+            parent.getActiveCanvas().repaint();
         } else if (source == refButton) {
             parent.loader.showDocument("classes/refs00.html");
         }

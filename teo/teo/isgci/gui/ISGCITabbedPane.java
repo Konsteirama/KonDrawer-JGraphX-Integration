@@ -14,6 +14,12 @@ import javax.swing.JTabbedPane;
 
 public class ISGCITabbedPane extends JTabbedPane {
 
+    
+    public ISGCITabbedPane() {
+        
+    }
+    
+    
 }
 
 /* EOF */
