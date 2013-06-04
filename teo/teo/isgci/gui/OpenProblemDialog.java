@@ -44,7 +44,7 @@ public class OpenProblemDialog extends JDialog
     protected NodeList npList, openList, pList;
     protected ListGroup lists;
     protected Problem problem;
-    protected JButton closeButton, showButton, drawButton;
+    protected JButton closeButton, showButton, drawButton, drawNewTabButton;
 
 
     public OpenProblemDialog(ISGCIMainFrame parent, String problem) {
@@ -131,9 +131,11 @@ public class OpenProblemDialog extends JDialog
 
         JPanel buttonPanel = new JPanel();
         drawButton = new JButton("Draw");
+        drawNewTabButton = new JButton("Draw in New Tab");
         showButton = new JButton("Class info");
         closeButton = new JButton("Close");
         buttonPanel.add(drawButton);
+        buttonPanel.add(drawNewTabButton);
         buttonPanel.add(showButton);
         buttonPanel.add(closeButton);
         c.insets = new Insets(5, 0, 5, 0);
@@ -144,6 +146,7 @@ public class OpenProblemDialog extends JDialog
         handleButtons();
 
         drawButton.addActionListener(this);
+        drawNewTabButton.addActionListener(this);
         showButton.addActionListener(this);
         closeButton.addActionListener(this);
         pack();
@@ -244,12 +247,9 @@ inP:
     public void actionPerformed(ActionEvent event) {
         Object source = event.getSource();
         if (source == drawButton) {
-            Cursor oldcursor = parent.getCursor();
-            setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
-            parent.getActiveCanvas().drawHierarchy(
-                    getNodes(lists.getSelectedNode()));
-            setCursor(oldcursor);
-            closeDialog();
+        	newDrawing(parent.getActiveCanvas());
+        } else if (source == drawNewTabButton) {
+        	newDrawing(parent.getNewCanvas());
         } else if (source == showButton) {
             JDialog info = new GraphClassInformationDialog(
                     parent, lists.getSelectedNode());
@@ -260,6 +260,18 @@ inP:
         } else if (source == closeButton) {
             closeDialog();
         }
+    }    
+    
+    /**
+     * Draws the selected Graph on a Canvas.
+     * @param canvas The canvas to be drawn on.
+     */
+    private void newDrawing(ISGCIGraphCanvas canvas){
+        Cursor oldcursor = parent.getCursor();
+        setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
+        canvas.drawHierarchy(getNodes(lists.getSelectedNode()));
+        setCursor(oldcursor);
+        closeDialog();    	
     }
 
 
@@ -286,9 +298,11 @@ inP:
         if (lists.getSelectedItem() == null) {
             showButton.setEnabled(false);
             drawButton.setEnabled(false);
+            drawNewTabButton.setEnabled(false);
         } else {
             showButton.setEnabled(true);
             drawButton.setEnabled(true);
+            drawNewTabButton.setEnabled(true);
         }
     }
 
