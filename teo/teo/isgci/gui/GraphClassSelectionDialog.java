@@ -13,9 +13,11 @@ package teo.isgci.gui;
 
 import teo.isgci.gc.GraphClass;
 import teo.isgci.grapht.BFSWalker;
+import teo.isgci.grapht.GAlg;
 import teo.isgci.grapht.Inclusion;
 import teo.isgci.grapht.RevBFSWalker;
 import teo.isgci.grapht.GraphWalker;
+import teo.isgci.db.Algo;
 import teo.isgci.db.DataSet;
 import java.awt.Cursor;
 import java.awt.GridBagLayout;
@@ -26,6 +28,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.HashSet;
 import java.util.Collection;
+import java.util.List;
 import java.util.Set;
 
 import javax.swing.JButton;
@@ -36,6 +39,8 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 
 import org.jgrapht.graph.DefaultEdge;
+import org.jgrapht.graph.SimpleDirectedGraph;
+import org.jgrapht.Graphs;
 
 /**
  * Display a list of graphclasses and change the drawing according to the
@@ -50,6 +55,7 @@ public class GraphClassSelectionDialog extends JDialog implements
     protected JButton addButton, removeButton, newButton, cancelButton,
             newTabButton;
     protected WebSearch search;
+ 
 
     public GraphClassSelectionDialog(ISGCIMainFrame parent) {
         super(parent, "Select Graph Classes", false);
@@ -159,43 +165,58 @@ public class GraphClassSelectionDialog extends JDialog implements
         Object source = event.getSource();
         if (source == cancelButton) {
             closeDialog();
-        } else if (source == newButton) {
-            newDrawing(parent.getActiveCanvas());
+        } else if (source == newButton) { // TODO Jannis check if correct
+            SimpleDirectedGraph<Set<GraphClass>, DefaultEdge> graph 
+                = getGraph();
+            parent.getTabbedPane().drawInActiveTab(graph);
+            closeDialog();
         } else if (source == search) {
             search.setListData(parent, classesList);
-        } else if (source == newTabButton) {
-            newDrawing(parent.getNewCanvas());
+        } else if (source == newTabButton) { // TODO Jannis check if correct
+            SimpleDirectedGraph<Set<GraphClass>, DefaultEdge> graph 
+                = getGraph();
+            parent.getTabbedPane().drawInNewTab(graph);
+            closeDialog();
         }
     }
 
     /**
-     * Draws the selected Graph on a Canvas.
+     * Generates and returns a SimpleDirectedGraph of GraphClasses.
+     * Generation is dependant on what was chosen by the user in 
+     * the {@link #classesList} and whether {@link #subCheck} and
+     * {@link #superCheck} were checked.
      * 
-     * @param canvas
-     *            The canvas to be drawn on.
+     * @return
+     *          The graph that represents the GraphClass and their sub-
+     *          and superclasses.
      */
-    private void newDrawing(final ISGCIGraphCanvas canvas) {
-        Cursor oldcursor = parent.getCursor();
-        setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
-        canvas.drawHierarchy(getNodes());
+    private SimpleDirectedGraph<Set<GraphClass>, DefaultEdge> getGraph() {
+        Collection<GraphClass> nodes = getNodes();
+        
+        SimpleDirectedGraph<Set<GraphClass>, DefaultEdge> graph =
+                Algo.createHierarchySubgraph(nodes);
 
-        for (Object o : classesList.getSelectedValuesList()) {
-            GraphClass gc = (GraphClass) o;
-            NodeView<Set<GraphClass>, DefaultEdge> v 
-                = parent.getActiveCanvas().findNode(gc);
-            if (v != null) {
-                v.setNameAndLabel(gc.toString());
+            List<SimpleDirectedGraph<Set<GraphClass>, DefaultEdge>> list =
+                    GAlg.split(graph, DefaultEdge.class);
+
+            SimpleDirectedGraph<Set<GraphClass>, DefaultEdge> superGraph
+                = new SimpleDirectedGraph<Set<GraphClass>, DefaultEdge>(
+                        DefaultEdge.class);
+            
+            for (SimpleDirectedGraph<Set<GraphClass>, DefaultEdge> subGraph 
+                    : list) {
+                Graphs.addGraph(superGraph, subGraph);
             }
-        }
-        canvas.updateBounds();
-
-        setCursor(oldcursor);
-        closeDialog();
+            
+            return superGraph;
     }
-
+    
     /**
      * Returns a Collection with the classes (in DataSet.inclGraph) that are
      * selected by the current settings.
+     * 
+     * @return
+     *          The Collection of GraphClasses based on userselection
      */
     protected final Collection<GraphClass> getNodes() {
         final HashSet<GraphClass> result = new HashSet<GraphClass>();
@@ -208,7 +229,7 @@ public class GraphClassSelectionDialog extends JDialog implements
             if (doSuper) {
                 new RevBFSWalker<GraphClass, Inclusion>(DataSet.inclGraph, gc,
                         null, GraphWalker.InitCode.DYNAMIC) {
-                    public void visit(GraphClass v) {
+                    public void visit(final GraphClass v) {
                         result.add(v);
                         super.visit(v);
                     }
@@ -217,7 +238,7 @@ public class GraphClassSelectionDialog extends JDialog implements
             if (doSub) {
                 new BFSWalker<GraphClass, Inclusion>(DataSet.inclGraph, gc,
                         null, GraphWalker.InitCode.DYNAMIC) {
-                    public void visit(GraphClass v) {
+                    public void visit(final GraphClass v) {
                         result.add(v);
                         super.visit(v);
                     }

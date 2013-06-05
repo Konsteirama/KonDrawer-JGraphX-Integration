@@ -11,18 +11,19 @@
 package teo.isgci.gui;
 
 import java.awt.BorderLayout;
-import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.event.*;
 import javax.swing.*;
-import javax.swing.event.*;
-import java.net.*;
 import java.io.*;
+import java.util.HashMap;
+import java.util.Map;
+
 import teo.isgci.db.DataSet;
-import teo.isgci.db.Ref;
+import teo.isgci.drawing.DrawingLibraryInterface;
+import teo.isgci.drawing.JGraphXAdapter;
 import teo.isgci.problem.*;
 import teo.isgci.gc.ForbiddenClass;
 import teo.isgci.gc.GraphClass;
@@ -30,6 +31,18 @@ import teo.isgci.gc.GraphClass;
 import java.awt.Color;
 import org.jgrapht.*;
 import org.jgrapht.graph.SimpleDirectedGraph;
+
+import com.mxgraph.layout.mxFastOrganicLayout;
+import com.mxgraph.layout.mxIGraphLayout;
+import com.mxgraph.layout.hierarchical.mxHierarchicalLayout;
+import com.mxgraph.swing.mxGraphComponent;
+import com.mxgraph.swing.util.mxMorphing;
+import com.mxgraph.util.mxConstants;
+import com.mxgraph.util.mxEvent;
+import com.mxgraph.util.mxEventObject;
+import com.mxgraph.util.mxEventSource.mxIEventListener;
+import com.mxgraph.view.mxStylesheet;
+
 import teo.isgci.grapht.*;
 import teo.isgci.xml.GraphMLWriter;
 
@@ -40,7 +53,7 @@ import java.util.ArrayList;*/
 /** The main frame of the application.
  */
 public class ISGCIMainFrame extends JFrame
-        implements WindowListener, ActionListener, ItemListener {
+        implements WindowListener, ActionListener {
 
     public static final String APPLICATIONNAME = "ISGCI";
 
@@ -61,8 +74,10 @@ public class ISGCIMainFrame extends JFrame
 
     // This is where the drawing goes.
     protected JScrollPane drawingPane;
-    // TEST
-    //public ISGCIGraphCanvas graphCanvas;
+
+    /**
+     * The tabbed Pane which handles all tabs and their creation / deletion.
+     */
     private ISGCITabbedPane tabbedPane;
 
 
@@ -72,7 +87,9 @@ public class ISGCIMainFrame extends JFrame
      */
     public ISGCIMainFrame(teo.Loader loader) {
         super(APPLICATIONNAME);
-
+        
+        
+        
         loader.register();
         this.loader = loader;
         tracker = this;
@@ -163,29 +180,14 @@ public class ISGCIMainFrame extends JFrame
         pack();
         setVisible(true);
     }
-
     
-    public ISGCIGraphCanvas getActiveCanvas() {
-        if (tabbedPane.getSelectedComponent() instanceof ISGCIGraphCanvas) {
-            return (ISGCIGraphCanvas) tabbedPane.getSelectedComponent();
-        } else {
-            System.out.println("Creating new Tab");
-            // remove current tab as it should be the startpage
-            tabbedPane.remove(tabbedPane.getSelectedIndex());
-            // create and return the new canvaspanel
-            tabbedPane.addTab("Test", createCanvasPanel());
-            return (ISGCIGraphCanvas) tabbedPane.getSelectedComponent();
-        }
-    }
-    
-    public ISGCIGraphCanvas getNewCanvas(){
-    	if(tabbedPane.startpageIsActive()){
-    		tabbedPane.removeStartpage();
-    	}
-    	ISGCIGraphCanvas panel = createCanvasPanel();
-        tabbedPane.addTab("Test", panel);
-        tabbedPane.setSelectedComponent(panel);
-        return (ISGCIGraphCanvas) tabbedPane.getSelectedComponent();
+    /**
+     * Getter for {link {@link #tabbedPane}.
+     * @return
+     *          Returns {link {@link #tabbedPane}.
+     */
+    public ISGCITabbedPane getTabbedPane() {
+        return tabbedPane;
     }
     
     /**
@@ -233,7 +235,7 @@ public class ISGCIMainFrame extends JFrame
         miExit.addActionListener(this);
         miNaming.addActionListener(this);
         miSearching.addActionListener(this);
-        miDrawUnproper.addItemListener(this);
+        //miDrawUnproper.addItemListener(this); // TODO
         miSelectGraphClasses.addActionListener(this);
         miCheckInclusion.addActionListener(this);
         miGraphClassInformation.addActionListener(this);
@@ -446,14 +448,14 @@ public class ISGCIMainFrame extends JFrame
         }
     }
 
-    public void itemStateChanged(ItemEvent event) {
-        Object object = event.getSource();
-
-        if (object == miDrawUnproper) {
-            getActiveCanvas().setDrawUnproper(
-                    ((JCheckBoxMenuItem) object).getState());
-        }
-    }
+//    public void itemStateChanged(ItemEvent event) {
+//        Object object = event.getSource();
+//
+//        if (object == miDrawUnproper) {
+//            getActiveCanvas().setDrawUnproper(
+//                    ((JCheckBoxMenuItem) object).getState());
+//        }
+//    }
 }
 
 
