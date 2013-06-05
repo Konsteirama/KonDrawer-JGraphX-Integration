@@ -555,9 +555,11 @@ public class InclusionResultDialog extends JDialog implements ActionListener {
             closeDialog();
             return;
         } else if (source == drawButton) {
-        	newDrawing(parent.getActiveCanvas());
+            // TODO jannis
+            //newDrawing(parent.getActiveCanvas());
         } else if (source == drawNewTabButton) {
-        	newDrawing(parent.getNewCanvas());
+            // TODO jannis
+            //newDrawing(parent.getNewCanvas());
         } else if (source == refButton) {
             parent.loader.showDocument("classes/refs00.html");
         }

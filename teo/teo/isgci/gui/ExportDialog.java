@@ -370,7 +370,8 @@ public class ExportDialog extends JDialog implements ActionListener {
                     fittopage.isSelected(), keepsideratio.isSelected(),
                     rotate.isSelected(), color.isSelected());
 
-            parent.getActiveCanvas().forcePaint(g);
+            // TODO jannis
+            //parent.getActiveCanvas().forcePaint(g);
             outstr = g.getContent();
             g.dispose();
             out.writeBytes(outstr);
@@ -388,29 +389,30 @@ public class ExportDialog extends JDialog implements ActionListener {
      * Export to GraphML.
      */
     protected void exportGML(FileOutputStream f) throws Exception {
-        Exception res = null;
-        String outstr;
-        Writer out = null;
-        
-        try {
-            out = new OutputStreamWriter(f, "UTF-8");
-            GraphMLWriter w = new GraphMLWriter(out,
-                    gmlYed.isSelected() ?
-                        GraphMLWriter.MODE_YED : GraphMLWriter.MODE_PLAIN,
-                    parent.getActiveCanvas().getDrawUnproper(),
-                    gmlHtml.isSelected());
-
-            w.startDocument();
-            parent.getActiveCanvas().write(w);
-            w.endDocument();
-        } catch (IOException ex)  {
-            res = ex;
-        } finally {
-            out.close();
-        }
-        
-        if (res != null)
-            throw res;
+        // TODO jannis
+//        Exception res = null;
+//        String outstr;
+//        Writer out = null;
+//        
+//        try {
+//            out = new OutputStreamWriter(f, "UTF-8");
+//            GraphMLWriter w = new GraphMLWriter(out,
+//                    gmlYed.isSelected() ?
+//                        GraphMLWriter.MODE_YED : GraphMLWriter.MODE_PLAIN,
+//                    parent.getActiveCanvas().getDrawUnproper(),
+//                    gmlHtml.isSelected());
+//
+//            w.startDocument();
+//            parent.getActiveCanvas().write(w);
+//            w.endDocument();
+//        } catch (IOException ex)  {
+//            res = ex;
+//        } finally {
+//            out.close();
+//        }
+//        
+//        if (res != null)
+//            throw res;
     }
 
 
@@ -425,7 +427,11 @@ public class ExportDialog extends JDialog implements ActionListener {
         try {
             out = new OutputStreamWriter(f, "UTF-8");
             SVGGraphics g = new SVGGraphics();
-            parent.getActiveCanvas().forcePaint(g);
+            
+            // TODO jannis
+            //parent.getActiveCanvas().forcePaint(g);
+            
+            
             outstr = g.getContent();
             g.dispose();
             out.write(outstr, 0, outstr.length());

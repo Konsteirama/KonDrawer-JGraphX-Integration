@@ -31,14 +31,13 @@ import teo.isgci.problem.*;
 import teo.isgci.grapht.*;
 import teo.isgci.util.LessLatex;
 
-
 /**
  * Displays three lists of graph classes: Minimal classes for which the given
  * problem is NP-complete, maximal classes for which the problem is polynomial,
  * and classes for which the problem is still open.
  */
-public class OpenProblemDialog extends JDialog
-        implements ItemListener, ActionListener, ListSelectionListener {
+public class OpenProblemDialog extends JDialog implements ItemListener,
+        ActionListener, ListSelectionListener {
     protected ISGCIMainFrame parent;
     protected JCheckBox fullBoundary;
     protected NodeList npList, openList, pList;
@@ -46,14 +45,13 @@ public class OpenProblemDialog extends JDialog
     protected Problem problem;
     protected JButton closeButton, showButton, drawButton, drawNewTabButton;
 
-
     public OpenProblemDialog(ISGCIMainFrame parent, String problem) {
-        super(parent, "Boundary classes for "+problem, false);
+        super(parent, "Boundary classes for " + problem, false);
         this.parent = parent;
         this.problem = DataSet.getProblem(problem);
         if (this.problem == null)
-            throw new IllegalArgumentException(
-                    "Problem "+ problem +" not found?!");
+            throw new IllegalArgumentException("Problem " + problem
+                    + " not found?!");
 
         lists = new ListGroup(3);
         JScrollPane scroller;
@@ -79,7 +77,7 @@ public class OpenProblemDialog extends JDialog
         gridbag.setConstraints(fullBoundary, c);
         contents.add(fullBoundary);
 
-        //---- NPC/open/P labels ----
+        // ---- NPC/open/P labels ----
         c.gridwidth = 1;
         c.insets = new Insets(0, 5, 0, 0);
         label = new JLabel("Minimal (co)NP-complete:", JLabel.LEFT);
@@ -95,7 +93,7 @@ public class OpenProblemDialog extends JDialog
         gridbag.setConstraints(label, c);
         contents.add(label);
 
-        //---- NPC/open/P classes ----
+        // ---- NPC/open/P classes ----
         c.insets = new Insets(0, 5, 5, 5);
         c.fill = GridBagConstraints.BOTH;
         c.gridwidth = 1;
@@ -153,12 +151,10 @@ public class OpenProblemDialog extends JDialog
         setSize(700, 300);
     }
 
-
     protected void closeDialog() {
         setVisible(false);
         dispose();
     }
-
 
     /**
      * Set the contents of the open list.
@@ -174,22 +170,21 @@ public class OpenProblemDialog extends JDialog
         openList.setListData(v.iterator());
     }
 
-
     /**
      * Set the contents of P/NP lists as all boundary classes.
      */
     private void initListsBoundary() {
         TreeSet<GraphClass> npc = new TreeSet<GraphClass>(new LessLatex());
         TreeSet<GraphClass> p = new TreeSet<GraphClass>(new LessLatex());
-        
+
         for (Inclusion e : DataSet.inclGraph.edgeSet()) {
             Complexity cfrom = problem.getComplexity(e.getSuper());
             Complexity cto = problem.getComplexity(e.getSub());
-            if (cfrom.likelyNotP()  &&  !cto.equals(cfrom)) {
+            if (cfrom.likelyNotP() && !cto.equals(cfrom)) {
                 npc.addAll(DataSet.getEquivalentClasses(e.getSuper()));
             }
-            if (cto.betterOrEqual(Complexity.P)  &&
-                    (cfrom.isUnknown() || cfrom.likelyNotP())) {
+            if (cto.betterOrEqual(Complexity.P)
+                    && (cfrom.isUnknown() || cfrom.likelyNotP())) {
                 p.addAll(DataSet.getEquivalentClasses(e.getSub()));
             }
         }
@@ -198,43 +193,40 @@ public class OpenProblemDialog extends JDialog
         pList.setListData(p.iterator());
     }
 
-
     /**
-     * Set the contents of P/NP lists as all minimal/maximal boundary
-     * classes.
+     * Set the contents of P/NP lists as all minimal/maximal boundary classes.
      */
     private void initListsMinMax() {
         TreeSet<GraphClass> npc = new TreeSet<GraphClass>(new LessLatex());
         TreeSet<GraphClass> p = new TreeSet<GraphClass>(new LessLatex());
 
         for (GraphClass gc : DataSet.getClasses()) {
-            if (npc.contains(gc)  ||   p.contains(gc))
+            if (npc.contains(gc) || p.contains(gc))
                 continue;
 
             Complexity c = problem.getComplexity(gc);
             Set<GraphClass> equs = DataSet.getEquivalentClasses(gc);
 
-notP:
-            if (c.likelyNotP()) {
+            notP: if (c.likelyNotP()) {
                 for (GraphClass equ : equs)
-                    for (GraphClass down :
-                            GAlg.outNeighboursOf(DataSet.inclGraph, equ)) {
-                        if (problem.getComplexity(down).likelyNotP()  &&  
-                                !equs.contains(down))
+                    for (GraphClass down : GAlg.outNeighboursOf(
+                            DataSet.inclGraph, equ)) {
+                        if (problem.getComplexity(down).likelyNotP()
+                                && !equs.contains(down))
                             break notP;
                     }
                 npc.addAll(equs);
             }
 
-inP:
-            if (c.betterOrEqual(Complexity.P)) {
+            inP: if (c.betterOrEqual(Complexity.P)) {
                 for (GraphClass equ : equs)
-                    for (GraphClass up :
-                            GAlg.inNeighboursOf(DataSet.inclGraph, equ)) {
+                    for (GraphClass up : GAlg.inNeighboursOf(DataSet.inclGraph,
+                            equ)) {
                         if (problem.getComplexity(up).betterOrEqual(
-                                Complexity.P)  &&  !equs.contains(up))
-                        break inP;
-                }
+                                Complexity.P)
+                                && !equs.contains(up))
+                            break inP;
+                    }
                 p.addAll(equs);
             }
         }
@@ -242,17 +234,18 @@ inP:
         npList.setListData(npc.iterator());
         pList.setListData(p.iterator());
     }
-        
 
     public void actionPerformed(ActionEvent event) {
         Object source = event.getSource();
         if (source == drawButton) {
-        	newDrawing(parent.getActiveCanvas());
+            // TODO jannis
+            //newDrawing(parent.getActiveCanvas());
         } else if (source == drawNewTabButton) {
-        	newDrawing(parent.getNewCanvas());
+            // TODO jannis
+            //newDrawing(parent.getNewCanvas());
         } else if (source == showButton) {
-            JDialog info = new GraphClassInformationDialog(
-                    parent, lists.getSelectedNode());
+            JDialog info = new GraphClassInformationDialog(parent,
+                    lists.getSelectedNode());
             info.setLocation(50, 50);
             info.pack();
             info.setSize(800, 600);
@@ -260,20 +253,21 @@ inP:
         } else if (source == closeButton) {
             closeDialog();
         }
-    }    
-    
+    }
+
     /**
      * Draws the selected Graph on a Canvas.
-     * @param canvas The canvas to be drawn on.
+     * 
+     * @param canvas
+     *            The canvas to be drawn on.
      */
-    private void newDrawing(ISGCIGraphCanvas canvas){
+    private void newDrawing(ISGCIGraphCanvas canvas) {
         Cursor oldcursor = parent.getCursor();
         setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
         canvas.drawHierarchy(getNodes(lists.getSelectedNode()));
         setCursor(oldcursor);
-        closeDialog();    	
+        closeDialog();
     }
-
 
     public void itemStateChanged(ItemEvent event) {
         Object source = event.getSource();
@@ -285,14 +279,12 @@ inP:
         }
     }
 
-
     public void valueChanged(ListSelectionEvent event) {
         handleButtons();
     }
 
-
-    /** Enables/disables the buttons depending on whether any items are
-     * selected
+    /**
+     * Enables/disables the buttons depending on whether any items are selected
      */
     public void handleButtons() {
         if (lists.getSelectedItem() == null) {
@@ -324,26 +316,20 @@ inP:
         return result;
     }
 
-
     /**
-     * Return a collection with the environment of the given node.
-     * The environment is found by walking over open super/subclasses until the
+     * Return a collection with the environment of the given node. The
+     * environment is found by walking over open super/subclasses until the
      * first non-open node is reached.
      */
     private Collection<GraphClass> getNodesOpen(GraphClass node,
             final Problem problem) {
-        /*final ArrayList<GraphClass> result = new ArrayList<GraphClass>();
-        new UBFSWalker<GraphClass,Inclusion>(
-                DataSet.inclGraph, node, null, GraphWalker.InitCode.DYNAMIC) {
-            public void visit(GraphClass v) {
-                result.add(v);
-                Complexity c = problem.getComplexity(v);
-                if (c.isUnknown())
-                    super.visit(v);
-                else
-                    finish(v);
-            }
-        }.run();*/
+        /*
+         * final ArrayList<GraphClass> result = new ArrayList<GraphClass>(); new
+         * UBFSWalker<GraphClass,Inclusion>( DataSet.inclGraph, node, null,
+         * GraphWalker.InitCode.DYNAMIC) { public void visit(GraphClass v) {
+         * result.add(v); Complexity c = problem.getComplexity(v); if
+         * (c.isUnknown()) super.visit(v); else finish(v); } }.run();
+         */
 
         ArrayList<GraphClass> result = new ArrayList<GraphClass>();
         result.addAll(getNodesNP(node, problem));
@@ -352,17 +338,16 @@ inP:
         return result;
     }
 
-
     /**
-     * Return a collection with the environment of the given node.
-     * The environment is found by walking over open subclasses until the
-     * first polynomial node is reached.
+     * Return a collection with the environment of the given node. The
+     * environment is found by walking over open subclasses until the first
+     * polynomial node is reached.
      */
     private Collection<GraphClass> getNodesNP(GraphClass node,
             final Problem problem) {
         final ArrayList<GraphClass> result = new ArrayList<GraphClass>();
-        new BFSWalker<GraphClass,Inclusion>(
-                DataSet.inclGraph, node, null, GraphWalker.InitCode.DYNAMIC) {
+        new BFSWalker<GraphClass, Inclusion>(DataSet.inclGraph, node, null,
+                GraphWalker.InitCode.DYNAMIC) {
             public void visit(GraphClass v) {
                 result.add(v);
                 if (problem.getComplexity(v).betterOrEqual(Complexity.P))
@@ -375,17 +360,16 @@ inP:
         return result;
     }
 
-
     /**
-     * Fills in a vector with the environment of the given node.
-     * The environment is found by walking over open superclasses until the
-     * first non-polynomial node is reached.
+     * Fills in a vector with the environment of the given node. The environment
+     * is found by walking over open superclasses until the first non-polynomial
+     * node is reached.
      */
     private Collection<GraphClass> getNodesP(GraphClass node,
             final Problem problem) {
         final ArrayList<GraphClass> result = new ArrayList<GraphClass>();
-        new RevBFSWalker<GraphClass,Inclusion>(
-                DataSet.inclGraph, node, null, GraphWalker.InitCode.DYNAMIC) {
+        new RevBFSWalker<GraphClass, Inclusion>(DataSet.inclGraph, node, null,
+                GraphWalker.InitCode.DYNAMIC) {
             public void visit(GraphClass v) {
                 result.add(v);
                 Complexity c = problem.getComplexity(v);
