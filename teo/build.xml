@@ -213,10 +213,11 @@
 
         <delete file="${isgci.jar}" />
         <jar destfile="${isgci.jar}" index="false">
+            <zipgroupfileset includes="*.jar" dir="${jarlib.dir}"/>
             <!-- otherwise Class-Path doesn't work -->
             <manifest>
                 <attribute name="Main-Class" value="teo.Loader" />
-                <attribute name="Class-Path" value="jgrapht.jar" />
+                <!--<attribute name="Class-Path" value="jgrapht.jar" /> -->
             </manifest>
             <fileset dir="${build.classes.dir}">
                 <include name="teo/**" />
@@ -696,6 +697,10 @@
     <target name="run" description="Run isgci">
 
         <java jar="${isgci.jar}" fork="true">
+            <classpath>
+                <path location="${jarlib.dir}/jgraphx.jar" />
+            </classpath>
+            
             <arg value="file://${web.dir}/" />
         </java>
     </target>
