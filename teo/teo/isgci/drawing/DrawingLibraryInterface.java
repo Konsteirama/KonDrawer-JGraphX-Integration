@@ -11,6 +11,7 @@
 
 package teo.isgci.drawing;
 
+import org.jgrapht.Graph;
 import org.jgrapht.ListenableGraph;
 import org.jgrapht.graph.DefaultEdge;
 
@@ -19,8 +20,10 @@ import javax.swing.JComponent;
 /**
  * Dumbed down version of the original, WIP DrawingLibraryInterface
  * TODO: replace this with the final one
+ * @param <V>
+ * @param <E>
  */
-public interface DrawingLibraryInterface {
+public interface DrawingLibraryInterface<V, E> {
 
     /**
      * Export the currently drawn graph to the path using the specified format.
@@ -36,6 +39,18 @@ public interface DrawingLibraryInterface {
     String[] getAvailableExportFormats();
 
     /**
+     * Returns the Interface for registering events.
+     * @return An instance of the GraphEventInterface
+     */
+    GraphEventInterface getGraphEventInterface();
+
+    /**
+     * Returns the interface for manipulating the shown graph.
+     * @return An instance of the GraphManipulationInterface
+     */
+    GraphManipulationInterface getGraphManipulationInterface();
+
+    /**
      * Returns the panel in which the graph is drawn.
      * @return A JComponent which draws the specified graphs
      */
@@ -45,6 +60,6 @@ public interface DrawingLibraryInterface {
      * Set a new graph which should be drawn.
      * @param g The new graph
      */
-    void setGraph(ListenableGraph<String, DefaultEdge> g);
+    void setGraph(Graph<V, E> g);
     
 }

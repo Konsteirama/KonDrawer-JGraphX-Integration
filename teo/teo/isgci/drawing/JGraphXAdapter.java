@@ -282,7 +282,7 @@ public class JGraphXAdapter<V, E> extends mxGraph implements
             
             // add edge between mxcells
             mxCell cell = (mxCell) insertEdge(defaultParent, null, 
-                    edge, sourceCell, targetCell);
+                    null, sourceCell, targetCell);
             
             // update cell size so cell isn't "above" graph
             updateCellSize(cell);
