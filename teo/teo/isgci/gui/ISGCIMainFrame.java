@@ -67,7 +67,7 @@ public class ISGCIMainFrame extends JFrame
     protected JMenuItem miNew, miExport, miExit;
     protected JMenuItem miNaming, miSearching, miDrawUnproper;
     protected JMenuItem miSelectGraphClasses, miCheckInclusion;
-    protected JMenuItem miGraphClassInformation;
+    protected JMenuItem miGraphClassInformation, miUserSettings;
     protected JMenuItem miCut, miCopy, miPaste, miDelete, miSelectAll;
     protected JMenu miOpenProblem, miColourProblem;
     protected JMenuItem miSmallgraphs, miHelp, miAbout;
@@ -239,6 +239,7 @@ public class ISGCIMainFrame extends JFrame
         miSelectGraphClasses.addActionListener(this);
         miCheckInclusion.addActionListener(this);
         miGraphClassInformation.addActionListener(this);
+        miUserSettings.addActionListener(this);
         //miDelete.addActionListener(this);
         //miSelectAll.addActionListener(this);
         //miOpenProblem.addActionListener(this);
@@ -304,6 +305,8 @@ public class ISGCIMainFrame extends JFrame
 
 
         helpMenu = new JMenu("Help");
+        miUserSettings = new JMenuItem("Settings");
+        helpMenu.add(miUserSettings);
         miSmallgraphs = new JMenuItem("Small graphs");
         helpMenu.add(miSmallgraphs);
         miHelp = new JMenuItem("Help");
@@ -445,9 +448,14 @@ public class ISGCIMainFrame extends JFrame
                     ((JMenuItem) event.getSource()).getText());
             open.setLocation(50, 50);
             open.setVisible(true);
+        } else if (object == miUserSettings) {
+            ISGCISettingsDialog settingsDialog = new ISGCISettingsDialog();
+            settingsDialog.setSize(500, 400);
+            settingsDialog.setVisible(true);
         }
     }
 
+    // TODO jannis
 //    public void itemStateChanged(ItemEvent event) {
 //        Object object = event.getSource();
 //
