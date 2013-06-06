@@ -82,6 +82,7 @@ public class ISGCITabbedPane extends JTabbedPane {
      */
     public void removeStartpage() {
         remove(startpage);
+        startpageActive = false;
     }
     
     /**
@@ -93,19 +94,21 @@ public class ISGCITabbedPane extends JTabbedPane {
      *          The class of the edges.
      * @param graph
      *          The graph that will be drawn and interacted with within 
-     *          this tab.
+     *          this tab.          
+     * @param name
+     * 			The name of the Tab
      */
-    public <V, E> void drawInNewTab(Graph<V, E> graph) {
+    public <V, E> void drawInNewTab(Graph<V, E> graph, String name) {
         if (startpageActive) {
             removeStartpage();
         }
         
-        // TODO jannis
         JGraphXInterface<V, E> graphXInterface 
         = new JGraphXInterface<V, E>(graph);
 
         JComponent panel = graphXInterface.getPanel();
-        addTab("TODO", panel);
+        addTab(name, panel);
+        setSelectedComponent(panel);
         
         // save context for later reference
         panelToInterfaceMap.put(panel, graphXInterface);
@@ -124,13 +127,23 @@ public class ISGCITabbedPane extends JTabbedPane {
      *          
      * @param <E>
      *          The class of the edge.
+     *          
+     * @param name
+     * 			The name of the Tab
      */
-    public <V, E> void drawInActiveTab(Graph<V, E> graph) {
-        
-        // TODO jannis
-        
-        
-        
+    public <V, E> void drawInActiveTab(Graph<V, E> graph, String name) {
+    	if(startpageActive){
+    		drawInNewTab(graph, name);
+    	} else{
+	        JGraphXInterface<V, E> graphXInterface 
+	        = new JGraphXInterface<V, E>(graph);	
+	        JComponent panel = graphXInterface.getPanel();	        
+	        getActiveDrawingLibraryInterface().setGraph(graph);
+	        setTitleAt(getSelectedIndex(), name);
+	                
+	        // save context for later reference
+	        panelToInterfaceMap.put(panel, graphXInterface);
+    	}
     }
     
     /**

@@ -165,17 +165,17 @@ public class GraphClassSelectionDialog extends JDialog implements
         Object source = event.getSource();
         if (source == cancelButton) {
             closeDialog();
-        } else if (source == newButton) { // TODO Jannis check if correct
+        } else if (source == newButton) {
             SimpleDirectedGraph<Set<GraphClass>, DefaultEdge> graph 
                 = getGraph();
-            parent.getTabbedPane().drawInActiveTab(graph);
+            parent.getTabbedPane().drawInActiveTab(graph, classesList.getSelectedValue().toString());
             closeDialog();
         } else if (source == search) {
             search.setListData(parent, classesList);
-        } else if (source == newTabButton) { // TODO Jannis check if correct
+        } else if (source == newTabButton) {
             SimpleDirectedGraph<Set<GraphClass>, DefaultEdge> graph 
                 = getGraph();
-            parent.getTabbedPane().drawInNewTab(graph);
+            parent.getTabbedPane().drawInNewTab(graph,classesList.getSelectedValue().toString());
             closeDialog();
         }
     }
