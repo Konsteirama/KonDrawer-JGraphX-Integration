@@ -17,6 +17,7 @@ import java.awt.Insets;
 import java.awt.event.*;
 import javax.swing.*;
 import teo.isgci.db.Algo;
+import teo.isgci.db.Algo.NamePref;
 
 public class NamingDialog extends JDialog implements ActionListener {
     protected ISGCIMainFrame parent;
@@ -29,7 +30,9 @@ public class NamingDialog extends JDialog implements ActionListener {
         super(parent, "Naming preference", true);
         this.parent = parent;
         group = new ButtonGroup();
-        Algo.NamePref mode = parent.getActiveCanvas().getNamingPref();
+        
+        Algo.NamePref mode = this.parent.getTabbedPane().getNamingPref(parent.getTabbedPane().getSelectedComponent());
+
         LatexGraphics latex = ISGCIMainFrame.latex;
         Container contents = getContentPane();
 
@@ -109,7 +112,11 @@ public class NamingDialog extends JDialog implements ActionListener {
                 pref = Algo.NamePref.FORBIDDEN;
             else if (c == derivedBox.getModel())
                 pref = Algo.NamePref.DERIVED;
-            parent.getActiveCanvas().setNamingPref(pref);
+            
+            parent.getTabbedPane().setNamingPref(pref, 
+                    parent.getTabbedPane().getSelectedComponent());
+                
+            
             closeDialog();
         }
     }

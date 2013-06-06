@@ -155,19 +155,20 @@ public class IQDialog extends JDialog
         if (source == cancelButton) {
             closeDialog();
         } else if (source == newButton) {
-            Cursor oldcursor = parent.getCursor();
-            setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
-            parent.getActiveCanvas().drawHierarchy(getNodes());
-            
-            for (Object o : classesList.getSelectedValues()) {
-                GraphClass gc = (GraphClass) o;
-                NodeView v = parent.getActiveCanvas().findNode(gc);
-                if (v != null)
-                    v.setNameAndLabel(gc.toString());
-            }
-            parent.getActiveCanvas().updateBounds();
-            
-            setCursor(oldcursor);
+         // TODO jannis
+//            Cursor oldcursor = parent.getCursor();
+//            setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
+//            parent.getActiveCanvas().drawHierarchy(getNodes());
+//            
+//            for (Object o : classesList.getSelectedValues()) {
+//                GraphClass gc = (GraphClass) o;
+//                NodeView v = parent.getActiveCanvas().findNode(gc);
+//                if (v != null)
+//                    v.setNameAndLabel(gc.toString());
+//            }
+//            parent.getActiveCanvas().updateBounds();
+//            
+//            setCursor(oldcursor);
             closeDialog();
         } else if (source == search) {
             search.setListData(parent, classesList);

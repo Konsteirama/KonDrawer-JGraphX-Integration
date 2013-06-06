@@ -19,6 +19,7 @@ import java.util.List;
 import java.util.Collections;
 import javax.swing.*;
 import teo.isgci.db.*;
+import teo.isgci.db.Algo.NamePref;
 import teo.isgci.gc.GraphClass;
 import teo.isgci.util.LessLatex;
 
@@ -34,7 +35,13 @@ public class SearchDialog extends JDialog implements ActionListener {
         super(parent, "Search for a graphclass", true);
         this.parent = parent;
         group = new ButtonGroup();
-        Algo.NamePref mode = parent.getActiveCanvas().getNamingPref();
+        
+        // TODO jannis
+        // original
+        //Algo.NamePref mode = parent.getActiveCanvas().getNamingPref();
+        // modified for restructuring
+        Algo.NamePref mode = NamePref.BASIC;
+        
         Container content = getContentPane();
 
         GridBagLayout gridbag = new GridBagLayout();
@@ -72,11 +79,12 @@ public class SearchDialog extends JDialog implements ActionListener {
         cancelButton.addActionListener(this);
         setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
     
-        List<GraphClass> names = parent.getActiveCanvas().getClasses();
-        if (!names.isEmpty()) {
-            Collections.sort(names, new LessLatex());
-            classesList.setListData(names);
-        }
+        // TODO jannis
+//        List<GraphClass> names = parent.getActiveCanvas().getClasses();
+//        if (!names.isEmpty()) {
+//            Collections.sort(names, new LessLatex());
+//            classesList.setListData(names);
+//        }
         pack();
         setSize(300, 350);
     
@@ -93,10 +101,11 @@ public class SearchDialog extends JDialog implements ActionListener {
         if (source == cancelButton) {
             closeDialog();
         } else if (source == searchButton) {
-            NodeView view = parent.getActiveCanvas().findNode(
-                            classesList.getSelectedNode());
-            parent.getActiveCanvas().markOnly(view);
-            parent.getActiveCanvas().centerNode(view);
+            // TODO jannis
+//            NodeView view = parent.getActiveCanvas().findNode(
+//                            classesList.getSelectedNode());
+//            parent.getActiveCanvas().markOnly(view);
+//            parent.getActiveCanvas().centerNode(view);
             closeDialog();
         }
     }
