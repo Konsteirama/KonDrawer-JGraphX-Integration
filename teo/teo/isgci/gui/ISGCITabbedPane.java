@@ -22,6 +22,8 @@ import javax.swing.JTabbedPane;
 
 import org.jgrapht.Graph;
 
+import teo.isgci.db.Algo;
+import teo.isgci.db.Algo.NamePref;
 import teo.isgci.drawing.JGraphXInterface;
 import teo.isgci.drawing.DrawingLibraryInterface;
 
@@ -56,6 +58,17 @@ public class ISGCITabbedPane extends JTabbedPane {
     private HashMap<JComponent, DrawingLibraryInterface> panelToInterfaceMap
         = new HashMap<JComponent, DrawingLibraryInterface>();
     
+    /**
+     * Maps the content of the tabs to their corresponding
+     * DrawingLibraryInterface.
+     */
+    private HashMap<JComponent, Algo.NamePref> panelToNamingPref
+        = new HashMap<JComponent, Algo.NamePref>();
+    
+    /**
+     * The mode which indicates the preferred name of a Node.
+     */
+    private Algo.NamePref defaultMode = NamePref.BASIC;
     
     /**
      * Creates a new Tabbed pane with a startpage as only active tab.
@@ -94,9 +107,9 @@ public class ISGCITabbedPane extends JTabbedPane {
      *          The class of the edges.
      * @param graph
      *          The graph that will be drawn and interacted with within 
-     *          this tab.          
+     *          this tab.
      * @param name
-     * 			The name of the Tab
+     *          The name of the Tab
      */
     public <V, E> void drawInNewTab(Graph<V, E> graph, String name) {
         if (startpageActive) {
@@ -112,6 +125,7 @@ public class ISGCITabbedPane extends JTabbedPane {
         
         // save context for later reference
         panelToInterfaceMap.put(panel, graphXInterface);
+        panelToNamingPref.put(panel, defaultMode);
     }
     
     /**
@@ -129,21 +143,15 @@ public class ISGCITabbedPane extends JTabbedPane {
      *          The class of the edge.
      *          
      * @param name
-     * 			The name of the Tab
+     *          The name of the Tab
      */
     public <V, E> void drawInActiveTab(Graph<V, E> graph, String name) {
-    	if(startpageActive){
-    		drawInNewTab(graph, name);
-    	} else{
-	        JGraphXInterface<V, E> graphXInterface 
-	        = new JGraphXInterface<V, E>(graph);	
-	        JComponent panel = graphXInterface.getPanel();	        
-	        getActiveDrawingLibraryInterface().setGraph(graph);
-	        setTitleAt(getSelectedIndex(), name);
-	                
-	        // save context for later reference
-	        panelToInterfaceMap.put(panel, graphXInterface);
-    	}
+        if (startpageActive) {
+            drawInNewTab(graph, name);
+        } else {
+            getActiveDrawingLibraryInterface().setGraph(graph);
+            setTitleAt(getSelectedIndex(), name);
+        }
     }
     
     /**
@@ -160,6 +168,54 @@ public class ISGCITabbedPane extends JTabbedPane {
         }
         
         return panelToInterfaceMap.get(panel);
+    }
+
+    /**
+     * 
+     * @return 
+     *          The default naming preference of this tabbed pane.
+     */
+    public NamePref getNamingPref() {
+        return defaultMode;
+    }
+
+    /**
+     * Changes the default naming preference of this tabbed pane.
+     * 
+     * @param pref
+     *          The new default naming preference of this tabbed pane.
+     */
+    public void setNamingPref(NamePref pref) {
+        this.defaultMode = pref;
+    }
+    
+    /**
+     * @param c 
+     *          The tab for which the naming preference is wanted.
+     * 
+     * @return 
+     *          The default naming preference of the given Tab.
+     */
+    public NamePref getNamingPref(Component c) {
+        if (panelToNamingPref.containsKey(c)) {
+            return panelToNamingPref.get(c);
+        } else 
+            return defaultMode;
+    }
+
+    /**
+     * Changes the naming preferences of target tab.
+     * 
+     * @param pref
+     *          The new default naming preference of this tab.
+     * @param c
+     *          The Tab for which the naming preference is changed.
+     */
+    public void setNamingPref(NamePref pref, Component c) {
+        if (panelToNamingPref.containsKey(c)) {
+            panelToNamingPref.remove(c);
+            panelToNamingPref.put((JComponent) c, pref);
+        }
     }
 }
 
