@@ -31,13 +31,8 @@ public class NamingDialog extends JDialog implements ActionListener {
         this.parent = parent;
         group = new ButtonGroup();
         
-        
-        // TODO Jannis
-        // Original
         Algo.NamePref mode = this.parent.getTabbedPane().getNamingPref(parent.getTabbedPane().getSelectedComponent());
-        // modified during restructuring
-//        Algo.NamePref mode = NamePref.BASIC;
-        
+
         LatexGraphics latex = ISGCIMainFrame.latex;
         Container contents = getContentPane();
 
@@ -118,7 +113,6 @@ public class NamingDialog extends JDialog implements ActionListener {
             else if (c == derivedBox.getModel())
                 pref = Algo.NamePref.DERIVED;
             
-            // TODO jannis
             parent.getTabbedPane().setNamingPref(pref, 
                     parent.getTabbedPane().getSelectedComponent());
                 

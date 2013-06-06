@@ -182,9 +182,9 @@ public class ISGCIMainFrame extends JFrame
     }
     
     /**
-     * Getter for {link {@link #tabbedPane}.
+     * Getter for {@link #tabbedPane}.
      * @return
-     *          Returns {link {@link #tabbedPane}.
+     *          Returns {@link #tabbedPane}.
      */
     public ISGCITabbedPane getTabbedPane() {
         return tabbedPane;
