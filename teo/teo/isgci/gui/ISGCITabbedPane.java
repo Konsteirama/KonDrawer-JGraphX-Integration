@@ -87,6 +87,13 @@ public class ISGCITabbedPane extends JTabbedPane {
         = new HashMap<JComponent, Algo.NamePref>();
     
     /**
+     * Maps a complexity to the corresponding color.
+     */
+    private HashMap<JComponent, HashMap<Complexity, Color>> 
+        panelToComplexityColoring
+        = new HashMap<JComponent, HashMap<Complexity, Color>>();
+    
+    /**
      * The mode which indicates the default preferred name of a Node.
      */
     private Algo.NamePref defaultMode = NamePref.BASIC;
@@ -128,6 +135,7 @@ public class ISGCITabbedPane extends JTabbedPane {
         setSelectedComponent(startpage);
         ButtonTabComponent closeButton = new ButtonTabComponent(this);
         this.setTabComponentAt(this.getSelectedIndex(), closeButton);
+        resetDefaultColorScheme();
     }
 
     /**
@@ -164,6 +172,7 @@ public class ISGCITabbedPane extends JTabbedPane {
         setSelectedComponent(panel);
         ButtonTabComponent closeButton = new ButtonTabComponent(this);
         this.setTabComponentAt(this.getSelectedIndex(), closeButton);
+        resetDefaultColorScheme();
         
         // save context for later reference
         panelToInterfaceMap.put(panel, graphXInterface);
@@ -289,12 +298,17 @@ public class ISGCITabbedPane extends JTabbedPane {
     }
 
     /**
+     * Sets the problem for a given tab. The problem of a tab determines the
+     * coloring of the graph on it.
      * 
      * @param problem
+     *          the new problem of the tab.
+     *          
      * @param c
+     *          the tab for which the problem is changed.
      */
     public void setProblem(Problem problem, Component c) {
-        if(panelToProblem.containsKey(c)){
+        if (panelToProblem.containsKey(c)){
             panelToProblem.remove(c);
         }
         panelToProblem.put((JComponent) c, problem);
@@ -308,9 +322,15 @@ public class ISGCITabbedPane extends JTabbedPane {
     }
     
     /**
+     * Gives the problem for a given tab. The problem of a tab determines the
+     * coloring of the graph on it.
      * 
      * @param c
+     *          the tab for which the problem is wanted
+     *          
      * @return
+     *          the problem of the given tab, 
+     *          null or "none" if no problem is chosen
      */
     public Problem getProblem(Component c) {
         if (panelToProblem.containsKey(c)) {
@@ -319,34 +339,75 @@ public class ISGCITabbedPane extends JTabbedPane {
         return null;
     }
     
-    //TODO replace with actual colors from options menu
-    /** Colours for different complexities */
-    public static final Color COLOR_LIN = Color.green;
-    public static final Color COLOR_P = Color.green.darker();
-    public static final Color COLOR_NPC = Color.red;
-    public static final Color COLOR_INTERMEDIATE = SColor.brighter(Color.red);
-    public static final Color COLOR_UNKNOWN = Color.white;
+    /**
+     * Sets a new color for the given complexity on the currently selected tab.
+     * 
+     * @param complexity
+     *          the complexity for which the color is changed.
+     *          
+     * @param color
+     *          the new color for the given complexity
+     */
+    public void setColor(Complexity complexity, Color color) {        
+        HashMap<Complexity, Color> complexityToColor = 
+                new HashMap<Complexity, Color>();
+        
+        if (panelToComplexityColoring.containsKey(getSelectedComponent())) {
+            complexityToColor =
+                    panelToComplexityColoring.get(getSelectedComponent());
+        } else {
+            panelToComplexityColoring.put((JComponent) getSelectedComponent(), 
+                    complexityToColor);
+        }
+        
+        complexityToColor.put(complexity, color);        
+    }
     
     /**
-     * Return the color for node considering its complexity for the active
-     * problem.
+     * Resets the coloring scheme of the currently selected tab.
      */
-    protected Color complexityColor(Set<GraphClass> set) {
+    public void resetDefaultColorScheme() {        
+        HashMap<Complexity, Color> complexityToColor = 
+                new HashMap<Complexity, Color>();
+        
+        if (panelToComplexityColoring.containsKey(getSelectedComponent())) {
+            complexityToColor =
+                    panelToComplexityColoring.get(getSelectedComponent());
+        } else {
+            panelToComplexityColoring.put((JComponent) getSelectedComponent(), 
+                    complexityToColor);
+        }
+        
+        complexityToColor.put(Complexity.LINEAR, Color.green);
+        
+        complexityToColor.put(Complexity.UNKNOWN, Color.white);
+        complexityToColor.put(Complexity.OPEN, Color.white);
+        
+        complexityToColor.put(null, Color.white);
+        
+        complexityToColor.put(Complexity.P, Color.green.darker());
+        
+        complexityToColor.put(Complexity.CONPC, Color.red);
+        complexityToColor.put(Complexity.NPC, Color.red);
+        complexityToColor.put(Complexity.NPH, Color.red);
+        
+        complexityToColor.put(Complexity.GIC, Color.red.brighter());
+    }
+    
+    /**
+     * @param node 
+     *          the node for which the color is returned.
+     * 
+     * @return 
+     *          the color for node considering its complexity for the active
+     *          problem.
+     */
+    protected Color complexityColor(Set<GraphClass> node) {
         Problem problem = getProblem(getSelectedComponent());
-        if (problem == null)
-            return COLOR_UNKNOWN;
-        Complexity complexity = problem.getComplexity(set.iterator().next());
-        if (complexity.isUnknown())
-            return COLOR_UNKNOWN;
-        if (complexity.betterOrEqual(Complexity.LINEAR))
-            return COLOR_LIN;
-        if (complexity.betterOrEqual(Complexity.P))
-            return COLOR_P;
-        if (complexity.equals(Complexity.GIC))
-            return COLOR_INTERMEDIATE;
-        if (complexity.likelyNotP())
-            return COLOR_NPC;
-        return COLOR_UNKNOWN;
+        Complexity complexity = problem.getComplexity(node.iterator().next());
+        
+        return panelToComplexityColoring.
+                get(getSelectedComponent()).get(complexity);
     }
 }
 
