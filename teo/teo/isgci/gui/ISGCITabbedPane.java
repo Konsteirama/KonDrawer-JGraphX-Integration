@@ -13,8 +13,10 @@
 
 package teo.isgci.gui;
 
+import java.awt.Color;
 import java.awt.Component;
 import java.util.HashMap;
+import java.util.Set;
 
 import javax.swing.JComponent;
 import javax.swing.JPanel;
@@ -23,11 +25,16 @@ import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
 import org.jgrapht.Graph;
+import org.jgrapht.graph.DefaultEdge;
 
+import sun.security.util.PendingException;
 import teo.isgci.db.Algo;
 import teo.isgci.db.Algo.NamePref;
 import teo.isgci.drawing.JGraphXInterface;
 import teo.isgci.drawing.DrawingLibraryInterface;
+import teo.isgci.gc.GraphClass;
+import teo.isgci.problem.Complexity;
+import teo.isgci.problem.Problem;
 
 /**
  * The ISGCI specific implementation of the tabbedpane. Will create a
@@ -65,6 +72,12 @@ public class ISGCITabbedPane extends JTabbedPane {
      */
     private HashMap<JComponent, Boolean> panelToDrawUnproper
         = new HashMap<JComponent, Boolean>();
+    
+    /**
+     * Maps the tab to their corresponding Problem.
+     */
+    private HashMap<JComponent, Problem> panelToProblem
+        = new HashMap<JComponent, Problem>();
     
     /**
      * Maps the content of the tabs to their corresponding
@@ -250,6 +263,8 @@ public class ISGCITabbedPane extends JTabbedPane {
     /**
      * Sets the drawUnproper value for the currently open tab.
      * 
+     * @param c
+     *          The Tab for which the drawUnproper state is changed.
      * @param state
      *          the new drawUnproper state of the open tab
      */
@@ -261,6 +276,8 @@ public class ISGCITabbedPane extends JTabbedPane {
     }
     
     /**
+     * @param c
+     *          The tab for which the drawUnproper state is wanted.
      * @return
      *          true if unproper inclusions shall be drawn, else false.
      */
@@ -269,6 +286,67 @@ public class ISGCITabbedPane extends JTabbedPane {
             return true;
         } else
             return (panelToDrawUnproper.get(getSelectedComponent()));
+    }
+
+    /**
+     * 
+     * @param problem
+     * @param c
+     */
+    public void setProblem(Problem problem, Component c) {
+        if(panelToProblem.containsKey(c)){
+            panelToProblem.remove(c);
+        }
+        panelToProblem.put((JComponent) c, problem);
+        Graph graph = getActiveDrawingLibraryInterface().getGraph();
+        for (Object o : graph.vertexSet()) {
+            Set<GraphClass> node = (Set<GraphClass>) o;
+            getActiveDrawingLibraryInterface().getGraphManipulationInterface().
+                colorNode(node, complexityColor(node));            
+        }
+        getSelectedComponent().repaint();
+    }
+    
+    /**
+     * 
+     * @param c
+     * @return
+     */
+    public Problem getProblem(Component c) {
+        if (panelToProblem.containsKey(c)) {
+            return panelToProblem.get(c);
+        }
+        return null;
+    }
+    
+    //TODO replace with actual colors from options menu
+    /** Colours for different complexities */
+    public static final Color COLOR_LIN = Color.green;
+    public static final Color COLOR_P = Color.green.darker();
+    public static final Color COLOR_NPC = Color.red;
+    public static final Color COLOR_INTERMEDIATE = SColor.brighter(Color.red);
+    public static final Color COLOR_UNKNOWN = Color.white;
+    
+    /**
+     * Return the color for node considering its complexity for the active
+     * problem.
+     */
+    protected Color complexityColor(Set<GraphClass> set) {
+        Problem problem = getProblem(getSelectedComponent());
+        if (problem == null)
+            return COLOR_UNKNOWN;
+        Complexity complexity = problem.getComplexity(set.iterator().next());
+        if (complexity.isUnknown())
+            return COLOR_UNKNOWN;
+        if (complexity.betterOrEqual(Complexity.LINEAR))
+            return COLOR_LIN;
+        if (complexity.betterOrEqual(Complexity.P))
+            return COLOR_P;
+        if (complexity.equals(Complexity.GIC))
+            return COLOR_INTERMEDIATE;
+        if (complexity.likelyNotP())
+            return COLOR_NPC;
+        return COLOR_UNKNOWN;
     }
 }
 

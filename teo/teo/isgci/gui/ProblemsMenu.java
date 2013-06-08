@@ -48,9 +48,9 @@ public class ProblemsMenu extends JMenu implements ActionListener {
     }
 
     public void actionPerformed(ActionEvent event) {
-        // TODO jannis
-//        parent.getActiveCanvas().setProblem(
-//                DataSet.getProblem(event.getActionCommand()));
+        parent.getTabbedPane().setProblem(
+                DataSet.getProblem(event.getActionCommand()), 
+                parent.getTabbedPane().getSelectedComponent());
     }
 }
 
