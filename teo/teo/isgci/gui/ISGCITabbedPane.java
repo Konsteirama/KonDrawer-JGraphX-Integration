@@ -25,9 +25,6 @@ import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
 import org.jgrapht.Graph;
-import org.jgrapht.graph.DefaultEdge;
-
-import sun.security.util.PendingException;
 import teo.isgci.db.Algo;
 import teo.isgci.db.Algo.NamePref;
 import teo.isgci.drawing.JGraphXInterface;
@@ -109,7 +106,8 @@ public class ISGCITabbedPane extends JTabbedPane {
                 
                 ISGCITabbedPane sourceTabbedPane = 
                         (ISGCITabbedPane) changeEvent.getSource();
-                if (!sourceTabbedPane.startpageActive && (sourceTabbedPane.getSelectedIndex() >= 0)) {
+                if (!sourceTabbedPane.startpageActive 
+                        && (sourceTabbedPane.getSelectedIndex() >= 0)) {
                     ((ISGCIMainFrame) sourceTabbedPane.
                         getParent().getParent().getParent().getParent())
                         .setDrawUnproper(sourceTabbedPane
