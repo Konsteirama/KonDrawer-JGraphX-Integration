@@ -454,16 +454,15 @@ public class ISGCIMainFrame extends JFrame
             settingsDialog.setVisible(true);
         }
     }
+    
+    public void itemStateChanged(ItemEvent event) {
+        Object object = event.getSource();
 
-    // TODO jannis
-//    public void itemStateChanged(ItemEvent event) {
-//        Object object = event.getSource();
-//
-//        if (object == miDrawUnproper) {
-//            getActiveCanvas().setDrawUnproper(
-//                    ((JCheckBoxMenuItem) object).getState());
-//        }
-//    }
+        if (object == miDrawUnproper) {
+            getTabbedPane().setDrawUnproper(
+                    ((JCheckBoxMenuItem) object).getState());
+        }
+    }
 }
 
 

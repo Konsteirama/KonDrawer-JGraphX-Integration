@@ -19,7 +19,9 @@ import teo.isgci.db.DataSet;
 import teo.isgci.gc.GraphClass;
 import teo.isgci.util.Utility;
 
-
+/**
+ * A popup menu which opens when right-clicking a Node in the Graph.
+ */
 public class NodePopup extends JPopupMenu implements ActionListener {
     ISGCIMainFrame parent;
     JMenuItem deleteItem, infoItem;
@@ -55,9 +57,8 @@ public class NodePopup extends JPopupMenu implements ActionListener {
                     CHANGENAME.length());
             view.setNameAndLabel(fullname);
             
-            // TODO jannis
-            //parent.getActiveCanvas().updateBounds();
-            //parent.getActiveCanvas().repaint();
+            parent.getTabbedPane().getSelectedComponent().update(parent.getTabbedPane().getSelectedComponent().getGraphics());
+            parent.getTabbedPane().getSelectedComponent().repaint();
         }
     }
     

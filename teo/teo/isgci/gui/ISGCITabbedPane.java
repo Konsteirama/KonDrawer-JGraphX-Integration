@@ -59,14 +59,20 @@ public class ISGCITabbedPane extends JTabbedPane {
         = new HashMap<JComponent, DrawingLibraryInterface>();
     
     /**
+     * Maps the tab to their corresponding drawUnproper state.
+     */
+    private HashMap<JComponent, Boolean> panelToDrawUnproper
+        = new HashMap<JComponent, Boolean>();
+    
+    /**
      * Maps the content of the tabs to their corresponding
-     * DrawingLibraryInterface.
+     * naming preference.
      */
     private HashMap<JComponent, Algo.NamePref> panelToNamingPref
         = new HashMap<JComponent, Algo.NamePref>();
     
     /**
-     * The mode which indicates the preferred name of a Node.
+     * The mode which indicates the default preferred name of a Node.
      */
     private Algo.NamePref defaultMode = NamePref.BASIC;
     
@@ -88,6 +94,9 @@ public class ISGCITabbedPane extends JTabbedPane {
         startpageActive = true;
         startpage = new JPanel();
         addTab("Welcome to ISGCI", startpage);
+        setSelectedComponent(startpage);
+        ButtonTabComponent closeButton = new ButtonTabComponent(this);
+        this.setTabComponentAt(this.getSelectedIndex(), closeButton);
     }
 
     /**
@@ -122,6 +131,8 @@ public class ISGCITabbedPane extends JTabbedPane {
         JComponent panel = graphXInterface.getPanel();
         addTab(name, panel);
         setSelectedComponent(panel);
+        ButtonTabComponent closeButton = new ButtonTabComponent(this);
+        this.setTabComponentAt(this.getSelectedIndex(), closeButton);
         
         // save context for later reference
         panelToInterfaceMap.put(panel, graphXInterface);
@@ -216,6 +227,30 @@ public class ISGCITabbedPane extends JTabbedPane {
             panelToNamingPref.remove(c);
             panelToNamingPref.put((JComponent) c, pref);
         }
+    }
+
+    /**
+     * Sets the drawUnproper value for the currently open tab.
+     * 
+     * @param state
+     *          the new drawUnproper state of the open tab
+     */
+    public void setDrawUnproper(boolean state) {
+        if (panelToDrawUnproper.containsKey(getSelectedComponent())) {
+            panelToDrawUnproper.remove(getSelectedComponent());
+        }
+        panelToDrawUnproper.put((JComponent) getSelectedComponent(), state);
+    }
+    
+    /**
+     * @return
+     *          true if unproper inclusions shall be drawn, else false.
+     */
+    public boolean getDrawUnproper() {
+        if (!panelToDrawUnproper.containsKey(getSelectedComponent())) {
+            return true;
+        } else
+            return (panelToDrawUnproper.get(getSelectedComponent()));
     }
 }
 

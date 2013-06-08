@@ -10,6 +10,7 @@
 
 package teo.isgci.gui;
 
+import java.awt.Component;
 import java.awt.event.*;
 import java.util.Set;
 import javax.swing.*;
@@ -38,6 +39,10 @@ public class EdgePopup extends JPopupMenu implements ActionListener {
     public void actionPerformed(ActionEvent event) {
         Object source = event.getSource();
         if (source == infoItem) {
+            Component tab = parent.getTabbedPane().getSelectedComponent();
+            tab.getComponentAt(tab.getMousePosition());
+            System.out.println(tab.getComponentAt(tab.getMousePosition()).toString());
+//            JDialog d = InclusionResultDialog.newInstance(parent, DataSet.getClass(tab.getComponentAt(tab.getMousePosition()).get), v2)
             // TODO jannis
 //            JDialog d = InclusionResultDialog.newInstance(parent,
 //                DataSet.getClass(
