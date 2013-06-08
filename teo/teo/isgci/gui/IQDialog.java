@@ -12,6 +12,7 @@
 package teo.isgci.gui;
 
 import teo.isgci.gc.GraphClass;
+import teo.isgci.db.Algo;
 import teo.isgci.db.DataSet;
 import teo.isgci.grapht.*;
 import teo.isgci.util.LatexGlyph;
@@ -23,8 +24,13 @@ import java.awt.Insets;
 import java.awt.Container;
 import java.awt.event.*;
 import javax.swing.*;
+
+import org.jgrapht.graph.DefaultEdge;
+import org.jgrapht.graph.SimpleDirectedGraph;
+
 import java.util.HashSet;
 import java.util.Collection;
+import java.util.Set;
 
 
 /**
@@ -156,19 +162,21 @@ public class IQDialog extends JDialog
             closeDialog();
         } else if (source == newButton) {
          // TODO jannis
-//            Cursor oldcursor = parent.getCursor();
-//            setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
-//            parent.getActiveCanvas().drawHierarchy(getNodes());
-//            
+            Cursor oldcursor = parent.getCursor();
+            setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
+            SimpleDirectedGraph<Set<GraphClass>, DefaultEdge> graph =
+                    Algo.createHierarchySubgraph(getNodes());
+            parent.getTabbedPane().drawInActiveTab(graph, "");
+            
 //            for (Object o : classesList.getSelectedValues()) {
 //                GraphClass gc = (GraphClass) o;
 //                NodeView v = parent.getActiveCanvas().findNode(gc);
 //                if (v != null)
 //                    v.setNameAndLabel(gc.toString());
 //            }
-//            parent.getActiveCanvas().updateBounds();
-//            
-//            setCursor(oldcursor);
+            parent.getTabbedPane().getSelectedComponent().repaint();
+            
+            setCursor(oldcursor);
             closeDialog();
         } else if (source == search) {
             search.setListData(parent, classesList);
