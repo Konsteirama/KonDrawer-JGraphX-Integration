@@ -109,7 +109,7 @@ public class ISGCITabbedPane extends JTabbedPane {
                 
                 ISGCITabbedPane sourceTabbedPane = 
                         (ISGCITabbedPane) changeEvent.getSource();
-                if (!sourceTabbedPane.startpageActive) {
+                if (!sourceTabbedPane.startpageActive && (sourceTabbedPane.getSelectedIndex() >= 0)) {
                     ((ISGCIMainFrame) sourceTabbedPane.
                         getParent().getParent().getParent().getParent())
                         .setDrawUnproper(sourceTabbedPane
@@ -308,6 +308,7 @@ public class ISGCITabbedPane extends JTabbedPane {
      *          the tab for which the problem is changed.
      */
     public void setProblem(Problem problem, Component c) {
+        if (startpageActive) return;
         if (panelToProblem.containsKey(c)){
             panelToProblem.remove(c);
         }
