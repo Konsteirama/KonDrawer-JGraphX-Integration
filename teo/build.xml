@@ -182,7 +182,8 @@
         <javac srcdir="."
                destdir="${build.classes.dir}"
                includeantruntime="false"
-               debug="yes">
+               debug="yes"
+               target="1.6" source="1.6">
             <classpath refid="compile.classpath" />
             <include name="**/*.java" />
             <exclude name="IQ.java" />
