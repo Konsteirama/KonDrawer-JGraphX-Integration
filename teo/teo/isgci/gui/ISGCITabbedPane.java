@@ -175,7 +175,7 @@ public class ISGCITabbedPane extends JTabbedPane {
      *          The name of the Tab
      */
     public <V, E> void drawInActiveTab(Graph<V, E> graph, String name) {
-        if (startpageActive) {
+        if (startpageActive || getSelectedComponent()==null) {
             drawInNewTab(graph, name);
         } else {
             getActiveDrawingLibraryInterface().setGraph(graph);
