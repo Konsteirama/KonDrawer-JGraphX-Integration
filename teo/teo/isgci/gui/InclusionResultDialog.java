@@ -19,11 +19,18 @@ import java.awt.Container;
 import java.awt.event.*;
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
+
+import org.jgrapht.graph.DefaultEdge;
+import org.jgrapht.graph.SimpleDirectedGraph;
+
 import java.util.Iterator;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
+
+import teo.isg.Graph;
 import teo.isgci.gui.*;
 import teo.isgci.gc.ForbiddenClass;
 import teo.isgci.gc.GraphClass;
@@ -555,39 +562,43 @@ public class InclusionResultDialog extends JDialog implements ActionListener {
             closeDialog();
             return;
         } else if (source == drawButton) {
-            // TODO jannis
-            //newDrawing(parent.getActiveCanvas());
+            SimpleDirectedGraph<Set<GraphClass>, DefaultEdge> graph =
+                Algo.createHierarchySubgraph(Algo.nodesBetween(upper, lower));
+            parent.getTabbedPane().drawInActiveTab(graph,
+                upper.toString() + "-" + lower.toString());
         } else if (source == drawNewTabButton) {
-            // TODO jannis
-            //newDrawing(parent.getNewCanvas());
+            SimpleDirectedGraph<Set<GraphClass>, DefaultEdge> graph =
+                Algo.createHierarchySubgraph(Algo.nodesBetween(upper, lower));
+            parent.getTabbedPane().drawInNewTab(graph,
+                upper.toString() + "-" + lower.toString());
         } else if (source == refButton) {
             parent.loader.showDocument("classes/refs00.html");
         }
     }
     
     
-    /**
-     * Draws the selected Graph on a Canvas.
-     * @param canvas The canvas to be drawn on.
-     */
-    private void newDrawing(ISGCIGraphCanvas canvas){
-        Cursor oldcursor = parent.getCursor();
-        setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
-        canvas.drawHierarchy(Algo.nodesBetween(upper, lower));
-
-        NodeView node1 = canvas.findNode(
-                DataSet.getClass(nodeName1));
-        NodeView node2 = canvas.findNode(
-                DataSet.getClass(nodeName2));
-        if (node1 != null  && node2 != null) {
-            node1.setNameAndLabel(nodeName1);
-            node2.setNameAndLabel(nodeName2);
-        }
-        
-        setCursor(oldcursor);
-        closeDialog();
-        canvas.repaint();    	
-    }
+//    /**
+//     * Draws the selected Graph on a Canvas.
+//     * @param canvas The canvas to be drawn on.
+//     */
+//    private void newDrawing(ISGCIGraphCanvas canvas){
+//        Cursor oldcursor = parent.getCursor();
+//        setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
+//        canvas.drawHierarchy(Algo.nodesBetween(upper, lower));
+//
+//        NodeView node1 = canvas.findNode(
+//                DataSet.getClass(nodeName1));
+//        NodeView node2 = canvas.findNode(
+//                DataSet.getClass(nodeName2));
+//        if (node1 != null  && node2 != null) {
+//            node1.setNameAndLabel(nodeName1);
+//            node2.setNameAndLabel(nodeName2);
+//        }
+//        
+//        setCursor(oldcursor);
+//        closeDialog();
+//        canvas.repaint();    	
+//    }
 
 
     /**
