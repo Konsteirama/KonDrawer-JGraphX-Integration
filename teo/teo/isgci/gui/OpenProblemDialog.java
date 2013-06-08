@@ -20,6 +20,10 @@ import java.awt.Insets;
 import java.awt.event.*;
 import javax.swing.*;
 import javax.swing.event.*;
+
+import org.jgrapht.graph.DefaultEdge;
+import org.jgrapht.graph.SimpleDirectedGraph;
+
 import java.util.Vector;
 import java.util.Collection;
 import java.util.ArrayList;
@@ -238,11 +242,19 @@ public class OpenProblemDialog extends JDialog implements ItemListener,
     public void actionPerformed(ActionEvent event) {
         Object source = event.getSource();
         if (source == drawButton) {
-            // TODO jannis
-            //newDrawing(parent.getActiveCanvas());
+            SimpleDirectedGraph<Set<GraphClass>, DefaultEdge> graph =
+                Algo.createHierarchySubgraph(getNodes(lists.getSelectedNode()));
+            parent.getTabbedPane().drawInActiveTab(
+                graph, problem.getName() + " - " 
+                + lists.getSelectedNode().toString());
+            closeDialog();
         } else if (source == drawNewTabButton) {
-            // TODO jannis
-            //newDrawing(parent.getNewCanvas());
+            SimpleDirectedGraph<Set<GraphClass>, DefaultEdge> graph =
+                Algo.createHierarchySubgraph(getNodes(lists.getSelectedNode()));
+            parent.getTabbedPane().drawInNewTab(
+                graph, problem.getName() + " - " 
+                + lists.getSelectedNode().toString());
+            closeDialog();
         } else if (source == showButton) {
             JDialog info = new GraphClassInformationDialog(parent,
                     lists.getSelectedNode());
