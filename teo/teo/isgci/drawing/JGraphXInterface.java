@@ -214,4 +214,9 @@ public class JGraphXInterface<V, E> implements DrawingLibraryInterface<V, E> {
 
         graphManipulation.reapplyHierarchicalLayout();
     }
+
+    @Override
+    public Graph<V, E> getGraph() {
+        return graphAdapter.getGraph();
+    }
 }

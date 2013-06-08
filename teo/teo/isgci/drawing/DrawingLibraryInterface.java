@@ -62,4 +62,10 @@ public interface DrawingLibraryInterface<V, E> {
      */
     void setGraph(Graph<V, E> g);
     
+    /**
+     * Returns the Graph of this Interface
+     * @return The used Graph
+     */
+    Graph<V, E> getGraph();
+    
 }
