@@ -15,9 +15,15 @@ import java.awt.GridBagLayout;
 import java.awt.GridBagConstraints;
 import java.awt.Insets;
 import java.awt.event.*;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Collections;
+import java.util.Set;
+
 import javax.swing.*;
+
+import org.jgrapht.graph.DefaultEdge;
+
 import teo.isgci.db.*;
 import teo.isgci.db.Algo.NamePref;
 import teo.isgci.gc.GraphClass;
@@ -36,11 +42,8 @@ public class SearchDialog extends JDialog implements ActionListener {
         this.parent = parent;
         group = new ButtonGroup();
         
-        // TODO jannis
-        // original
-        //Algo.NamePref mode = parent.getActiveCanvas().getNamingPref();
-        // modified for restructuring
-        Algo.NamePref mode = NamePref.BASIC;
+        Algo.NamePref mode = parent.getTabbedPane().
+                getNamingPref(parent.getTabbedPane().getSelectedComponent());
         
         Container content = getContentPane();
 
@@ -79,12 +82,18 @@ public class SearchDialog extends JDialog implements ActionListener {
         cancelButton.addActionListener(this);
         setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
     
-        // TODO jannis
-//        List<GraphClass> names = parent.getActiveCanvas().getClasses();
-//        if (!names.isEmpty()) {
-//            Collections.sort(names, new LessLatex());
-//            classesList.setListData(names);
-//        }
+        Set setNames = parent.getTabbedPane().getActiveDrawingLibraryInterface().getGraph().vertexSet();
+        List<GraphClass> listNames = new ArrayList<GraphClass>();
+        for (Object object : setNames) {
+            for (Object name : (Set) object) {
+                listNames.add((GraphClass) name);
+            }
+        }
+        if (!listNames.isEmpty()) {
+            Collections.sort(listNames, new LessLatex());
+            classesList.setListData(listNames);
+        }
+        
         pack();
         setSize(300, 350);
     
@@ -100,12 +109,16 @@ public class SearchDialog extends JDialog implements ActionListener {
         Object source = event.getSource();
         if (source == cancelButton) {
             closeDialog();
-        } else if (source == searchButton) {
-            // TODO jannis
-//            NodeView view = parent.getActiveCanvas().findNode(
-//                            classesList.getSelectedNode());
-//            parent.getActiveCanvas().markOnly(view);
-//            parent.getActiveCanvas().centerNode(view);
+        } else if (source == searchButton) {            
+            Set<GraphClass> node = null;
+            Set setNames = parent.getTabbedPane().getActiveDrawingLibraryInterface().getGraph().vertexSet();
+            List<GraphClass> listNames = new ArrayList<GraphClass>();
+            for (Object object : setNames) {
+                Set names = (Set) object;
+                if(names.contains(classesList.getSelectedValue()))
+                    node = (Set<GraphClass>) object;
+            }
+            parent.getTabbedPane().getActiveDrawingLibraryInterface().getGraphManipulationInterface().centerNode(node);
             closeDialog();
         }
     }
