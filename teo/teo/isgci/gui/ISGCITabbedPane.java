@@ -19,6 +19,8 @@ import java.util.HashMap;
 import javax.swing.JComponent;
 import javax.swing.JPanel;
 import javax.swing.JTabbedPane;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
 
 import org.jgrapht.Graph;
 
@@ -81,6 +83,22 @@ public class ISGCITabbedPane extends JTabbedPane {
      */
     public ISGCITabbedPane() {
         addStartpage();
+        
+        ChangeListener changeListener = new ChangeListener() {
+            public void stateChanged(ChangeEvent changeEvent) {
+                
+                ISGCITabbedPane sourceTabbedPane = 
+                        (ISGCITabbedPane) changeEvent.getSource();
+                if (!sourceTabbedPane.startpageActive) {
+                    ((ISGCIMainFrame) sourceTabbedPane.
+                        getParent().getParent().getParent().getParent())
+                        .setDrawUnproper(sourceTabbedPane
+                        .getDrawUnproper(sourceTabbedPane
+                        .getComponentAt(sourceTabbedPane.getSelectedIndex())));
+                }
+            }
+        };
+        addChangeListener(changeListener);
     }
 
     /**
@@ -235,7 +253,7 @@ public class ISGCITabbedPane extends JTabbedPane {
      * @param state
      *          the new drawUnproper state of the open tab
      */
-    public void setDrawUnproper(boolean state) {
+    public void setDrawUnproper(boolean state, Component c) {
         if (panelToDrawUnproper.containsKey(getSelectedComponent())) {
             panelToDrawUnproper.remove(getSelectedComponent());
         }
@@ -246,7 +264,7 @@ public class ISGCITabbedPane extends JTabbedPane {
      * @return
      *          true if unproper inclusions shall be drawn, else false.
      */
-    public boolean getDrawUnproper() {
+    public boolean getDrawUnproper(Component c) {
         if (!panelToDrawUnproper.containsKey(getSelectedComponent())) {
             return true;
         } else

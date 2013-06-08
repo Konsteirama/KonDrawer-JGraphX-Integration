@@ -53,7 +53,7 @@ import java.util.ArrayList;*/
 /** The main frame of the application.
  */
 public class ISGCIMainFrame extends JFrame
-        implements WindowListener, ActionListener {
+        implements WindowListener, ActionListener, ItemListener {
 
     public static final String APPLICATIONNAME = "ISGCI";
 
@@ -235,7 +235,7 @@ public class ISGCIMainFrame extends JFrame
         miExit.addActionListener(this);
         miNaming.addActionListener(this);
         miSearching.addActionListener(this);
-        //miDrawUnproper.addItemListener(this); // TODO
+        miDrawUnproper.addItemListener(this); // TODO
         miSelectGraphClasses.addActionListener(this);
         miCheckInclusion.addActionListener(this);
         miGraphClassInformation.addActionListener(this);
@@ -457,11 +457,15 @@ public class ISGCIMainFrame extends JFrame
     
     public void itemStateChanged(ItemEvent event) {
         Object object = event.getSource();
-
         if (object == miDrawUnproper) {
             getTabbedPane().setDrawUnproper(
-                    ((JCheckBoxMenuItem) object).getState());
+                    ((JCheckBoxMenuItem) object).getState(),
+                    getTabbedPane().getSelectedComponent());
         }
+    }
+    
+    public void setDrawUnproper(boolean state){
+        miDrawUnproper.setSelected(state);
     }
 }
 
