@@ -16,6 +16,7 @@ package teo.isgci.gui;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Container;
+import java.awt.FlowLayout;
 import java.awt.MouseInfo;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
@@ -51,12 +52,12 @@ import teo.isgci.problem.Problem;
  * and draws a new graph - which this class should be used for.
  */
 public class ISGCITabbedPane extends JTabbedPane {
-
+    
     /**
      * The version of this class. Should be changed every time
      * this class is modified.
      */
-    private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 2L;
 
     /**
      * Indicates whether the startpage is currently a tab in the tabbedpane.
@@ -155,18 +156,19 @@ public class ISGCITabbedPane extends JTabbedPane {
     private MouseListener mouseListener = new MouseAdapter() {
         @Override
         public void mouseClicked(MouseEvent e) {
-            if (e.getButton() == 3) {
+            if (e.getButton() == MouseEvent.BUTTON2) {
                 e.consume();
                 
                 mxGraphComponent comp = ((mxGraphComponent) panelToInterfaceMap.
                         get(getSelectedComponent()).getPanel());
                 
                 Object v = comp.getCellAt(e.getX(), e.getY());
-                if (v == null)
+                if (v == null) {
                     return;
+                }
                 if (v instanceof mxCell) {
                     //TODO edge-/nodePopup adjustment
-                    if(comp.getGraph().getModel().isEdge(v)){
+                    if (comp.getGraph().getModel().isEdge(v)) {
                         Object o = ((JGraphXAdapter) comp.getGraph()).getCellToEdgeMap().get(v);
 //                        edgePopup.setEdge((EdgeView) v);
 //                        edgePopup.show(e.getComponent(), e.getX(), e.getY());
@@ -204,7 +206,7 @@ public class ISGCITabbedPane extends JTabbedPane {
         addTab("Welcome to ISGCI", startpage);
         setSelectedComponent(startpage);
         ButtonTabComponent closeButton = new ButtonTabComponent(this);
-        this.setTabComponentAt(this.getSelectedIndex(), closeButton);
+        setTabComponentAt(getSelectedIndex(), closeButton);
         resetDefaultColorScheme();
     }
 
@@ -238,11 +240,17 @@ public class ISGCITabbedPane extends JTabbedPane {
             = new JGraphXInterface<V, E>(graph);
 
         JComponent panel = graphXInterface.getPanel();
-        addTab(name, panel);
+        addTab("", panel);
         ButtonTabComponent closeButton = new ButtonTabComponent(this);
         
-        setSelectedComponent(panel);
-        this.setTabComponentAt(this.getSelectedIndex(), closeButton);
+        // Create a new panel to store the name as latex + closebutton
+        JPanel jpanel = new JPanel(new FlowLayout());
+        jpanel.add(new LatexLabel(name));
+        jpanel.add(closeButton);
+        
+        // set jpanel as tab-"index"-content
+        setSelectedComponent(panel);        
+        setTabComponentAt(getSelectedIndex(), jpanel);
         resetDefaultColorScheme();
         
         ((mxGraphComponent) panel).getGraphControl().
@@ -324,8 +332,9 @@ public class ISGCITabbedPane extends JTabbedPane {
     public NamePref getNamingPref(Component c) {
         if (panelToNamingPref.containsKey(c)) {
             return panelToNamingPref.get(c);
-        } else 
+        } else {
             return defaultMode;
+        }
     }
 
     /**
@@ -367,8 +376,9 @@ public class ISGCITabbedPane extends JTabbedPane {
     public boolean getDrawUnproper(Component c) {
         if (!panelToDrawUnproper.containsKey(getSelectedComponent())) {
             return true;
-        } else
+        } else {
             return (panelToDrawUnproper.get(getSelectedComponent()));
+        }
     }
 
     /**
@@ -382,8 +392,8 @@ public class ISGCITabbedPane extends JTabbedPane {
      *          the tab for which the problem is changed.
      */
     public void setProblem(Problem problem, Component c) {
-        if (startpageActive) return;
-        if (panelToProblem.containsKey(c)){
+        if (startpageActive) { return; }
+        if (panelToProblem.containsKey(c)) {
             panelToProblem.remove(c);
         }
         panelToProblem.put((JComponent) c, problem);
