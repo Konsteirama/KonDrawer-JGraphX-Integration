@@ -16,6 +16,10 @@ package teo.isgci.gui;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Container;
+import java.awt.MouseInfo;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
 import java.util.HashMap;
 import java.util.Set;
 
@@ -26,8 +30,14 @@ import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
 import org.jgrapht.Graph;
+
+import com.mxgraph.model.mxCell;
+import com.mxgraph.swing.mxGraphComponent;
+import com.mxgraph.util.mxXmlUtils;
+
 import teo.isgci.db.Algo;
 import teo.isgci.db.Algo.NamePref;
+import teo.isgci.drawing.JGraphXAdapter;
 import teo.isgci.drawing.JGraphXInterface;
 import teo.isgci.drawing.DrawingLibraryInterface;
 import teo.isgci.gc.GraphClass;
@@ -96,35 +106,88 @@ public class ISGCITabbedPane extends JTabbedPane {
      */
     private Algo.NamePref defaultMode = NamePref.BASIC;
     
+
+    /**
+     * A popup menu which is shown after right-clicking a node.
+     */
+    private NodePopup nodePopup;
+
+    /**
+     * A popup menu which is shown after right-clicking an edge.
+     */
+    private EdgePopup edgePopup;
+    
+    /**
+     * A listener which triggers if a tab is changed and then adjusts the
+     * state of the drawUnproper menu item in the mainframe to match the
+     * drawUnproper state of the tab.
+     */
+    private ChangeListener changeListener = new ChangeListener() {
+        public void stateChanged(ChangeEvent changeEvent) {
+
+            if (!startpageActive && getSelectedIndex() >= 0) {
+
+                Container parent = getParent();
+
+                while (parent != null
+                        && !(parent instanceof ISGCIMainFrame)) {
+                    parent = parent.getParent();
+                }
+
+                if (parent != null) {
+                    ISGCIMainFrame mainframe = (ISGCIMainFrame) parent;
+
+                    mainframe.setDrawUnproper(
+                            getDrawUnproper(getSelectedComponent()));
+
+                }
+            }
+        }
+    };
+    
+    /**
+     * A mouse listener.
+     * On right-click it opens a popup window if the clicked object is a node
+     * or a edge.
+     */
+    
+    
+    private MouseListener mouseListener = new MouseAdapter() {
+        @Override
+        public void mouseClicked(MouseEvent e) {
+            if (e.getButton() == 3) {
+                e.consume();
+                
+                mxGraphComponent comp = ((mxGraphComponent) panelToInterfaceMap.
+                        get(getSelectedComponent()).getPanel());
+                
+                Object v = comp.getCellAt(e.getX(), e.getY());
+                if (v == null)
+                    return;
+                if (v instanceof mxCell) {
+                    //TODO edge-/nodePopup adjustment
+                    if(comp.getGraph().getModel().isEdge(v)){
+                        Object o = ((JGraphXAdapter) comp.getGraph()).getCellToEdgeMap().get(v);
+//                        edgePopup.setEdge((EdgeView) v);
+//                        edgePopup.show(e.getComponent(), e.getX(), e.getY());
+                    } else {
+                        Set node = (Set)((JGraphXAdapter) comp.getGraph()).getCellToVertexMap().get(v);
+//                        nodePopup.setNode((NodeView) node);
+                        nodePopup.show(e.getComponent(), e.getX(), e.getY());
+                    }                        
+                }
+            }
+        }
+    };
+    
     /**
      * Creates a new Tabbed pane with a startpage as only active tab.
      */
     public ISGCITabbedPane() {
-        addStartpage();
-        
-        ChangeListener changeListener = new ChangeListener() {
-            public void stateChanged(ChangeEvent changeEvent) {
-
-                if (!startpageActive && getSelectedIndex() >= 0) {
-
-                    Container parent = getParent();
-
-                    while (parent != null
-                            && !(parent instanceof ISGCIMainFrame)) {
-                        parent = parent.getParent();
-                    }
-
-                    if (parent != null) {
-                        ISGCIMainFrame mainframe = (ISGCIMainFrame) parent;
-
-                        mainframe.setDrawUnproper(
-                                getDrawUnproper(getSelectedComponent()));
-
-                    }
-                }
-            }
-        };
-        
+        nodePopup = new NodePopup((ISGCIMainFrame) getParent());
+        edgePopup = new EdgePopup((ISGCIMainFrame) getParent());
+        addStartpage();       
+        addMouseListener(mouseListener);
         addChangeListener(changeListener);
     }
 
@@ -176,10 +239,14 @@ public class ISGCITabbedPane extends JTabbedPane {
 
         JComponent panel = graphXInterface.getPanel();
         addTab(name, panel);
-        setSelectedComponent(panel);
         ButtonTabComponent closeButton = new ButtonTabComponent(this);
+        
+        setSelectedComponent(panel);
         this.setTabComponentAt(this.getSelectedIndex(), closeButton);
         resetDefaultColorScheme();
+        
+        ((mxGraphComponent) panel).getGraphControl().
+                addMouseListener(mouseListener);      
         
         // save context for later reference
         panelToInterfaceMap.put(panel, graphXInterface);
