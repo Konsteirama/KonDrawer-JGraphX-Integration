@@ -95,7 +95,7 @@ public class GraphClassSelectionDialog extends JDialog implements
         c.weightx = 1.0;
         c.weighty = 1.0;
         c.fill = GridBagConstraints.BOTH;
-        classesList = new NodeList(parent.latex);
+        classesList = new NodeList();
         JScrollPane scroller = new JScrollPane(classesList);
         gridbag.setConstraints(scroller, c);
         contents.add(scroller);

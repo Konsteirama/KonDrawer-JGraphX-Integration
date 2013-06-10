@@ -23,12 +23,8 @@ import java.io.*;
  * A Label that can depict a subset of latex. drawLatexString can also
  * be called from other classes.
  */
-public class LatexLabel extends JComponent {
-
-    /** Where the glyphs come from. */
-    private LatexGraphics latex;
-    
-    /** Contents of this label */
+public class LatexLabel extends JComponent {   
+    /** Contents of this label. */
     private String text;
 
     private int align;
@@ -38,17 +34,17 @@ public class LatexLabel extends JComponent {
     /**
      * Creates a new label without text.
      */
-    public LatexLabel(LatexGraphics l) {
-        this(l, "", JLabel.LEFT);
+    public LatexLabel() {
+        this("", JLabel.LEFT);
     }
 
     /**
-     * Creates a new label
+     * Creates a new label.
      *
      * @param text the contents of the label
      */
-    public LatexLabel(LatexGraphics l, String text) {
-        this(l, text, JLabel.LEFT);
+    public LatexLabel(String text) {
+        this(text, JLabel.LEFT);
     }
 
     /**
@@ -57,8 +53,7 @@ public class LatexLabel extends JComponent {
      * @param text contents of the label
      * @param alignment alignment of the label (only LEFT supported )
      */
-    public LatexLabel(LatexGraphics l, String text, int alignment) {
-        this.latex = l;
+    public LatexLabel(String text, int alignment) {
         this.text = text;
         align = alignment;
         setBorder(BorderFactory.createEmptyBorder(3, 0, 3, 0));
@@ -134,14 +129,16 @@ public class LatexLabel extends JComponent {
 
         Insets insets = getInsets();
         Graphics g;
-        if (getGraphics() == null)
+        if (getGraphics() == null) {
             g = new NulGraphics();
-        else
+        } else {
             g = getGraphics().create();
+        }
         g.setFont(getFont());
         FontMetrics fm = g.getFontMetrics();
         Dimension d = new Dimension(
-                insets.left + insets.right + latex.getLatexWidth(g, text),
+                insets.left + insets.right 
+                + LatexGraphics.getInstance().getLatexWidth(g, text),
                 insets.top + insets.bottom + fm.getHeight());
         g.dispose();
         return d;
@@ -149,6 +146,8 @@ public class LatexLabel extends JComponent {
 
     /**
      * Returns the minimum size of the label.
+     * 
+     * @return The minimum size of the label.
      */
     public Dimension getMinimumSize() {
         return getPreferredSize();
@@ -156,9 +155,11 @@ public class LatexLabel extends JComponent {
 
     /**
      * Returns the maximal size of the label.
+     * 
+     * @return The maximum size of the label.
      */
     public Dimension getMaximumSize() {
-        return new Dimension(Integer.MAX_VALUE,Integer.MAX_VALUE);
+        return new Dimension(Integer.MAX_VALUE, Integer.MAX_VALUE);
         //return getPreferredSize();
     }
 
@@ -170,9 +171,11 @@ public class LatexLabel extends JComponent {
      * @param str the string to draw
      * @param x where to paint
      * @param y where to paint
+     * 
+     * @return The width of the latexstring.
      */
     public int drawLatexString(Graphics g, String str, int x, int y) {
-        return latex.drawLatexString(g, str, x, y);
+        return LatexGraphics.getInstance().drawLatexString(g, str, x, y);
     }
 
 
@@ -182,7 +185,7 @@ public class LatexLabel extends JComponent {
      * @param f the fontmetrics
      */
     public int getLatexWidth(Graphics g, String str) {
-        return latex.getLatexWidth(g, str);
+        return LatexGraphics.getInstance().getLatexWidth(g, str);
     }
 
 

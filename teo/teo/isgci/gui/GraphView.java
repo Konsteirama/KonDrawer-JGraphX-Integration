@@ -39,7 +39,6 @@ public class GraphView<V,E> {
     protected Component parent;
     protected SimpleDirectedGraph<V,E> graph;
     protected HierarchyLayout<V,E> layouter;
-    protected LatexGraphics latexgraphics;
     protected boolean drawUnproper;
     /** NodeViews */
     protected List<NodeView<V,E> > views;
@@ -81,21 +80,6 @@ public class GraphView<V,E> {
      */
     public SimpleDirectedGraph<V,E> getGraph() {
         return graph;
-    }
-
-
-    /**
-     * Set the LatexGraphics to be used for formatting latex strings.
-     */
-    public void setLatexGraphics(LatexGraphics g) {
-        latexgraphics = g;
-    }
-
-    /**
-     * Return the LatexGraphics to be used for formatting latex strings.
-     */
-    LatexGraphics getLatexGraphics() {
-        return latexgraphics;
     }
 
     public void setDrawUnproper(boolean b) {

@@ -55,7 +55,7 @@ public class ISGCIGraphCanvas extends
 
 
     public ISGCIGraphCanvas(ISGCIMainFrame parent) {
-        super(parent, parent.latex, new ISGCIVertexFactory(), null);
+        super(parent, new ISGCIVertexFactory(), null);
         problem = null;
         namingPref = Algo.NamePref.BASIC;
         setWidthFunc(new NodeWidthFunc());

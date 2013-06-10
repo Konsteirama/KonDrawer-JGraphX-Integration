@@ -107,7 +107,7 @@ public class GraphClassInformationDialog extends JDialog
         c.weighty = 1.0;
         c.fill = GridBagConstraints.BOTH;
         c.gridwidth = GridBagConstraints.REMAINDER;
-        classesList = new NodeList(parent.latex);
+        classesList = new NodeList();
         classesList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         JScrollPane scroller = new JScrollPane(classesList);
         scroller.setPreferredSize(listdim);
@@ -157,14 +157,14 @@ public class GraphClassInformationDialog extends JDialog
         c.insets = new Insets(0, 5, 5, 5);
         c.gridwidth = 2;
         c.weighty = 1.0;
-        supClassesList = new NodeList(parent.latex);
+        supClassesList = new NodeList();
         scroller = new JScrollPane(supClassesList);
         scroller.setPreferredSize(listdim);
         scroller.setMinimumSize(listdim);
         gridbag.setConstraints(scroller, c);
         contents.add(scroller);
 
-        equClassesList = new NodeList(parent.latex);
+        equClassesList = new NodeList();
         scroller = new JScrollPane(equClassesList);
         scroller.setPreferredSize(listdim);
         scroller.setMinimumSize(listdim);
@@ -172,7 +172,7 @@ public class GraphClassInformationDialog extends JDialog
         contents.add(scroller);
 
         c.gridwidth = GridBagConstraints.REMAINDER;
-        subClassesList = new NodeList(parent.latex);
+        subClassesList = new NodeList();
         scroller = new JScrollPane(subClassesList);
         scroller.setPreferredSize(listdim);
         scroller.setMinimumSize(listdim);

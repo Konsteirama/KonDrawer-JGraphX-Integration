@@ -33,7 +33,6 @@ public class NamingDialog extends JDialog implements ActionListener {
         
         Algo.NamePref mode = this.parent.getTabbedPane().getNamingPref(parent.getTabbedPane().getSelectedComponent());
 
-        LatexGraphics latex = ISGCIMainFrame.latex;
         Container contents = getContentPane();
 
         GridBagLayout gridbag = new GridBagLayout();
@@ -51,7 +50,7 @@ public class NamingDialog extends JDialog implements ActionListener {
         gridbag.setConstraints(basicBox, c);
         contents.add(basicBox);
         c.gridwidth = GridBagConstraints.REMAINDER;
-        LatexLabel label = latex.newLabel("e.g. threshold");
+        LatexLabel label = new LatexLabel("e.g. threshold");
         gridbag.setConstraints(label, c);
         contents.add(label);
 
@@ -63,7 +62,7 @@ public class NamingDialog extends JDialog implements ActionListener {
         gridbag.setConstraints(forbiddenBox, c);
         contents.add(forbiddenBox);
         c.gridwidth = GridBagConstraints.REMAINDER;
-        label = latex.newLabel("e.g. (P_4,2K_2,C_4)-free");
+        label = new LatexLabel("e.g. (P_4,2K_2,C_4)-free");
         gridbag.setConstraints(label, c);
         contents.add(label);
         
@@ -74,7 +73,7 @@ public class NamingDialog extends JDialog implements ActionListener {
         gridbag.setConstraints(derivedBox, c);
         contents.add(derivedBox);
         c.gridwidth = GridBagConstraints.REMAINDER;
-        label = latex.newLabel("e.g. cograph \\cap split");
+        label = new LatexLabel("e.g. cograph \\cap split");
         gridbag.setConstraints(label, c);
         contents.add(label);
 
