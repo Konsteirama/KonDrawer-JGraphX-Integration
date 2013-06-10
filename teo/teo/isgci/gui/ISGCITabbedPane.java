@@ -15,6 +15,7 @@ package teo.isgci.gui;
 
 import java.awt.Color;
 import java.awt.Component;
+import java.awt.Container;
 import java.util.HashMap;
 import java.util.Set;
 
@@ -103,19 +104,27 @@ public class ISGCITabbedPane extends JTabbedPane {
         
         ChangeListener changeListener = new ChangeListener() {
             public void stateChanged(ChangeEvent changeEvent) {
-                
-                ISGCITabbedPane sourceTabbedPane = 
-                        (ISGCITabbedPane) changeEvent.getSource();
-                if (!sourceTabbedPane.startpageActive 
-                        && (sourceTabbedPane.getSelectedIndex() >= 0)) {
-                    ((ISGCIMainFrame) sourceTabbedPane.
-                        getParent().getParent().getParent().getParent())
-                        .setDrawUnproper(sourceTabbedPane
-                        .getDrawUnproper(sourceTabbedPane
-                        .getComponentAt(sourceTabbedPane.getSelectedIndex())));
+
+                if (!startpageActive && getSelectedIndex() >= 0) {
+
+                    Container parent = getParent();
+
+                    while (parent != null
+                            && !(parent instanceof ISGCIMainFrame)) {
+                        parent = parent.getParent();
+                    }
+
+                    if (parent != null) {
+                        ISGCIMainFrame mainframe = (ISGCIMainFrame) parent;
+
+                        mainframe.setDrawUnproper(
+                                getDrawUnproper(getSelectedComponent()));
+
+                    }
                 }
             }
         };
+        
         addChangeListener(changeListener);
     }
 
@@ -163,7 +172,7 @@ public class ISGCITabbedPane extends JTabbedPane {
         }
         
         JGraphXInterface<V, E> graphXInterface 
-        = new JGraphXInterface<V, E>(graph);
+            = new JGraphXInterface<V, E>(graph);
 
         JComponent panel = graphXInterface.getPanel();
         addTab(name, panel);
