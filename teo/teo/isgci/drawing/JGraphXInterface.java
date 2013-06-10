@@ -11,17 +11,23 @@
 
 package teo.isgci.drawing;
 
+import java.awt.Component;
 import java.awt.event.MouseEvent;
 
 import com.mxgraph.layout.mxIGraphLayout;
 import com.mxgraph.layout.hierarchical.mxHierarchicalLayout;
 import com.mxgraph.model.mxCell;
 import com.mxgraph.swing.mxGraphComponent;
+import com.mxgraph.view.mxCellState;
 
 import org.jgrapht.Graph;
 import org.jgrapht.ListenableGraph;
 import org.jgrapht.graph.DefaultEdge;
+
+import teo.isgci.gui.LatexLabel;
+
 import javax.swing.JComponent;
+import javax.swing.JLabel;
 
 /**
  * Dumbed down version of the original, WIP interface
@@ -51,6 +57,7 @@ public class JGraphXInterface<V, E> implements DrawingLibraryInterface<V, E> {
         // Also overrides the default behavior of JGraphX panning
         // implementation so the users are not required to hold down shift
         // and ctrl
+        // and draws the label via latexlabel
         graphComponent = new mxGraphComponent(graphAdapter) {
             @Override
             public boolean isPanningEvent(MouseEvent event) {
@@ -67,6 +74,19 @@ public class JGraphXInterface<V, E> implements DrawingLibraryInterface<V, E> {
 
                 return cell == null || cell.isEdge();
             }
+            
+            @Override
+            public Component[] createComponents(mxCellState state) {
+                if (getGraph().getModel().isVertex(state.getCell())) {
+                    String label = state.getLabel();
+                    // get rid of these nasty [] around all labels 
+                    label = label.replace("[", "");
+                    label = label.replace("]", "");
+                    
+                    return new Component[] { new LatexLabel(label) };
+                }
+                return null;
+            };
         };
 
         graphManipulation = new GraphManipulation(graphComponent, graphAdapter);
