@@ -103,7 +103,7 @@ public class OpenProblemDialog extends JDialog implements ItemListener,
         c.gridwidth = 1;
         c.weightx = 1.0;
         c.weighty = 1.0;
-        npList = new NodeList(ISGCIMainFrame.latex);
+        npList = new NodeList();
         scroller = new JScrollPane(npList);
         scroller.setPreferredSize(listdim);
         lists.add(npList);
@@ -111,7 +111,7 @@ public class OpenProblemDialog extends JDialog implements ItemListener,
         gridbag.setConstraints(scroller, c);
         contents.add(scroller);
 
-        openList = new NodeList(ISGCIMainFrame.latex);
+        openList = new NodeList();
         scroller = new JScrollPane(openList);
         scroller.setPreferredSize(listdim);
         lists.add(openList);
@@ -120,7 +120,7 @@ public class OpenProblemDialog extends JDialog implements ItemListener,
         contents.add(scroller);
 
         c.gridwidth = GridBagConstraints.REMAINDER;
-        pList = new NodeList(ISGCIMainFrame.latex);
+        pList = new NodeList();
         scroller = new JScrollPane(pList);
         scroller.setPreferredSize(listdim);
         lists.add(pList);
@@ -242,18 +242,20 @@ public class OpenProblemDialog extends JDialog implements ItemListener,
     public void actionPerformed(ActionEvent event) {
         Object source = event.getSource();
         if (source == drawButton) {
-            SimpleDirectedGraph<Set<GraphClass>, DefaultEdge> graph =
-                Algo.createHierarchySubgraph(getNodes(lists.getSelectedNode()));
+            SimpleDirectedGraph<Set<GraphClass>, DefaultEdge> graph = Algo
+                    .createHierarchySubgraph(getNodes(lists.getSelectedNode()));
             parent.getTabbedPane().drawInActiveTab(
-                graph, problem.getName() + " - " 
-                + lists.getSelectedNode().toString());
+                    graph,
+                    problem.getName() + " - "
+                            + lists.getSelectedNode().toString());
             closeDialog();
         } else if (source == drawNewTabButton) {
-            SimpleDirectedGraph<Set<GraphClass>, DefaultEdge> graph =
-                Algo.createHierarchySubgraph(getNodes(lists.getSelectedNode()));
+            SimpleDirectedGraph<Set<GraphClass>, DefaultEdge> graph = Algo
+                    .createHierarchySubgraph(getNodes(lists.getSelectedNode()));
             parent.getTabbedPane().drawInNewTab(
-                graph, problem.getName() + " - " 
-                + lists.getSelectedNode().toString());
+                    graph,
+                    problem.getName() + " - "
+                            + lists.getSelectedNode().toString());
             closeDialog();
         } else if (source == showButton) {
             JDialog info = new GraphClassInformationDialog(parent,

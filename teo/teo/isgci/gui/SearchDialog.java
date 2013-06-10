@@ -36,15 +36,14 @@ public class SearchDialog extends JDialog implements ActionListener {
     protected JButton searchButton, cancelButton;
     protected NodeList classesList;
 
-
     public SearchDialog(ISGCIMainFrame parent) {
         super(parent, "Search for a graphclass", true);
         this.parent = parent;
         group = new ButtonGroup();
-        
-        Algo.NamePref mode = parent.getTabbedPane().
-                getNamingPref(parent.getTabbedPane().getSelectedComponent());
-        
+
+        Algo.NamePref mode = parent.getTabbedPane().getNamingPref(
+                parent.getTabbedPane().getSelectedComponent());
+
         Container content = getContentPane();
 
         GridBagLayout gridbag = new GridBagLayout();
@@ -56,19 +55,19 @@ public class SearchDialog extends JDialog implements ActionListener {
         c.weighty = 1.0;
         c.weightx = 1.0;
         c.fill = GridBagConstraints.BOTH;
-        classesList = new NodeList(parent.latex);
+        classesList = new NodeList();
         classesList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         JScrollPane scroller = new JScrollPane(classesList);
         gridbag.setConstraints(scroller, c);
         content.add(scroller);
-        
+
         c.insets = new Insets(0, 5, 0, 0);
         c.weightx = 0.0;
         c.weighty = 0.0;
         c.fill = GridBagConstraints.NONE;
         c.anchor = GridBagConstraints.WEST;
         c.fill = GridBagConstraints.BOTH;
-    
+
         JPanel p = new JPanel();
         searchButton = new JButton("Search");
         cancelButton = new JButton("Cancel");
@@ -81,8 +80,9 @@ public class SearchDialog extends JDialog implements ActionListener {
         searchButton.addActionListener(this);
         cancelButton.addActionListener(this);
         setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
-    
-        Set setNames = parent.getTabbedPane().getActiveDrawingLibraryInterface().getGraph().vertexSet();
+
+        Set setNames = parent.getTabbedPane()
+                .getActiveDrawingLibraryInterface().getGraph().vertexSet();
         List<GraphClass> listNames = new ArrayList<GraphClass>();
         for (Object object : setNames) {
             for (Object name : (Set) object) {
@@ -93,12 +93,11 @@ public class SearchDialog extends JDialog implements ActionListener {
             Collections.sort(listNames, new LessLatex());
             classesList.setListData(listNames);
         }
-        
+
         pack();
         setSize(300, 350);
-    
-    }
 
+    }
 
     protected void closeDialog() {
         setVisible(false);
@@ -109,16 +108,18 @@ public class SearchDialog extends JDialog implements ActionListener {
         Object source = event.getSource();
         if (source == cancelButton) {
             closeDialog();
-        } else if (source == searchButton) {            
+        } else if (source == searchButton) {
             Set<GraphClass> node = null;
-            Set setNames = parent.getTabbedPane().getActiveDrawingLibraryInterface().getGraph().vertexSet();
+            Set setNames = parent.getTabbedPane()
+                    .getActiveDrawingLibraryInterface().getGraph().vertexSet();
             List<GraphClass> listNames = new ArrayList<GraphClass>();
             for (Object object : setNames) {
                 Set names = (Set) object;
-                if(names.contains(classesList.getSelectedValue()))
+                if (names.contains(classesList.getSelectedValue()))
                     node = (Set<GraphClass>) object;
             }
-            parent.getTabbedPane().getActiveDrawingLibraryInterface().getGraphManipulationInterface().centerNode(node);
+            parent.getTabbedPane().getActiveDrawingLibraryInterface()
+                    .getGraphManipulationInterface().centerNode(node);
             closeDialog();
         }
     }

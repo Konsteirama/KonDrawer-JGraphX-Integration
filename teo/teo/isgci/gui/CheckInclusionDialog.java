@@ -77,7 +77,7 @@ public class CheckInclusionDialog extends JDialog
         c.insets = new Insets(5, 5, 5, 5);
         c.weightx = 1.0;
         c.weighty = 1.0;
-        firstList = new NodeList(parent.latex);
+        firstList = new NodeList();
         firstList.setListData(DataSet.getClasses());
         firstList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         JScrollPane scroller = new JScrollPane(firstList);
@@ -109,7 +109,7 @@ public class CheckInclusionDialog extends JDialog
         gridbag.setConstraints(secondSearch, c);
         content.add(secondSearch);
 
-        secondList = new NodeList(parent.latex);
+        secondList = new NodeList();
         secondList.setListData(DataSet.getClasses());
         secondList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         scroller = new JScrollPane(secondList);

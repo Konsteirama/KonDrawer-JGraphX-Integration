@@ -108,8 +108,8 @@ public class InclusionResultDialog extends JDialog implements ActionListener {
         gridbag.setConstraints(line1, constraints);
         content.add(line1);
 
-        LatexLabel line2 = new LatexLabel(parent.latex,
-                node1.toString() +" and "+ node2.toString()+".");
+        LatexLabel line2 = new LatexLabel(node1.toString() 
+                + " and " + node2.toString() + ".");
         //line2.setFont(new Font("TimesRoman",Font.PLAIN,14));
         gridbag.setConstraints(line2, constraints);
         content.add(line2);
@@ -164,18 +164,18 @@ public class InclusionResultDialog extends JDialog implements ActionListener {
         this(parent);
         upper = lower = null;
 
-        LatexLabel l = new LatexLabel(parent.latex, node1.toString());
+        LatexLabel l = new LatexLabel(node1.toString());
         //l.setFont(new Font("TimesRoman",Font.PLAIN,14));
         constraints.gridwidth = GridBagConstraints.REMAINDER;
         gridbag.setConstraints(l, constraints);
         content.add(l);
 
-        LatexLabel equiv = new LatexLabel(parent.latex, "$\\equiv$");
+        LatexLabel equiv = new LatexLabel("$\\equiv$");
         constraints.gridwidth = GridBagConstraints.REMAINDER;
         gridbag.setConstraints(equiv,constraints);
         content.add(equiv);
 
-        l = new LatexLabel(parent.latex, node2.toString());
+        l = new LatexLabel(node2.toString());
         //l.setFont(new Font("TimesRoman",Font.PLAIN,14));
         constraints.gridwidth = GridBagConstraints.REMAINDER;
         gridbag.setConstraints(l, constraints);
@@ -354,7 +354,7 @@ public class InclusionResultDialog extends JDialog implements ActionListener {
             JComponent p = new JPanel();
             p.setAlignmentX(JComponent.LEFT_ALIGNMENT);
             p.add(new JLabel("by disjointness of"));
-            p.add(new LatexLabel(parent.latex, rel.get1()+" and "+rel.get2()));
+            p.add(new LatexLabel(rel.get1()+" and "+rel.get2()));
             res.add(p);
             refs = p;
         }
@@ -394,8 +394,8 @@ public class InclusionResultDialog extends JDialog implements ActionListener {
             JComponent p = new JPanel();
             p.setAlignmentX(JComponent.LEFT_ALIGNMENT);
             p.add(new JLabel("witnesses:"));
-            p.add(new LatexLabel(parent.latex, why1.toString()));
-            p.add(new LatexLabel(parent.latex, why2.toString()));
+            p.add(new LatexLabel(why1.toString()));
+            p.add(new LatexLabel(why2.toString()));
             res.add(p);
         } else {
             JPanel p = new JPanel();
@@ -440,7 +440,7 @@ public class InclusionResultDialog extends JDialog implements ActionListener {
                 JComponent p = new JPanel();
                 p.setAlignmentX(JComponent.LEFT_ALIGNMENT);
                 p.add(new JLabel("witness:"));
-                p.add(new LatexLabel(parent.latex, why.toString()));
+                p.add(new LatexLabel(why.toString()));
                 res.add(p);
                 return res;
             }
@@ -470,7 +470,7 @@ public class InclusionResultDialog extends JDialog implements ActionListener {
         c.anchor = GridBagConstraints.NORTHWEST;
 
         for (GraphClass gc : classes) {
-            label = new LatexLabel(parent.latex, gc.toString());
+            label = new LatexLabel(gc.toString());
             gridbag.setConstraints(label, c);
             panel.add(label);
         }
@@ -500,8 +500,7 @@ public class InclusionResultDialog extends JDialog implements ActionListener {
         constraints.anchor = GridBagConstraints.WEST;
         
         for (int i = path.size()-1; i >= 0; i--) {
-            LatexLabel l = new LatexLabel(parent.latex,
-                path.get(i).getSub().toString());
+            LatexLabel l = new LatexLabel(path.get(i).getSub().toString());
             constraints.gridwidth = 1;
             gridbag.setConstraints(l, constraints);
             compo.add(l);
@@ -516,31 +515,32 @@ public class InclusionResultDialog extends JDialog implements ActionListener {
 
             LatexLabel subset;
             if (details  &&
-                        DataSet.getEquivalentClasses(sup).contains(sub))
-                subset = new LatexLabel(parent.latex, "   $\\equiv$");
-            else if (details  &&  e.isProper())
-                subset = new LatexLabel(parent.latex, "   $\\subset$");
-            else
-                subset = new LatexLabel(parent.latex, "   $\\subseteq$");
+                        DataSet.getEquivalentClasses(sup).contains(sub)) {
+                subset = new LatexLabel("   $\\equiv$");
+            } else if (details  &&  e.isProper()) {
+                subset = new LatexLabel("   $\\subset$");
+            } else {
+                subset = new LatexLabel("   $\\subseteq$");
+            }
             constraints.gridwidth = 1;
-            gridbag.setConstraints(subset,constraints);
+            gridbag.setConstraints(subset, constraints);
             compo.add(subset);
                 
             StringBuffer s = new StringBuffer();
-            for (Object o : e.getRefs())
+            for (Object o : e.getRefs()) {
                 s.append(o);
-            JLabel label1=new JLabel(s.toString(), JLabel.CENTER);
+            }
+            JLabel label1 = new JLabel(s.toString(), JLabel.CENTER);
             constraints.gridwidth = GridBagConstraints.REMAINDER;
             gridbag.setConstraints(label1, constraints);
             compo.add(label1);
         }
 
-        LatexLabel l = new LatexLabel(parent.latex,
-            path.get(0).getSuper().toString());
+        LatexLabel l = new LatexLabel(path.get(0).getSuper().toString());
         constraints.gridwidth = 1;
         gridbag.setConstraints(l, constraints);
         compo.add(l);
-        JLabel label2=new JLabel("", JLabel.CENTER);
+        JLabel label2 = new JLabel("", JLabel.CENTER);
             constraints.gridwidth = GridBagConstraints.REMAINDER;
         gridbag.setConstraints(label2, constraints);
         compo.add(label2);

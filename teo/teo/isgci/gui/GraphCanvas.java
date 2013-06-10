@@ -43,7 +43,6 @@ public class GraphCanvas<V,E> extends JPanel
     protected View markedView;
     protected boolean dragInProcess;
     protected boolean drawUnproper;
-    protected LatexGraphics latexgraphics;
     protected VertexFactory<V> vertexFactory;
     protected IntFunction<V> widthFunc;
     
@@ -56,12 +55,10 @@ public class GraphCanvas<V,E> extends JPanel
 
 
     public GraphCanvas(Component parent,
-            LatexGraphics latexgraphics,
             VertexFactory<V> vertexFactory,
             IntFunction<V> widthFunc) {
         super();
         this.parent = parent;
-        this.latexgraphics = latexgraphics;
         this.vertexFactory = vertexFactory;
         this.widthFunc = widthFunc;
         graphs = new ArrayList<GraphView<V,E> >();
@@ -91,7 +88,6 @@ public class GraphCanvas<V,E> extends JPanel
     protected GraphView<V,E> addGraph(SimpleDirectedGraph<V,E> g) {
         GraphView<V,E> gv = new GraphView<V,E>(this, g,
                 vertexFactory, widthFunc);
-        gv.setLatexGraphics(latexgraphics);
         gv.setDrawUnproper(drawUnproper);
         graphs.add(gv);
         return gv;
@@ -176,10 +172,6 @@ public class GraphCanvas<V,E> extends JPanel
     protected void setProperness(EdgeView<V,E> view) {
     }
 
-
-    public LatexGraphics getLatexGraphics() {
-        return latexgraphics;
-    }
 
     public void setWidthFunc(IntFunction<V> widthFunc) {
         this.widthFunc = widthFunc;
@@ -275,7 +267,7 @@ public class GraphCanvas<V,E> extends JPanel
     public void forcePaint(Graphics g) {
         g.setClip(bounds);
         //g.setColor(getForeground());          // Done by ...View.paint
-        g.setFont(latexgraphics.getFont());
+        g.setFont(LatexGraphics.getInstance().getFont());
         dopaint(g);
     }
 

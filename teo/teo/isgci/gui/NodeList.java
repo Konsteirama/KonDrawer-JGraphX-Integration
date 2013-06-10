@@ -23,30 +23,27 @@ import teo.isgci.gc.GraphClass;
  * A JList filled with ISGCINodes, that are displayed with formatted html.
  */
 public class NodeList extends JList {
-    LatexGraphics latex;
-
 
     /**
      * Create a new list with the given nodes in it.
      */
-    public NodeList(LatexGraphics latex, Vector nodes) {
+    public NodeList(Vector nodes) {
         super(nodes);
-        init(latex);
+        init();
     }
 
 
     /**
      * Create a new list.
      */
-    public NodeList(LatexGraphics latex) {
+    public NodeList() {
         super();
-        init(latex);
+        init();
     }
 
-    protected void init(LatexGraphics latex) {
-        this.latex = latex;
+    protected void init() {
         setCellRenderer(new NodeListCellRenderer());
-        setFont(latex.getFont());
+        setFont(LatexGraphics.getInstance().getFont());
     }
 
 
@@ -94,7 +91,7 @@ public class NodeList extends JList {
                 JList list, Object value, int index,
                 boolean isSelected, boolean cellHasFocus) {
             LatexLabel label =
-                    latex.newLabel(((GraphClass) value).toString());
+                    new LatexLabel(((GraphClass) value).toString());
             if (isSelected) {
                 label.setBackground(list.getSelectionBackground());
                 label.setForeground(list.getSelectionForeground());

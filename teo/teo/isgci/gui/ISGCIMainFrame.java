@@ -58,7 +58,6 @@ public class ISGCIMainFrame extends JFrame
     public static final String APPLICATIONNAME = "ISGCI";
 
     public static ISGCIMainFrame tracker; // Needed for MediaTracker (hack)
-    public static LatexGraphics latex;
     public static Font font;
 
     protected teo.Loader loader;
@@ -97,10 +96,13 @@ public class ISGCIMainFrame extends JFrame
         DataSet.init(loader, "data/isgci.xml");
         ForbiddenClass.initRules(loader, "data/smallgraphs.xml");
         PSGraphics.init(loader);
-        if (latex == null) {
-            latex = new LatexGraphics();
-            latex.init(loader);
-        }
+        LatexGraphics.init(loader);
+        
+        
+//        if (latex == null) {
+//            latex = new LatexGraphics();
+//            latex.init(loader);
+//        }
 
         boolean createMaps = false;
         try {
