@@ -6,7 +6,7 @@ import java.awt.event.MouseWheelEvent;
 
 import com.mxgraph.swing.mxGraphComponent;
 
-public class InternalMouseAdapter extends MouseAdapter {
+class InternalMouseAdapter extends MouseAdapter {
 
     private mxGraphComponent graphComponent;
 

@@ -10,7 +10,7 @@ import org.jgrapht.Graph;
  * 
  * @param <E>
  */
-public class JGraphXInterfaceFactory<V, E> extends DrawingLibraryFactory<V, E> {
+class JGraphXInterfaceFactory<V, E> extends DrawingLibraryFactory<V, E> {
     
     /**
      * Should only be used by the DrawingLibraryFactory.

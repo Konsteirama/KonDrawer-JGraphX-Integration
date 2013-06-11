@@ -8,7 +8,7 @@ import com.mxgraph.swing.mxGraphComponent;
  * Dumbed down version of the original, WIP GraphEvent
  * TODO: replace this with the final one
  */
-public class GraphEvent implements GraphEventInterface {
+class GraphEvent implements GraphEventInterface {
 
     private mxGraphComponent graphComponent;
 

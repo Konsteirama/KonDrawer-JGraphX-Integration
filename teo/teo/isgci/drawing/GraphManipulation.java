@@ -18,7 +18,7 @@ import java.awt.*;
  * @param <V>
  * @param <E>
  */
-public class GraphManipulation<V, E> implements GraphManipulationInterface {
+class GraphManipulation<V, E> implements GraphManipulationInterface {
 
     /**
      * Adapter holding the current graph in JgraphX and JGraphT data structure.

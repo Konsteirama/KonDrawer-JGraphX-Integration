@@ -33,7 +33,7 @@ import javax.swing.JLabel;
  * Dumbed down version of the original, WIP interface
  * TODO: replace this with the final one
  */
-public class JGraphXInterface<V, E> implements DrawingLibraryInterface<V, E> {
+class JGraphXInterface<V, E> implements DrawingLibraryInterface<V, E> {
 
     private mxGraphComponent graphComponent;
 

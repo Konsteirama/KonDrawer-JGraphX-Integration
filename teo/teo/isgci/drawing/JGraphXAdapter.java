@@ -32,8 +32,7 @@ import com.mxgraph.view.mxGraph;
  * @param <V> Vertex
  * @param <E> Edge
  */
-public class JGraphXAdapter<V, E> extends mxGraph implements
-        GraphListener<V, E> {
+class JGraphXAdapter<V, E> extends mxGraph implements GraphListener<V, E> {
 
         /**
          * The graph to be drawn.
