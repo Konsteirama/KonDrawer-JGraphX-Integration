@@ -16,7 +16,7 @@ public abstract class DrawingLibraryFactory<V, E> {
     /**
      * The current instance of the implemented DrawingLibraryInterface.
      */
-    private static DrawingLibraryFactory<?, ?> currentFactory;
+    private static DrawingLibraryFactory currentFactory;
     
     /**
      * Returns the current instance of the current
@@ -29,7 +29,7 @@ public abstract class DrawingLibraryFactory<V, E> {
      * @return
      *          The current instance of the DrawingLibraryFactory
      */
-    public static <V, E> DrawingLibraryFactory<?, ?> getFactory() {
+    public static <V, E> DrawingLibraryFactory getFactory() {
         if (currentFactory == null) {
             currentFactory = new JGraphXInterfaceFactory<V, E>();
         }

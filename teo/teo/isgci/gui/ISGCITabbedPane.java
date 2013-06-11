@@ -32,14 +32,9 @@ import javax.swing.event.ChangeListener;
 
 import org.jgrapht.Graph;
 
-import com.mxgraph.model.mxCell;
-import com.mxgraph.swing.mxGraphComponent;
-import com.mxgraph.util.mxXmlUtils;
-
 import teo.isgci.db.Algo;
 import teo.isgci.db.Algo.NamePref;
-import teo.isgci.drawing.JGraphXAdapter;
-import teo.isgci.drawing.JGraphXInterface;
+import teo.isgci.drawing.DrawingLibraryFactory;
 import teo.isgci.drawing.DrawingLibraryInterface;
 import teo.isgci.gc.GraphClass;
 import teo.isgci.problem.Complexity;
@@ -159,6 +154,8 @@ public class ISGCITabbedPane extends JTabbedPane {
             if (e.getButton() == MouseEvent.BUTTON2) {
                 e.consume();
                 
+                /*  TODO no jgraphx references!
+                
                 mxGraphComponent comp = ((mxGraphComponent) panelToInterfaceMap.
                         get(getSelectedComponent()).getPanel());
                 
@@ -177,7 +174,7 @@ public class ISGCITabbedPane extends JTabbedPane {
 //                        nodePopup.setNode((NodeView) node);
                         nodePopup.show(e.getComponent(), e.getX(), e.getY());
                     }                        
-                }
+                } */
             }
         }
     };
@@ -236,8 +233,9 @@ public class ISGCITabbedPane extends JTabbedPane {
             removeStartpage();
         }
         
-        JGraphXInterface<V, E> graphXInterface 
-            = new JGraphXInterface<V, E>(graph);
+        DrawingLibraryInterface<V, E> graphXInterface = 
+                DrawingLibraryFactory.getFactory().
+                    createDrawingLibraryInterface(graph);
 
         JComponent panel = graphXInterface.getPanel();
         addTab("", panel);
@@ -253,8 +251,22 @@ public class ISGCITabbedPane extends JTabbedPane {
         setTabComponentAt(getSelectedIndex(), jpanel);
         resetDefaultColorScheme();
         
+        /* No JGraphX reference! 
+         * TODO
+         * 
+         * 
+         * Use this instead:
+         * 
+         graphXInterface.getGraphEventInterface().
+                registerMouseAdapter(mouseAdapter);
+         *  
+         *
+         *  wrong version:
+         *  
         ((mxGraphComponent) panel).getGraphControl().
                 addMouseListener(mouseListener);      
+        
+        */
         
         // save context for later reference
         panelToInterfaceMap.put(panel, graphXInterface);
