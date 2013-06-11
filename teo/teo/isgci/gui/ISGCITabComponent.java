@@ -69,6 +69,8 @@ public class ISGCITabComponent extends JPanel {
 
         // transform titles of JTabbedPane to their LaTeX text
         LatexLabel label = new LatexLabel(name);
+        // make background transparent
+        label.setBackground(new Color(0, 0, 0, 0));
         add(label);
         
         // add more space between the label and the button

@@ -11,6 +11,7 @@
 
 package teo.isgci.drawing;
 
+import java.awt.Color;
 import java.awt.Component;
 import java.awt.event.MouseEvent;
 
@@ -83,7 +84,11 @@ class JGraphXInterface<V, E> implements DrawingLibraryInterface<V, E> {
                     label = label.replace("[", "");
                     label = label.replace("]", "");
                     
-                    return new Component[] { new LatexLabel(label) };
+                    LatexLabel latexlabel = new LatexLabel(label);
+                    // make background transparent
+                    latexlabel.setBackground(new Color(0, 0, 0, 0));
+                    
+                    return new Component[] { latexlabel };
                 }
                 return null;
             };
