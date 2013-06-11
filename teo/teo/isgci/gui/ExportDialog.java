@@ -10,23 +10,38 @@
 
 package teo.isgci.gui;
 
-import java.io.*;
 import java.awt.BorderLayout;
+import java.awt.CardLayout;
 import java.awt.Color;
+import java.awt.Component;
+import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.Font;
-import java.awt.Component;
-import java.awt.CardLayout;
-import java.awt.BorderLayout;
 import java.awt.Insets;
-import java.awt.Container;
-import java.awt.event.*;
-import javax.swing.*;
-import javax.swing.border.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.io.DataOutputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.OutputStreamWriter;
+import java.io.Writer;
 
-import teo.isgci.drawing.JGraphXInterface;
-import teo.isgci.grapht.*;
-import teo.isgci.xml.GraphMLWriter;
+import javax.swing.Box;
+import javax.swing.BoxLayout;
+import javax.swing.ButtonGroup;
+import javax.swing.JButton;
+import javax.swing.JCheckBox;
+import javax.swing.JComboBox;
+import javax.swing.JDialog;
+import javax.swing.JFileChooser;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.JRadioButton;
+import javax.swing.JSeparator;
+import javax.swing.JTextArea;
+import javax.swing.border.EmptyBorder;
+
+import teo.isgci.drawing.DrawingLibraryInterface;
 
 public class ExportDialog extends JDialog implements ActionListener {
 
@@ -351,8 +366,8 @@ public class ExportDialog extends JDialog implements ActionListener {
         } catch (Exception e) {
             res = false;
             e.printStackTrace();
-            MessageDialog.error(parent, "Error while exporting:\n"+
-                e.toString());
+            MessageDialog.error(parent, "Error while exporting:\n"
+                    + e.toString());
         }
         return res;
     }
@@ -390,7 +405,8 @@ public class ExportDialog extends JDialog implements ActionListener {
      * Export to GraphML.
      */
     protected void exportGML(FileOutputStream f) throws Exception {
-        JGraphXInterface graphInterface = (JGraphXInterface) parent.getTabbedPane().getActiveDrawingLibraryInterface();
+        DrawingLibraryInterface graphInterface 
+            = parent.getTabbedPane().getActiveDrawingLibraryInterface();
         Exception res = null;
         Writer out = null;
         
@@ -402,8 +418,9 @@ public class ExportDialog extends JDialog implements ActionListener {
             out.close();
         }
         
-        if (res != null)
+        if (res != null) {
             throw res;
+        }
     }
 
 
@@ -430,8 +447,9 @@ public class ExportDialog extends JDialog implements ActionListener {
             out.close();
         }
         
-        if (res != null)
+        if (res != null) {
             throw res;
+        }
     }
 
 }

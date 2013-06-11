@@ -233,11 +233,11 @@ public class ISGCITabbedPane extends JTabbedPane {
             removeStartpage();
         }
         
-        DrawingLibraryInterface<V, E> graphXInterface = 
+        DrawingLibraryInterface<V, E> drawingInterface = 
                 DrawingLibraryFactory.getFactory().
                     createDrawingLibraryInterface(graph);
 
-        JComponent panel = graphXInterface.getPanel();
+        JComponent panel = drawingInterface.getPanel();
         addTab("", panel);
         ButtonTabComponent closeButton = new ButtonTabComponent(this);
         
@@ -269,7 +269,7 @@ public class ISGCITabbedPane extends JTabbedPane {
         */
         
         // save context for later reference
-        panelToInterfaceMap.put(panel, graphXInterface);
+        panelToInterfaceMap.put(panel, drawingInterface);
         panelToNamingPref.put(panel, defaultMode);
     }
     

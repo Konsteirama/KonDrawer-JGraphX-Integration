@@ -11,39 +11,38 @@
 package teo.isgci.gui;
 
 import java.awt.BorderLayout;
+import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.Point;
 import java.awt.Rectangle;
-import java.awt.event.*;
-import javax.swing.*;
-import java.io.*;
-import java.util.HashMap;
-import java.util.Map;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
+import java.awt.event.WindowEvent;
+import java.awt.event.WindowListener;
+import java.io.FileOutputStream;
+import java.io.OutputStreamWriter;
 
-import teo.isgci.db.DataSet;
-import teo.isgci.drawing.DrawingLibraryInterface;
-import teo.isgci.drawing.JGraphXAdapter;
-import teo.isgci.problem.*;
-import teo.isgci.gc.ForbiddenClass;
-import teo.isgci.gc.GraphClass;
+import javax.swing.JCheckBoxMenuItem;
+import javax.swing.JDialog;
+import javax.swing.JFrame;
+import javax.swing.JMenu;
+import javax.swing.JMenuBar;
+import javax.swing.JMenuItem;
+import javax.swing.JScrollPane;
+import javax.swing.JViewport;
 
-import java.awt.Color;
-import org.jgrapht.*;
+import org.jgrapht.Graphs;
 import org.jgrapht.graph.SimpleDirectedGraph;
 
-import com.mxgraph.layout.mxFastOrganicLayout;
-import com.mxgraph.layout.mxIGraphLayout;
-import com.mxgraph.layout.hierarchical.mxHierarchicalLayout;
-import com.mxgraph.swing.mxGraphComponent;
-import com.mxgraph.swing.util.mxMorphing;
-import com.mxgraph.util.mxConstants;
-import com.mxgraph.util.mxEvent;
-import com.mxgraph.util.mxEventObject;
-import com.mxgraph.util.mxEventSource.mxIEventListener;
-import com.mxgraph.view.mxStylesheet;
-
-import teo.isgci.grapht.*;
+import teo.isgci.db.DataSet;
+import teo.isgci.gc.ForbiddenClass;
+import teo.isgci.gc.GraphClass;
+import teo.isgci.grapht.GAlg;
+import teo.isgci.grapht.Inclusion;
+import teo.isgci.problem.Problem;
 import teo.isgci.xml.GraphMLWriter;
 
 /*import teo.isgci.gc.GraphClass;
