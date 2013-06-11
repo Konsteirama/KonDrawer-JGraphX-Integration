@@ -233,8 +233,7 @@ public class ISGCITabbedPane extends JTabbedPane {
         }
         
         DrawingLibraryInterface<V, E> drawingInterface = 
-                DrawingLibraryFactory.getFactory().
-                    createDrawingLibraryInterface(graph);
+                DrawingLibraryFactory.createNewInterface(graph);
 
         JComponent panel = drawingInterface.getPanel();
         addTab("", panel);
