@@ -199,9 +199,10 @@ public class ISGCITabbedPane extends JTabbedPane {
         }
         startpageActive = true;
         startpage = new JPanel();
-        addTab("Welcome to ISGCI", startpage);
+        addTab("", startpage);
         setSelectedComponent(startpage);
-        ButtonTabComponent closeButton = new ButtonTabComponent(this);
+        ISGCITabComponent closeButton 
+            = new ISGCITabComponent(this, "Welcome to ISGCI");
         setTabComponentAt(getSelectedIndex(), closeButton);
         resetDefaultColorScheme();
     }
@@ -237,16 +238,11 @@ public class ISGCITabbedPane extends JTabbedPane {
 
         JComponent panel = drawingInterface.getPanel();
         addTab("", panel);
-        ButtonTabComponent closeButton = new ButtonTabComponent(this);
+        ISGCITabComponent tabComponent = new ISGCITabComponent(this, name);
         
-        // Create a new panel to store the name as latex + closebutton
-        JPanel jpanel = new JPanel(new FlowLayout());
-        jpanel.add(new LatexLabel(name));
-        jpanel.add(closeButton);
-        
-        // set jpanel as tab-"index"-content
-        setSelectedComponent(panel);        
-        setTabComponentAt(getSelectedIndex(), jpanel);
+        // set tabcomponent as .. tabcomponent
+        setSelectedComponent(panel);
+        setTabComponentAt(getSelectedIndex(), tabComponent);
         resetDefaultColorScheme();
         
         /* No JGraphX reference! 
