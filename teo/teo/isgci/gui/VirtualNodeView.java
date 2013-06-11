@@ -12,9 +12,9 @@
 package teo.isgci.gui;
 
 import java.awt.Dimension;
+import java.awt.Graphics;
 import java.awt.Point;
 import java.awt.Rectangle;
-import java.awt.Graphics;
 
 /**
  * Displays a virtual node: it has no dimension and is not painted.

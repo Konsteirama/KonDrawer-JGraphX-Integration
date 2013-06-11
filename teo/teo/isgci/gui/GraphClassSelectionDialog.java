@@ -11,23 +11,14 @@
 
 package teo.isgci.gui;
 
-import teo.isgci.gc.GraphClass;
-import teo.isgci.grapht.BFSWalker;
-import teo.isgci.grapht.GAlg;
-import teo.isgci.grapht.Inclusion;
-import teo.isgci.grapht.RevBFSWalker;
-import teo.isgci.grapht.GraphWalker;
-import teo.isgci.db.Algo;
-import teo.isgci.db.DataSet;
-import java.awt.Cursor;
-import java.awt.GridBagLayout;
-import java.awt.GridBagConstraints;
-import java.awt.Insets;
 import java.awt.Container;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.util.HashSet;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -38,9 +29,18 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 
+import org.jgrapht.Graphs;
 import org.jgrapht.graph.DefaultEdge;
 import org.jgrapht.graph.SimpleDirectedGraph;
-import org.jgrapht.Graphs;
+
+import teo.isgci.db.Algo;
+import teo.isgci.db.DataSet;
+import teo.isgci.gc.GraphClass;
+import teo.isgci.grapht.BFSWalker;
+import teo.isgci.grapht.GAlg;
+import teo.isgci.grapht.GraphWalker;
+import teo.isgci.grapht.Inclusion;
+import teo.isgci.grapht.RevBFSWalker;
 
 /**
  * Display a list of graphclasses and change the drawing according to the

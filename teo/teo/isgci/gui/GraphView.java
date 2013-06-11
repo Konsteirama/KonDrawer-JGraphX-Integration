@@ -10,26 +10,24 @@
 
 package teo.isgci.gui;
 
-import java.awt.Component;
 import java.awt.Color;
-import java.awt.Graphics;
+import java.awt.Component;
 import java.awt.Dimension;
+import java.awt.Graphics;
 import java.awt.Point;
 import java.awt.Rectangle;
-import java.awt.event.*;
-import javax.swing.*;
-import java.util.Collection;
-import java.util.Collections;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
-import org.xml.sax.SAXException;
-import org.jgrapht.graph.SimpleDirectedGraph;
+
 import org.jgrapht.VertexFactory;
-import teo.isgci.db.DataSet;
-import teo.isgci.db.Algo;
-import teo.isgci.layout.*;
-import teo.isgci.xml.GraphMLWriter;
+import org.jgrapht.graph.SimpleDirectedGraph;
+import org.xml.sax.SAXException;
+
+import teo.isgci.layout.GraphDrawInfo;
+import teo.isgci.layout.HierarchyLayout;
 import teo.isgci.util.IntFunction;
+import teo.isgci.xml.GraphMLWriter;
 
 /**
  * Display a graph in a GraphCanvas.

@@ -10,14 +10,16 @@
 
 package teo.isgci.gui;
 
-import teo.isgci.xml.GraphMLWriter;
 import java.awt.Color;
-import java.awt.Graphics;
-import java.awt.FontMetrics;
 import java.awt.Dimension;
+import java.awt.FontMetrics;
+import java.awt.Graphics;
 import java.awt.Point;
 import java.awt.Rectangle;
+
 import org.xml.sax.SAXException;
+
+import teo.isgci.xml.GraphMLWriter;
 
 /**
  * Displays a node.

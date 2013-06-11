@@ -10,33 +10,41 @@
 
 package teo.isgci.gui;
 
-import java.awt.Cursor;
-import java.awt.GridBagLayout;
-import java.awt.GridBagConstraints;
-import java.awt.Dimension;
-import java.awt.Insets;
 import java.awt.Container;
-import java.awt.event.*;
-import javax.swing.*;
+import java.awt.Dimension;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.awt.Insets;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
+import java.util.Set;
+
+import javax.swing.Box;
+import javax.swing.JButton;
+import javax.swing.JComponent;
+import javax.swing.JDialog;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.ScrollPaneConstants;
 import javax.swing.border.EmptyBorder;
 
 import org.jgrapht.graph.DefaultEdge;
 import org.jgrapht.graph.SimpleDirectedGraph;
 
-import java.util.Iterator;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Set;
-
-import teo.isg.Graph;
-import teo.isgci.gui.*;
+import teo.isgci.db.AbstractRelation;
+import teo.isgci.db.Algo;
+import teo.isgci.db.DataSet;
+import teo.isgci.db.Disjointness;
+import teo.isgci.db.Incomparability;
 import teo.isgci.gc.ForbiddenClass;
 import teo.isgci.gc.GraphClass;
-import teo.isgci.grapht.Inclusion;
 import teo.isgci.grapht.GAlg;
-import teo.isgci.db.*;
+import teo.isgci.grapht.Inclusion;
 import teo.isgci.util.LessLatex;
 
 

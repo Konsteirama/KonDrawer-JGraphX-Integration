@@ -11,10 +11,17 @@
 package teo.isgci.gui;
 
 import java.awt.Component;
-import java.awt.event.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.util.Set;
-import javax.swing.*;
+
+import javax.swing.JDialog;
+import javax.swing.JMenu;
+import javax.swing.JMenuItem;
+import javax.swing.JPopupMenu;
+
 import org.jgrapht.graph.DefaultEdge;
+
 import teo.isgci.db.DataSet;
 import teo.isgci.gc.GraphClass;
 import teo.isgci.util.Utility;

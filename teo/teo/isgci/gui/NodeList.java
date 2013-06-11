@@ -10,12 +10,14 @@
 
 package teo.isgci.gui;
 
-import java.util.Vector;
-import java.util.Iterator;
-import java.util.Collection;
 import java.awt.Component;
-import javax.swing.*;
-import javax.swing.event.*;
+import java.util.Collection;
+import java.util.Iterator;
+import java.util.Vector;
+
+import javax.swing.JList;
+import javax.swing.ListCellRenderer;
+
 import teo.isgci.gc.GraphClass;
 
 

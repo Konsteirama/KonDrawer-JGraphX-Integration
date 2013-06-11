@@ -11,26 +11,30 @@
 
 package teo.isgci.gui;
 
-import teo.isgci.gc.GraphClass;
-import teo.isgci.db.Algo;
-import teo.isgci.db.DataSet;
-import teo.isgci.grapht.*;
-import teo.isgci.util.LatexGlyph;
-import java.io.IOException;
-import java.awt.Cursor;
-import java.awt.GridBagLayout;
-import java.awt.GridBagConstraints;
-import java.awt.Insets;
 import java.awt.Container;
-import java.awt.event.*;
-import javax.swing.*;
+import java.awt.Cursor;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.awt.Insets;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.Set;
+
+import javax.swing.JButton;
+import javax.swing.JDialog;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
 
 import org.jgrapht.graph.DefaultEdge;
 import org.jgrapht.graph.SimpleDirectedGraph;
 
-import java.util.HashSet;
-import java.util.Collection;
-import java.util.Set;
+import teo.isgci.db.Algo;
+import teo.isgci.db.DataSet;
+import teo.isgci.gc.GraphClass;
+import teo.isgci.util.LatexGlyph;
 
 
 /**

@@ -10,27 +10,38 @@
 
 package teo.isgci.gui;
 
-import java.io.IOException;
-import java.awt.Color;
-import java.awt.Dimension;
-import java.awt.FlowLayout;
 import java.awt.BorderLayout;
-import java.awt.GridBagLayout;
-import java.awt.GridBagConstraints;
-import java.awt.Insets;
+import java.awt.Color;
 import java.awt.Container;
-import java.awt.event.*;
-import javax.swing.*;
-import javax.swing.event.*;
-import javax.swing.table.AbstractTableModel;
-import java.util.Vector;
-import java.util.Iterator;
-import java.util.Collections;
+import java.awt.Dimension;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.awt.Insets;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.util.ArrayList;
-import teo.isgci.problem.*;
+import java.util.Collections;
+import java.util.Iterator;
+import java.util.Vector;
+
+import javax.swing.BorderFactory;
+import javax.swing.JButton;
+import javax.swing.JDialog;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.JTable;
+import javax.swing.ListSelectionModel;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
+import javax.swing.table.AbstractTableModel;
+
 import teo.isgci.db.Algo;
 import teo.isgci.db.DataSet;
 import teo.isgci.gc.GraphClass;
+import teo.isgci.problem.Problem;
 import teo.isgci.util.LessLatex;
 
 

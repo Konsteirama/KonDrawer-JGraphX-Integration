@@ -10,31 +10,26 @@
 
 package teo.isgci.gui;
 
-import java.awt.Component;
 import java.awt.Color;
-import java.awt.Dimension;
-import java.awt.Graphics;
 import java.awt.Point;
-import java.awt.Rectangle;
-import java.awt.event.*;
-import javax.swing.*;
-import java.util.Collection;
-import java.util.Set;
+import java.awt.event.MouseEvent;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
-import org.xml.sax.SAXException;
-import org.jgrapht.VertexFactory;
-import org.jgrapht.graph.SimpleDirectedGraph;
+import java.util.Set;
+
 import org.jgrapht.graph.DefaultEdge;
-import teo.isgci.db.*;
+import org.jgrapht.graph.SimpleDirectedGraph;
+
+import teo.isgci.db.Algo;
+import teo.isgci.db.DataSet;
+import teo.isgci.gc.GraphClass;
+import teo.isgci.grapht.GAlg;
+import teo.isgci.grapht.ISGCIVertexFactory;
+import teo.isgci.grapht.Inclusion;
 import teo.isgci.problem.Complexity;
 import teo.isgci.problem.Problem;
-import teo.isgci.xml.GraphMLWriter;
 import teo.isgci.util.IntFunction;
-import teo.isgci.gc.GraphClass;
-import teo.isgci.grapht.ISGCIVertexFactory;
-import teo.isgci.grapht.GAlg;
-import teo.isgci.grapht.Inclusion;
 
 /**
  * A canvas that can display an inclusion graph.

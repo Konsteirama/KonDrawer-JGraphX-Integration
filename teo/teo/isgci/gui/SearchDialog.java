@@ -11,21 +11,25 @@
 package teo.isgci.gui;
 
 import java.awt.Container;
-import java.awt.GridBagLayout;
 import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
 import java.awt.Insets;
-import java.awt.event.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.util.ArrayList;
-import java.util.List;
 import java.util.Collections;
+import java.util.List;
 import java.util.Set;
 
-import javax.swing.*;
+import javax.swing.ButtonGroup;
+import javax.swing.JButton;
+import javax.swing.JCheckBox;
+import javax.swing.JDialog;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.ListSelectionModel;
 
-import org.jgrapht.graph.DefaultEdge;
-
-import teo.isgci.db.*;
-import teo.isgci.db.Algo.NamePref;
+import teo.isgci.db.Algo;
 import teo.isgci.gc.GraphClass;
 import teo.isgci.util.LessLatex;
 
