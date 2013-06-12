@@ -137,7 +137,6 @@ public class ISGCISettingsDialog extends JDialog implements ActionListener,
         tabOrientation = new JComboBox(tabs);
         tabOrientation.setSelectedIndex(0);
 
-        show();
         setDefaultCloseOperation(DISPOSE_ON_CLOSE);
         addListeners();
     }
