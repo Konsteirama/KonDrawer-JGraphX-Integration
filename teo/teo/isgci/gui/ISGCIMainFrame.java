@@ -450,7 +450,7 @@ public class ISGCIMainFrame extends JFrame
             open.setLocation(50, 50);
             open.setVisible(true);
         } else if (object == miUserSettings) {
-            ISGCISettingsDialog settingsDialog = new ISGCISettingsDialog();
+            ISGCISettingsDialog settingsDialog = new ISGCISettingsDialog(this);
             settingsDialog.setSize(500, 400);
             settingsDialog.setVisible(true);
         }
