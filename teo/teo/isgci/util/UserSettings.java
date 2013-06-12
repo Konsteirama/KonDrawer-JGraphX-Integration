@@ -12,8 +12,13 @@
 package teo.isgci.util;
 
 import java.awt.Color;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
+
+import javax.swing.JComponent;
+
+import teo.isgci.problem.Complexity;
 
 
 
@@ -27,36 +32,119 @@ public abstract class UserSettings {
     //                  Settings
     // ------------------------------------------------
     
-    /**
-     * A sample color with sample javadoc.
-     * TODO marc delete this property.
-     */
-    private Color nodeColor = Color.green;
+  /**
+   * Maps a complexity to the corresponding color.
+   */
+  private static HashMap<Complexity, Color> complexityToColor
+      = getDefaultColorScheme();
     
     
     //               Getter / Setter
     // ------------------------------------------------
-    
-    
+        
     /**
-     * Sample getter and javadoc.
-     * TODO marc delete this getter
-     * @return
-     *          returns {@link #nodeColor}
-     */         
-    public Color getNodeColor() {
-        return nodeColor;
+     * Sets a new color for the given complexity.
+     * 
+     * @param complexity
+     *          the complexity for which the color is changed.
+     *          
+     * @param color
+     *          the new color for the given complexity
+     */
+    public static void setColor(Complexity complexity, Color color) { 
+        complexityToColor.put(complexity, color);   
+        updateSettings();     
     }
     
     /**
-     * Sample setter and javadoc.
-     * TODO marc delete this setter
-     * @param value
-     *          sets {@link #nodeColor}
+     * Returns the color of the given complexity.
+     * 
+     * @param complexity
+     *          the complexity for which the color is wanted
+     * @return
+     *          the color which is mapped to the given complexity
      */
-    public void setNodeColor(Color value) {
-        nodeColor = value;
-        updateSettings();
+    public static Color getColor(Complexity complexity) {
+        return complexityToColor.get(complexity);
+    }
+    
+    /**
+     * Returns the current mapping from complexities to their colors.
+     * 
+     * @return
+     *          the current color scheme
+     */
+    public static HashMap<Complexity, Color> getColorScheme() {
+        return complexityToColor;
+    }
+
+    /**
+     * Sets the color scheme to the given mapping.
+     * 
+     * @param colorScheme
+     *          the new color scheme
+     */
+    public static void setColorScheme(HashMap<Complexity, Color> colorScheme) {
+        for (Complexity complexity : colorScheme.keySet()) {
+            complexityToColor.put(complexity, colorScheme.get(complexity));
+        }
+    }
+    
+    /**
+     * Returns the default coloring scheme.
+     * 
+     * @return
+     *          a hashmap in which each complexity is mapped to a color.
+     */
+    public static HashMap<Complexity, Color> getDefaultColorScheme() {        
+        HashMap<Complexity, Color> defaultComplexityToColor = 
+                new HashMap<Complexity, Color>();
+        
+        defaultComplexityToColor.put(Complexity.LINEAR, Color.green);
+        
+        defaultComplexityToColor.put(Complexity.UNKNOWN, Color.white);
+        defaultComplexityToColor.put(Complexity.OPEN, Color.white);
+        
+        defaultComplexityToColor.put(null, Color.white);
+        
+        defaultComplexityToColor.put(Complexity.P, Color.green.darker());
+        
+        defaultComplexityToColor.put(Complexity.CONPC, Color.red);
+        defaultComplexityToColor.put(Complexity.NPC, Color.red);
+        defaultComplexityToColor.put(Complexity.NPH, Color.red);
+        
+        defaultComplexityToColor.put(Complexity.GIC, Color.red.brighter());
+        
+        return defaultComplexityToColor;
+    }
+    
+    /**
+     * Returns the default coloring scheme for the colorblind mode.
+     * 
+     * @return
+     *          a hashmap in which each complexity is mapped to a color.
+     */
+    public static HashMap<Complexity, Color> getDefaultColorBlindColorScheme() {
+        HashMap<Complexity, Color> defaultComplexityToColor = 
+                new HashMap<Complexity, Color>();
+        
+        defaultComplexityToColor.
+            put(Complexity.LINEAR, new Color(253, 184, 99));
+        
+        defaultComplexityToColor.put(Complexity.UNKNOWN, Color.white);
+        defaultComplexityToColor.put(Complexity.OPEN, Color.white);
+        
+        defaultComplexityToColor.put(null, Color.white);
+        
+        defaultComplexityToColor.put(Complexity.P, new Color(230, 97, 1));
+        
+        defaultComplexityToColor.put(Complexity.CONPC, new Color(94, 60, 153));
+        defaultComplexityToColor.put(Complexity.NPC, new Color(94, 60, 153));
+        defaultComplexityToColor.put(Complexity.NPH, new Color(94, 60, 153));
+        
+        defaultComplexityToColor.put(Complexity.GIC, new Color(178, 171, 210));
+        
+        return defaultComplexityToColor;
     }
     
     //            Subscribe / Unsubscribe
