@@ -242,6 +242,7 @@
             </fileset>
             <fileset dir="${data.dir}">
                 <include name="images/*.gif" />
+                <include name="icons/*.gif" />
             </fileset>
         </jar>
         <signjar alias="isgci"
