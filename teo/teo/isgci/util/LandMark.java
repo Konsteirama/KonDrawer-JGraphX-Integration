@@ -14,13 +14,17 @@ import java.awt.Dimension;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 import java.util.Vector;
 
+import org.jgrapht.graph.DefaultEdge;
 import org.jgrapht.graph.SimpleDirectedGraph;
 
 import teo.Loader;
+import teo.isgci.db.Algo;
 import teo.isgci.db.DataSet;
 import teo.isgci.gc.GraphClass;
+import teo.isgci.grapht.GAlg;
 import teo.isgci.grapht.Inclusion;
 import teo.isgci.gui.ISGCIMainFrame;
 import teo.isgci.xml.ISGCIReader;
@@ -71,32 +75,15 @@ public class LandMark {
         BufferedImage image;
 
         landmarks.set(0, n);
-
-        // TODO jannis  ???
-        // had to be commented out for restructuring drawinglibraryinterface
-//        //---- Create the map
-//        parent.getActiveCanvas().drawHierarchy(landmarks);
-//        // reverse order so n is last in case it is one of the landmarks
-//        for (int i = landmarks.size()-1; i >= 0; i--) {
-//            GraphClass gc = landmarks.get(i);
-//            NodeView v = parent.getActiveCanvas().findNode(gc);
-//            v.setNameAndLabel(gc.toString());
-//            v.setMark(i == 0);
-//        }
-//        parent.getActiveCanvas().updateBounds();
-//
-//
-//        //---- Export it as png
-//        dim = parent.getActiveCanvas().getPreferredSize();
-//        image = new BufferedImage(dim.width, dim.height,
-//                BufferedImage.TYPE_INT_ARGB);
-//        parent.getActiveCanvas().forcePaint(image.getGraphics());
-//        try {
-//            ImageIO.write(image, "png",
-//                    new File(path +"/"+ n.getID() +".png"));
-//        } catch (IOException e) {
-//            System.err.println(e);
-//        }
+        
+        //---- Create the map
+        SimpleDirectedGraph<Set<GraphClass>, DefaultEdge> graph =
+                Algo.createHierarchySubgraph(landmarks);
+        parent.getTabbedPane().drawInNewTab(graph, landmarks.get(0).toString());
+        //---- Export it as png
+        parent.getTabbedPane().getActiveDrawingLibraryInterface().export("png", path);
+        //---- Close the map
+        parent.getTabbedPane().remove(parent.getTabbedPane().getSelectedComponent());
     }
 
 
