@@ -13,6 +13,7 @@ package teo.isgci.drawing;
 
 import java.awt.Color;
 import java.awt.Component;
+import java.awt.Point;
 import java.awt.event.MouseEvent;
 
 import com.mxgraph.layout.mxIGraphLayout;
@@ -239,5 +240,17 @@ class JGraphXInterface<V, E> implements DrawingLibraryInterface<V, E> {
     @Override
     public Graph<V, E> getGraph() {
         return graphAdapter.getGraph();
+    }
+
+    @Override
+    public V getNodeAt(Point p) {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    @Override
+    public E getEdgeAt(Point p) {
+        // TODO Auto-generated method stub
+        return null;
     }
 }

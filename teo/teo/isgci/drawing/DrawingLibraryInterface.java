@@ -11,6 +11,8 @@
 
 package teo.isgci.drawing;
 
+import java.awt.Point;
+
 import org.jgrapht.Graph;
 import org.jgrapht.ListenableGraph;
 import org.jgrapht.graph.DefaultEdge;
@@ -67,5 +69,20 @@ public interface DrawingLibraryInterface<V, E> {
      * @return The used Graph
      */
     Graph<V, E> getGraph();
+    
+    /**
+     * Returns the node located at the specified point
+     * @param p Location to look for a node
+     * @return Node located at the given point or null if there is no node
+     */
+    V getNodeAt(Point p);
+
+
+    /**
+     * Returns the edge located at the specified point
+     * @param p Location to look for an edge
+     * @return Edge located at the given point or null if there is no edge
+     */
+    E getEdgeAt(Point p);
     
 }
