@@ -16,10 +16,8 @@ package teo.isgci.gui;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Container;
-import java.awt.FlowLayout;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
 import java.util.HashMap;
 import java.util.Set;
 
@@ -38,6 +36,7 @@ import teo.isgci.drawing.DrawingLibraryInterface;
 import teo.isgci.gc.GraphClass;
 import teo.isgci.problem.Complexity;
 import teo.isgci.problem.Problem;
+import teo.isgci.util.UserSettings;
 
 /**
  * The ISGCI specific implementation of the tabbedpane. Will create a
@@ -88,13 +87,7 @@ public class ISGCITabbedPane extends JTabbedPane {
      */
     private HashMap<JComponent, Algo.NamePref> panelToNamingPref
         = new HashMap<JComponent, Algo.NamePref>();
-    
-    /**
-     * Maps a complexity to the corresponding color.
-     */
-    private HashMap<JComponent, HashMap<Complexity, Color>> 
-        panelToComplexityColoring
-        = new HashMap<JComponent, HashMap<Complexity, Color>>();
+
     
     /**
      * The mode which indicates the default preferred name of a Node.
@@ -147,33 +140,22 @@ public class ISGCITabbedPane extends JTabbedPane {
      */
     
     
-    private MouseListener mouseListener = new MouseAdapter() {
+    private MouseAdapter mouseAdapter = new MouseAdapter() {
         @Override
         public void mouseClicked(MouseEvent e) {
-            if (e.getButton() == MouseEvent.BUTTON2) {
-                e.consume();
-                
-                /*  TODO no jgraphx references!
-                
-                mxGraphComponent comp = ((mxGraphComponent) panelToInterfaceMap.
-                        get(getSelectedComponent()).getPanel());
-                
-                Object v = comp.getCellAt(e.getX(), e.getY());
-                if (v == null) {
-                    return;
-                }
-                if (v instanceof mxCell) {
-                    //TODO edge-/nodePopup adjustment
-                    if (comp.getGraph().getModel().isEdge(v)) {
-                        Object o = ((JGraphXAdapter) comp.getGraph()).getCellToEdgeMap().get(v);
-//                        edgePopup.setEdge((EdgeView) v);
-//                        edgePopup.show(e.getComponent(), e.getX(), e.getY());
-                    } else {
-                        Set node = (Set)((JGraphXAdapter) comp.getGraph()).getCellToVertexMap().get(v);
-//                        nodePopup.setNode((NodeView) node);
-                        nodePopup.show(e.getComponent(), e.getX(), e.getY());
-                    }                        
-                } */
+            if (e.getButton() == MouseEvent.BUTTON3) {         
+                Object node = getActiveDrawingLibraryInterface().
+                        getNodeAt(e.getPoint());
+                Object edge = getActiveDrawingLibraryInterface().
+                        getEdgeAt(e.getPoint());
+                //TODO wait for implementation of getNodeAt and getEdgeAt and rework popups
+//                if (node != null) {
+//                    nodePopup.setNode((NodeView) node);
+//                    nodePopup.show(e.getComponent(), e.getX(), e.getY());
+//                } else if (edge != null){
+//                    edgePopup.setEdge((EdgeView) edge);
+//                    edgePopup.show(e.getComponent(), e.getX(), e.getY());
+//                }
             }
         }
     };
@@ -185,7 +167,7 @@ public class ISGCITabbedPane extends JTabbedPane {
         nodePopup = new NodePopup((ISGCIMainFrame) getParent());
         edgePopup = new EdgePopup((ISGCIMainFrame) getParent());
         addStartpage();       
-        addMouseListener(mouseListener);
+        addMouseListener(mouseAdapter);
         addChangeListener(changeListener);
     }
 
@@ -204,7 +186,6 @@ public class ISGCITabbedPane extends JTabbedPane {
         ISGCITabComponent closeButton 
             = new ISGCITabComponent(this, "Welcome to ISGCI");
         setTabComponentAt(getSelectedIndex(), closeButton);
-        resetDefaultColorScheme();
     }
 
     /**
@@ -243,26 +224,10 @@ public class ISGCITabbedPane extends JTabbedPane {
         // set tabcomponent as .. tabcomponent
         setSelectedComponent(panel);
         setTabComponentAt(getSelectedIndex(), tabComponent);
-        resetDefaultColorScheme();
         
-        /* No JGraphX reference! 
-         * TODO
-         * 
-         * 
-         * Use this instead:
-         * 
-         graphXInterface.getGraphEventInterface().
+        drawingInterface.getGraphEventInterface().
                 registerMouseAdapter(mouseAdapter);
-         *  
-         *
-         *  wrong version:
-         *  
-        ((mxGraphComponent) panel).getGraphControl().
-                addMouseListener(mouseListener);      
-        
-        */
-        
-        // save context for later reference
+         
         panelToInterfaceMap.put(panel, drawingInterface);
         panelToNamingPref.put(panel, defaultMode);
     }
@@ -429,61 +394,7 @@ public class ISGCITabbedPane extends JTabbedPane {
         }
         return null;
     }
-    
-    /**
-     * Sets a new color for the given complexity on the currently selected tab.
-     * 
-     * @param complexity
-     *          the complexity for which the color is changed.
-     *          
-     * @param color
-     *          the new color for the given complexity
-     */
-    public void setColor(Complexity complexity, Color color) {        
-        HashMap<Complexity, Color> complexityToColor = 
-                new HashMap<Complexity, Color>();
-        
-        if (panelToComplexityColoring.containsKey(getSelectedComponent())) {
-            complexityToColor =
-                    panelToComplexityColoring.get(getSelectedComponent());
-        } else {
-            panelToComplexityColoring.put((JComponent) getSelectedComponent(), 
-                    complexityToColor);
-        }
-        
-        complexityToColor.put(complexity, color);        
-    }
-    
-    /**
-     * Resets the coloring scheme of the currently selected tab.
-     */
-    public void resetDefaultColorScheme() {        
-        HashMap<Complexity, Color> complexityToColor = 
-                new HashMap<Complexity, Color>();
-        
-        if (panelToComplexityColoring.containsKey(getSelectedComponent())) {
-            complexityToColor =
-                    panelToComplexityColoring.get(getSelectedComponent());
-        } else {
-            panelToComplexityColoring.put((JComponent) getSelectedComponent(), 
-                    complexityToColor);
-        }
-        
-        complexityToColor.put(Complexity.LINEAR, Color.green);
-        
-        complexityToColor.put(Complexity.UNKNOWN, Color.white);
-        complexityToColor.put(Complexity.OPEN, Color.white);
-        
-        complexityToColor.put(null, Color.white);
-        
-        complexityToColor.put(Complexity.P, Color.green.darker());
-        
-        complexityToColor.put(Complexity.CONPC, Color.red);
-        complexityToColor.put(Complexity.NPC, Color.red);
-        complexityToColor.put(Complexity.NPH, Color.red);
-        
-        complexityToColor.put(Complexity.GIC, Color.red.brighter());
-    }
+
     
     /**
      * @param node 
@@ -497,8 +408,7 @@ public class ISGCITabbedPane extends JTabbedPane {
         Problem problem = getProblem(getSelectedComponent());
         Complexity complexity = problem.getComplexity(node.iterator().next());
         
-        return panelToComplexityColoring.
-                get(getSelectedComponent()).get(complexity);
+        return UserSettings.getColor(complexity);
     }
 }
 
