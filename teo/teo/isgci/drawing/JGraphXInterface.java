@@ -69,10 +69,6 @@ class JGraphXInterface<V, E> implements DrawingLibraryInterface<V, E> {
                 mxCell cell = (mxCell) getCellAt(event.getX(),
                         event.getY());
 
-                if (!getBounds().contains(event.getPoint())) {
-                    return false;
-                }
-
                 return cell == null || cell.isEdge();
             }
             
