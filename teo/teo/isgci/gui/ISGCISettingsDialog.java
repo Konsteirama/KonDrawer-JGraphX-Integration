@@ -10,13 +10,11 @@
 
 package teo.isgci.gui;
 
-import java.awt.Color;
 import java.awt.Container;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.image.ColorModel;
 
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
@@ -28,16 +26,11 @@ import javax.swing.JList;
 import javax.swing.JPanel;
 import javax.swing.JTabbedPane;
 import javax.swing.colorchooser.AbstractColorChooserPanel;
-import javax.swing.colorchooser.ColorSelectionModel;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
-import javax.swing.plaf.basic.BasicScrollPaneUI.HSBChangeListener;
 
-import oracle.jrockit.jfr.Options;
-
-import sun.nio.cs.AbstractCharsetProvider;
 
 /**
  * A dialog where the user can change various settings.
@@ -54,11 +47,11 @@ public class ISGCISettingsDialog extends JDialog implements ActionListener,
     protected JButton cancelButton;
     protected JButton applyButton;
     protected JButton okButton;
-    protected JList<String> colourOptions;
+    protected JList colourOptions;
     protected JColorChooser colours;
-    protected JComboBox<String> tabOrientation;
+    protected JComboBox tabOrientation;
     private String[] tabs = new String[] { "Top", "East", "West", "Bottom" };
-    protected JComboBox<String> theme; // nachschlagen
+    protected JComboBox theme; // nachschlagen
     protected JCheckBox toolbar;
 
     /**
@@ -122,7 +115,7 @@ public class ISGCISettingsDialog extends JDialog implements ActionListener,
         userInterface.add(label);
         c.weightx = 0.3;
         c.gridwidth = GridBagConstraints.REMAINDER;
-        // ergänzen zoomlevel, erklärung
+        // ergaenzen zoomlevel, erklaerung
 
         //toolbar show/hide checkbox
         c.weightx = 1.0;
@@ -141,7 +134,7 @@ public class ISGCISettingsDialog extends JDialog implements ActionListener,
         label = new JLabel("Tab Orientation", JLabel.LEFT);
         c.weightx = 0.3;
         c.gridwidth = GridBagConstraints.REMAINDER;
-        tabOrientation = new JComboBox<String>(tabs);
+        tabOrientation = new JComboBox(tabs);
         tabOrientation.setSelectedIndex(0);
 
         show();
