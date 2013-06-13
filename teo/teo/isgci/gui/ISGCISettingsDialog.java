@@ -35,6 +35,9 @@ import javax.swing.event.ChangeListener;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
+import teo.isgci.problem.Complexity;
+import teo.isgci.util.UserSettings;
+
 /**
  * A dialog where the user can change various settings.
  * 
@@ -46,11 +49,20 @@ public class ISGCISettingsDialog extends JDialog implements ActionListener,
 
     protected ISGCIMainFrame parent;
     protected JTabbedPane options = new JTabbedPane(JTabbedPane.TOP);
-    protected JButton cancelButton, applyButton, okButton, setDefaultButton;
+    protected JButton uiCancelButton, uiApplyButton, uiOkButton,
+            uiSetDefaultButton;
+    protected JButton gcCancelButton, gcApplyButton, gcOkButton,
+            gcSetDefaultButton;
     protected JList colourOptions;
     protected JColorChooser colours;
     protected JComboBox tabOrientation, theme;// nachschlagen
     private String[] tabs = new String[] { "Top", "East", "West", "Bottom" };
+    private String[] themes = new String[] { "Metal", "Motif",
+            "Platform standard" };
+    private String[] problemes = new String[] { "font colour",
+            "backgroundcolour", "unkown complexity",
+            "GraphIsomorphism-complete", "NP-complete", "lineartime solvable",
+            "P", "open classes", "CONPC", "NPH", "keine" };
     protected JCheckBox toolbar;
     protected JSlider zoomLevel;
 
@@ -104,11 +116,12 @@ public class ISGCISettingsDialog extends JDialog implements ActionListener,
         options.addTab("Graph Colours", tabGraphColours);
         this.add(options);
 
-        tabGraphColours.add(colours);
-
-        Border border = new BevelBorder(BevelBorder.RAISED);
+        /*
+         * userinterface tab
+         */
+        Border ui = new BevelBorder(BevelBorder.RAISED);
         // userInterface.setBackground(Color.WHITE);
-        userInterface.setBorder(border);
+        userInterface.setBorder(ui);
         c.anchor = GridBagConstraints.WEST;
         c.fill = GridBagConstraints.BOTH;
         c.insets = new Insets(5, 5, 20, 5);
@@ -169,55 +182,97 @@ public class ISGCISettingsDialog extends JDialog implements ActionListener,
         c.fill = GridBagConstraints.NONE;
         c.weightx = 0.0;
         c.gridwidth = GridBagConstraints.REMAINDER;
-        theme = new JComboBox(tabs);
+        theme = new JComboBox(themes);
         theme.setSelectedIndex(0);
         theme.setSize(30, 10);
         userInterface.add(theme, c);
-        
-        //Buttons fixen, apply??
-        
+
+        /*
+         * Buttons fixen, apply??
+         */
         c.anchor = GridBagConstraints.WEST;
         c.fill = GridBagConstraints.NONE;
         c.weightx = 0.0;
         c.weighty = 0.0;
         c.insets = new Insets(0, 5, 10, 40);
         c.gridwidth = 1;
-        setDefaultButton = new JButton("Reset to default");
-        tabUserInterface.add(setDefaultButton, c);
+        uiSetDefaultButton = new JButton("Reset to default");
+        tabUserInterface.add(uiSetDefaultButton, c);
 
         c.anchor = GridBagConstraints.EAST;
         c.insets = new Insets(0, 5, 10, 5);
         c.gridwidth = GridBagConstraints.RELATIVE;
-        okButton = new JButton("Ok");
-        tabUserInterface.add(okButton, c);
+        uiOkButton = new JButton("Ok");
+        tabUserInterface.add(uiOkButton, c);
 
         c.anchor = GridBagConstraints.WEST;
         c.gridwidth = GridBagConstraints.RELATIVE;
-        cancelButton = new JButton("Cancel");
-        tabUserInterface.add(cancelButton, c);
+        uiCancelButton = new JButton("Cancel");
+        tabUserInterface.add(uiCancelButton, c);
 
         c.anchor = GridBagConstraints.WEST;
         c.gridwidth = GridBagConstraints.REMAINDER;
-        applyButton = new JButton("Apply");
-        tabUserInterface.add(applyButton, c);
+        uiApplyButton = new JButton("Apply");
+        uiApplyButton.setEnabled(false);
+        tabUserInterface.add(uiApplyButton, c);
+
+        /*
+         * graph colours tab
+         */
+        Border graph = new BevelBorder(BevelBorder.RAISED);
+        // userInterface.setBackground(Color.WHITE);
+        graphColours.setBorder(graph);
+        c.anchor = GridBagConstraints.WEST;
+        c.fill = GridBagConstraints.BOTH;
+        c.insets = new Insets(5, 5, 20, 5);
+        c.weightx = 1.0;
+        c.weighty = 0.85;
+        c.gridwidth = GridBagConstraints.REMAINDER;
+        tabGraphColours.add(graphColours, c);
+
+        c.gridwidth = GridBagConstraints.RELATIVE;
+        colourOptions = new JList(problemes);
+        colourOptions.setSelectedIndex(1);
+        graphColours.add(colourOptions, c);
+        c.gridwidth = GridBagConstraints.REMAINDER;
+        c.insets = new Insets(10, 5, 10, 5);
+        graphColours.add(colours, c);
 
         setDefaultCloseOperation(DISPOSE_ON_CLOSE);
 
-        cancelButton.addActionListener(this);
-        okButton.addActionListener(this);
-        applyButton.addActionListener(this);
-        setDefaultButton.addActionListener(this);
+        uiCancelButton.addActionListener(this);
+        uiOkButton.addActionListener(this);
+        uiApplyButton.addActionListener(this);
+        uiSetDefaultButton.addActionListener(this);
+        /*
+         * gcCancelButton.addActionListener(this);
+         * gcOkButton.addActionListener(this);
+         * gcApplyButton.addActionListener(this);
+         * gcSetDefaultButton.addActionListener(this);
+         */
         tabOrientation.addActionListener(this);
-
+        theme.addActionListener(this);
+        toolbar.addActionListener(this);
+        colourOptions.addListSelectionListener(this);
     }
 
     public void actionPerformed(ActionEvent event) {
         Object source = event.getSource();
-        if (source == cancelButton) {
+        if (source == uiCancelButton) {
             closeDialog();
-        } else if (source == okButton) {
+        } else if (source == uiOkButton) {
 
-        } else if (source == applyButton) {
+        } else if (source == uiApplyButton) {
+
+        } else if (source == uiSetDefaultButton) {
+
+        } else if (source == gcCancelButton) {
+            closeDialog();
+        } else if (source == gcOkButton) {
+
+        } else if (source == gcApplyButton) {
+
+        } else if (source == gcSetDefaultButton) {
 
         } else if (source == tabOrientation) {
             int x = tabOrientation.getSelectedIndex();
@@ -230,7 +285,13 @@ public class ISGCISettingsDialog extends JDialog implements ActionListener,
             } else if (x == 3) {
                 options.setTabPlacement(JTabbedPane.BOTTOM);
             }
+        } else if (source == theme) {
+
+        } else if (source == toolbar) {
+
         }
+        uiApplyButton.setEnabled(!uiApplyButton.isEnabled());
+        gcApplyButton.setEnabled(!gcApplyButton.isEnabled());
     }
 
     public void closeDialog() {
@@ -239,7 +300,29 @@ public class ISGCISettingsDialog extends JDialog implements ActionListener,
     }
 
     public void valueChanged(ListSelectionEvent event) {
-
+        if (colourOptions.getSelectedIndex() == 0) {
+            
+        } else if (colourOptions.getSelectedIndex() == 1) {
+            
+        } else if (colourOptions.getSelectedIndex() == 2) {
+            colours.setColor(UserSettings.getColor(Complexity.UNKNOWN));
+        } else if (colourOptions.getSelectedIndex() == 3) {
+            colours.setColor(UserSettings.getColor(Complexity.GIC));
+        } else if (colourOptions.getSelectedIndex() == 4) {
+            colours.setColor(UserSettings.getColor(Complexity.NPC));
+        } else if (colourOptions.getSelectedIndex() == 5) {
+            colours.setColor(UserSettings.getColor(Complexity.LINEAR));
+        } else if (colourOptions.getSelectedIndex() == 6) {
+            colours.setColor(UserSettings.getColor(Complexity.P));
+        } else if (colourOptions.getSelectedIndex() == 7) {
+            colours.setColor(UserSettings.getColor(Complexity.OPEN));
+        } else if (colourOptions.getSelectedIndex() == 8) {
+            colours.setColor(UserSettings.getColor(Complexity.CONPC));
+        } else if (colourOptions.getSelectedIndex() == 9) {
+            colours.setColor(UserSettings.getColor(Complexity.NPH));
+        } else if (colourOptions.getSelectedIndex() == 10) {
+            colours.setColor(UserSettings.getColor(null));
+        }
     }
 
     public void stateChanged(ChangeEvent event) {

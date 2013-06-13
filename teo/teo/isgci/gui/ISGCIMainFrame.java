@@ -451,7 +451,7 @@ public class ISGCIMainFrame extends JFrame
             open.setVisible(true);
         } else if (object == miUserSettings) {
             ISGCISettingsDialog settingsDialog = new ISGCISettingsDialog(this);
-            settingsDialog.setSize(500, 400);
+            settingsDialog.setSize(650, 450);
             settingsDialog.setVisible(true);
         }
     }
