@@ -10,8 +10,10 @@
 
 package teo.isgci.gui;
 
+import java.awt.Color;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
+import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
@@ -24,6 +26,8 @@ import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.JPanel;
 import javax.swing.JTabbedPane;
+import javax.swing.border.BevelBorder;
+import javax.swing.border.Border;
 import javax.swing.colorchooser.AbstractColorChooserPanel;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
@@ -90,14 +94,30 @@ public class ISGCISettingsDialog extends JDialog implements ActionListener,
 
         GridBagLayout gridbag = new GridBagLayout();
         GridBagConstraints c = new GridBagConstraints();
-        JPanel canvas = new JPanel(gridbag);
+        JPanel tabCanvas = new JPanel(gridbag);
+        JPanel tabUserInterface = new JPanel(gridbag);
+        JPanel tabGraphColours = new JPanel(gridbag);
         JPanel userInterface = new JPanel(gridbag);
+        JPanel canvas = new JPanel(gridbag);
         JPanel graphColours = new JPanel(gridbag);
 
-        options.add("Canvas", canvas);
-        options.addTab("User Interface", userInterface);
-        options.addTab("Graph Colours", graphColours);
+        options.add("Canvas", tabCanvas);
+        options.addTab("User Interface", tabUserInterface);
+        options.addTab("Graph Colours", tabGraphColours);
         this.add(options);
+
+        tabGraphColours.add(colours);
+        
+        Border border = new BevelBorder(BevelBorder.RAISED);
+        //userInterface.setBackground(Color.WHITE);
+        userInterface.setBorder(border);
+        c.anchor = GridBagConstraints.WEST;
+        c.fill = GridBagConstraints.BOTH;
+        c.insets = new Insets(5, 5, 20, 5);
+        c.weightx = 1.0;
+        c.weighty = 0.85;
+        c.gridwidth = GridBagConstraints.REMAINDER;
+        tabUserInterface.add(userInterface,c);
 
         // Set default zoom level option
         c.anchor = GridBagConstraints.WEST;
@@ -112,26 +132,28 @@ public class ISGCISettingsDialog extends JDialog implements ActionListener,
         // ergaenzen zoomlevel, erklaerung*/
 
         // toolbar show/hide checkbox
-        c.weightx = 1.0;
+        c.weightx = 0.0;
         c.gridwidth = GridBagConstraints.RELATIVE;
         label = new JLabel("Display Toolbar", JLabel.LEFT);
         gridbag.setConstraints(label, c);
         userInterface.add(label);
         toolbar = new JCheckBox();
-        c.weightx = 0.3;
+        c.weightx = 0.0;
         c.gridwidth = GridBagConstraints.REMAINDER;
         gridbag.setConstraints(toolbar, c);
         userInterface.add(toolbar);
 
         // dropdown menu to choose the placement of the tabs
-        c.weightx = 1.0;
+        c.weightx = 0.0;
         c.gridwidth = GridBagConstraints.RELATIVE;
         label = new JLabel("Tab Orientation", JLabel.LEFT);
         userInterface.add(label, c);
-        c.weightx = 0.3;
+        c.fill = GridBagConstraints.NONE;
+        c.weightx = 0.0;
         c.gridwidth = GridBagConstraints.REMAINDER;
         tabOrientation = new JComboBox(tabs);
         tabOrientation.setSelectedIndex(0);
+        tabOrientation.setSize(30, 10);
         userInterface.add(tabOrientation, c);
 
         setDefaultCloseOperation(DISPOSE_ON_CLOSE);
