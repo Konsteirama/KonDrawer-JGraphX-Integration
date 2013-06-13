@@ -25,6 +25,7 @@ import javax.swing.JDialog;
 import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.JPanel;
+import javax.swing.JSlider;
 import javax.swing.JTabbedPane;
 import javax.swing.border.BevelBorder;
 import javax.swing.border.Border;
@@ -44,17 +45,14 @@ public class ISGCISettingsDialog extends JDialog implements ActionListener,
         ListSelectionListener, ChangeListener {
 
     protected ISGCIMainFrame parent;
-    JTabbedPane options = new JTabbedPane(JTabbedPane.TOP);
-    protected JButton setDefaultButton;
-    protected JButton cancelButton = new JButton("Cancel");
-    protected JButton applyButton;
-    protected JButton okButton;
+    protected JTabbedPane options = new JTabbedPane(JTabbedPane.TOP);
+    protected JButton cancelButton, applyButton, okButton, setDefaultButton;
     protected JList colourOptions;
     protected JColorChooser colours;
-    protected JComboBox tabOrientation;
+    protected JComboBox tabOrientation, theme;// nachschlagen
     private String[] tabs = new String[] { "Top", "East", "West", "Bottom" };
-    protected JComboBox theme; // nachschlagen
     protected JCheckBox toolbar;
+    protected JSlider zoomLevel;
 
     /**
      * This field should change every time the class is changed - once it is
@@ -107,9 +105,9 @@ public class ISGCISettingsDialog extends JDialog implements ActionListener,
         this.add(options);
 
         tabGraphColours.add(colours);
-        
+
         Border border = new BevelBorder(BevelBorder.RAISED);
-        //userInterface.setBackground(Color.WHITE);
+        // userInterface.setBackground(Color.WHITE);
         userInterface.setBorder(border);
         c.anchor = GridBagConstraints.WEST;
         c.fill = GridBagConstraints.BOTH;
@@ -117,21 +115,28 @@ public class ISGCISettingsDialog extends JDialog implements ActionListener,
         c.weightx = 1.0;
         c.weighty = 0.85;
         c.gridwidth = GridBagConstraints.REMAINDER;
-        tabUserInterface.add(userInterface,c);
+        tabUserInterface.add(userInterface, c);
 
         // Set default zoom level option
         c.anchor = GridBagConstraints.WEST;
         c.fill = GridBagConstraints.BOTH;
         c.weightx = 1.0;
-        c.gridwidth = GridBagConstraints.REMAINDER;
+        c.gridwidth = GridBagConstraints.RELATIVE;
         JLabel label = new JLabel("Set default zoom level", JLabel.LEFT);
         gridbag.setConstraints(label, c);
         userInterface.add(label);
-        // c.weightx = 0.3;
-        // c.gridwidth = GridBagConstraints.REMAINDER;
+        c.fill = GridBagConstraints.NONE;
+        c.weightx = 0.0;
+        c.gridwidth = GridBagConstraints.REMAINDER;
+        zoomLevel = new JSlider(JSlider.HORIZONTAL, 0, 20, 10);
+        zoomLevel.setMajorTickSpacing(10);
+        zoomLevel.setMinorTickSpacing(1);
+        zoomLevel.setPaintTicks(true);
+        userInterface.add(zoomLevel, c);
         // ergaenzen zoomlevel, erklaerung*/
 
         // toolbar show/hide checkbox
+        c.fill = GridBagConstraints.BOTH;
         c.weightx = 0.0;
         c.gridwidth = GridBagConstraints.RELATIVE;
         label = new JLabel("Display Toolbar", JLabel.LEFT);
@@ -140,8 +145,7 @@ public class ISGCISettingsDialog extends JDialog implements ActionListener,
         toolbar = new JCheckBox();
         c.weightx = 0.0;
         c.gridwidth = GridBagConstraints.REMAINDER;
-        gridbag.setConstraints(toolbar, c);
-        userInterface.add(toolbar);
+        userInterface.add(toolbar, c);
 
         // dropdown menu to choose the placement of the tabs
         c.weightx = 0.0;
@@ -156,14 +160,54 @@ public class ISGCISettingsDialog extends JDialog implements ActionListener,
         tabOrientation.setSize(30, 10);
         userInterface.add(tabOrientation, c);
 
+        c.fill = GridBagConstraints.BOTH;
+        c.weightx = 0.0;
+        c.gridwidth = GridBagConstraints.RELATIVE;
+        label = new JLabel("Set Java Theme", JLabel.LEFT);
+        gridbag.setConstraints(label, c);
+        userInterface.add(label);
+        c.fill = GridBagConstraints.NONE;
+        c.weightx = 0.0;
+        c.gridwidth = GridBagConstraints.REMAINDER;
+        theme = new JComboBox(tabs);
+        theme.setSelectedIndex(0);
+        theme.setSize(30, 10);
+        userInterface.add(theme, c);
+        
+        //Buttons fixen, apply??
+        
+        c.anchor = GridBagConstraints.WEST;
+        c.fill = GridBagConstraints.NONE;
+        c.weightx = 0.0;
+        c.weighty = 0.0;
+        c.insets = new Insets(0, 5, 10, 40);
+        c.gridwidth = 1;
+        setDefaultButton = new JButton("Reset to default");
+        tabUserInterface.add(setDefaultButton, c);
+
+        c.anchor = GridBagConstraints.EAST;
+        c.insets = new Insets(0, 5, 10, 5);
+        c.gridwidth = GridBagConstraints.RELATIVE;
+        okButton = new JButton("Ok");
+        tabUserInterface.add(okButton, c);
+
+        c.anchor = GridBagConstraints.WEST;
+        c.gridwidth = GridBagConstraints.RELATIVE;
+        cancelButton = new JButton("Cancel");
+        tabUserInterface.add(cancelButton, c);
+
+        c.anchor = GridBagConstraints.WEST;
+        c.gridwidth = GridBagConstraints.REMAINDER;
+        applyButton = new JButton("Apply");
+        tabUserInterface.add(applyButton, c);
+
         setDefaultCloseOperation(DISPOSE_ON_CLOSE);
-        /*
-         * cancelButton.addActionListener(this);
-         * okButton.addActionListener(this);
-         * applyButton.addActionListener(this);
-         * setDefaultButton.addActionListener(this);
-         * tabOrientation.addActionListener(this);
-         */
+
+        cancelButton.addActionListener(this);
+        okButton.addActionListener(this);
+        applyButton.addActionListener(this);
+        setDefaultButton.addActionListener(this);
+        tabOrientation.addActionListener(this);
 
     }
 
