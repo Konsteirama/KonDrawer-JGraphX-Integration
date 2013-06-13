@@ -16,6 +16,7 @@ import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.HashMap;
 
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
@@ -47,12 +48,13 @@ import teo.isgci.util.UserSettings;
 public class ISGCISettingsDialog extends JDialog implements ActionListener,
         ListSelectionListener, ChangeListener {
 
+    protected JPanel graphColours;
     protected ISGCIMainFrame parent;
     protected JTabbedPane options = new JTabbedPane(JTabbedPane.TOP);
     protected JButton uiCancelButton, uiApplyButton, uiOkButton,
             uiSetDefaultButton;
     protected JButton gcCancelButton, gcApplyButton, gcOkButton,
-            gcSetDefaultButton;
+            gcSetDefaultButton, gcColorBlind;
     protected JList colourOptions;
     protected JColorChooser colours;
     protected JComboBox tabOrientation, theme;// nachschlagen
@@ -65,6 +67,16 @@ public class ISGCISettingsDialog extends JDialog implements ActionListener,
             "P", "open classes", "CONPC", "NPH", "keine" };
     protected JCheckBox toolbar;
     protected JSlider zoomLevel;
+    private Color unknown = UserSettings.getColor(Complexity.UNKNOWN),
+            gic = UserSettings.getColor(Complexity.GIC), npc = UserSettings
+                    .getColor(Complexity.NPC), linear = UserSettings
+                    .getColor(Complexity.LINEAR), p = UserSettings
+                    .getColor(Complexity.P), open = UserSettings
+                    .getColor(Complexity.OPEN), conpc = UserSettings
+                    .getColor(Complexity.CONPC), nph = UserSettings
+                    .getColor(Complexity.NPH), empty = UserSettings
+                    .getColor(null), text, background;
+    private HashMap<Complexity, Color> colorscheme = new HashMap<Complexity, Color>();
 
     /**
      * This field should change every time the class is changed - once it is
@@ -196,7 +208,7 @@ public class ISGCISettingsDialog extends JDialog implements ActionListener,
         c.weighty = 0.0;
         c.insets = new Insets(0, 5, 10, 40);
         c.gridwidth = 1;
-        uiSetDefaultButton = new JButton("Reset to default");
+        uiSetDefaultButton = new JButton("Default settings");
         tabUserInterface.add(uiSetDefaultButton, c);
 
         c.anchor = GridBagConstraints.EAST;
@@ -238,22 +250,59 @@ public class ISGCISettingsDialog extends JDialog implements ActionListener,
         c.insets = new Insets(10, 5, 10, 5);
         graphColours.add(colours, c);
 
+        /*
+         * Buttons fixen, apply??
+         */
+        c.anchor = GridBagConstraints.WEST;
+        c.fill = GridBagConstraints.NONE;
+        c.weightx = 0.0;
+        c.weighty = 0.0;
+        c.insets = new Insets(0, 5, 10, 40);
+        c.gridwidth = 1;
+        gcSetDefaultButton = new JButton("Default Colours");
+        tabGraphColours.add(gcSetDefaultButton, c);
+
+        c.anchor = GridBagConstraints.EAST;
+        c.insets = new Insets(0, 5, 10, 5);
+        c.gridwidth = GridBagConstraints.RELATIVE;
+        gcOkButton = new JButton("Ok");
+        tabGraphColours.add(gcOkButton, c);
+
+        c.anchor = GridBagConstraints.EAST;
+        c.insets = new Insets(0, 5, 10, 5);
+        c.gridwidth = GridBagConstraints.RELATIVE;
+        gcColorBlind = new JButton("Set scheme for color blind");
+        tabGraphColours.add(gcColorBlind, c);
+
+        c.anchor = GridBagConstraints.WEST;
+        c.gridwidth = GridBagConstraints.RELATIVE;
+        gcCancelButton = new JButton("Cancel");
+        tabGraphColours.add(gcCancelButton, c);
+
+        c.anchor = GridBagConstraints.WEST;
+        c.gridwidth = GridBagConstraints.REMAINDER;
+        gcApplyButton = new JButton("Apply");
+        gcApplyButton.setEnabled(false);
+        tabGraphColours.add(gcApplyButton, c);
+
         setDefaultCloseOperation(DISPOSE_ON_CLOSE);
 
         uiCancelButton.addActionListener(this);
         uiOkButton.addActionListener(this);
         uiApplyButton.addActionListener(this);
         uiSetDefaultButton.addActionListener(this);
-        /*
-         * gcCancelButton.addActionListener(this);
-         * gcOkButton.addActionListener(this);
-         * gcApplyButton.addActionListener(this);
-         * gcSetDefaultButton.addActionListener(this);
-         */
+
+        gcCancelButton.addActionListener(this);
+        gcOkButton.addActionListener(this);
+        gcApplyButton.addActionListener(this);
+        gcSetDefaultButton.addActionListener(this);
+        gcColorBlind.addActionListener(this);
+
         tabOrientation.addActionListener(this);
         theme.addActionListener(this);
         toolbar.addActionListener(this);
         colourOptions.addListSelectionListener(this);
+        colours.getSelectionModel().addChangeListener(this);
     }
 
     public void actionPerformed(ActionEvent event) {
@@ -261,19 +310,35 @@ public class ISGCISettingsDialog extends JDialog implements ActionListener,
         if (source == uiCancelButton) {
             closeDialog();
         } else if (source == uiOkButton) {
+            if (gcApplyButton.isEnabled()) {
+                UserSettings.setColorScheme(colorscheme);
+            }
+            if (uiApplyButton.isEnabled()) {
 
+            }
+            closeDialog();
         } else if (source == uiApplyButton) {
-
+            uiApplyButton.setEnabled(false);
         } else if (source == uiSetDefaultButton) {
 
         } else if (source == gcCancelButton) {
             closeDialog();
         } else if (source == gcOkButton) {
+            if (gcApplyButton.isEnabled()) {
+                UserSettings.setColorScheme(colorscheme);
+            }
+            if (uiApplyButton.isEnabled()) {
+
+            }
+            closeDialog();
+        } else if (source == gcColorBlind) {
 
         } else if (source == gcApplyButton) {
-
+            gcApplyButton.setEnabled(false);
+            UserSettings.setColorScheme(colorscheme);
+            colorscheme.clear();
         } else if (source == gcSetDefaultButton) {
-
+            colorscheme = UserSettings.getDefaultColorScheme();
         } else if (source == tabOrientation) {
             int x = tabOrientation.getSelectedIndex();
             if (x == 0) {
@@ -285,13 +350,14 @@ public class ISGCISettingsDialog extends JDialog implements ActionListener,
             } else if (x == 3) {
                 options.setTabPlacement(JTabbedPane.BOTTOM);
             }
+            if (!uiApplyButton.isEnabled()) {
+                uiApplyButton.setEnabled(true);
+            }
         } else if (source == theme) {
 
         } else if (source == toolbar) {
 
         }
-        uiApplyButton.setEnabled(!uiApplyButton.isEnabled());
-        gcApplyButton.setEnabled(!gcApplyButton.isEnabled());
     }
 
     public void closeDialog() {
@@ -300,33 +366,109 @@ public class ISGCISettingsDialog extends JDialog implements ActionListener,
     }
 
     public void valueChanged(ListSelectionEvent event) {
-        if (colourOptions.getSelectedIndex() == 0) {
-            
-        } else if (colourOptions.getSelectedIndex() == 1) {
-            
-        } else if (colourOptions.getSelectedIndex() == 2) {
-            colours.setColor(UserSettings.getColor(Complexity.UNKNOWN));
-        } else if (colourOptions.getSelectedIndex() == 3) {
-            colours.setColor(UserSettings.getColor(Complexity.GIC));
-        } else if (colourOptions.getSelectedIndex() == 4) {
-            colours.setColor(UserSettings.getColor(Complexity.NPC));
-        } else if (colourOptions.getSelectedIndex() == 5) {
-            colours.setColor(UserSettings.getColor(Complexity.LINEAR));
-        } else if (colourOptions.getSelectedIndex() == 6) {
-            colours.setColor(UserSettings.getColor(Complexity.P));
-        } else if (colourOptions.getSelectedIndex() == 7) {
-            colours.setColor(UserSettings.getColor(Complexity.OPEN));
-        } else if (colourOptions.getSelectedIndex() == 8) {
-            colours.setColor(UserSettings.getColor(Complexity.CONPC));
-        } else if (colourOptions.getSelectedIndex() == 9) {
-            colours.setColor(UserSettings.getColor(Complexity.NPH));
-        } else if (colourOptions.getSelectedIndex() == 10) {
-            colours.setColor(UserSettings.getColor(null));
+        int i = colourOptions.getSelectedIndex();
+        if (i == 0) {
+            colours.setColor(text);
+        } else if (i == 1) {
+            colours.setColor(background);
+        } else if (i == 2) {
+            colours.setColor(unknown);
+        } else if (i == 3) {
+            colours.setColor(gic);
+        } else if (i == 4) {
+            colours.setColor(npc);
+        } else if (i == 5) {
+            colours.setColor(linear);
+        } else if (i == 6) {
+            colours.setColor(p);
+        } else if (i == 7) {
+            colours.setColor(open);
+        } else if (i == 8) {
+            colours.setColor(conpc);
+        } else if (i == 9) {
+            colours.setColor(nph);
+        } else if (i == 10) {
+            colours.setColor(empty);
         }
     }
 
     public void stateChanged(ChangeEvent event) {
-
+        Color newColor = colours.getColor();
+        int s = colourOptions.getSelectedIndex();
+        if (s == 0) {
+            if (newColor != text) {
+                text = newColor;
+                gcApplyButton.setEnabled(true);
+            }
+        } else if (s == 1) {
+            if (newColor != background) {
+                background = newColor;
+                gcApplyButton.setEnabled(true);
+            }
+        } else if (s == 2) {
+            if (newColor != unknown) {
+                unknown = newColor;
+                colorscheme.remove(unknown);
+                colorscheme.put(Complexity.UNKNOWN, unknown);
+                gcApplyButton.setEnabled(true);
+            }
+        } else if (s == 3) {
+            if (newColor != gic) {
+                gic = newColor;
+                colorscheme.remove(gic);
+                colorscheme.put(Complexity.GIC, gic);
+                gcApplyButton.setEnabled(true);
+            }
+        } else if (s == 4) {
+            if (newColor != npc) {
+                npc = newColor;
+                colorscheme.remove(npc);
+                colorscheme.put(Complexity.NPC, npc);
+                gcApplyButton.setEnabled(true);
+            }
+        } else if (s == 5) {
+            if (newColor != linear) {
+                linear = newColor;
+                colorscheme.remove(linear);
+                colorscheme.put(Complexity.LINEAR, linear);
+                gcApplyButton.setEnabled(true);
+            }
+        } else if (s == 6) {
+            if (newColor != p) {
+                p = newColor;
+                colorscheme.remove(p);
+                colorscheme.put(Complexity.P, p);
+                gcApplyButton.setEnabled(true);
+            }
+        } else if (s == 7) {
+            if (newColor != open) {
+                open = newColor;
+                colorscheme.remove(open);
+                colorscheme.put(Complexity.OPEN, open);
+                gcApplyButton.setEnabled(true);
+            }
+        } else if (s == 8) {
+            if (newColor != conpc) {
+                conpc = newColor;
+                colorscheme.remove(conpc);
+                colorscheme.put(Complexity.CONPC, conpc);
+                gcApplyButton.setEnabled(true);
+            }
+        } else if (s == 9) {
+            if (newColor != nph) {
+                nph = newColor;
+                colorscheme.remove(nph);
+                colorscheme.put(Complexity.NPH, nph);
+                gcApplyButton.setEnabled(true);
+            }
+        } else if (s == 10) {
+            if (newColor != empty) {
+                empty = newColor;
+                colorscheme.remove(empty);
+                colorscheme.put(null, empty);
+                gcApplyButton.setEnabled(true);
+            }
+        }
     }
 
 }
