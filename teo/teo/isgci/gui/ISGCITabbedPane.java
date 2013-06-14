@@ -13,9 +13,12 @@
 
 package teo.isgci.gui;
 
+import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Container;
+import java.awt.FlowLayout;
+import java.awt.GridLayout;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.ArrayList;
@@ -23,13 +26,16 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Set;
 
+import javax.swing.JButton;
 import javax.swing.JComponent;
 import javax.swing.JPanel;
 import javax.swing.JTabbedPane;
+import javax.swing.SpringLayout;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
 import org.jgrapht.Graph;
+import org.jgrapht.graph.DefaultDirectedGraph;
 import org.jgrapht.graph.DefaultEdge;
 
 import teo.isgci.db.Algo;
@@ -37,6 +43,7 @@ import teo.isgci.db.Algo.NamePref;
 import teo.isgci.db.DataSet;
 import teo.isgci.drawing.DrawingLibraryFactory;
 import teo.isgci.drawing.DrawingLibraryInterface;
+import teo.isgci.drawing.GraphManipulationInterface;
 import teo.isgci.gc.GraphClass;
 import teo.isgci.grapht.GAlg;
 import teo.isgci.grapht.Inclusion;
@@ -67,7 +74,7 @@ public class ISGCITabbedPane extends JTabbedPane implements Updatable {
     /**
      * The startpage that is displayed upon start of the window. 
      */
-    private JPanel startpage;
+    private Component startpage;
 
     /**
      * Maps the content of the tabs to their corresponding
@@ -194,8 +201,70 @@ public class ISGCITabbedPane extends JTabbedPane implements Updatable {
         if (startpageActive) {
             return;
         }
+        
         startpageActive = true;
-        startpage = new JPanel();
+        
+        // Create a graphcanvas with ISGCI logo
+        
+        // space => make nodes bigger
+        String i1 = "   I   "; 
+        String s = "   S   ";
+        String g = "   G   ";
+        String c = "   C   ";
+        String i2 = "   I    "; // needs to be one space bigger, else i1 == i2
+        
+        Graph<String, DefaultEdge> isgci 
+            = new DefaultDirectedGraph<String, DefaultEdge>(DefaultEdge.class);
+        
+        isgci.addVertex(i1);
+        isgci.addVertex(s);
+        isgci.addVertex(g);
+        isgci.addVertex(c);
+        isgci.addVertex(i2);
+        
+        isgci.addEdge(i1, s);
+        isgci.addEdge(s, c);
+        isgci.addEdge(s, g);
+        isgci.addEdge(g, c);
+        isgci.addEdge(c, i2);
+        
+        DrawingLibraryInterface<String, DefaultEdge> drawingInterface = 
+                DrawingLibraryFactory.createNewInterface(isgci);
+        
+        // color nodes differently
+        GraphManipulationInterface<String, DefaultEdge> gmi 
+            = drawingInterface.getGraphManipulationInterface();
+        
+        gmi.colorNode(new String[] { i1 }, 
+                UserSettings.getColor(Complexity.CONPC));
+        gmi.colorNode(new String[] { s }, 
+                UserSettings.getColor(Complexity.GIC));
+        gmi.colorNode(new String[] { g }, 
+                UserSettings.getColor(Complexity.LINEAR));
+        gmi.colorNode(new String[] { c }, 
+                UserSettings.getColor(Complexity.OPEN));
+        gmi.colorNode(new String[] { i2 }, 
+                UserSettings.getColor(Complexity.P));
+        
+        
+        // create a springlayout with buttons
+        final int cols = 1;
+        final int rows = 4;
+        
+        JPanel buttonPanel = new JPanel(new GridLayout(rows, cols, 5, 5));
+        
+        buttonPanel.add(new JButton("Create a new graph-drawing"));
+        buttonPanel.add(new JButton("Browse the graph database"));
+        buttonPanel.add(new JButton("Change settings"));
+        buttonPanel.add(new JButton("About ISGCI"));
+        
+        
+        JPanel parentPanel = new JPanel(new BorderLayout());
+        
+        parentPanel.add(buttonPanel, BorderLayout.LINE_START);
+        parentPanel.add(drawingInterface.getPanel(), BorderLayout.CENTER);
+        
+        startpage = parentPanel;
         addTab("", startpage);
         setSelectedComponent(startpage);
         ISGCITabComponent closeButton 
