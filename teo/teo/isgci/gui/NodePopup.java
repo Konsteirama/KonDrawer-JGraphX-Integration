@@ -22,7 +22,6 @@ import javax.swing.JPopupMenu;
 
 import org.jgrapht.graph.DefaultEdge;
 
-import teo.isgci.db.DataSet;
 import teo.isgci.gc.GraphClass;
 import teo.isgci.util.Utility;
 
@@ -33,7 +32,7 @@ public class NodePopup extends JPopupMenu implements ActionListener {
     ISGCIMainFrame parent;
     JMenuItem deleteItem, infoItem;
     JMenu nameItem;
-    NodeView<Set<GraphClass>,DefaultEdge> view;
+    Set<GraphClass> node;
 
     private static String CHANGENAME = "Name: ";
 
@@ -46,15 +45,12 @@ public class NodePopup extends JPopupMenu implements ActionListener {
         infoItem.addActionListener(this);
     }
 
-    public void setNode(NodeView n) {
-        view = n;
-    }
 
     public void actionPerformed(ActionEvent event) {
         Object source = event.getSource();
         if (source == infoItem) {
             JDialog d = new GraphClassInformationDialog(
-                    parent, DataSet.getClass(view.getFullName()));
+                    parent, node.iterator().next());
             d.setLocation(50, 50);
             d.pack();
             d.setSize(800, 600);
@@ -62,7 +58,8 @@ public class NodePopup extends JPopupMenu implements ActionListener {
         } else if (event.getActionCommand().startsWith(CHANGENAME)) {
             String fullname = event.getActionCommand().substring(
                     CHANGENAME.length());
-            view.setNameAndLabel(fullname);
+            parent.getTabbedPane().getActiveDrawingLibraryInterface().
+                getGraphManipulationInterface().renameNode(node, fullname);
             
             parent.getTabbedPane().getSelectedComponent().update(parent.getTabbedPane().getSelectedComponent().getGraphics());
             parent.getTabbedPane().getSelectedComponent().repaint();
@@ -70,14 +67,13 @@ public class NodePopup extends JPopupMenu implements ActionListener {
     }
     
     public void show(Component orig, int x, int y) {
-        Set<GraphClass> gcs = view.getNode();
         int i = 0;
 
         nameItem.removeAll();
-        nameItem.setEnabled(gcs.size() != 1);
-        JMenuItem[] mItem = new JMenuItem[gcs.size()];
+        nameItem.setEnabled(node.size() != 1);
+        JMenuItem[] mItem = new JMenuItem[node.size()];
         //FIXME sort and render latex properly
-        for (GraphClass gc : gcs) {
+        for (GraphClass gc : node) {
             nameItem.add(mItem[i] = new JMenuItem(
                     Utility.getShortName(gc.toString())));
             mItem[i].setActionCommand(CHANGENAME + gc.toString());
@@ -86,6 +82,10 @@ public class NodePopup extends JPopupMenu implements ActionListener {
         }
         
         super.show(orig, x, y);
+    }
+
+    public void setNode(Set<GraphClass> node) {
+        this.node = node;        
     }
 }
 

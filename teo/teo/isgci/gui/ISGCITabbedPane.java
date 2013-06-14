@@ -149,22 +149,31 @@ public class ISGCITabbedPane extends JTabbedPane implements Updatable {
     
     
     private MouseAdapter mouseAdapter = new MouseAdapter() {
-        @Override
         public void mouseClicked(MouseEvent e) {
-            System.out.println("maus");
-            if (e.getButton() == MouseEvent.BUTTON3) {         
+            if (e.getButton() == MouseEvent.BUTTON3 
+                    && getActiveDrawingLibraryInterface() != null) {         
                 Object node = getActiveDrawingLibraryInterface().
                         getNodeAt(e.getPoint());
                 Object edge = getActiveDrawingLibraryInterface().
                         getEdgeAt(e.getPoint());
+                
+                Container parent = getParent();
+
+                while (parent != null
+                        && !(parent instanceof ISGCIMainFrame)) {
+                    parent = parent.getParent();
+                }
+                
                 //TODO wait for implementation of getNodeAt and getEdgeAt and rework popups
-//                if (node != null) {
-//                    nodePopup.setNode((NodeView) node);
-//                    nodePopup.show(e.getComponent(), e.getX(), e.getY());
-//                } else if (edge != null){
-//                    edgePopup.setEdge((EdgeView) edge);
-//                    edgePopup.show(e.getComponent(), e.getX(), e.getY());
-//                }
+                if (node != null) {
+                    nodePopup = new NodePopup((ISGCIMainFrame) parent);
+                    nodePopup.setNode((Set<GraphClass>) node);
+                    nodePopup.show(e.getComponent(), e.getX(), e.getY());
+                } else if (edge != null){
+                    edgePopup = new EdgePopup((ISGCIMainFrame) parent);
+                    edgePopup.setEdge((DefaultEdge) edge);
+                    edgePopup.show(e.getComponent(), e.getX(), e.getY());
+                }
             }
         }
     };
@@ -173,8 +182,6 @@ public class ISGCITabbedPane extends JTabbedPane implements Updatable {
      * Creates a new Tabbed pane with a startpage as only active tab.
      */
     public ISGCITabbedPane() {
-        nodePopup = new NodePopup((ISGCIMainFrame) getParent());
-        edgePopup = new EdgePopup((ISGCIMainFrame) getParent());
         addStartpage();       
         addMouseListener(mouseAdapter);
         addChangeListener(changeListener);

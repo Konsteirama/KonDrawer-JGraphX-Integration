@@ -238,17 +238,17 @@ public class ISGCIGraphCanvas extends
 
         event.consume();
         
-        View v = getViewAt(event.getPoint());
-        if (v == null)
-            return true;
-        if (v instanceof NodeView) {
-            nodePopup.setNode((NodeView) v);
-            nodePopup.show(this, event.getX(), event.getY());
-        }
-        if (v instanceof EdgeView) {
-            edgePopup.setEdge((EdgeView) v);
-            edgePopup.show(this, event.getX(), event.getY());
-        }
+//        View v = getViewAt(event.getPoint());
+//        if (v == null)
+//            return true;
+//        if (v instanceof NodeView) {
+//            nodePopup.setNode((NodeView) v);
+//            nodePopup.show(this, event.getX(), event.getY());
+//        }
+//        if (v instanceof EdgeView) {
+//            edgePopup.setEdge((EdgeView) v);
+//            edgePopup.show(this, event.getX(), event.getY());
+//        }
         return true;
     }
 

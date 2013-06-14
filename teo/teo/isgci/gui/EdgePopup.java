@@ -10,11 +10,11 @@
 
 package teo.isgci.gui;
 
-import java.awt.Component;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.Set;
 
+import javax.swing.JDialog;
 import javax.swing.JMenuItem;
 import javax.swing.JPopupMenu;
 
@@ -26,7 +26,7 @@ import teo.isgci.gc.GraphClass;
 public class EdgePopup extends JPopupMenu implements ActionListener {
     ISGCIMainFrame parent;
     JMenuItem deleteItem, infoItem;
-    EdgeView<Set<GraphClass>,DefaultEdge> view;
+    DefaultEdge edge = new DefaultEdge();;
 
     public EdgePopup(ISGCIMainFrame parent) {
         super();
@@ -35,28 +35,31 @@ public class EdgePopup extends JPopupMenu implements ActionListener {
         add(infoItem = new JMenuItem("Information"));
         infoItem.addActionListener(this);
     }
-
-    public void setEdge(EdgeView n) {
-        view = n;
-    }
-
+    
     public void actionPerformed(ActionEvent event) {
         Object source = event.getSource();
         if (source == infoItem) {
-            Component tab = parent.getTabbedPane().getSelectedComponent();
-            tab.getComponentAt(tab.getMousePosition());
-            System.out.println(tab.getComponentAt(tab.getMousePosition()).toString());
-//            JDialog d = InclusionResultDialog.newInstance(parent, DataSet.getClass(tab.getComponentAt(tab.getMousePosition()).get), v2)
-            // TODO jannis
-//            JDialog d = InclusionResultDialog.newInstance(parent,
-//                DataSet.getClass(
-//                    parent.getActiveCanvas().getView(view.getFrom()).getFullName()),
-//                DataSet.getClass(
-//                    parent.getActiveCanvas().getView(view.getTo()).getFullName()));
-//            d.setLocation(50, 50);
-//            d.pack();
-//            d.setVisible(true);
+            ISGCITabbedPane tabbedPane = parent.getTabbedPane();
+            Set<GraphClass> sourceNode = (Set<GraphClass>) tabbedPane
+                    .getActiveDrawingLibraryInterface().getGraph()
+                    .getEdgeSource(edge);
+
+            Set<GraphClass> targetNode = (Set<GraphClass>) tabbedPane
+                    .getActiveDrawingLibraryInterface().getGraph()
+                    .getEdgeTarget(edge);
+            
+            JDialog d = InclusionResultDialog.newInstance(parent,
+                sourceNode.iterator().next(),
+                targetNode.iterator().next());
+            d.setLocation(50, 50);
+            d.pack();
+            d.setVisible(true);
         } 
+    }
+
+    public void setEdge(DefaultEdge edge) {
+        this.edge = edge;
+        
     }
 }
 
