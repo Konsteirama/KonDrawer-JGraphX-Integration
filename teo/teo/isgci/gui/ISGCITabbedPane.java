@@ -43,6 +43,7 @@ import teo.isgci.grapht.GAlg;
 import teo.isgci.grapht.Inclusion;
 import teo.isgci.problem.Complexity;
 import teo.isgci.problem.Problem;
+import teo.isgci.util.Updatable;
 import teo.isgci.util.UserSettings;
 
 /**
@@ -51,7 +52,7 @@ import teo.isgci.util.UserSettings;
  * the {link {@link #addTab(Graph)} method, because it closes the startpage
  * and draws a new graph - which this class should be used for.
  */
-public class ISGCITabbedPane extends JTabbedPane {
+public class ISGCITabbedPane extends JTabbedPane implements Updatable {
     
     /**
      * The version of this class. Should be changed every time
@@ -177,6 +178,7 @@ public class ISGCITabbedPane extends JTabbedPane {
         addStartpage();       
         addMouseListener(mouseAdapter);
         addChangeListener(changeListener);
+        UserSettings.subscribeToOptionChanges(this);
     }
 
     /**
@@ -264,6 +266,10 @@ public class ISGCITabbedPane extends JTabbedPane {
             drawInNewTab(graph, name);
         } else {
             getActiveDrawingLibraryInterface().setGraph(graph);
+            //reapply properness and coloring
+            setProperness();
+            setProblem(getProblem(getSelectedComponent())
+                    , getSelectedComponent());
             setTitleAt(getSelectedIndex(), name);
         }
     }
@@ -346,6 +352,7 @@ public class ISGCITabbedPane extends JTabbedPane {
             panelToDrawUnproper.remove(getSelectedComponent());
         }
         panelToDrawUnproper.put((JComponent) getSelectedComponent(), state);
+        setProperness();
     }
     
     /**
@@ -478,6 +485,14 @@ public class ISGCITabbedPane extends JTabbedPane {
         Complexity complexity = problem.getComplexity(node.iterator().next());
         
         return UserSettings.getColor(complexity);
+    }
+
+    @Override
+    public void updateOptions() {
+        // Reapply color, to change all nodes to the new color scheme
+        for (Component tab : this.getComponents()) {
+            setProblem(getProblem(tab), tab);
+        }        
     }
 }
 
