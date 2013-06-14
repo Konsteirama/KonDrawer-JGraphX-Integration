@@ -146,8 +146,8 @@ public class ISGCIToolBar extends JToolBar {
     private void addGeneralButtons() {
         // NEW DRAWING
         String newDrawingTooltip = "Open a dialog to create a new drawing";
-        JButton newdrawingbutton = createImageButton(NEW_DRAWING_ICON,
-                newDrawingTooltip);
+        JButton newdrawingbutton 
+            = createImageButton(NEW_DRAWING_ICON, "Draw", newDrawingTooltip);
         add(newdrawingbutton);
 
         newdrawingbutton.addActionListener(new ActionListener() {
@@ -160,7 +160,8 @@ public class ISGCIToolBar extends JToolBar {
         
         // EXPORT
         String exportTooltip = "Open the export dialog";
-        JButton exportbutton = createImageButton(EXPORT_ICON, exportTooltip);
+        JButton exportbutton 
+            = createImageButton(EXPORT_ICON, "Export", exportTooltip);
         add(exportbutton);
 
         exportbutton.addActionListener(new ActionListener() {
@@ -389,13 +390,14 @@ public class ISGCIToolBar extends JToolBar {
         JButton button;
 
         java.net.URL imgURL = getClass().getResource(path);
+        
         if (imgURL != null) {
+            
             ImageIcon imgIcon = new ImageIcon(imgURL, description);
-
-            button = new JButton(imgIcon);
-            // TODO
-            //button.add(new JLabel(name));
+            button = new JButton(name, imgIcon);
+            
         } else {
+            
             System.err.println("Couldn't find file: " + path);
             if (name.isEmpty()) {
                 button = new JButton("?");
