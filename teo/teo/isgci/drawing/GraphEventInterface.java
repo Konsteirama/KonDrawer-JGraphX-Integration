@@ -3,7 +3,7 @@ package teo.isgci.drawing;
 import java.awt.event.MouseAdapter;
 
 /**
- * Dumbed down version of the original, WIP GraphEventInterface
+ * Dumbed down version of the original, WIP GraphEventInterface.
  * TODO: replace this with the final one
  */
 public interface GraphEventInterface {

@@ -6,7 +6,7 @@ import java.awt.*;
  * Dumbed down version of the original, WIP GraphEventInterface
  * TODO: replace this with the final one
  */
-public interface GraphManipulationInterface {
+public interface GraphManipulationInterface<V, E> {
     /**
      * returns a boolean, denoting whether the related graph is able to perform
      * a redo operation.
@@ -17,25 +17,29 @@ public interface GraphManipulationInterface {
 
     boolean canUndo();
 
-    void centerNode(Object node);
+    void centerNode(V node);
 
-    void colorNode(Object node, Color color);
+    void colorNode(V[] node, Color color);
 
-    void markEdge(Object node1, Object node2);
+    void markEdge(E[] edges);
+    
+    void unmarkEdge(E[] edges);
 
     void reapplyHierarchicalLayout();
 
     void redo();
 
-    void removeNode(Object node);
+    void removeNode(V node);
 
-    void renameNode(Object node, String newName);
+    void renameNode(V node, String newName);
 
     void resetLayout();
 
     void undo();
+    
+    void zoomTo(double factor);
 
-    void zoom(double factor);
+    void zoom(boolean zoomIn);
 
-    void zoom(double factor, double centerx, double centery);
+    void zoom(boolean zoomIn, Point center);
 }
