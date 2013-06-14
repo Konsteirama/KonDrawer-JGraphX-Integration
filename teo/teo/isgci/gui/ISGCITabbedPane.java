@@ -99,7 +99,7 @@ public class ISGCITabbedPane extends JTabbedPane implements Updatable {
     /**
      * The mode which indicates the default preferred name of a Node.
      */
-    private Algo.NamePref defaultMode = NamePref.BASIC;
+    private Algo.NamePref defaultMode = UserSettings.getNamingPref();
     
 
     /**
@@ -247,6 +247,7 @@ public class ISGCITabbedPane extends JTabbedPane implements Updatable {
         panelToNamingPref.put(panel, defaultMode);
         
         setProperness();
+        applyNamingPref(panel);
     }
     
     /**
@@ -338,9 +339,24 @@ public class ISGCITabbedPane extends JTabbedPane implements Updatable {
      *          The Tab for which the naming preference is changed.
      */
     public void setNamingPref(NamePref pref, Component c) {
-        if (panelToNamingPref.containsKey(c)) {
-            panelToNamingPref.remove(c);
-            panelToNamingPref.put((JComponent) c, pref);
+        panelToNamingPref.put((JComponent) c, pref);
+        applyNamingPref(c);
+    }
+    
+    /**
+     * Applies the naming preference of a given tab on each of its nodes.
+     * 
+     * @param c
+     *         the tab on which the nodes will be renamed
+     */
+    private void applyNamingPref(Component c) {
+        DrawingLibraryInterface graphInterface = panelToInterfaceMap.get(c);
+        Graph graph = graphInterface.getGraph();
+        Algo.NamePref namePref = panelToNamingPref.get(c);
+        for (Object node : graph.vertexSet()) {
+            String newName = Algo.getName((Set<GraphClass>) node, namePref);
+            graphInterface.getGraphManipulationInterface()
+                .renameNode(node, newName);
         }
     }
 
@@ -353,9 +369,6 @@ public class ISGCITabbedPane extends JTabbedPane implements Updatable {
      *          the new drawUnproper state of the open tab
      */
     public void setDrawUnproper(boolean state, Component c) {
-        if (panelToDrawUnproper.containsKey(getSelectedComponent())) {
-            panelToDrawUnproper.remove(getSelectedComponent());
-        }
         panelToDrawUnproper.put((JComponent) getSelectedComponent(), state);
         setProperness();
     }
@@ -386,9 +399,6 @@ public class ISGCITabbedPane extends JTabbedPane implements Updatable {
      */
     public void setProblem(Problem problem, Component c) {
         if (startpageActive) { return; }
-        if (panelToProblem.containsKey(c)) {
-            panelToProblem.remove(c);
-        }
         panelToProblem.put((JComponent) c, problem);
         Graph graph = getActiveDrawingLibraryInterface().getGraph();
         HashMap<Color , List<Set<GraphClass>>> colorToNodes = 
@@ -441,10 +451,10 @@ public class ISGCITabbedPane extends JTabbedPane implements Updatable {
      *          true if the edge is proper, false otherwise.
      */
     private boolean getProperness(Graph graph, DefaultEdge edge){
-        GraphClass source = (GraphClass) ((Set<GraphClass>) graph.
-                                            getEdgeSource(edge)).toArray()[0];
-        GraphClass target = (GraphClass) ((Set<GraphClass>) graph.
-                                            getEdgeTarget(edge)).toArray()[0];
+        GraphClass source = (GraphClass) ((Set<GraphClass>) 
+                            graph.getEdgeSource(edge)).iterator().next();
+        GraphClass target = (GraphClass) ((Set<GraphClass>) 
+                            graph.getEdgeTarget(edge)).iterator().next();
         List<Inclusion> path = GAlg.getPath(DataSet.inclGraph, source, target);
         return (Algo.isPathProper(path)  
                 || Algo.isPathProper(Algo.makePathProper(path)));
@@ -488,7 +498,8 @@ public class ISGCITabbedPane extends JTabbedPane implements Updatable {
     protected Color complexityColor(Set<GraphClass> node) {
         Problem problem = getProblem(getSelectedComponent());
         if (problem != null){
-            Complexity complexity = problem.getComplexity(node.iterator().next());            
+            Complexity complexity = 
+                    problem.getComplexity(node.iterator().next());
             return UserSettings.getColor(complexity);
         }
         return UserSettings.getColor(Complexity.UNKNOWN);
@@ -500,6 +511,8 @@ public class ISGCITabbedPane extends JTabbedPane implements Updatable {
         for (Component tab : this.getComponents()) {
             setProblem(getProblem(tab), tab);
         }        
+        setNamingPref(UserSettings.getNamingPref());
+        setNamingPref(UserSettings.getNamingPref(), getSelectedComponent());
     }
 }
 

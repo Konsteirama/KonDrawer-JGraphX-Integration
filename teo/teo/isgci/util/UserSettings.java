@@ -18,6 +18,7 @@ import java.util.List;
 
 import javax.swing.JComponent;
 
+import teo.isgci.db.Algo;
 import teo.isgci.problem.Complexity;
 
 
@@ -37,6 +38,11 @@ public abstract class UserSettings {
    */
   private static HashMap<Complexity, Color> complexityToColor
       = getDefaultColorScheme();
+  
+  /**
+   * The default naming preference which is used for new tabs.
+   */
+  private static Algo.NamePref defaultNamePref = Algo.NamePref.BASIC;
     
     
     //               Getter / Setter
@@ -146,6 +152,29 @@ public abstract class UserSettings {
         defaultComplexityToColor.put(Complexity.GIC, new Color(178, 171, 210));
         
         return defaultComplexityToColor;
+    }
+    
+    /**
+     * Sets the default naming preference.
+     * 
+     * @param namepref
+     *          the new default naming preference
+     */
+    public static void setNamingPref(Algo.NamePref namepref) {
+        if (namepref != null) {
+            defaultNamePref = namepref;
+            updateSettings();
+        }
+    }
+    
+    /**
+     * Returns the default naming preference which should be used for new tabs.
+     * 
+     * @return
+     *          the default naming preference
+     */
+    public static Algo.NamePref getNamingPref() {
+        return defaultNamePref;
     }
     
     //            Subscribe / Unsubscribe

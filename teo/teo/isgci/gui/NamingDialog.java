@@ -24,6 +24,7 @@ import javax.swing.JPanel;
 import javax.swing.JRadioButton;
 
 import teo.isgci.db.Algo;
+import teo.isgci.util.UserSettings;
 
 public class NamingDialog extends JDialog implements ActionListener {
     protected ISGCIMainFrame parent;
@@ -112,15 +113,11 @@ public class NamingDialog extends JDialog implements ActionListener {
             Object c = group.getSelection();
             Algo.NamePref pref = Algo.NamePref.BASIC;
             if (c == basicBox.getModel())
-                pref = Algo.NamePref.BASIC;
+                UserSettings.setNamingPref(Algo.NamePref.BASIC);
             else if (c == forbiddenBox.getModel())
-                pref = Algo.NamePref.FORBIDDEN;
+                UserSettings.setNamingPref(Algo.NamePref.FORBIDDEN);
             else if (c == derivedBox.getModel())
-                pref = Algo.NamePref.DERIVED;
-            
-            parent.getTabbedPane().setNamingPref(pref, 
-                    parent.getTabbedPane().getSelectedComponent());
-                
+                UserSettings.setNamingPref(Algo.NamePref.DERIVED);                
             
             closeDialog();
         }
