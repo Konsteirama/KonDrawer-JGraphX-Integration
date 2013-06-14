@@ -410,7 +410,7 @@ public class ISGCIMainFrame extends JFrame implements WindowListener {
             public void actionPerformed(ActionEvent e) {              
                 ISGCISettingsDialog settingsDialog 
                     = new ISGCISettingsDialog(mainframe);
-                settingsDialog.setSize(650, 450);
+                settingsDialog.setSize(650, 550);
                 settingsDialog.setVisible(true);
             }
         });

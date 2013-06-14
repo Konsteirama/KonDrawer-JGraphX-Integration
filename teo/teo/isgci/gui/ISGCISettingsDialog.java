@@ -50,7 +50,7 @@ public class ISGCISettingsDialog extends JDialog implements ActionListener,
 
     protected JPanel graphColours;
     protected ISGCIMainFrame parent;
-    protected JTabbedPane options = new JTabbedPane(JTabbedPane.TOP);
+    protected JTabbedPane options = new JTabbedPane(/*UserSettings.getTabPlacement()*/JTabbedPane.TOP);
     protected JButton uiCancelButton, uiApplyButton, uiOkButton,
             uiSetDefaultButton;
     protected JButton gcCancelButton, gcApplyButton, gcOkButton,
@@ -65,7 +65,7 @@ public class ISGCISettingsDialog extends JDialog implements ActionListener,
             "backgroundcolour", "unkown complexity",
             "GraphIsomorphism-complete", "NP-complete", "lineartime solvable",
             "P", "open classes", "CONPC", "NPH", "keine" };
-    protected JCheckBox toolbar;
+    protected JCheckBox toolbar, groupColours;
     protected JSlider zoomLevel;
     private Color unknown = UserSettings.getColor(Complexity.UNKNOWN),
             gic = UserSettings.getColor(Complexity.GIC), npc = UserSettings
@@ -77,6 +77,7 @@ public class ISGCISettingsDialog extends JDialog implements ActionListener,
                     .getColor(Complexity.NPH), empty = UserSettings
                     .getColor(null), text, background;
     private HashMap<Complexity, Color> colorscheme = new HashMap<Complexity, Color>();
+    private Boolean group = true;
 
     /**
      * This field should change every time the class is changed - once it is
@@ -168,6 +169,7 @@ public class ISGCISettingsDialog extends JDialog implements ActionListener,
         gridbag.setConstraints(label, c);
         userInterface.add(label);
         toolbar = new JCheckBox();
+        toolbar.setSelected(true);
         c.weightx = 0.0;
         c.gridwidth = GridBagConstraints.REMAINDER;
         userInterface.add(toolbar, c);
@@ -249,6 +251,13 @@ public class ISGCISettingsDialog extends JDialog implements ActionListener,
         c.gridwidth = GridBagConstraints.REMAINDER;
         c.insets = new Insets(10, 5, 10, 5);
         graphColours.add(colours, c);
+        c.anchor = GridBagConstraints.WEST;
+        groupColours = new JCheckBox("Group problems");
+        groupColours.setSelected(true);
+        c.weightx = 0.0;
+        c.weighty = 0.0;
+        c.gridwidth = GridBagConstraints.REMAINDER;
+        graphColours.add(groupColours, c);
 
         /*
          * Buttons fixen, apply??
@@ -297,6 +306,7 @@ public class ISGCISettingsDialog extends JDialog implements ActionListener,
         gcApplyButton.addActionListener(this);
         gcSetDefaultButton.addActionListener(this);
         gcColorBlind.addActionListener(this);
+        groupColours.addActionListener(this);
 
         tabOrientation.addActionListener(this);
         theme.addActionListener(this);
@@ -332,13 +342,62 @@ public class ISGCISettingsDialog extends JDialog implements ActionListener,
             }
             closeDialog();
         } else if (source == gcColorBlind) {
-
+            colorscheme = UserSettings.getDefaultColorBlindColorScheme();
+            for (Complexity complexity : colorscheme.keySet()) {
+                if (complexity == Complexity.UNKNOWN) {
+                    unknown = colorscheme.get(complexity);
+                } else if (complexity == Complexity.CONPC) {
+                    conpc = colorscheme.get(complexity);
+                } else if (complexity == Complexity.NPC) {
+                    npc = colorscheme.get(complexity);
+                } else if (complexity == Complexity.NPH) {
+                    nph = colorscheme.get(complexity);
+                } else if (complexity == null) {
+                    empty = colorscheme.get(complexity);
+                } else if (complexity == Complexity.P) {
+                    p = colorscheme.get(complexity);
+                } else if (complexity == Complexity.GIC) {
+                    gic = colorscheme.get(complexity);
+                } else if (complexity == Complexity.LINEAR) {
+                    linear = colorscheme.get(complexity);
+                } else if (complexity == Complexity.OPEN) {
+                    open = colorscheme.get(complexity);
+                }
+            }
+            int i = colourOptions.getSelectedIndex();
+            colourOptions.clearSelection();
+            colourOptions.setSelectedIndex(i);
         } else if (source == gcApplyButton) {
             gcApplyButton.setEnabled(false);
             UserSettings.setColorScheme(colorscheme);
             colorscheme.clear();
         } else if (source == gcSetDefaultButton) {
             colorscheme = UserSettings.getDefaultColorScheme();
+            for (Complexity complexity : colorscheme.keySet()) {
+                if (complexity == Complexity.UNKNOWN) {
+                    unknown = colorscheme.get(complexity);
+                } else if (complexity == Complexity.CONPC) {
+                    conpc = colorscheme.get(complexity);
+                } else if (complexity == Complexity.NPC) {
+                    npc = colorscheme.get(complexity);
+                } else if (complexity == Complexity.NPH) {
+                    nph = colorscheme.get(complexity);
+                } else if (complexity == null) {
+                    empty = colorscheme.get(complexity);
+                } else if (complexity == Complexity.P) {
+                    p = colorscheme.get(complexity);
+                } else if (complexity == Complexity.GIC) {
+                    gic = colorscheme.get(complexity);
+                } else if (complexity == Complexity.LINEAR) {
+                    linear = colorscheme.get(complexity);
+                } else if (complexity == Complexity.OPEN) {
+                    open = colorscheme.get(complexity);
+                }
+            }
+            groupColours.setSelected(true);
+            int i = colourOptions.getSelectedIndex();
+            colourOptions.clearSelection();
+            colourOptions.setSelectedIndex(i);
         } else if (source == tabOrientation) {
             int x = tabOrientation.getSelectedIndex();
             if (x == 0) {
@@ -357,6 +416,8 @@ public class ISGCISettingsDialog extends JDialog implements ActionListener,
 
         } else if (source == toolbar) {
 
+        }else if (source == groupColours){
+            group = groupColours.isSelected();
         }
     }
 
@@ -412,6 +473,10 @@ public class ISGCISettingsDialog extends JDialog implements ActionListener,
                 colorscheme.put(Complexity.UNKNOWN, unknown);
                 gcApplyButton.setEnabled(true);
             }
+            if(group){
+                empty = newColor;
+                open = newColor;
+            }
         } else if (s == 3) {
             if (newColor != gic) {
                 gic = newColor;
@@ -425,6 +490,10 @@ public class ISGCISettingsDialog extends JDialog implements ActionListener,
                 colorscheme.remove(npc);
                 colorscheme.put(Complexity.NPC, npc);
                 gcApplyButton.setEnabled(true);
+            }
+            if(group){
+                nph = newColor;
+                conpc = newColor;
             }
         } else if (s == 5) {
             if (newColor != linear) {
@@ -447,12 +516,20 @@ public class ISGCISettingsDialog extends JDialog implements ActionListener,
                 colorscheme.put(Complexity.OPEN, open);
                 gcApplyButton.setEnabled(true);
             }
+            if(group){
+                unknown = newColor;
+                empty = newColor;
+            }
         } else if (s == 8) {
             if (newColor != conpc) {
                 conpc = newColor;
                 colorscheme.remove(conpc);
                 colorscheme.put(Complexity.CONPC, conpc);
                 gcApplyButton.setEnabled(true);
+            }
+            if(group){
+                nph = newColor;
+                npc = newColor;
             }
         } else if (s == 9) {
             if (newColor != nph) {
@@ -461,12 +538,20 @@ public class ISGCISettingsDialog extends JDialog implements ActionListener,
                 colorscheme.put(Complexity.NPH, nph);
                 gcApplyButton.setEnabled(true);
             }
+            if(group){
+                npc = newColor;
+                conpc = newColor;
+            }
         } else if (s == 10) {
             if (newColor != empty) {
                 empty = newColor;
                 colorscheme.remove(empty);
                 colorscheme.put(null, empty);
                 gcApplyButton.setEnabled(true);
+            }
+            if(group){
+                unknown = newColor;
+                open = newColor;
             }
         }
     }
