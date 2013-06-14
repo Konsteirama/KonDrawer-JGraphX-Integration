@@ -3,20 +3,19 @@ package teo.isgci.drawing;
 import java.awt.Color;
 import java.awt.Point;
 
+import org.jgrapht.Graph;
+
 import com.mxgraph.layout.hierarchical.mxHierarchicalLayout;
+import com.mxgraph.model.mxICell;
 import com.mxgraph.swing.mxGraphComponent;
 import com.mxgraph.util.mxConstants;
 import com.mxgraph.util.mxEvent;
 import com.mxgraph.util.mxEventObject;
-import com.mxgraph.util.mxUtils;
 import com.mxgraph.util.mxEventSource.mxIEventListener;
 import com.mxgraph.util.mxUndoManager;
 import com.mxgraph.util.mxUndoableEdit;
+import com.mxgraph.util.mxUtils;
 import com.mxgraph.view.mxGraph;
-
-import org.jgrapht.Graph;
-
-import javax.swing.JScrollBar;
 
 /**
  * Dumbed down version of the original, WIP GraphEventInterface.
@@ -25,11 +24,6 @@ import javax.swing.JScrollBar;
  * @param <E>
  */
 class GraphManipulation<V, E> implements GraphManipulationInterface<V, E> {
-
-    /**
-     * Adapter holding the current graph in JgraphX and JGraphT data structure.
-     */
-    private JGraphXAdapter<V, E> graphAdapter;
 
     /**
      * GraphComponent is the panel the graph is drawn in.
@@ -42,16 +36,89 @@ class GraphManipulation<V, E> implements GraphManipulationInterface<V, E> {
     private mxUndoManager undoManager;
 
     /**
+     * Returns the current graph adapter
+     * @return The current graph adapter
+     */
+    private JGraphXAdapter<V, E> getGraphAdapter()
+    {
+        return (JGraphXAdapter<V, E>) graphComponent.getGraph();
+    }
+
+    /**
+     * Returns the cell associated with the given node
+     * @param node
+     * @return
+     */
+    private mxICell getCellFromNode(V node)
+    {
+        return getGraphAdapter().getVertexToCellMap().get(node);
+    }
+
+    /**
+     * Returns the cell associated with the given edge
+     * @param edge
+     * @return
+     */
+    private mxICell getCellFromEdge(E edge)
+    {
+        return getGraphAdapter().getEdgeToCellMap().get(edge);
+    }
+
+    /**
+     * Returns the cells associated with the given nodes
+     * @param nodes
+     * @return
+     */
+    private mxICell[] getCellsFromNodes(V[] nodes)
+    {
+        mxICell[] cells = new mxICell[nodes.length];
+        for(int i = 0; i < nodes.length; i++){
+            cells[i] = getCellFromNode(nodes[i]);
+        }
+        return cells;
+    }
+
+    /**
+     * Returns the cells associated with the given edges
+     * @param edges
+     * @return
+     */
+    private mxICell[] getCellsFromEdges(E[] edges)
+    {
+        mxICell[] cells = new mxICell[edges.length];
+        for(int i = 0; i < edges.length; i++){
+            cells[i] = getCellFromEdge(edges[i]);
+        }
+        return cells;
+    }
+
+    /**
+     * Translates a point from graphComponent to graph
+     * @param p
+     * @return
+     */
+    private Point getPointOnGraph(Point p)
+    {
+        mxGraph graph = graphComponent.getGraph();
+
+        double s = graph.getView().getScale();
+        Point tr = graph.getView().getTranslate().getPoint();
+
+        double off = graph.getGridSize() / 2;
+        double x = graph.snap(p.getX() / s - tr.getX() - off);
+        double y = graph.snap(p.getY() / s - tr.getY() - off);
+
+        return new Point((int)x, (int)y);
+    }
+
+    /**
      * Constructor of the class. Creates an instance of the GraphManipulation
      * class that operates on a given graphComponent.
      *
      * @param graphComponent : a JGRaphX graphComponent, shown on the panel
-     * @param graphXAdapter  :
      */
-    public GraphManipulation(mxGraphComponent graphComponent,
-                             JGraphXAdapter<V, E> graphXAdapter) {
+    public GraphManipulation(mxGraphComponent graphComponent) {
         this.graphComponent = graphComponent;
-        this.graphAdapter = graphXAdapter;
 
         // initiation of undoManager variable
         this.undoManager = new mxUndoManager();
@@ -103,7 +170,7 @@ class GraphManipulation<V, E> implements GraphManipulationInterface<V, E> {
 
         graph.getModel().beginUpdate();
 
-        graphComponent.scrollCellToVisible(node, true);
+        graphComponent.scrollCellToVisible(getCellFromNode(node), true);
 
         graph.getModel().endUpdate();
     }
@@ -116,9 +183,17 @@ class GraphManipulation<V, E> implements GraphManipulationInterface<V, E> {
      */
     @Override
     public void colorNode(V[] nodes, Color color) {
+
         mxGraph graph = graphComponent.getGraph();
+
+        graph.getModel().beginUpdate();
+
+
+
         graph.setCellStyles(mxConstants.STYLE_FILLCOLOR,
-                mxUtils.hexString(color), nodes);
+                mxUtils.hexString(color), getCellsFromNodes(nodes));
+
+        graph.getModel().endUpdate();
     }
 
     /**
@@ -129,9 +204,15 @@ class GraphManipulation<V, E> implements GraphManipulationInterface<V, E> {
      */
     @Override
     public void markEdge(E[] edges) {
-        mxGraph graph = graphComponent.getGraph();        
+
+        mxGraph graph = graphComponent.getGraph();
+
+        graph.getModel().beginUpdate();
+
         graph.setCellStyles(mxConstants.STYLE_STROKECOLOR,
-                mxUtils.hexString(Color.black), edges);
+                mxUtils.hexString(Color.black), getCellsFromEdges(edges));
+
+        graph.getModel().endUpdate();
     }
     
     /**
@@ -142,9 +223,14 @@ class GraphManipulation<V, E> implements GraphManipulationInterface<V, E> {
      */
     @Override
     public void unmarkEdge(E[] edges) {
-        mxGraph graph = graphComponent.getGraph();        
+        mxGraph graph = graphComponent.getGraph();
+
+        graph.getModel().beginUpdate();
+
         graph.setCellStyles(mxConstants.STYLE_STROKECOLOR,
-                mxUtils.hexString(Color.blue), edges);
+                mxUtils.hexString(Color.blue), getCellsFromEdges(edges));
+
+        graph.getModel().endUpdate();
     }
 
     /**
@@ -180,8 +266,7 @@ class GraphManipulation<V, E> implements GraphManipulationInterface<V, E> {
     public void removeNode(V node) {
         mxGraph graph = graphComponent.getGraph();
 
-        Object[] cells = new Object[1];
-        cells[0] = node;
+        Object[] cells = new Object[]{getCellFromNode(node)};
 
         // Adds all edges connected to the node
         cells = graph.addAllEdges(cells);
@@ -211,7 +296,7 @@ class GraphManipulation<V, E> implements GraphManipulationInterface<V, E> {
 
         graph.getModel().beginUpdate();
 
-        graphComponent.labelChanged(node, nodeName, null);
+        graphComponent.labelChanged(getCellFromNode(node), nodeName, null);
 
         graph.getModel().endUpdate();
     }
@@ -222,7 +307,7 @@ class GraphManipulation<V, E> implements GraphManipulationInterface<V, E> {
      */
     @Override
     public void resetLayout() {
-        Graph<V, E> graphT = graphAdapter.getGraph();
+        Graph<V, E> graphT = getGraphAdapter().getGraph();
 
         JGraphXAdapter<V, E> newGraphAdapter = new JGraphXAdapter<V, E>(graphT);
     }
@@ -257,9 +342,6 @@ class GraphManipulation<V, E> implements GraphManipulationInterface<V, E> {
      */
     @Override
     public void zoom(boolean zoomIn) {
-        if (!graphComponent.isCenterZoom()) {
-            graphComponent.setCenterZoom(true);
-        }
 
         // factor isn't a good measure ask if it could be changed
         if (zoomIn) {
@@ -277,18 +359,20 @@ class GraphManipulation<V, E> implements GraphManipulationInterface<V, E> {
      */
     @Override
     public void zoom(boolean zoomIn, Point center) {
+
+        Point pointOnCanvas = getPointOnGraph(center);
+
         zoom(zoomIn);
-        
-        // Get the horizontal and vertical Scrollbar
-        JScrollBar horScrollBar = graphComponent.getHorizontalScrollBar(); 
-        JScrollBar vertScrollBar = graphComponent.getVerticalScrollBar();  
-        
-        // Get the relative position of the mousepointer in x and y
-        double relPosX = center.getX() / graphComponent.getWidth();
-        double relPosY = center.getY() / graphComponent.getHeight();
-        
-        // Zoom to the relative x and y coordinates
-        horScrollBar.setValue((int) (relPosX * horScrollBar.getMaximum()));
-        vertScrollBar.setValue((int) (relPosY * vertScrollBar.getMaximum()));
+
+        Point newPointOnCanvas = getPointOnGraph(center);
+
+        Point delta = new Point((int) (pointOnCanvas.getX()
+                - newPointOnCanvas.getX()), (int) (pointOnCanvas.getY()
+                - newPointOnCanvas.getY()));
+
+        Point viewPosition = graphComponent.getViewport().getViewPosition();
+        viewPosition.translate((int) delta.getX(), (int) delta.getY());
+
+        graphComponent.getViewport().setViewPosition(viewPosition);
     }
 }

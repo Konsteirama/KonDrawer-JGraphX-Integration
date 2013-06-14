@@ -106,10 +106,14 @@ class JGraphXInterface<V, E> implements DrawingLibraryInterface<V, E> {
         };
 
         graphManipulation =
-                new GraphManipulation<V, E>(graphComponent, graphAdapter);
+                new GraphManipulation<V, E>(graphComponent);
         graphEvent = new GraphEvent(graphComponent);
 
         graphComponent.setWheelScrollingEnabled(false);
+        graphComponent.setAutoScroll(false);
+        graphComponent.setCenterZoom(false);
+        graphComponent.setConnectable(false);
+
         graphEvent.registerMouseAdapter(
                 new InternalMouseAdapter(graphComponent, graphManipulation));
 
@@ -413,6 +417,10 @@ class JGraphXInterface<V, E> implements DrawingLibraryInterface<V, E> {
             return null;
     }
 
+    /**
+     * Set a new graph which should be drawn.
+     * @param g The new graph
+     */
     @Override
     public void setGraph(Graph<V, E> g) {
         graphAdapter = createNewAdapter(g);
@@ -423,6 +431,11 @@ class JGraphXInterface<V, E> implements DrawingLibraryInterface<V, E> {
         graphManipulation.reapplyHierarchicalLayout();
     }
 
+    /**
+     * Returns the current graph.
+     *
+     * @return the current graph
+     */
     @Override
     public Graph<V, E> getGraph() {
         return graphAdapter.getGraph();
