@@ -223,7 +223,7 @@ public class ISGCIGraphCanvas extends
 
         for (GraphView<Set<GraphClass>,DefaultEdge> gv : graphs) {
             if ((p = gv.getNodeCenter(v)) != null) {
-                ((ISGCIMainFrame) parent).centerCanvas(p);
+                //((ISGCIMainFrame) parent).centerCanvas(p);
                 return;
             }
         }
