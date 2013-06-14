@@ -20,7 +20,6 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
@@ -34,8 +33,8 @@ import org.jgrapht.Graph;
 import org.jgrapht.graph.DefaultEdge;
 
 import teo.isgci.db.Algo;
-import teo.isgci.db.DataSet;
 import teo.isgci.db.Algo.NamePref;
+import teo.isgci.db.DataSet;
 import teo.isgci.drawing.DrawingLibraryFactory;
 import teo.isgci.drawing.DrawingLibraryInterface;
 import teo.isgci.gc.GraphClass;
@@ -164,7 +163,6 @@ public class ISGCITabbedPane extends JTabbedPane implements Updatable {
                     parent = parent.getParent();
                 }
                 
-                //TODO wait for implementation of getNodeAt and getEdgeAt and rework popups
                 if (node != null) {
                     nodePopup = new NodePopup((ISGCIMainFrame) parent);
                     nodePopup.setNode((Set<GraphClass>) node);
