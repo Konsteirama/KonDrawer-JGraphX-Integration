@@ -463,7 +463,7 @@ public class ISGCITabbedPane extends JTabbedPane implements Updatable {
             boolean isProper = getProperness(graph, edge);
             if (!isProper && getDrawUnproper(getSelectedComponent())) {
                 markEdges.add(edge);
-            } else if (isProper 
+            } else if (!isProper 
                         && !getDrawUnproper(getSelectedComponent())){
                 unmarkEdges.add(edge);
             }
@@ -487,9 +487,11 @@ public class ISGCITabbedPane extends JTabbedPane implements Updatable {
      */
     protected Color complexityColor(Set<GraphClass> node) {
         Problem problem = getProblem(getSelectedComponent());
-        Complexity complexity = problem.getComplexity(node.iterator().next());
-        
-        return UserSettings.getColor(complexity);
+        if (problem != null){
+            Complexity complexity = problem.getComplexity(node.iterator().next());            
+            return UserSettings.getColor(complexity);
+        }
+        return UserSettings.getColor(Complexity.UNKNOWN);
     }
 
     @Override
