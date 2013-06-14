@@ -378,8 +378,10 @@ public class ISGCITabbedPane extends JTabbedPane {
         Graph graph = getActiveDrawingLibraryInterface().getGraph();
         for (Object o : graph.vertexSet()) {
             Set<GraphClass> node = (Set<GraphClass>) o;
-            getActiveDrawingLibraryInterface().getGraphManipulationInterface().
-                colorNode(node, complexityColor(node));            
+            
+            // TODO jannis: signature change
+            //getActiveDrawingLibraryInterface().getGraphManipulationInterface().
+            //    colorNode(node, complexityColor(node));            
         }
         getSelectedComponent().repaint();
     }

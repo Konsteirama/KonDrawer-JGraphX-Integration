@@ -14,16 +14,14 @@ package teo.isgci.drawing;
 import java.awt.Point;
 
 import org.jgrapht.Graph;
-import org.jgrapht.ListenableGraph;
-import org.jgrapht.graph.DefaultEdge;
 
-import javax.swing.JComponent;
+import com.mxgraph.swing.mxGraphComponent;
 
 /**
  * Dumbed down version of the original, WIP DrawingLibraryInterface
  * TODO: replace this with the final one
- * @param <V>
- * @param <E>
+ * @param <V> b.
+ * @param <E> b.
  */
 public interface DrawingLibraryInterface<V, E> {
 
@@ -50,13 +48,27 @@ public interface DrawingLibraryInterface<V, E> {
      * Returns the interface for manipulating the shown graph.
      * @return An instance of the GraphManipulationInterface
      */
-    GraphManipulationInterface getGraphManipulationInterface();
+    GraphManipulationInterface<V, E> getGraphManipulationInterface();
 
     /**
      * Returns the panel in which the graph is drawn.
-     * @return A JComponent which draws the specified graphs
+     * @return A mxGraphComponent which draws the specified graphs
      */
-    JComponent getPanel();
+    mxGraphComponent getPanel();
+
+    /**
+     * Returns the node located at the specified point
+     * @param p Location to look for a node
+     * @return Node located at the given point or null if there is no node
+     */
+    V getNodeAt(Point p);
+
+    /**
+     * Returns the edge located at the specified point
+     * @param p Location to look for an edge
+     * @return Edge located at the given point or null if there is no edge
+     */
+    E getEdgeAt(Point p);
 
     /**
      * Set a new graph which should be drawn.
@@ -65,24 +77,9 @@ public interface DrawingLibraryInterface<V, E> {
     void setGraph(Graph<V, E> g);
     
     /**
-     * Returns the Graph of this Interface
-     * @return The used Graph
+     * Returns the jgrapht graph that is currently drawn.
+     * @return The jgraphT graph associated with this interface.
      */
     Graph<V, E> getGraph();
-    
-    /**
-     * Returns the node located at the specified point
-     * @param p Location to look for a node
-     * @return Node located at the given point or null if there is no node
-     */
-    V getNodeAt(Point p);
-
-
-    /**
-     * Returns the edge located at the specified point
-     * @param p Location to look for an edge
-     * @return Edge located at the given point or null if there is no edge
-     */
-    E getEdgeAt(Point p);
-    
 }
+
