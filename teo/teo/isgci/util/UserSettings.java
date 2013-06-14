@@ -88,6 +88,7 @@ public abstract class UserSettings {
         for (Complexity complexity : colorScheme.keySet()) {
             complexityToColor.put(complexity, colorScheme.get(complexity));
         }
+        updateSettings();
     }
     
     /**

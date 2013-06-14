@@ -18,7 +18,9 @@ import java.awt.Component;
 import java.awt.Container;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
@@ -148,6 +150,7 @@ public class ISGCITabbedPane extends JTabbedPane {
     private MouseAdapter mouseAdapter = new MouseAdapter() {
         @Override
         public void mouseClicked(MouseEvent e) {
+            System.out.println("maus");
             if (e.getButton() == MouseEvent.BUTTON3) {         
                 Object node = getActiveDrawingLibraryInterface().
                         getNodeAt(e.getPoint());
@@ -376,12 +379,21 @@ public class ISGCITabbedPane extends JTabbedPane {
         }
         panelToProblem.put((JComponent) c, problem);
         Graph graph = getActiveDrawingLibraryInterface().getGraph();
+        HashMap<Color , List<Set<GraphClass>>> colorToNodes = 
+                new HashMap<Color, List<Set<GraphClass>>>();
+        // Put all nodes with the same color in a list
         for (Object o : graph.vertexSet()) {
             Set<GraphClass> node = (Set<GraphClass>) o;
-            
-            // TODO jannis: signature change
-            //getActiveDrawingLibraryInterface().getGraphManipulationInterface().
-            //    colorNode(node, complexityColor(node));            
+            Color color = complexityColor(node);
+            if (!colorToNodes.containsKey(color)) {
+                colorToNodes.put(color, new ArrayList<Set<GraphClass>>());
+            }
+            colorToNodes.get(color).add(node);           
+        }
+        // Color all lists with their color
+        for (Color color : colorToNodes.keySet()) {
+            getActiveDrawingLibraryInterface().getGraphManipulationInterface()
+                .colorNode(colorToNodes.get(color).toArray(), color);
         }
         getSelectedComponent().repaint();
     }
@@ -432,26 +444,25 @@ public class ISGCITabbedPane extends JTabbedPane {
      */
     private void setProperness() {
         Graph graph = getActiveDrawingLibraryInterface().getGraph();
+        List<DefaultEdge> markEdges = new ArrayList<DefaultEdge>();
+        List<DefaultEdge> unmarkEdges = new ArrayList<DefaultEdge>();
         for (Object o : graph.edgeSet()) {
             DefaultEdge edge = (DefaultEdge) o;
             boolean isProper = getProperness(graph, edge);
-            if (!isProper && panelToDrawUnproper.get(getSelectedComponent())) {
-//                Set<GraphClass> source = (Set<GraphClass>) graph.
-//                        getEdgeSource(edge);
-//                Set<GraphClass> target = (Set<GraphClass>) graph.
-//                        getEdgeTarget(edge);
-//                getActiveDrawingLibraryInterface().
-//                    getGraphManipulationInterface().markEdge(source, target);
+            if (!isProper && getDrawUnproper(getSelectedComponent())) {
+                markEdges.add(edge);
             } else if (isProper 
-                        && !panelToDrawUnproper.get(getSelectedComponent())){
-//                Set<GraphClass> source = (Set<GraphClass>) graph.
-//                        getEdgeSource(edge);
-//                Set<GraphClass> target = (Set<GraphClass>) graph.
-//                        getEdgeTarget(edge);
-//                getActiveDrawingLibraryInterface().
-//                    getGraphManipulationInterface().markEdge(source, target);                
+                        && !getDrawUnproper(getSelectedComponent())){
+                unmarkEdges.add(edge);
             }
         }
+        if (markEdges.size() > 0){
+            getActiveDrawingLibraryInterface().
+            getGraphManipulationInterface().markEdge(markEdges.toArray());
+        } else if (unmarkEdges.size() > 0) {
+            getActiveDrawingLibraryInterface().
+            getGraphManipulationInterface().unmarkEdge(unmarkEdges.toArray());
+        } 
     }
     
     /**
