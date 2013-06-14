@@ -19,6 +19,7 @@ import java.awt.Container;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Set;
 
 import javax.swing.JComponent;
@@ -28,12 +29,16 @@ import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
 import org.jgrapht.Graph;
+import org.jgrapht.graph.DefaultEdge;
 
 import teo.isgci.db.Algo;
+import teo.isgci.db.DataSet;
 import teo.isgci.db.Algo.NamePref;
 import teo.isgci.drawing.DrawingLibraryFactory;
 import teo.isgci.drawing.DrawingLibraryInterface;
 import teo.isgci.gc.GraphClass;
+import teo.isgci.grapht.GAlg;
+import teo.isgci.grapht.Inclusion;
 import teo.isgci.problem.Complexity;
 import teo.isgci.problem.Problem;
 import teo.isgci.util.UserSettings;
@@ -230,6 +235,8 @@ public class ISGCITabbedPane extends JTabbedPane {
          
         panelToInterfaceMap.put(panel, drawingInterface);
         panelToNamingPref.put(panel, defaultMode);
+        
+        setProperness();
     }
     
     /**
@@ -395,6 +402,55 @@ public class ISGCITabbedPane extends JTabbedPane {
         return null;
     }
 
+    /**
+     * Returns the properness of a given edge, in a given graph.
+     * 
+     * @param graph
+     *          the graph in which the edge is in
+     * 
+     * @param edge
+     *          the edge which is checked for properness.
+     *          
+     * @return
+     *          true if the edge is proper, false otherwise.
+     */
+    private boolean getProperness(Graph graph, DefaultEdge edge){
+        GraphClass source = (GraphClass) ((Set<GraphClass>) graph.
+                                            getEdgeSource(edge)).toArray()[0];
+        GraphClass target = (GraphClass) ((Set<GraphClass>) graph.
+                                            getEdgeTarget(edge)).toArray()[0];
+        List<Inclusion> path = GAlg.getPath(DataSet.inclGraph, source, target);
+        return (Algo.isPathProper(path)  
+                || Algo.isPathProper(Algo.makePathProper(path)));
+    }
+    
+    /**
+     * Marks edges of the currently active tab, depending on it's drawUnproper
+     * state.
+     */
+    private void setProperness() {
+        Graph graph = getActiveDrawingLibraryInterface().getGraph();
+        for (Object o : graph.edgeSet()) {
+            DefaultEdge edge = (DefaultEdge) o;
+            boolean isProper = getProperness(graph, edge);
+            if (!isProper && panelToDrawUnproper.get(getSelectedComponent())) {
+//                Set<GraphClass> source = (Set<GraphClass>) graph.
+//                        getEdgeSource(edge);
+//                Set<GraphClass> target = (Set<GraphClass>) graph.
+//                        getEdgeTarget(edge);
+//                getActiveDrawingLibraryInterface().
+//                    getGraphManipulationInterface().markEdge(source, target);
+            } else if (isProper 
+                        && !panelToDrawUnproper.get(getSelectedComponent())){
+//                Set<GraphClass> source = (Set<GraphClass>) graph.
+//                        getEdgeSource(edge);
+//                Set<GraphClass> target = (Set<GraphClass>) graph.
+//                        getEdgeTarget(edge);
+//                getActiveDrawingLibraryInterface().
+//                    getGraphManipulationInterface().markEdge(source, target);                
+            }
+        }
+    }
     
     /**
      * @param node 
