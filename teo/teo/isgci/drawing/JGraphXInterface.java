@@ -11,6 +11,7 @@
 
 package teo.isgci.drawing;
 
+import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.Graphics2D;
@@ -99,7 +100,11 @@ class JGraphXInterface<V, E> implements DrawingLibraryInterface<V, E> {
                     label = label.replace("[", "");
                     label = label.replace("]", "");
 
-                    return new Component[]{new LatexLabel(label)};
+                    LatexLabel ll = new LatexLabel(label);
+                    ll.setBackground(new Color(0, 0, 0, 0));
+                    
+                    
+                    return new Component[]{ ll };
                 }
                 return null;
             };
