@@ -164,18 +164,15 @@ public class ISGCIMainFrame extends JFrame
 
         setJMenuBar(createMenus());
         
-        // Create and add new toolbar
-        ISGCIToolBar toolbar = new ISGCIToolBar();
-        getContentPane().add(toolbar, BorderLayout.PAGE_START);
-        
-        // Create and add tabbed interface for canvas
-        // TODO: should not add a canvaspanel on creation; 
-        // instead there should be a startpage of some sort 
+        // Create and add tabbed interface for canvas 
         tabbedPane = new ISGCITabbedPane();
-        
         getContentPane().add(tabbedPane, BorderLayout.CENTER);
         
-        //getContentPane().add("Center", createCanvasPanel());
+        // Create and add new toolbar - has to be after tabbedpane
+        // because toolbar needs to listen to tabbedpane
+        ISGCIToolBar toolbar = new ISGCIToolBar(this);
+        getContentPane().add(toolbar, BorderLayout.PAGE_START);
+        
         registerListeners();
         setLocation(20, 20);
         pack();
@@ -405,10 +402,7 @@ public class ISGCIMainFrame extends JFrame
         } else if (object == miNew) {
             new ISGCIMainFrame(loader);
         } else if (object == miExport) {
-            JDialog export = new ExportDialog(this);
-            export.setLocation(50, 50);
-            export.pack();
-            export.setVisible(true);
+            openExportDialog();
         } else if (object == miNaming) {
             JDialog d = new NamingDialog(this);
             d.setLocation(50,50);
@@ -431,11 +425,7 @@ public class ISGCIMainFrame extends JFrame
             check.setSize(700, 400);
             check.setVisible(true);
         } else if (object == miSelectGraphClasses) {
-            JDialog select = new GraphClassSelectionDialog(this);
-            select.setLocation(50, 50);
-            select.pack();
-            select.setSize(500, 400);
-            select.setVisible(true);
+            openSelectGraphClassesDialog();
         } else if (object == miAbout) {
             JDialog select = new AboutDialog(this);
             select.setLocation(50, 50);
@@ -467,6 +457,27 @@ public class ISGCIMainFrame extends JFrame
     
     public void setDrawUnproper(boolean state){
         miDrawUnproper.setSelected(state);
+    }
+    
+    /**
+     * Opens a new SelectGraphClasses dialog.
+     */
+    public void openSelectGraphClassesDialog() {
+        JDialog select = new GraphClassSelectionDialog(this);
+        select.setLocation(50, 50);
+        select.pack();
+        select.setSize(500, 400);
+        select.setVisible(true);
+    }
+    
+    /**
+     * Opens a new export dialog.
+     */
+    public void openExportDialog() {
+        JDialog export = new ExportDialog(this);
+        export.setLocation(50, 50);
+        export.pack();
+        export.setVisible(true);
     }
 }
 
