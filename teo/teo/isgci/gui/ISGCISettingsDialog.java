@@ -40,6 +40,7 @@ import javax.swing.event.ChangeListener;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
+import teo.isgci.db.Algo;
 import teo.isgci.problem.Complexity;
 import teo.isgci.util.UserSettings;
 
@@ -58,15 +59,13 @@ public class ISGCISettingsDialog extends JDialog implements ActionListener,
                                                      * UserSettings.getTabPlacement
                                                      * ()
                                                      */JTabbedPane.TOP);
-    protected JButton uiCancelButton, uiApplyButton, uiOkButton,
-            uiSetDefaultButton;
-    protected JButton gcCancelButton, gcApplyButton, gcOkButton,
-            gcSetDefaultButton, gcColorBlind;
+    protected JButton cancelButton, applyButton, okButton, uiSetDefaultButton;
+    protected JButton gcSetDefaultButton, gcColorBlind;
     protected JList colourOptions;
     protected JColorChooser colours;
     protected JComboBox tabOrientation, theme, namingPreference;// nachschlagen
     private String[] tabs = new String[] { "Top", "East", "West", "Bottom" };
-    private String[] themes = new String[] { "Metal", "Motif",
+    private String[] themes = new String[] { "Metal", "Nimbus",
             "Platform standard" };
     private String[] problemes = new String[] { "font colour",
             "backgroundcolour", "unkown complexity",
@@ -86,6 +85,8 @@ public class ISGCISettingsDialog extends JDialog implements ActionListener,
                     .getColor(null), text, background;
     private HashMap<Complexity, Color> colorscheme = new HashMap<Complexity, Color>();
     private Boolean group = true;
+    private Boolean setToolbar = false, setTheme = false, setZoom = false,
+            setTabOrientation = false, setNamingPreferences = false;
 
     /**
      * This field should change every time the class is changed - once it is
@@ -238,19 +239,19 @@ public class ISGCISettingsDialog extends JDialog implements ActionListener,
         c.anchor = GridBagConstraints.EAST;
         c.insets = new Insets(0, 5, 10, 5);
         c.gridwidth = GridBagConstraints.RELATIVE;
-        uiOkButton = new JButton("Ok");
-        tabUserInterface.add(uiOkButton, c);
+        okButton = new JButton("Ok");
+        tabUserInterface.add(okButton, c);
 
         c.anchor = GridBagConstraints.WEST;
         c.gridwidth = GridBagConstraints.RELATIVE;
-        uiCancelButton = new JButton("Cancel");
-        tabUserInterface.add(uiCancelButton, c);
+        cancelButton = new JButton("Cancel");
+        tabUserInterface.add(cancelButton, c);
 
         c.anchor = GridBagConstraints.WEST;
         c.gridwidth = GridBagConstraints.REMAINDER;
-        uiApplyButton = new JButton("Apply");
-        uiApplyButton.setEnabled(false);
-        tabUserInterface.add(uiApplyButton, c);
+        applyButton = new JButton("Apply");
+        applyButton.setEnabled(false);
+        tabUserInterface.add(applyButton, c);
 
         /*
          * graph colours tab
@@ -296,8 +297,8 @@ public class ISGCISettingsDialog extends JDialog implements ActionListener,
         c.anchor = GridBagConstraints.EAST;
         c.insets = new Insets(0, 5, 10, 5);
         c.gridwidth = GridBagConstraints.RELATIVE;
-        gcOkButton = new JButton("Ok");
-        tabGraphColours.add(gcOkButton, c);
+        okButton = new JButton("Ok");
+        tabGraphColours.add(okButton, c);
 
         c.anchor = GridBagConstraints.EAST;
         c.insets = new Insets(0, 5, 10, 5);
@@ -307,25 +308,22 @@ public class ISGCISettingsDialog extends JDialog implements ActionListener,
 
         c.anchor = GridBagConstraints.WEST;
         c.gridwidth = GridBagConstraints.RELATIVE;
-        gcCancelButton = new JButton("Cancel");
-        tabGraphColours.add(gcCancelButton, c);
+        cancelButton = new JButton("Cancel");
+        tabGraphColours.add(cancelButton, c);
 
         c.anchor = GridBagConstraints.WEST;
         c.gridwidth = GridBagConstraints.REMAINDER;
-        gcApplyButton = new JButton("Apply");
-        gcApplyButton.setEnabled(false);
-        tabGraphColours.add(gcApplyButton, c);
+        applyButton = new JButton("Apply");
+        applyButton.setEnabled(false);
+        tabGraphColours.add(applyButton, c);
 
         setDefaultCloseOperation(DISPOSE_ON_CLOSE);
 
-        uiCancelButton.addActionListener(this);
-        uiOkButton.addActionListener(this);
-        uiApplyButton.addActionListener(this);
+        cancelButton.addActionListener(this);
+        okButton.addActionListener(this);
+        applyButton.addActionListener(this);
         uiSetDefaultButton.addActionListener(this);
 
-        gcCancelButton.addActionListener(this);
-        gcOkButton.addActionListener(this);
-        gcApplyButton.addActionListener(this);
         gcSetDefaultButton.addActionListener(this);
         gcColorBlind.addActionListener(this);
         groupColours.addActionListener(this);
@@ -340,30 +338,15 @@ public class ISGCISettingsDialog extends JDialog implements ActionListener,
 
     public void actionPerformed(ActionEvent event) {
         Object source = event.getSource();
-        if (source == uiCancelButton) {
+        if (source == cancelButton) {
             closeDialog();
-        } else if (source == uiOkButton) {
-            if (gcApplyButton.isEnabled()) {
-                UserSettings.setColorScheme(colorscheme);
-            }
-            if (uiApplyButton.isEnabled()) {
-
+        } else if (source == okButton) {
+            if (applyButton.isEnabled()) {
+                applyButton.doClick();
             }
             closeDialog();
-        } else if (source == uiApplyButton) {
-            uiApplyButton.setEnabled(false);
         } else if (source == uiSetDefaultButton) {
 
-        } else if (source == gcCancelButton) {
-            closeDialog();
-        } else if (source == gcOkButton) {
-            if (gcApplyButton.isEnabled()) {
-                UserSettings.setColorScheme(colorscheme);
-            }
-            if (uiApplyButton.isEnabled()) {
-
-            }
-            closeDialog();
         } else if (source == gcColorBlind) {
             colorscheme = UserSettings.getDefaultColorBlindColorScheme();
             for (Complexity complexity : colorscheme.keySet()) {
@@ -390,8 +373,23 @@ public class ISGCISettingsDialog extends JDialog implements ActionListener,
             int i = colourOptions.getSelectedIndex();
             colourOptions.clearSelection();
             colourOptions.setSelectedIndex(i);
-        } else if (source == gcApplyButton) {
-            gcApplyButton.setEnabled(false);
+        } else if (source == applyButton) {
+            applyButton.setEnabled(false);
+            if (setNamingPreferences) {
+
+            }
+            if (setTabOrientation) {
+
+            }
+            if (setTheme) {
+
+            }
+            if (setZoom) {
+
+            }
+            if (setToolbar) {
+
+            }
             UserSettings.setColorScheme(colorscheme);
             colorscheme.clear();
         } else if (source == gcSetDefaultButton) {
@@ -432,45 +430,40 @@ public class ISGCISettingsDialog extends JDialog implements ActionListener,
             } else if (x == 3) {
                 options.setTabPlacement(JTabbedPane.BOTTOM);
             }
-            if (!uiApplyButton.isEnabled()) {
-                uiApplyButton.setEnabled(true);
+            setTabOrientation = true;
+            if (!applyButton.isEnabled()) {
+                applyButton.setEnabled(true);
             }
         } else if (source == theme) {
             int i = theme.getSelectedIndex();
-            if (i==0){
+            if (i == 0) {
                 try {
-                    UIManager.setLookAndFeel(UIManager.getCrossPlatformLookAndFeelClassName());
+                    UIManager.setLookAndFeel(UIManager
+                            .getCrossPlatformLookAndFeelClassName());
                 } catch (ClassNotFoundException e) {
-                    // TODO Auto-generated catch block
                     e.printStackTrace();
                 } catch (InstantiationException e) {
-                    // TODO Auto-generated catch block
                     e.printStackTrace();
                 } catch (IllegalAccessException e) {
-                    // TODO Auto-generated catch block
                     e.printStackTrace();
                 } catch (UnsupportedLookAndFeelException e) {
-                    // TODO Auto-generated catch block
                     e.printStackTrace();
                 }
                 SwingUtilities.updateComponentTreeUI(this);
                 this.pack();
-            }else if ( i==1){
-                for (LookAndFeelInfo info : UIManager.getInstalledLookAndFeels()) {
+            } else if (i == 1) {
+                for (LookAndFeelInfo info : UIManager
+                        .getInstalledLookAndFeels()) {
                     if ("Nimbus".equals(info.getName())) {
                         try {
                             UIManager.setLookAndFeel(info.getClassName());
                         } catch (ClassNotFoundException e) {
-                            // TODO Auto-generated catch block
                             e.printStackTrace();
                         } catch (InstantiationException e) {
-                            // TODO Auto-generated catch block
                             e.printStackTrace();
                         } catch (IllegalAccessException e) {
-                            // TODO Auto-generated catch block
                             e.printStackTrace();
                         } catch (UnsupportedLookAndFeelException e) {
-                            // TODO Auto-generated catch block
                             e.printStackTrace();
                         }
                         break;
@@ -478,31 +471,47 @@ public class ISGCISettingsDialog extends JDialog implements ActionListener,
                 }
                 SwingUtilities.updateComponentTreeUI(this);
                 this.pack();
-            }else if(i==2){
+            } else if (i == 2) {
                 try {
-                    UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+                    UIManager.setLookAndFeel(UIManager
+                            .getSystemLookAndFeelClassName());
                 } catch (ClassNotFoundException e) {
-                    // TODO Auto-generated catch block
                     e.printStackTrace();
                 } catch (InstantiationException e) {
-                    // TODO Auto-generated catch block
                     e.printStackTrace();
                 } catch (IllegalAccessException e) {
-                    // TODO Auto-generated catch block
                     e.printStackTrace();
                 } catch (UnsupportedLookAndFeelException e) {
-                    // TODO Auto-generated catch block
                     e.printStackTrace();
                 }
                 SwingUtilities.updateComponentTreeUI(this);
                 this.pack();
             }
+            setTheme = true;
+            if (!applyButton.isEnabled()) {
+                applyButton.setEnabled(true);
+            }
         } else if (source == toolbar) {
-
+            toolbar.setSelected(toolbar.isSelected());
+            setToolbar = (!setToolbar);
+            if (!applyButton.isEnabled()) {
+                applyButton.setEnabled(true);
+            }
         } else if (source == groupColours) {
             group = groupColours.isSelected();
         } else if (source == namingPreference) {
-            
+            int i = namingPreference.getSelectedIndex();
+            if (i == 0) {
+
+            } else if (i == 1) {
+
+            } else if (i == 2) {
+
+            }
+            setNamingPreferences = true;
+            if (!applyButton.isEnabled()) {
+                applyButton.setEnabled(true);
+            }
         }
     }
 
@@ -544,19 +553,19 @@ public class ISGCISettingsDialog extends JDialog implements ActionListener,
         if (s == 0) {
             if (newColor != text) {
                 text = newColor;
-                gcApplyButton.setEnabled(true);
+                applyButton.setEnabled(true);
             }
         } else if (s == 1) {
             if (newColor != background) {
                 background = newColor;
-                gcApplyButton.setEnabled(true);
+                applyButton.setEnabled(true);
             }
         } else if (s == 2) {
             if (newColor != unknown) {
                 unknown = newColor;
                 colorscheme.remove(unknown);
                 colorscheme.put(Complexity.UNKNOWN, unknown);
-                gcApplyButton.setEnabled(true);
+                applyButton.setEnabled(true);
             }
             if (group) {
                 empty = newColor;
@@ -567,14 +576,14 @@ public class ISGCISettingsDialog extends JDialog implements ActionListener,
                 gic = newColor;
                 colorscheme.remove(gic);
                 colorscheme.put(Complexity.GIC, gic);
-                gcApplyButton.setEnabled(true);
+                applyButton.setEnabled(true);
             }
         } else if (s == 4) {
             if (newColor != npc) {
                 npc = newColor;
                 colorscheme.remove(npc);
                 colorscheme.put(Complexity.NPC, npc);
-                gcApplyButton.setEnabled(true);
+                applyButton.setEnabled(true);
             }
             if (group) {
                 nph = newColor;
@@ -585,21 +594,21 @@ public class ISGCISettingsDialog extends JDialog implements ActionListener,
                 linear = newColor;
                 colorscheme.remove(linear);
                 colorscheme.put(Complexity.LINEAR, linear);
-                gcApplyButton.setEnabled(true);
+                applyButton.setEnabled(true);
             }
         } else if (s == 6) {
             if (newColor != p) {
                 p = newColor;
                 colorscheme.remove(p);
                 colorscheme.put(Complexity.P, p);
-                gcApplyButton.setEnabled(true);
+                applyButton.setEnabled(true);
             }
         } else if (s == 7) {
             if (newColor != open) {
                 open = newColor;
                 colorscheme.remove(open);
                 colorscheme.put(Complexity.OPEN, open);
-                gcApplyButton.setEnabled(true);
+                applyButton.setEnabled(true);
             }
             if (group) {
                 unknown = newColor;
@@ -610,7 +619,7 @@ public class ISGCISettingsDialog extends JDialog implements ActionListener,
                 conpc = newColor;
                 colorscheme.remove(conpc);
                 colorscheme.put(Complexity.CONPC, conpc);
-                gcApplyButton.setEnabled(true);
+                applyButton.setEnabled(true);
             }
             if (group) {
                 nph = newColor;
@@ -621,7 +630,7 @@ public class ISGCISettingsDialog extends JDialog implements ActionListener,
                 nph = newColor;
                 colorscheme.remove(nph);
                 colorscheme.put(Complexity.NPH, nph);
-                gcApplyButton.setEnabled(true);
+                applyButton.setEnabled(true);
             }
             if (group) {
                 npc = newColor;
@@ -632,7 +641,7 @@ public class ISGCISettingsDialog extends JDialog implements ActionListener,
                 empty = newColor;
                 colorscheme.remove(empty);
                 colorscheme.put(null, empty);
-                gcApplyButton.setEnabled(true);
+                applyButton.setEnabled(true);
             }
             if (group) {
                 unknown = newColor;
