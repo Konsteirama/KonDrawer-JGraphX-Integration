@@ -75,16 +75,12 @@ public class ISGCIToolBar extends JToolBar {
 
         // UNDO
         String undoTooltip = "Undo the last action";
-        ImageIcon undoicon = createImageIcon(UNDO_ICON, undoTooltip);
-        JButton undobutton = new JButton(undoicon);
-        undobutton.setToolTipText(undoTooltip);
+        JButton undobutton = createImageButton(UNDO_ICON, undoTooltip);
         add(undobutton);
         
         // REDO
         String redoTooltip = "Redo the last undo action";
-        ImageIcon redoicon = createImageIcon(REDO_ICON, "desc");
-        JButton redobutton = new JButton(redoicon);
-        redobutton.setToolTipText(redoTooltip);
+        JButton redobutton = createImageButton(REDO_ICON, redoTooltip);
         add(redobutton);
         
         // ----
@@ -92,23 +88,18 @@ public class ISGCIToolBar extends JToolBar {
         
         // EXPORT
         String exportTooltip = "Open the export dialog";
-        ImageIcon exporticon = createImageIcon(EXPORT_ICON, "desc");
-        JButton exportbutton = new JButton(exporticon);
-        exportbutton.setToolTipText(exportTooltip);
+        JButton exportbutton = createImageButton(EXPORT_ICON, exportTooltip);
         add(exportbutton);
         
         // RESET
         String resetTooltip = "Reset the graph's layout";
-        ImageIcon reseticon = createImageIcon(RESET_ICON, "desc");
-        JButton resetbutton = new JButton(reseticon);
-        resetbutton.setToolTipText(resetTooltip);
+        JButton resetbutton = createImageButton(RESET_ICON, resetTooltip);
         add(resetbutton);
         
         // RESTORE
         String restoreTooltip = "Restore the graph to its original state";
-        ImageIcon restoreicon = createImageIcon(RESTORE_ICON, "desc");
-        JButton restorebutton = new JButton(restoreicon);
-        restorebutton.setToolTipText(restoreTooltip);
+        JButton restorebutton 
+            = createImageButton(RESTORE_ICON, restoreTooltip);
         add(restorebutton);
         
         // ----
@@ -116,30 +107,24 @@ public class ISGCIToolBar extends JToolBar {
         
         // ZOOM IN
         String zoomInTooltip = "Zoom In";
-        ImageIcon zoominicon = createImageIcon(ZOOM_IN_ICON, "desc");
-        JButton zoominbutton = new JButton(zoominicon);
-        zoominbutton.setToolTipText(zoomInTooltip);
+        JButton zoominbutton = createImageButton(ZOOM_IN_ICON, zoomInTooltip);
         add(zoominbutton);
         
         // ZOOM OUT
         String zoomOutTooltip = "Zoom Out";
-        ImageIcon zoomouticon = createImageIcon(ZOOM_OUT_ICON, "desc");
-        JButton zoomoutbutton = new JButton(zoomouticon);
-        zoomoutbutton.setToolTipText(zoomOutTooltip);
+        JButton zoomoutbutton 
+            = createImageButton(ZOOM_OUT_ICON, zoomOutTooltip);
         add(zoomoutbutton);
         
         // ZOOM
         String zoomTooltip = "?";
-        ImageIcon zoomicon = createImageIcon(ZOOM_ICON, "desc");
-        JButton zoombutton = new JButton(zoomicon);
-        zoombutton.setToolTipText(zoomTooltip);
+        JButton zoombutton = createImageButton(ZOOM_ICON, zoomTooltip);
         add(zoombutton);
         
         // ZOOM TO FIT
         String zoomToFitTooltip = "Zoom to fit everything into the canvas";
-        ImageIcon zoomtofiticon = createImageIcon(ZOOM_TO_FIT_ICON, "desc");
-        JButton zoomtofitbutton = new JButton(zoomtofiticon);
-        zoomtofitbutton.setToolTipText(zoomToFitTooltip);
+        JButton zoomtofitbutton 
+            = createImageButton(ZOOM_TO_FIT_ICON, zoomToFitTooltip);
         add(zoomtofitbutton);
         
         // ----
@@ -147,23 +132,18 @@ public class ISGCIToolBar extends JToolBar {
         
         // DELETE
         String deleteTooltip = "?";
-        ImageIcon deleteicon = createImageIcon(DELETE_ICON, "desc");
-        JButton deletebutton = new JButton(deleteicon);
-        deletebutton.setToolTipText(deleteTooltip);
+        JButton deletebutton = createImageButton(DELETE_ICON, deleteTooltip);
         add(deletebutton);
         
         // SEARCH
         String searchTooltip = "Searches for the specific node in the canvas.";
-        ImageIcon searchicon = createImageIcon(SEARCH_ICON, "desc");
-        JButton searchbutton = new JButton(searchicon);
-        searchbutton.setToolTipText(searchTooltip);
+        JButton searchbutton = createImageButton(SEARCH_ICON, searchTooltip);
         add(searchbutton);
         
         // NEW DRAWING
         String newDrawingTooltip = "Open a dialog to create a new drawing";
-        ImageIcon newdrawingicon = createImageIcon(NEW_DRAWING_ICON, "desc");
-        JButton newdrawingbutton = new JButton(newdrawingicon);
-        newdrawingbutton.setToolTipText(newDrawingTooltip);
+        JButton newdrawingbutton 
+            = createImageButton(NEW_DRAWING_ICON, newDrawingTooltip);
         add(newdrawingbutton);
     }
     
@@ -173,22 +153,28 @@ public class ISGCIToolBar extends JToolBar {
      * @param icon
      *          The relative path to {@link #ICONPATH} to the icon
      * @param description
-     *          The description of the ImageIcon
+     *          The description of the ImageIcon and the tooltip text for
+     *          the button.
      * 
      *  @return 
-     *  A new ImageIcon created from icon and tooltip or null, if the path
-     *  was invalid.
+     *  A new JButton created from icon and tooltip or a button with ? if the
+     *  path was invalid
      */
-    protected ImageIcon createImageIcon(String icon, String description) {
+    protected JButton createImageButton(String icon, String description) {
         String path = ICONPATH + icon;
+        JButton button;
         
         java.net.URL imgURL = getClass().getResource(path);
-        if (imgURL != null) {          
-            return new ImageIcon(imgURL, description);
+        if (imgURL != null) {
+            ImageIcon imgIcon = new ImageIcon(imgURL, description);
+            button = new JButton(imgIcon);
         } else {
             System.err.println("Couldn't find file: " + path);
-            return null;
+            button = new JButton("?");
         }
+        
+        button.setToolTipText(description);
+        return button;
     }
 }
 
