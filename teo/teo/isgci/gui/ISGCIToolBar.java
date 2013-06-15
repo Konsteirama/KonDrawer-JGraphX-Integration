@@ -159,13 +159,13 @@ public class ISGCIToolBar extends JToolBar {
         });
         
         // REAPPLYLAYOUT
-        String resetTooltip = "Reset the graph's layout";
-        JButton resetbutton = IconButtonFactory.createImageButton(
-                IconButtonFactory.REFRESH_ICON, resetTooltip);
+        String reapplyTooltip = "Reset the graph's layout";
+        JButton reapplybutton = IconButtonFactory.createImageButton(
+                IconButtonFactory.REFRESH_ICON, reapplyTooltip);
 
-        add(resetbutton);
+        add(reapplybutton);
         
-        resetbutton.addActionListener(new ActionListener() {
+        reapplybutton.addActionListener(new ActionListener() {
 
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -182,12 +182,12 @@ public class ISGCIToolBar extends JToolBar {
 
 
         // RESTORELAYOUT
-        String restoreTooltip = "Restore the graph to its original state";
-        JButton restorebutton = IconButtonFactory.createImageButton(
-                IconButtonFactory.HELP_ICON, restoreTooltip);
-        add(restorebutton);
+        String resetTooltip = "Reset the graph to its original state";
+        JButton resetbutton = IconButtonFactory.createImageButton(
+                IconButtonFactory.RESET_ICON, resetTooltip);
+        add(resetbutton);
 
-        restorebutton.addActionListener(new ActionListener() {
+        resetbutton.addActionListener(new ActionListener() {
 
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -232,23 +232,6 @@ public class ISGCIToolBar extends JToolBar {
      * Adds zooming-related controls to the toolbar.
      */
     private void addZoomControls() {
-        // ZOOM IN
-        String zoomInTooltip = "Zoom In";
-        JButton zoominbutton = IconButtonFactory.createImageButton(
-                IconButtonFactory.ZOOM_IN_ICON, zoomInTooltip);
-
-        zoominbutton.addActionListener(new ActionListener() {
-
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                GraphManipulationInterface<?, ?> graphManipulation = 
-                        getManipulationInterface();
-                
-                if (graphManipulation != null) {
-                    graphManipulation.zoom(true);
-                }
-            }
-        });
 
         // ZOOM
         final String defaultEntry = "Set Zoom";
@@ -291,6 +274,27 @@ public class ISGCIToolBar extends JToolBar {
                 
             }
         });
+        
+        // ZOOM IN
+        String zoomInTooltip = "Zoom In";
+        JButton zoominbutton = IconButtonFactory.createImageButton(
+                IconButtonFactory.ZOOM_IN_ICON, zoomInTooltip);
+
+        add(zoominbutton);
+        
+        zoominbutton.addActionListener(new ActionListener() {
+
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                GraphManipulationInterface<?, ?> graphManipulation = 
+                        getManipulationInterface();
+                
+                if (graphManipulation != null) {
+                    graphManipulation.zoom(true);
+                }
+            }
+        });
+
         
         // ZOOM OUT
         String zoomOutTooltip = "Zoom Out";
@@ -343,6 +347,20 @@ public class ISGCIToolBar extends JToolBar {
             @Override
             public void actionPerformed(ActionEvent e) {
                 mainframe.openSearchDialog();
+            }
+        });
+        
+        // HOME
+        String homeTooltip = "Opens a new tab with the startpage.";
+        JButton homebutton = IconButtonFactory.createImageButton(
+                IconButtonFactory.HOME_ICON, homeTooltip);
+        add(homebutton);
+
+        homebutton.addActionListener(new ActionListener() {
+
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                mainframe.getTabbedPane().addStartpage();
             }
         });
     }

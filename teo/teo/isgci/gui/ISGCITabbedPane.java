@@ -198,7 +198,7 @@ public class ISGCITabbedPane extends JTabbedPane implements Updatable {
      * Adds a Startpage to the ISGCITabbedPane. Should only be called in the
      * Constructor.
      */
-    private void addStartpage() {
+    public void addStartpage() {
         if (startpageActive) {
             return;
         }
@@ -210,6 +210,7 @@ public class ISGCITabbedPane extends JTabbedPane implements Updatable {
         setSelectedComponent(startpage);
         ISGCITabComponent closeButton 
             = new ISGCITabComponent(this, "Welcome to ISGCI");
+        
         setTabComponentAt(getSelectedIndex(), closeButton);
         
     }

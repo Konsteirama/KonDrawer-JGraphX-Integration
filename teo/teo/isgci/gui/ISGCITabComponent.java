@@ -106,9 +106,16 @@ public class ISGCITabComponent extends JPanel {
             addActionListener(this);
         }
 
+        @Override
         public void actionPerformed(ActionEvent e) {
             int i = pane.indexOfTabComponent(ISGCITabComponent.this);
-            if (i != -1) {
+            
+            // if the active tab is the startpage, notify the isgcitabbedpane
+            // about it
+            if (pane.getSelectedComponent() instanceof ISGCIStartPanel
+                    && pane instanceof ISGCITabbedPane) {
+                ((ISGCITabbedPane) pane).removeStartpage();
+            } else if (i != -1) { // or just remove the tab
                 pane.remove(i);
             }
         }

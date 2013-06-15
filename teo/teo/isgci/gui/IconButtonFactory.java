@@ -60,9 +60,15 @@ public final class IconButtonFactory {
     /** Filename for ExportIcon. */
     public static final String EXPORT_ICON = "Export.gif";
 
-    /** Filename for RestoreIcon. */
+    /** Filename for RefreshIcon. */
     public static final String REFRESH_ICON = "Refresh.gif";
+    
+    /** Filename for ResetIcon. */
+    public static final String RESET_ICON = "Reset.gif";
 
+    /** Filename for HomeIcon. */
+    public static final String HOME_ICON = "Home.gif";
+    
     /** Filename for Zoom In Icon. */
     public static final String ZOOM_IN_ICON = "ZoomIn.gif";
 
@@ -106,7 +112,7 @@ public final class IconButtonFactory {
      *            The relative path to {@link #ICONPATH} to the icon
      *            
      * @param name
-     *            A name that will be displayed next to the icon. Can be null.
+     *            A name that will be displayed next to the icon. Can be empty.
      *            
      * @param description
      *            The description of the ImageIcon and the tooltip text for the
