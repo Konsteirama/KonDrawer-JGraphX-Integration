@@ -1,4 +1,14 @@
 /*
+ * Close button for the register of tabs
+ *
+ * $Header$
+ *
+ * This file is part of the Information System on Graph Classes and their
+ * Inclusions (ISGCI) at http://www.graphclasses.org.
+ * Email: isgci@graphclasses.org
+ */
+
+/*
  * Copyright (c) 1995, 2008, Oracle and/or its affiliates. All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -52,19 +62,34 @@ import javax.swing.JTabbedPane;
 import javax.swing.plaf.basic.BasicButtonUI;
 
 /**
- * Component to be used as tabComponent; Contains a JLabel to show the text and
- * a JButton to close the tab it belongs to
+ * Component to be used as tabComponent. Contains a JLabel to show the text and
+ * a JButton to close the tab it belongs to.
  */
 public class ISGCITabComponent extends JPanel {
-    private final JTabbedPane pane;
+    /**
+     * Should be changed every time the class is changed.
+     */
+    private static final long serialVersionUID = 1L;
+    
+    /** Parent. */
+    private final JTabbedPane parent;
 
+    /** 
+     * Creates a new tabbedcomponent with close button and name.
+     * 
+     * @param pane
+     *          The parent.
+     * @param name
+     *          The name that will be next to the close button, compiled with
+     *          LaTeX.
+     */
     public ISGCITabComponent(final JTabbedPane pane, String name) {
         // unset default FlowLayout' gaps
         super(new FlowLayout(FlowLayout.LEFT, 0, 0));
         if (pane == null) {
             throw new NullPointerException("TabbedPane is null");
         }
-        this.pane = pane;
+        this.parent = pane;
         setOpaque(false);
 
         // transform titles of JTabbedPane to their LaTeX text
@@ -74,7 +99,8 @@ public class ISGCITabComponent extends JPanel {
         add(label);
         
         // add more space between the label and the button
-        label.setBorder(BorderFactory.createEmptyBorder(0, 0, 0, 5));
+        final int gap = 5;
+        label.setBorder(BorderFactory.createEmptyBorder(0, 0, 0, gap));
         
         // tab button
         JButton button = new TabButton();
@@ -85,9 +111,16 @@ public class ISGCITabComponent extends JPanel {
 
     }
 
+    /** Close button. */
     private class TabButton extends JButton implements ActionListener {
+        /**
+         * Should be changed every time the class is changed.
+         */
+        private static final long serialVersionUID = 1L;
+
+        /** Creates a new close button for the tab. */
         public TabButton() {
-            int size = 17;
+            final int size = 17;
             setPreferredSize(new Dimension(size, size));
             setToolTipText("close this tab");
             // Make the button looks the same for all Laf's
@@ -100,7 +133,7 @@ public class ISGCITabComponent extends JPanel {
             setBorderPainted(false);
             // Making nice rollover effect
             // we use the same listener for all buttons
-            addMouseListener(buttonMouseListener);
+            addMouseListener(BUTTONMOUSELISTENER);
             setRolloverEnabled(true);
             // Close the proper tab by clicking the button
             addActionListener(this);
@@ -108,23 +141,24 @@ public class ISGCITabComponent extends JPanel {
 
         @Override
         public void actionPerformed(ActionEvent e) {
-            int i = pane.indexOfTabComponent(ISGCITabComponent.this);
+            int i = parent.indexOfTabComponent(ISGCITabComponent.this);
             
             // if the active tab is the startpage, notify the isgcitabbedpane
             // about it
-            if (pane.getSelectedComponent() instanceof ISGCIStartPanel
-                    && pane instanceof ISGCITabbedPane) {
-                ((ISGCITabbedPane) pane).removeStartpage();
+            if (parent.getSelectedComponent() instanceof ISGCIStartPanel
+                    && parent instanceof ISGCITabbedPane) {
+                ((ISGCITabbedPane) parent).removeStartpage();
             } else if (i != -1) { // or just remove the tab
-                pane.remove(i);
+                parent.remove(i);
             }
         }
 
         // we don't want to update UI for this button
-        public void updateUI() {
-        }
+        @Override
+        public void updateUI() { }
 
         // paint the cross
+        @Override
         protected void paintComponent(Graphics g) {
             super.paintComponent(g);
             Graphics2D g2 = (Graphics2D) g.create();
@@ -137,7 +171,9 @@ public class ISGCITabComponent extends JPanel {
             if (getModel().isRollover()) {
                 g2.setColor(Color.MAGENTA);
             }
-            int delta = 6;
+
+            final int delta = 6;
+
             g2.drawLine(delta, delta, getWidth() - delta - 1, getHeight()
                     - delta - 1);
             g2.drawLine(getWidth() - delta - 1, delta, delta, getHeight()
@@ -146,7 +182,11 @@ public class ISGCITabComponent extends JPanel {
         }
     }
 
-    private final static MouseListener buttonMouseListener = new MouseAdapter() {
+    /**
+     * Listener for tab component.
+     */
+    private static final MouseListener BUTTONMOUSELISTENER
+        = new MouseAdapter() {
         public void mouseEntered(MouseEvent e) {
             Component component = e.getComponent();
             if (component instanceof AbstractButton) {
@@ -164,3 +204,5 @@ public class ISGCITabComponent extends JPanel {
         }
     };
 }
+
+/* EOF */
