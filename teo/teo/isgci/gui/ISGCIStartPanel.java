@@ -96,7 +96,7 @@ class ISGCIStartPanel extends JPanel {
             = drawingLibInterface.getGraphManipulationInterface();
         
         gmi.colorNode(new String[] { i1 }, 
-                UserSettings.getColor(Complexity.CONPC));
+                UserSettings.getColor(Complexity.NPH));
         gmi.colorNode(new String[] { s }, 
                 UserSettings.getColor(Complexity.GIC));
         gmi.colorNode(new String[] { g }, 
@@ -108,18 +108,26 @@ class ISGCIStartPanel extends JPanel {
         
         
         // create a boxlayout with buttons
-        final int rows = 4;
-        final int cols = 1;
+        final int rows = 1;
+        final int cols = 4;
         JPanel buttonPanel = new JPanel(new GridLayout(rows, cols));
         
         // Buttons
-        JButton drawButton = new JButton("Create a new graph-drawing");
-        JButton databaseButton = new JButton("Browse the graph database");
-        JButton settingsButton = new JButton("Change settings");
-        JButton aboutButton = new JButton("About ISGCI");
+        JButton drawButton = IconButtonFactory.createImageButton(
+                IconButtonFactory.ADD_ICON, "Draw",
+                "Open a dialog to create a new graph drawing");
+        JButton databaseButton = IconButtonFactory.createImageButton(
+                IconButtonFactory.ZOOM_ICON, "Browse",
+                "Open a dialog to browse the graph database");
+        JButton settingsButton = IconButtonFactory.createImageButton(
+                IconButtonFactory.PREFERENCES_ICON, "Settings",
+                "Open a dialog to change settings");
+        JButton aboutButton = IconButtonFactory.createImageButton(
+                IconButtonFactory.INFORMATION_ICON, "About",
+                "About ISGCI");
         
         // set buttonsize
-        final Dimension buttonSize = new Dimension(200, 80);
+        final Dimension buttonSize = new Dimension(100, 50);
         
         drawButton.setPreferredSize(buttonSize);
         databaseButton.setPreferredSize(buttonSize);
@@ -162,7 +170,7 @@ class ISGCIStartPanel extends JPanel {
         buttonPanel.add(aboutButton);
         
         // set news-pane
-        final Dimension newsSize = new Dimension(250, 300); 
+        final Dimension newsSize = new Dimension(250, 100); 
         
         JComponent newsPane = loadNews();
         newsPane.setPreferredSize(newsSize);
@@ -171,9 +179,9 @@ class ISGCIStartPanel extends JPanel {
         final int gap = 5;
         setLayout(new BorderLayout(gap, gap));
         
-        add(buttonPanel, BorderLayout.LINE_START);
+        add(buttonPanel, BorderLayout.PAGE_START);
         add(drawingLibInterface.getPanel(), BorderLayout.CENTER);
-        add(newsPane, BorderLayout.LINE_END);
+        add(newsPane, BorderLayout.PAGE_END);
        
     }
     
