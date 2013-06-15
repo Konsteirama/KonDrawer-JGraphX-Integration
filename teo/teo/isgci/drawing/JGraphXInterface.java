@@ -109,6 +109,9 @@ class JGraphXInterface<V, E> implements DrawingLibraryInterface<V, E> {
                 return null;
             };
         };
+        
+        graphComponent.getViewport().setOpaque(true);
+        graphComponent.getViewport().setBackground(Color.white);
 
         graphManipulation =
                 new GraphManipulation<V, E>(graphComponent);
