@@ -56,7 +56,7 @@ public class ISGCITabbedPane extends JTabbedPane implements Updatable {
      * The version of this class. Should be changed every time
      * this class is modified.
      */
-    private static final long serialVersionUID = 2L;
+    private static final long serialVersionUID = 3L;
 
     /**
      * Indicates whether the startpage is currently a tab in the tabbedpane.
@@ -66,7 +66,7 @@ public class ISGCITabbedPane extends JTabbedPane implements Updatable {
     /**
      * The startpage that is displayed upon start of the window. 
      */
-    private Component startpage;
+    private ISGCIStartPanel startpage;
 
     /**
      * Maps the content of the tabs to their corresponding
@@ -300,8 +300,12 @@ public class ISGCITabbedPane extends JTabbedPane implements Updatable {
      */
     public DrawingLibraryInterface getActiveDrawingLibraryInterface() {
         Component panel = getSelectedComponent();
-        if (panel == startpage || !panelToInterfaceMap.containsKey(panel)) {
-            return null; // TODO ?
+        if (panel == startpage) {
+            return startpage.getDrawingLibraryInterface();
+        }
+        
+        if (!panelToInterfaceMap.containsKey(panel)) {
+            return null;
         }
         
         return panelToInterfaceMap.get(panel);

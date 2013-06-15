@@ -16,7 +16,6 @@ import java.awt.event.ActionListener;
 
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
-import javax.swing.JLabel;
 import javax.swing.JToolBar;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
@@ -100,29 +99,23 @@ public class ISGCIToolBar extends JToolBar {
         addButtons();
 
         mainframe = parent;
-        
-        parent.getTabbedPane().addChangeListener(new ChangeListener() {
-
-            @Override
-            public void stateChanged(ChangeEvent e) {
-                DrawingLibraryInterface<?, ?> drawinglib 
-                    = parent.getTabbedPane()
-                        .getActiveDrawingLibraryInterface();
-
-                // no tab active / startpage
-                if (drawinglib == null) {
-                    return;
-                }
-                
-                graphManipulation = drawinglib.getGraphManipulationInterface();
-                
-                // enable/disable undo/redo buttons
-                //redoButton.setEnabled(graphManipulation.canRedo());
-                //undoButton.setEnabled(graphManipulation.canUndo());
-            }
-        });
     }
 
+    /**
+     * Refreshes the drawinglibraryinterface before clicking a button.
+     */
+    private void refreshManipulationInterface() {
+        DrawingLibraryInterface<?, ?> drawinglib = mainframe.getTabbedPane()
+                .getActiveDrawingLibraryInterface();
+
+        // no tab active
+        if (drawinglib == null) {
+            return;
+        }
+
+        graphManipulation = drawinglib.getGraphManipulationInterface();
+    }
+    
     /**
      * Adds buttons to the toolbar.
      */
@@ -154,6 +147,7 @@ public class ISGCIToolBar extends JToolBar {
 
             @Override
             public void actionPerformed(ActionEvent e) {
+                refreshManipulationInterface();
                 mainframe.openSelectGraphClassesDialog();
             }
         });
@@ -168,6 +162,7 @@ public class ISGCIToolBar extends JToolBar {
 
             @Override
             public void actionPerformed(ActionEvent e) {
+                refreshManipulationInterface();
                 mainframe.openExportDialog();
             }
         });
@@ -187,6 +182,7 @@ public class ISGCIToolBar extends JToolBar {
 
             @Override
             public void actionPerformed(ActionEvent e) {
+                refreshManipulationInterface();
                 if (graphManipulation != null) {
                     // undo, if possible
                     if (graphManipulation.canUndo()) {
@@ -209,6 +205,7 @@ public class ISGCIToolBar extends JToolBar {
 
             @Override
             public void actionPerformed(ActionEvent e) {
+                refreshManipulationInterface();
                 if (graphManipulation != null) {
                     // undo, if possible
                     if (graphManipulation.canRedo()) {
@@ -231,6 +228,7 @@ public class ISGCIToolBar extends JToolBar {
             @Override
             public void actionPerformed(ActionEvent e) {
                 if (graphManipulation != null) {
+                    refreshManipulationInterface();
                     graphManipulation.reapplyHierarchicalLayout();
                     
                 }
@@ -247,6 +245,7 @@ public class ISGCIToolBar extends JToolBar {
 
             @Override
             public void actionPerformed(ActionEvent e) {
+                refreshManipulationInterface();
                 if (graphManipulation != null) {
                     graphManipulation.resetLayout();
                 }
@@ -267,6 +266,7 @@ public class ISGCIToolBar extends JToolBar {
 
             @Override
             public void actionPerformed(ActionEvent e) {
+                refreshManipulationInterface();
                 if (graphManipulation != null) {
                     graphManipulation.zoom(true);
                 }
@@ -283,6 +283,7 @@ public class ISGCIToolBar extends JToolBar {
 
             @Override
             public void actionPerformed(ActionEvent e) {
+                refreshManipulationInterface();
                 if (graphManipulation != null) {
                     graphManipulation.zoom(false);
                 }
@@ -298,6 +299,7 @@ public class ISGCIToolBar extends JToolBar {
 
             @Override
             public void actionPerformed(ActionEvent e) {
+                refreshManipulationInterface();
                 // TODO
             }
         });
@@ -312,6 +314,7 @@ public class ISGCIToolBar extends JToolBar {
 
             @Override
             public void actionPerformed(ActionEvent e) {
+                refreshManipulationInterface();
                 // TODO
             }
         });
@@ -331,6 +334,7 @@ public class ISGCIToolBar extends JToolBar {
 
             @Override
             public void actionPerformed(ActionEvent e) {
+                refreshManipulationInterface();
                 // TODO
             }
         });
@@ -345,6 +349,7 @@ public class ISGCIToolBar extends JToolBar {
 
             @Override
             public void actionPerformed(ActionEvent e) {
+                refreshManipulationInterface();
                 // TODO
             }
         });

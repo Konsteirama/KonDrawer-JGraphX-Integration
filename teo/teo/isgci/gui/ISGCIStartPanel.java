@@ -54,6 +54,11 @@ class ISGCIStartPanel extends JPanel {
         = "http://92.51.130.117/news.html";
     
     /**
+     * The drawinglibraryinterface used to draw the isgci graph.
+     */
+    private DrawingLibraryInterface<String, DefaultEdge> drawingLibInterface;
+    
+    /**
      * Creates a new StartPanel for ISGCI.
      * 
      * @param parent
@@ -84,12 +89,11 @@ class ISGCIStartPanel extends JPanel {
         isgci.addEdge(g, c);
         isgci.addEdge(c, i2);
         
-        DrawingLibraryInterface<String, DefaultEdge> drawingInterface = 
-                DrawingLibraryFactory.createNewInterface(isgci);
+        drawingLibInterface = DrawingLibraryFactory.createNewInterface(isgci);
         
         // color nodes differently
         GraphManipulationInterface<String, DefaultEdge> gmi 
-            = drawingInterface.getGraphManipulationInterface();
+            = drawingLibInterface.getGraphManipulationInterface();
         
         gmi.colorNode(new String[] { i1 }, 
                 UserSettings.getColor(Complexity.CONPC));
@@ -168,7 +172,7 @@ class ISGCIStartPanel extends JPanel {
         setLayout(new BorderLayout(gap, gap));
         
         add(buttonPanel, BorderLayout.LINE_START);
-        add(drawingInterface.getPanel(), BorderLayout.CENTER);
+        add(drawingLibInterface.getPanel(), BorderLayout.CENTER);
         add(newsPane, BorderLayout.LINE_END);
        
     }
@@ -191,6 +195,15 @@ class ISGCIStartPanel extends JPanel {
 
         JScrollPane scrollPane = new JScrollPane(jep);
         return scrollPane;
+    }
+    
+    /**
+     * Retrieve the drawinglibraryinterface used to display the ISGCI graph.
+     * @return
+     *          The drawinglibraryinterface used by this class.
+     */
+    public DrawingLibraryInterface getDrawingLibraryInterface() {
+        return drawingLibInterface;
     }
     
 }
