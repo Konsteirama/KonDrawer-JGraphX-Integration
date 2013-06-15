@@ -11,8 +11,11 @@
 package teo.isgci.gui;
 
 import java.awt.Component;
+import java.awt.MouseInfo;
+import java.awt.Point;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.MouseListener;
 import java.util.Set;
 
 import javax.swing.JDialog;
@@ -22,6 +25,8 @@ import javax.swing.JPopupMenu;
 
 import org.jgrapht.graph.DefaultEdge;
 
+import teo.isgci.drawing.DrawingLibraryInterface;
+import teo.isgci.drawing.GraphManipulationInterface;
 import teo.isgci.gc.GraphClass;
 import teo.isgci.util.Utility;
 
@@ -33,16 +38,18 @@ public class NodePopup extends JPopupMenu implements ActionListener {
     JMenuItem deleteItem, infoItem;
     JMenu nameItem;
     Set<GraphClass> node;
+    private Point p;
 
     private static String CHANGENAME = "Name: ";
 
     public NodePopup(ISGCIMainFrame parent) {
         super();
         this.parent = parent;
-        //deleteItem = new JMenuItem("Delete");
+        add(deleteItem = new JMenuItem("Delete"));
         add(infoItem = new JMenuItem("Information"));
         add(nameItem = new JMenu("Change name"));
         infoItem.addActionListener(this);
+        deleteItem.addActionListener(this);
     }
 
 
@@ -63,12 +70,17 @@ public class NodePopup extends JPopupMenu implements ActionListener {
             
             parent.getTabbedPane().getSelectedComponent().update(parent.getTabbedPane().getSelectedComponent().getGraphics());
             parent.getTabbedPane().getSelectedComponent().repaint();
+        } else if (source == deleteItem) {
+            DrawingLibraryInterface drawInterface = parent.getTabbedPane().getActiveDrawingLibraryInterface();
+            GraphManipulationInterface manipulationInterface = drawInterface.getGraphManipulationInterface();
+            manipulationInterface.removeNode(drawInterface.getNodeAt(p));
         }
     }
     
     public void show(Component orig, int x, int y) {
         int i = 0;
 
+        p = new Point(x, y);
         nameItem.removeAll();
         nameItem.setEnabled(node.size() != 1);
         JMenuItem[] mItem = new JMenuItem[node.size()];
