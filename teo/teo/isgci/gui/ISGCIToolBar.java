@@ -159,7 +159,7 @@ public class ISGCIToolBar extends JToolBar {
         });
         
         // REAPPLYLAYOUT
-        String reapplyTooltip = "Reset the graph's layout";
+        String reapplyTooltip = "Reapply the graph's layout";
         JButton reapplybutton = IconButtonFactory.createImageButton(
                 IconButtonFactory.REFRESH_ICON, reapplyTooltip);
 
