@@ -268,9 +268,7 @@ public class ISGCIMainFrame extends JFrame implements WindowListener {
             
             @Override
             public void actionPerformed(ActionEvent e) {
-                JDialog search = new SearchDialog(mainframe);
-                search.setLocation(DEFAULTPOSITION);
-                search.setVisible(true);
+                openSearchDialog();
             }
         });
         
@@ -546,6 +544,15 @@ public class ISGCIMainFrame extends JFrame implements WindowListener {
         JDialog select = new AboutDialog(this);
         select.setLocation(DEFAULTPOSITION);
         select.setVisible(true);
+    }
+    
+    /**
+     * Opens the search in drawing dialog.
+     */
+    public void openSearchDialog() {
+        JDialog search = new SearchDialog(this);
+        search.setLocation(DEFAULTPOSITION);
+        search.setVisible(true);
     }
 }
 

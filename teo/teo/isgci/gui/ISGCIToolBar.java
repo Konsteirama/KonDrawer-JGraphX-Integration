@@ -16,6 +16,7 @@ import java.awt.event.ActionListener;
 
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
+import javax.swing.JComboBox;
 import javax.swing.JToolBar;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
@@ -74,9 +75,6 @@ public class ISGCIToolBar extends JToolBar {
 
     /** Reference to parent-ISGCI Mainframe for opening dialogs etc. */
     private ISGCIMainFrame mainframe;
-    
-    /** The currently active drawinglibraryinterface. */
-    private GraphManipulationInterface<?, ?> graphManipulation;
 
     /** Undo button, reference here to disable/enable. */
     private JButton undoButton;
@@ -102,18 +100,21 @@ public class ISGCIToolBar extends JToolBar {
     }
 
     /**
-     * Refreshes the drawinglibraryinterface before clicking a button.
+     * Returns the drawinglibraryinterface.
+     * 
+     * @return
+     *          The currently active graphmanipulationinterface or null.
      */
-    private void refreshManipulationInterface() {
+    private GraphManipulationInterface<?, ?> getManipulationInterface() {
         DrawingLibraryInterface<?, ?> drawinglib = mainframe.getTabbedPane()
                 .getActiveDrawingLibraryInterface();
 
         // no tab active
         if (drawinglib == null) {
-            return;
+            return null;
         }
 
-        graphManipulation = drawinglib.getGraphManipulationInterface();
+        return drawinglib.getGraphManipulationInterface();
     }
     
     /**
@@ -147,7 +148,7 @@ public class ISGCIToolBar extends JToolBar {
 
             @Override
             public void actionPerformed(ActionEvent e) {
-                refreshManipulationInterface();
+                getManipulationInterface();
                 mainframe.openSelectGraphClassesDialog();
             }
         });
@@ -162,7 +163,7 @@ public class ISGCIToolBar extends JToolBar {
 
             @Override
             public void actionPerformed(ActionEvent e) {
-                refreshManipulationInterface();
+                getManipulationInterface();
                 mainframe.openExportDialog();
             }
         });
@@ -182,7 +183,9 @@ public class ISGCIToolBar extends JToolBar {
 
             @Override
             public void actionPerformed(ActionEvent e) {
-                refreshManipulationInterface();
+                GraphManipulationInterface<?, ?> graphManipulation = 
+                        getManipulationInterface();                
+                
                 if (graphManipulation != null) {
                     // undo, if possible
                     if (graphManipulation.canUndo()) {
@@ -205,7 +208,9 @@ public class ISGCIToolBar extends JToolBar {
 
             @Override
             public void actionPerformed(ActionEvent e) {
-                refreshManipulationInterface();
+                GraphManipulationInterface<?, ?> graphManipulation = 
+                        getManipulationInterface();
+                
                 if (graphManipulation != null) {
                     // undo, if possible
                     if (graphManipulation.canRedo()) {
@@ -227,8 +232,11 @@ public class ISGCIToolBar extends JToolBar {
 
             @Override
             public void actionPerformed(ActionEvent e) {
+                GraphManipulationInterface<?, ?> graphManipulation = 
+                        getManipulationInterface();
+                
                 if (graphManipulation != null) {
-                    refreshManipulationInterface();
+                    getManipulationInterface();
                     graphManipulation.reapplyHierarchicalLayout();
                     
                 }
@@ -245,7 +253,9 @@ public class ISGCIToolBar extends JToolBar {
 
             @Override
             public void actionPerformed(ActionEvent e) {
-                refreshManipulationInterface();
+                GraphManipulationInterface<?, ?> graphManipulation = 
+                        getManipulationInterface();
+                
                 if (graphManipulation != null) {
                     graphManipulation.resetLayout();
                 }
@@ -266,13 +276,52 @@ public class ISGCIToolBar extends JToolBar {
 
             @Override
             public void actionPerformed(ActionEvent e) {
-                refreshManipulationInterface();
+                GraphManipulationInterface<?, ?> graphManipulation = 
+                        getManipulationInterface();
+                
                 if (graphManipulation != null) {
                     graphManipulation.zoom(true);
                 }
             }
         });
 
+        // ZOOM
+        final String defaultEntry = "Set Zoom";
+        final String zoomToFit = "Zoom to fit";
+        final JComboBox zoomBox = new JComboBox(new String[] { defaultEntry, 
+                "100%", "200%", "300%", zoomToFit });
+        add(zoomBox);
+        
+        zoomBox.addActionListener(new ActionListener() {
+            
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                // get entry
+                String zoomLevel = zoomBox.getSelectedItem().toString();
+                // reset zoomBox
+                zoomBox.setSelectedIndex(0);
+                
+                GraphManipulationInterface<?, ?> graphManipulation = 
+                        getManipulationInterface();
+                
+                if (zoomLevel == defaultEntry) {
+                    return;
+                } else if (zoomLevel == zoomToFit) {
+                    //TODO
+                    return;
+                } else { // from here on, the text should be "x%"
+                    String zoom = zoomLevel.replace("%", "");
+                    try {
+                        double zoomFactor = Double.parseDouble(zoom);
+                        graphManipulation.zoomTo(zoomFactor / 100);
+                    } catch (Exception err) {
+                        err.printStackTrace();
+                    }
+                }
+                
+            }
+        });
+        
         // ZOOM OUT
         String zoomOutTooltip = "Zoom Out";
         JButton zoomoutbutton = createImageButton(ZOOM_OUT_ICON,
@@ -283,41 +332,43 @@ public class ISGCIToolBar extends JToolBar {
 
             @Override
             public void actionPerformed(ActionEvent e) {
-                refreshManipulationInterface();
+                GraphManipulationInterface<?, ?> graphManipulation = 
+                        getManipulationInterface();
+                
                 if (graphManipulation != null) {
                     graphManipulation.zoom(false);
                 }
             }
         });
 
-        // ZOOM
-        String zoomTooltip = "?";
-        JButton zoombutton = createImageButton(ZOOM_ICON, zoomTooltip);
-        add(zoombutton);
 
-        zoombutton.addActionListener(new ActionListener() {
+//        String zoomTooltip = "?";
+//        JButton zoombutton = createImageButton(ZOOM_ICON, zoomTooltip);
 
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                refreshManipulationInterface();
-                // TODO
-            }
-        });
+
+//        zoombutton.addActionListener(new ActionListener() {
+//
+//            @Override
+//            public void actionPerformed(ActionEvent e) {
+//                getManipulationInterface();
+//                // TODO
+//            }
+//        });
 
         // ZOOM TO FIT
-        String zoomToFitTooltip = "Zoom to fit everything into the canvas";
-        JButton zoomtofitbutton = createImageButton(ZOOM_TO_FIT_ICON, 
-                "Zoom to fit", zoomToFitTooltip);
-        add(zoomtofitbutton);
-
-        zoomtofitbutton.addActionListener(new ActionListener() {
-
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                refreshManipulationInterface();
-                // TODO
-            }
-        });
+//        String zoomToFitTooltip = "Zoom to fit everything into the canvas";
+//        JButton zoomtofitbutton = createImageButton(ZOOM_TO_FIT_ICON, 
+//                "Zoom to fit", zoomToFitTooltip);
+//        add(zoomtofitbutton);
+//
+//        zoomtofitbutton.addActionListener(new ActionListener() {
+//
+//            @Override
+//            public void actionPerformed(ActionEvent e) {
+//                getManipulationInterface();
+//                // TODO
+//            }
+//        });
     }
     
     /**
@@ -334,7 +385,7 @@ public class ISGCIToolBar extends JToolBar {
 
             @Override
             public void actionPerformed(ActionEvent e) {
-                refreshManipulationInterface();
+                getManipulationInterface();
                 // TODO
             }
         });
@@ -349,8 +400,7 @@ public class ISGCIToolBar extends JToolBar {
 
             @Override
             public void actionPerformed(ActionEvent e) {
-                refreshManipulationInterface();
-                // TODO
+                mainframe.openSearchDialog();
             }
         });
     }
