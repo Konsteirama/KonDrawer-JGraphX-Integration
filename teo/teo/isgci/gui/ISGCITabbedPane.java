@@ -17,8 +17,10 @@ import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Container;
-import java.awt.FlowLayout;
+import java.awt.Dimension;
 import java.awt.GridLayout;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.ArrayList;
@@ -30,7 +32,6 @@ import javax.swing.JButton;
 import javax.swing.JComponent;
 import javax.swing.JPanel;
 import javax.swing.JTabbedPane;
-import javax.swing.SpringLayout;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
@@ -119,6 +120,12 @@ public class ISGCITabbedPane extends JTabbedPane implements Updatable {
      */
     private EdgePopup edgePopup;
     
+    
+    /**
+     * The reference to the mainframe that contains this panel.
+     */
+    private ISGCIMainFrame mainframe;
+    
     /**
      * A listener which triggers if a tab is changed and then adjusts the
      * state of the drawUnproper menu item in the mainframe to match the
@@ -185,9 +192,12 @@ public class ISGCITabbedPane extends JTabbedPane implements Updatable {
     
     /**
      * Creates a new Tabbed pane with a startpage as only active tab.
+     * @param parent
+     *          The reference to the ISGCIMainFrame that contains this pane.
      */
-    public ISGCITabbedPane() {
-        addStartpage();       
+    public ISGCITabbedPane(ISGCIMainFrame parent) {
+        mainframe = parent;
+        addStartpage();
         addMouseListener(mouseAdapter);
         addChangeListener(changeListener);
         UserSettings.subscribeToOptionChanges(this);
@@ -247,19 +257,62 @@ public class ISGCITabbedPane extends JTabbedPane implements Updatable {
                 UserSettings.getColor(Complexity.P));
         
         
-        // create a springlayout with buttons
-        final int cols = 1;
+        // create a boxlayout with buttons
         final int rows = 4;
+        final int cols = 1;
+        JPanel buttonPanel = new JPanel(new GridLayout(rows, cols));
         
-        JPanel buttonPanel = new JPanel(new GridLayout(rows, cols, 5, 5));
+        // Buttons
+        JButton drawButton = new JButton("Create a new graph-drawing");
+        JButton databaseButton = new JButton("Browse the graph database");
+        JButton settingsButton = new JButton("Change settings");
+        JButton aboutButton = new JButton("About ISGCI");
         
-        buttonPanel.add(new JButton("Create a new graph-drawing"));
-        buttonPanel.add(new JButton("Browse the graph database"));
-        buttonPanel.add(new JButton("Change settings"));
-        buttonPanel.add(new JButton("About ISGCI"));
+        // set buttonsize
+        final Dimension buttonSize = new Dimension(200, 80);
         
+        drawButton.setPreferredSize(buttonSize);
+        databaseButton.setPreferredSize(buttonSize);
+        settingsButton.setPreferredSize(buttonSize);
+        aboutButton.setPreferredSize(buttonSize);
         
-        JPanel parentPanel = new JPanel(new BorderLayout());
+        // add actionhandler
+        drawButton.addActionListener(new ActionListener() {    
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                mainframe.openSelectGraphClassesDialog();
+            }
+        });
+        
+        databaseButton.addActionListener(new ActionListener() {    
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                mainframe.openBrowseDatabaseDialog();
+            }
+        });
+        
+        settingsButton.addActionListener(new ActionListener() {    
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                mainframe.openSettingsDialog();
+            }
+        });
+        
+        aboutButton.addActionListener(new ActionListener() {    
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                mainframe.openAboutDialog();
+            }
+        });
+        
+        // add to layout
+        buttonPanel.add(drawButton);
+        buttonPanel.add(databaseButton);
+        buttonPanel.add(settingsButton);
+        buttonPanel.add(aboutButton);
+        
+        final int gap = 5;
+        JPanel parentPanel = new JPanel(new BorderLayout(gap, gap));
         
         parentPanel.add(buttonPanel, BorderLayout.LINE_START);
         parentPanel.add(drawingInterface.getPanel(), BorderLayout.CENTER);

@@ -140,7 +140,7 @@ public class ISGCIMainFrame extends JFrame implements WindowListener {
         setJMenuBar(createMenus());
 
         // Create and add tabbed interface for canvas
-        tabbedPane = new ISGCITabbedPane();
+        tabbedPane = new ISGCITabbedPane(this);
         getContentPane().add(tabbedPane, BorderLayout.CENTER);
 
         // Create and add new toolbar - has to be after tabbedpane
@@ -322,11 +322,7 @@ public class ISGCIMainFrame extends JFrame implements WindowListener {
             
             @Override
             public void actionPerformed(ActionEvent e) {
-                JDialog info = new GraphClassInformationDialog(mainframe);
-                info.setLocation(DEFAULTPOSITION);
-                info.pack();
-                info.setSize(800, 600);
-                info.setVisible(true);
+                openBrowseDatabaseDialog();
             }
         });
         
@@ -335,10 +331,13 @@ public class ISGCIMainFrame extends JFrame implements WindowListener {
             
             @Override
             public void actionPerformed(ActionEvent e) {
+                final int width = 700;
+                final int height = 400;
+                
                 JDialog check = new CheckInclusionDialog(mainframe);
                 check.setLocation(DEFAULTPOSITION);
                 check.pack();
-                check.setSize(700, 400);
+                check.setSize(width, height);
                 check.setVisible(true);
             }
         });
@@ -400,18 +399,13 @@ public class ISGCIMainFrame extends JFrame implements WindowListener {
      *  @param mainMenuBar The menubar to which the entries are added.
      */
     private void addHelpMenu(JMenuBar mainMenuBar) {
-        // needed to reference this in actionlistener
-        final ISGCIMainFrame mainframe = this;
-        
+
         JMenuItem miUserSettings = new JMenuItem("Settings");
         miUserSettings.addActionListener(new ActionListener() {
             
             @Override
             public void actionPerformed(ActionEvent e) {              
-                ISGCISettingsDialog settingsDialog 
-                    = new ISGCISettingsDialog(mainframe);
-                settingsDialog.setSize(650, 550);
-                settingsDialog.setVisible(true);
+                openSettingsDialog();
             }
         });
         
@@ -438,9 +432,7 @@ public class ISGCIMainFrame extends JFrame implements WindowListener {
             
             @Override
             public void actionPerformed(ActionEvent e) {
-                JDialog select = new AboutDialog(mainframe);
-                select.setLocation(DEFAULTPOSITION);
-                select.setVisible(true);
+                openAboutDialog();
             }
         });
         
@@ -501,10 +493,13 @@ public class ISGCIMainFrame extends JFrame implements WindowListener {
      * Opens a new SelectGraphClasses dialog.
      */
     public void openSelectGraphClassesDialog() {
+        final int width = 500;
+        final int height = 400;
+        
         JDialog select = new GraphClassSelectionDialog(this);
         select.setLocation(DEFAULTPOSITION);
         select.pack();
-        select.setSize(500, 400);
+        select.setSize(width, height);
         select.setVisible(true);
     }
 
@@ -516,6 +511,41 @@ public class ISGCIMainFrame extends JFrame implements WindowListener {
         export.setLocation(DEFAULTPOSITION);
         export.pack();
         export.setVisible(true);
+    }
+    
+    /**
+     *  Opens the dialog to browse the database.
+     */
+    public void openBrowseDatabaseDialog() {
+        final int width = 800;
+        final int height = 600;
+        
+        JDialog info = new GraphClassInformationDialog(this);
+        info.setLocation(DEFAULTPOSITION);
+        info.pack();
+        info.setSize(width, height);
+        info.setVisible(true);
+    }
+    
+    /**
+     * Opens the settings dialog.
+     */
+    public void openSettingsDialog() {
+        final int width = 650;
+        final int height = 550;
+        
+        ISGCISettingsDialog settingsDialog = new ISGCISettingsDialog(this);
+        settingsDialog.setSize(width, height);
+        settingsDialog.setVisible(true);
+    }
+    
+    /**
+     * Opens the about dialog.
+     */
+    public void openAboutDialog() {
+        JDialog select = new AboutDialog(this);
+        select.setLocation(DEFAULTPOSITION);
+        select.setVisible(true);
     }
 }
 
