@@ -170,7 +170,7 @@ class ISGCIStartPanel extends JPanel {
         buttonPanel.add(aboutButton);
         
         // set news-pane
-        final Dimension newsSize = new Dimension(250, 100); 
+        final Dimension newsSize = new Dimension(400, 100); 
         
         JComponent newsPane = loadNews();
         newsPane.setPreferredSize(newsSize);
@@ -181,7 +181,7 @@ class ISGCIStartPanel extends JPanel {
         
         add(buttonPanel, BorderLayout.PAGE_START);
         add(drawingLibInterface.getPanel(), BorderLayout.CENTER);
-        add(newsPane, BorderLayout.PAGE_END);
+        add(newsPane, BorderLayout.LINE_END);
        
     }
     
