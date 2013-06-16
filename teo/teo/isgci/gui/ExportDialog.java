@@ -21,6 +21,7 @@ import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.DataOutputStream;
+import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
@@ -153,7 +154,7 @@ public class ExportDialog extends JDialog implements ActionListener {
             first = false;
             
             // adding description
-            if (format.equals("ps")) {
+            if (format.equals("ps") || format.equals("eps")) {
                 box.add(explText(
                     "A Postscript file can be included immediately in e.g. LaTeX\n"+
                     "documents, but it cannot easily be edited."));
@@ -240,30 +241,20 @@ public class ExportDialog extends JDialog implements ActionListener {
     protected boolean export() {
         
         boolean res = true;
-        FileOutputStream f;
-        try {
-            f = new FileOutputStream(file.getSelectedFile());
-        } catch (Exception e) {
-            e.printStackTrace();
-            MessageDialog.error(parent, "Cannot open file for writing:\n" 
-                + file.getSelectedFile().getPath());
-            return false;
+
+        DrawingLibraryInterface drawInterface 
+            = parent.getTabbedPane().getActiveDrawingLibraryInterface();
+        String chosenFormat = "";
+        Enumeration<AbstractButton> buttons = formats.getElements();
+        for (int i = 0; i < formats.getButtonCount(); i++) {
+            if (buttons.nextElement().getModel()
+                    .equals(formats.getSelection())) {
+                chosenFormat 
+                    = drawInterface.getAvailableExportFormats()[i];
+            }
         }
 
         try {
-            DrawingLibraryInterface drawInterface 
-                = parent.getTabbedPane().getActiveDrawingLibraryInterface();
-            String chosenFormat = "";
-            Enumeration<AbstractButton> buttons = formats.getElements();
-            for (int i = 0; i < formats.getButtonCount(); i++) {
-                if (buttons.nextElement().getModel()
-                        .equals(formats.getSelection())) {
-                    chosenFormat 
-                        = drawInterface.getAvailableExportFormats()[i];
-                }
-            }
-            String test = file.getSelectedFile().getName();
-            test = file.getSelectedFile().getPath();
             if (!file.getSelectedFile().getName().endsWith("." 
                     + chosenFormat)) {
                 drawInterface.export(chosenFormat
