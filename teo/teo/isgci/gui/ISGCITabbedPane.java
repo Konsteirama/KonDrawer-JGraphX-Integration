@@ -1,7 +1,7 @@
 /*
  * The ISGCI specific implementation of the tabbedpane. Will create a
  * startpage upon creation. Tabs can (and should be created) via 
- * the {link {@link #addTab(Graph)} method, because it closes the startpage
+ * the {@link #addTab(Graph)} method, because it closes the startpage
  * and draws a new graph - which this class should be used for.
  *
  * $Header$
@@ -48,7 +48,7 @@ import teo.isgci.util.UserSettings;
 /**
  * The ISGCI specific implementation of the tabbedpane. Will create a
  * startpage upon creation. Tabs can (and should be created) via 
- * the {link {@link #addTab(Graph)} method, because it closes the startpage
+ * the {@link #addTab(Graph)} method, because it closes the startpage
  * and draws a new graph - which this class should be used for.
  */
 public class ISGCITabbedPane extends JTabbedPane implements Updatable {
@@ -127,21 +127,8 @@ public class ISGCITabbedPane extends JTabbedPane implements Updatable {
         public void stateChanged(ChangeEvent changeEvent) {
 
             if (!startpageActive && getSelectedIndex() >= 0) {
-
-                Container parent = getParent();
-
-                while (parent != null
-                        && !(parent instanceof ISGCIMainFrame)) {
-                    parent = parent.getParent();
-                }
-
-                if (parent != null) {
-                    ISGCIMainFrame mainframe = (ISGCIMainFrame) parent;
-
-                    mainframe.setDrawUnproper(
-                            getDrawUnproper(getSelectedComponent()));
-
-                }
+                mainframe.setDrawUnproper(
+                        getDrawUnproper(getSelectedComponent()));
             }
         }
     };
@@ -222,7 +209,7 @@ public class ISGCITabbedPane extends JTabbedPane implements Updatable {
             = new ISGCITabComponent(this, "Welcome to ISGCI");
         
         setTabComponentAt(getSelectedIndex(), closeButton);
-        
+      
     }
 
     /**
@@ -299,7 +286,12 @@ public class ISGCITabbedPane extends JTabbedPane implements Updatable {
             setProperness();
             setProblem(getProblem(getSelectedComponent())
                     , getSelectedComponent());
-            setTitleAt(getSelectedIndex(), name);
+            
+            // set title
+            ISGCITabComponent closeButton 
+                = new ISGCITabComponent(this, name);
+        
+            setTabComponentAt(getSelectedIndex(), closeButton);
         }
     }
     
