@@ -11,7 +11,9 @@
 
 package teo.isgci.gui;
 
+import java.awt.BorderLayout;
 import java.awt.Container;
+import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
@@ -28,6 +30,7 @@ import javax.swing.JDialog;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
+import javax.swing.SwingUtilities;
 
 import org.jgrapht.Graphs;
 import org.jgrapht.graph.DefaultEdge;
@@ -161,22 +164,67 @@ public class GraphClassSelectionDialog extends JDialog implements
         classesList.setSelectedValue(node, true);
     }
 
+    @Override
     public void actionPerformed(ActionEvent event) {
         Object source = event.getSource();
+        
         if (source == cancelButton) {
             closeDialog();
         } else if (source == newButton) {
-            SimpleDirectedGraph<Set<GraphClass>, DefaultEdge> graph 
-                = getGraph();
-            parent.getTabbedPane().drawInActiveTab(graph, classesList.getSelectedValue().toString());
-            closeDialog();
+            
+            // Disable all buttons
+            newButton.setEnabled(false);
+            newTabButton.setEnabled(false);
+            cancelButton.setEnabled(false);
+            
+            // Inform user
+            newButton.setText("Please wait");
+            
+            // Create runnable to execute later, so swing repaints the ui first
+            Runnable drawGraph = new Runnable() {
+
+                @Override
+                public void run() {
+                    SimpleDirectedGraph<Set<GraphClass>, DefaultEdge> graph 
+                    = getGraph();
+                parent.getTabbedPane().drawInActiveTab(graph,
+                        classesList.getSelectedValue().toString());
+                closeDialog();
+                }
+
+            };
+            
+            SwingUtilities.invokeLater(drawGraph);
+            
+
         } else if (source == search) {
             search.setListData(parent, classesList);
         } else if (source == newTabButton) {
-            SimpleDirectedGraph<Set<GraphClass>, DefaultEdge> graph 
-                = getGraph();
-            parent.getTabbedPane().drawInNewTab(graph,classesList.getSelectedValue().toString());
-            closeDialog();
+            
+            // Disable all buttons
+            newButton.setEnabled(false);
+            newTabButton.setEnabled(false);
+            cancelButton.setEnabled(false);
+            
+            // Inform user
+            newTabButton.setText("Please wait");
+            
+            // Create runnable to execute later, so swing repaints the ui first
+            Runnable drawGraph = new Runnable() {
+
+                @Override
+                public void run() {
+                    SimpleDirectedGraph<Set<GraphClass>, DefaultEdge> graph 
+                    = getGraph();
+                parent.getTabbedPane().drawInNewTab(graph,
+                        classesList.getSelectedValue().toString());
+                closeDialog();
+                }
+
+            };
+            
+            SwingUtilities.invokeLater(drawGraph);
+
         }
     }
 

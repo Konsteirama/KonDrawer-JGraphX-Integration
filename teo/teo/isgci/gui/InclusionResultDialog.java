@@ -31,6 +31,7 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.ScrollPaneConstants;
+import javax.swing.SwingUtilities;
 import javax.swing.border.EmptyBorder;
 
 import org.jgrapht.graph.DefaultEdge;
@@ -47,7 +48,9 @@ import teo.isgci.grapht.GAlg;
 import teo.isgci.grapht.Inclusion;
 import teo.isgci.util.LessLatex;
 
-
+/**
+ * Displays the relation between two graphclasses.
+ */
 public class InclusionResultDialog extends JDialog implements ActionListener {
     protected ISGCIMainFrame parent;
     protected JButton okButton;
@@ -62,7 +65,7 @@ public class InclusionResultDialog extends JDialog implements ActionListener {
     protected static String nodeName1, nodeName2;
 
 
-    /** Creates the dialog
+    /** Creates the dialog.
      * @param parent parent of this dialog
      */
     protected InclusionResultDialog(ISGCIMainFrame parent) {
@@ -563,51 +566,84 @@ public class InclusionResultDialog extends JDialog implements ActionListener {
         dispose();
     }
 
-
+    @Override
     public void actionPerformed(ActionEvent event) {
         Object source = event.getSource();
+        
         if (source == okButton) {
             closeDialog();
             return;
         } else if (source == drawButton) {
-            SimpleDirectedGraph<Set<GraphClass>, DefaultEdge> graph =
-                Algo.createHierarchySubgraph(Algo.nodesBetween(upper, lower));
-            parent.getTabbedPane().drawInActiveTab(graph,
-                upper.toString() + "-" + lower.toString());
+         
+            okButton.setEnabled(false);
+            drawButton.setEnabled(false);
+            drawNewTabButton.setEnabled(false);
+            refButton.setEnabled(false);
+            
+            final String text = drawButton.getText(); 
+            drawButton.setText("Please wait");
+            
+            // Create runnable to execute later, so swing repaints the ui first
+            Runnable drawGraph = new Runnable() {
+
+                @Override
+                public void run() {
+                    SimpleDirectedGraph<Set<GraphClass>, DefaultEdge> graph 
+                        = Algo.createHierarchySubgraph(
+                                Algo.nodesBetween(upper, lower));
+                    parent.getTabbedPane().drawInActiveTab(graph,
+                            upper.toString() + "-" + lower.toString());
+                    
+                    // restore buttons
+                    okButton.setEnabled(true);
+                    drawButton.setEnabled(true);
+                    drawNewTabButton.setEnabled(true);
+                    refButton.setEnabled(true);
+                    
+                    drawButton.setText(text);
+                }
+            };
+
+            SwingUtilities.invokeLater(drawGraph);
+            
         } else if (source == drawNewTabButton) {
-            SimpleDirectedGraph<Set<GraphClass>, DefaultEdge> graph =
-                Algo.createHierarchySubgraph(Algo.nodesBetween(upper, lower));
-            parent.getTabbedPane().drawInNewTab(graph,
-                upper.toString() + "-" + lower.toString());
+            
+            okButton.setEnabled(false);
+            drawButton.setEnabled(false);
+            drawNewTabButton.setEnabled(false);
+            refButton.setEnabled(false);
+            
+            final String text = drawNewTabButton.getText(); 
+            drawNewTabButton.setText("Please wait");
+            
+            // Create runnable to execute later, so swing repaints the ui first
+            Runnable drawGraph = new Runnable() {
+
+                @Override
+                public void run() {
+                    SimpleDirectedGraph<Set<GraphClass>, DefaultEdge> graph 
+                        = Algo.createHierarchySubgraph(
+                                Algo.nodesBetween(upper, lower));
+                    parent.getTabbedPane().drawInNewTab(graph,
+                            upper.toString() + "-" + lower.toString());
+                    
+                    // restore buttons
+                    okButton.setEnabled(true);
+                    drawButton.setEnabled(true);
+                    drawNewTabButton.setEnabled(true);
+                    refButton.setEnabled(true);
+                    
+                    drawNewTabButton.setText(text);
+                }
+            };
+
+            SwingUtilities.invokeLater(drawGraph);
+            
+
         } else if (source == refButton) {
             parent.loader.showDocument("classes/refs00.html");
         }
     }
-    
-    
-//    /**
-//     * Draws the selected Graph on a Canvas.
-//     * @param canvas The canvas to be drawn on.
-//     */
-//    private void newDrawing(ISGCIGraphCanvas canvas){
-//        Cursor oldcursor = parent.getCursor();
-//        setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
-//        canvas.drawHierarchy(Algo.nodesBetween(upper, lower));
-//
-//        NodeView node1 = canvas.findNode(
-//                DataSet.getClass(nodeName1));
-//        NodeView node2 = canvas.findNode(
-//                DataSet.getClass(nodeName2));
-//        if (node1 != null  && node2 != null) {
-//            node1.setNameAndLabel(nodeName1);
-//            node2.setNameAndLabel(nodeName2);
-//        }
-//        
-//        setCursor(oldcursor);
-//        closeDialog();
-//        canvas.repaint();    	
-//    }
-
 
     /**
      * Creates a window displaying the relation between the given classnames.

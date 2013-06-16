@@ -32,6 +32,7 @@ import javax.swing.JDialog;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
+import javax.swing.SwingUtilities;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
@@ -182,8 +183,9 @@ public class OpenProblemDialog extends JDialog implements ItemListener,
         Vector v = new Vector();
         for (GraphClass gc : DataSet.getClasses()) {
             Complexity c = problem.getComplexity(gc);
-            if (c.isUnknown())
+            if (c.isUnknown()) {
                 v.add(gc);
+            }
         }
 
         openList.setListData(v.iterator());
@@ -220,32 +222,39 @@ public class OpenProblemDialog extends JDialog implements ItemListener,
         TreeSet<GraphClass> p = new TreeSet<GraphClass>(new LessLatex());
 
         for (GraphClass gc : DataSet.getClasses()) {
-            if (npc.contains(gc) || p.contains(gc))
+            if (npc.contains(gc) || p.contains(gc)) {
                 continue;
+            }
 
             Complexity c = problem.getComplexity(gc);
             Set<GraphClass> equs = DataSet.getEquivalentClasses(gc);
 
             notP: if (c.likelyNotP()) {
-                for (GraphClass equ : equs)
+                for (GraphClass equ : equs) {
                     for (GraphClass down : GAlg.outNeighboursOf(
                             DataSet.inclGraph, equ)) {
                         if (problem.getComplexity(down).likelyNotP()
-                                && !equs.contains(down))
+                                && !equs.contains(down)) {
                             break notP;
+                        }
                     }
+                }
+
                 npc.addAll(equs);
             }
 
             inP: if (c.betterOrEqual(Complexity.P)) {
-                for (GraphClass equ : equs)
-                    for (GraphClass up : GAlg.inNeighboursOf(DataSet.inclGraph,
-                            equ)) {
+                for (GraphClass equ : equs) {
+                    for (GraphClass up : GAlg.inNeighboursOf(
+                            DataSet.inclGraph, equ)) {
                         if (problem.getComplexity(up).betterOrEqual(
                                 Complexity.P)
-                                && !equs.contains(up))
+                                && !equs.contains(up)) {
                             break inP;
+                        }
                     }
+                }
+
                 p.addAll(equs);
             }
         }
@@ -257,21 +266,58 @@ public class OpenProblemDialog extends JDialog implements ItemListener,
     public void actionPerformed(ActionEvent event) {
         Object source = event.getSource();
         if (source == drawButton) {
-            SimpleDirectedGraph<Set<GraphClass>, DefaultEdge> graph = Algo
-                    .createHierarchySubgraph(getNodes(lists.getSelectedNode()));
-            parent.getTabbedPane().drawInActiveTab(
-                    graph,
-                    problem.getName() + " - "
-                            + lists.getSelectedNode().toString());
-            closeDialog();
+            
+            drawButton.setEnabled(false);
+            drawNewTabButton.setEnabled(false);
+            showButton.setEnabled(false);
+            closeButton.setEnabled(false);
+            
+            drawButton.setText("Please wait");
+            
+            // Create runnable to execute later, so swing repaints the ui first
+            Runnable drawGraph = new Runnable() {
+
+                @Override
+                public void run() {
+                    SimpleDirectedGraph<Set<GraphClass>, DefaultEdge> graph 
+                        = Algo.createHierarchySubgraph(
+                                getNodes(lists.getSelectedNode()));
+                    parent.getTabbedPane().drawInActiveTab(
+                            graph,
+                            problem.getName() + " - "
+                                    + lists.getSelectedNode().toString());
+                    closeDialog();
+                }
+            };
+
+            SwingUtilities.invokeLater(drawGraph);
+
         } else if (source == drawNewTabButton) {
-            SimpleDirectedGraph<Set<GraphClass>, DefaultEdge> graph = Algo
-                    .createHierarchySubgraph(getNodes(lists.getSelectedNode()));
-            parent.getTabbedPane().drawInNewTab(
-                    graph,
-                    problem.getName() + " - "
-                            + lists.getSelectedNode().toString());
-            closeDialog();
+            
+            drawButton.setEnabled(false);
+            drawNewTabButton.setEnabled(false);
+            showButton.setEnabled(false);
+            closeButton.setEnabled(false);
+            
+            drawNewTabButton.setText("Please wait");
+            
+            // Create runnable to execute later, so swing repaints the ui first
+            Runnable drawGraph = new Runnable() {
+
+                @Override
+                public void run() {
+                    SimpleDirectedGraph<Set<GraphClass>, DefaultEdge> graph 
+                        = Algo.createHierarchySubgraph(
+                                getNodes(lists.getSelectedNode()));
+                    parent.getTabbedPane().drawInNewTab(graph,
+                            problem.getName() + " - "
+                                    + lists.getSelectedNode().toString());
+                    closeDialog();
+                }
+            };
+
+            SwingUtilities.invokeLater(drawGraph);
+            
         } else if (source == showButton) {
             JDialog info = new GraphClassInformationDialog(parent,
                     lists.getSelectedNode());

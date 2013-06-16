@@ -23,7 +23,6 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Iterator;
 import java.util.Vector;
 
 import javax.swing.BorderFactory;
@@ -201,12 +200,12 @@ public class GraphClassInformationDialog extends JDialog
         okPanel.add(classButton);
         inclButton = new JButton("Inclusion info");
         okPanel.add(inclButton);
-        drawButton = new JButton ("Draw");
+        drawButton = new JButton("Draw");
         okPanel.add(drawButton);
         okButton = new JButton("Close");
         okPanel.add(okButton);
         c.weighty = 0.0;
-        c.insets = new Insets(5,0,0,0);
+        c.insets = new Insets(5, 0, 0, 0);
         c.gridwidth = GridBagConstraints.REMAINDER;
         gridbag.setConstraints(okPanel, c);
         contents.add(okPanel);
@@ -230,10 +229,11 @@ public class GraphClassInformationDialog extends JDialog
         equClassesList.addMouseListener(mouseAdapter);
         subClassesList.addMouseListener(mouseAdapter);
 
-        if (target != null)
+        if (target != null) {
             showNode(target);
-        else
+        } else {
             showNode();
+        }
     }
 
 
@@ -251,8 +251,9 @@ public class GraphClassInformationDialog extends JDialog
      */
     private void showNode() {
         GraphClass node = null;
-        if (classesList.getElementCount() > 0)
+        if (classesList.getElementCount() > 0) {
             node = (GraphClass) classesList.getModel().getElementAt(0);
+        }
         showNode(node);
         repaint();
     }
@@ -268,19 +269,17 @@ public class GraphClassInformationDialog extends JDialog
 
     /**
      * Update the information displayed in the super/sub/equiv lists.
-     * @param name graph classe of which to display the information
+     * @param target graph classe of which to display the information
      */
     private synchronized void updateLists(GraphClass target) {
         if (target == null) {
-            Vector empty = new Vector();
+            Vector<?> empty = new Vector<Object>();
             subClassesList.setListData(empty);
             supClassesList.setListData(empty);
             equClassesList.setListData(empty);
             return;
         }
 
-        Iterator iter;
-        int i;
         ArrayList<GraphClass> sup = Algo.superNodes(target);
         ArrayList<GraphClass> sub = Algo.subNodes(target);
         ArrayList<GraphClass> equ = Algo.equNodes(target);
@@ -301,27 +300,33 @@ public class GraphClassInformationDialog extends JDialog
         dispose();
     }
 
-
+    @Override
     public void valueChanged(ListSelectionEvent e) {
-        if (e.getValueIsAdjusting())
+        if (e.getValueIsAdjusting()) {
             return;
-        if (e.getSource() == classesList);
+        }
+        if (e.getSource() == classesList) {
+            ;
+        }
             showNode(classesList.getSelectedNode());
     }
 
 
+    @Override
     public void actionPerformed(ActionEvent event) {
         Object source = event.getSource();
+        
         if (source == okButton) {
             closeDialog();
         } else if (source == classButton) {
-            parent.loader.showDocument("classes/"+
-                classesList.getSelectedNode().getID() +".html");
+            parent.loader.showDocument("classes/"
+                + classesList.getSelectedNode().getID() + ".html");
         } else if (source == inclButton) {
             GraphClass c1 = classesList.getSelectedNode();
             GraphClass c2 = lists.getSelectedNode();
             if (c1 != null && c2 != null) {
-                JDialog dia = InclusionResultDialog.newInstance(parent, c1,c2);
+                JDialog dia = InclusionResultDialog
+                        .newInstance(parent, c1, c2);
                 dia.setVisible(true);
             }
         } else if (source == drawButton) {
@@ -365,14 +370,16 @@ class ProblemsModel extends AbstractTableModel {
     public Object getValueAt(int row, int col) {
         if (row < 0  ||  row >= DataSet.problems.size()  ||
                 col < 0  ||  col > 1 ||
-                gc == null)
+                gc == null) {
             return "???";
+        }
 
         Problem p = DataSet.problems.elementAt(row);
-        if (col == 0)
+        if (col == 0) {
             return p.getName();
-        else if (col == 1)
+        } else if (col == 1) {
             return p.getComplexityString(p.getComplexity(gc));
+        }
 
         return "???";
     }
