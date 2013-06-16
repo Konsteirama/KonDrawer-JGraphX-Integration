@@ -24,6 +24,7 @@ import java.util.List;
 import java.util.Set;
 
 import javax.swing.JComponent;
+import javax.swing.JDialog;
 import javax.swing.JTabbedPane;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
@@ -150,24 +151,24 @@ public class ISGCITabbedPane extends JTabbedPane implements Updatable {
      * On right-click it opens a popup window if the clicked object is a node
      * or a edge.
      */
-    
-    
-    private MouseAdapter mouseAdapter = new MouseAdapter() {
-        public void mouseClicked(MouseEvent e) {
-            if (e.getButton() == MouseEvent.BUTTON3 
-                    && getActiveDrawingLibraryInterface() != null) {         
-                Object node = getActiveDrawingLibraryInterface().
-                        getNodeAt(e.getPoint());
-                Object edge = getActiveDrawingLibraryInterface().
-                        getEdgeAt(e.getPoint());
-                
-                Container parent = getParent();
+    private MouseAdapter mouseAdapter = new MouseAdapter() {        
+        public void mouseClicked(MouseEvent e) {  
+            
+            Object node = getActiveDrawingLibraryInterface().
+                    getNodeAt(e.getPoint());
+            Object edge = getActiveDrawingLibraryInterface().
+                    getEdgeAt(e.getPoint());
+            
+            Container parent = getParent();
 
-                while (parent != null
-                        && !(parent instanceof ISGCIMainFrame)) {
-                    parent = parent.getParent();
-                }
-                
+            while (parent != null
+                    && !(parent instanceof ISGCIMainFrame)) {
+                parent = parent.getParent();
+            }    
+            
+            // Right-click event
+            if (e.getButton() == MouseEvent.BUTTON3 
+                    && getActiveDrawingLibraryInterface() != null) {
                 if (node != null) {
                     nodePopup = new NodePopup((ISGCIMainFrame) parent);
                     nodePopup.setNode((Set<GraphClass>) node);
@@ -177,6 +178,15 @@ public class ISGCITabbedPane extends JTabbedPane implements Updatable {
                     edgePopup.setEdge((DefaultEdge) edge);
                     edgePopup.show(e.getComponent(), e.getX(), e.getY());
                 }
+            // Double-click event
+            } else if (e.getClickCount() == 2)  { 
+                JDialog d = new GraphClassInformationDialog(
+                        (ISGCIMainFrame) parent
+                        , ((Set<GraphClass>) node).iterator().next());
+                d.setLocation(50, 50);
+                d.pack();
+                d.setSize(800, 600);
+                d.setVisible(true);
             }
         }
     };
@@ -330,6 +340,9 @@ public class ISGCITabbedPane extends JTabbedPane implements Updatable {
      */
     public void setNamingPref(NamePref pref) {
         this.defaultMode = pref;
+        for (Component tab : panelToNamingPref.keySet()) {
+            setNamingPref(pref, tab);
+        }
     }
     
     /**
