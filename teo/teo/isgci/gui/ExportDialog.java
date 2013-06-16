@@ -25,7 +25,9 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.io.Writer;
+import java.util.Enumeration;
 
+import javax.swing.AbstractButton;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.ButtonGroup;
@@ -47,8 +49,6 @@ public class ExportDialog extends JDialog implements ActionListener {
 
     /** The card titles (and ids) */
     protected static final String CARD_FORMAT ="Please choose the file format";
-    protected static final String CARD_PS = "Postscript options";
-    protected static final String CARD_GML = "GraphML options";
     protected static final String CARD_FILE = "Destination file";
     protected String current;
 
@@ -61,14 +61,6 @@ public class ExportDialog extends JDialog implements ActionListener {
 
     /* Format items */
     protected ButtonGroup formats;
-    protected JRadioButton radioPS, radioGML, radioSVG;
-
-    /* Postscript items */
-    protected JCheckBox fittopage, keepsideratio, rotate, color;
-    protected JComboBox papersize;
-
-    /* GraphML items */
-    protected JRadioButton gmlPlain, gmlYed, gmlHtml, gmlLatex; 
 
     /* Save location items */
     protected JFileChooser file;
@@ -119,8 +111,6 @@ public class ExportDialog extends JDialog implements ActionListener {
         content.add(cardPanel, BorderLayout.CENTER);
 
         cardPanel.add(cardFormat(), CARD_FORMAT);
-        cardPanel.add(cardPS(), CARD_PS);
-        cardPanel.add(cardGML(), CARD_GML);
         cardPanel.add(cardFile(), CARD_FILE);
 
         showCard(CARD_FORMAT);
@@ -146,134 +136,57 @@ public class ExportDialog extends JDialog implements ActionListener {
     /**
      * Return the card where the user can select the file format.
      */
-    private Component cardFormat() {
+    private Component cardFormat() {        
         Box box = new Box(BoxLayout.Y_AXIS);
 
         formats = new ButtonGroup();
-
-        radioPS = new JRadioButton("Postscript ( .ps)");
-        radioPS.setAlignmentX(Component.LEFT_ALIGNMENT);
-        formats.add(radioPS);
-        box.add(radioPS);
-        box.add(explText(
-            "A Postscript file can be included immediately in e.g. LaTeX\n"+
-            "documents, but it cannot easily be edited."));
-
-        radioSVG = new JRadioButton("Structured Vector Graphics ( .svg)");
-        radioSVG.setAlignmentX(Component.LEFT_ALIGNMENT);
-        formats.add(radioSVG);
-        box.add(radioSVG);
-        box.add(explText(
-            "An SVG file is suitable for editing the diagram, e.g. with\n"+
-            "inkscape (http://www.inkscape.org), but cannot be included\n"+
-            "directly in LaTeX."));
-
-        radioGML = new JRadioButton("GraphML ( .graphml)");
-        radioGML.setAlignmentX(Component.LEFT_ALIGNMENT);
-        formats.add(radioGML);
-        box.add(radioGML);
-        box.add(explText(
-            "A graphml file contains the structure of the graph and is\n"+
-            "suitable for processing by many graph tools, but does not\n"+
-            "contain layout information and cannot be included directly\n"+
-            "in LaTeX. Editing and laying out can be done with e.g. yEd.\n"+
-            "(http://www.yworks.com)"));
-
-        radioPS.setSelected(true);
-
-        JPanel p = new JPanel();
-        p.add(box, BorderLayout.CENTER);
-        return p;
-    }
-
-
-    /**
-     * Return the card where the user can set Postscript options
-     */
-    private Component cardPS() {
-        Box box = new Box(BoxLayout.Y_AXIS);
-
-        fittopage = new JCheckBox("Fit to page", true);
-        box.add(fittopage);
-
-        keepsideratio = new JCheckBox("Keep side ratio", true);
-        box.add(keepsideratio);
-
-        rotate = new JCheckBox("Rotate 90 degrees", false);
-        box.add(rotate);
-
-        color = new JCheckBox("Colour", false);
-        box.add(color);
-
-        Box box2 = new Box(BoxLayout.X_AXIS);
-
-        JLabel label = new JLabel("Paper size:", JLabel.LEFT);
-        label.setBorder(new EmptyBorder(new Insets(0,0,0,10)));
-        box2.add(label);
-
-        papersize = new JComboBox();
-        papersize.addItem("A4");
-        papersize.addItem("A3");
-        papersize.addItem("Letter");
-        papersize.addItem("Legal");
-        papersize.addItem("Tabloid");
-        papersize.setMaximumSize(papersize.getPreferredSize());
-        box2.add(papersize);
-        box.add(box2);
-
-        JPanel p = new JPanel();
-        p.add(box, BorderLayout.CENTER);
-        return p;
-    }
-
-
-    /**
-     * Return the card where the user can set GraphML options
-     */
-    private Component cardGML() {
-        ButtonGroup b;
-        Box box = new Box(BoxLayout.Y_AXIS);
+        boolean first = true;
         
-        b = new ButtonGroup();
-
-        gmlPlain = new JRadioButton("Plain graphml");
-        gmlPlain.addActionListener(this);
-        b.add(gmlPlain);
-        box.add(gmlPlain);
-        box.add(explText(
-            "This contains the class names in Latex format as comments\n"+
-            "and the relations between the classes."));
-
-        gmlYed = new JRadioButton("Graphml for yEd");
-        gmlYed.setSelected(true);
-        gmlYed.addActionListener(this);
-        b.add(gmlYed);
-        box.add(gmlYed);
-        box.add(explText(
-            "This contains class names as labels of the nodes, styled\n"+
-            "arrows for (un)proper inclusions and colourings for\n"+
-            "algorithmic complexity. Note that for yEd the file must have\n"+
-            "extension .graphml."));
-        
-        b = new ButtonGroup();
-        box.add(Box.createRigidArea(new Dimension(0,20)));
-
-        gmlHtml = new JRadioButton("Html labels");
-        gmlHtml.setSelected(true);
-        b.add(gmlHtml);
-        box.add(gmlHtml);
-        box.add(explText("Class names are formatted using html"));
-
-        gmlLatex = new JRadioButton("Latex labels");
-        b.add(gmlLatex);
-        box.add(gmlLatex);
-        box.add(explText("Class names are unformatted LaTeX code"));
+        DrawingLibraryInterface drawInterface 
+                = parent.getTabbedPane().getActiveDrawingLibraryInterface();
+        for (String format : drawInterface.getAvailableExportFormats()) {
+            JRadioButton radioB = new JRadioButton(format);
+            radioB.setAlignmentX(Component.LEFT_ALIGNMENT);
+            formats.add(radioB);
+            box.add(radioB);
+            radioB.setSelected(first);
+            first = false;
+            
+            // adding description
+            if (format.equals("ps")) {
+                box.add(explText(
+                    "A Postscript file can be included immediately in e.g. LaTeX\n"+
+                    "documents, but it cannot easily be edited."));
+            } else if (format.equals("svg")) {
+                box.add(explText(
+                    "An SVG file is suitable for editing the diagram, e.g. with\n"+
+                    "inkscape (http://www.inkscape.org), but cannot be included\n"+
+                    "directly in LaTeX."));                
+            } else if (format.equals("graphml")) {
+                box.add(explText(
+                    "A graphml file contains the structure of the graph and is\n"+
+                    "suitable for processing by many graph tools, but does not\n"+
+                    "contain layout information and cannot be included directly\n"+
+                    "in LaTeX. Editing and laying out can be done with e.g. yEd.\n"+
+                    "(http://www.yworks.com)"));                
+            } else if (format.equals("jpg")) {
+                box.add(explText(
+                    "A JPG file is one of the current standard file formats for\n" + 
+                    "images. It can be viewed and processed on nearly any device\n" + 
+                    "or any image-processing application. It is more comprimated\n"+
+                    "than the PNG format."));                
+            } else if (format.equals("png")) {
+                box.add(explText(
+                    "A PNG file is one of the current standard file formats for\n" + 
+                    "images. It can be viewed and processed on nearly any device\n" + 
+                    "or any image-processing application. It can be transparent.\n"));
+            }
+        }
 
         JPanel p = new JPanel();
         p.add(box, BorderLayout.CENTER);
         return p;
     }
-
 
     /**
      * Return the card where the user can select the destination file.
@@ -310,30 +223,10 @@ public class ExportDialog extends JDialog implements ActionListener {
         if (source == cancelButton)
             closeDialog();
         else if (source == nextButton) {
-            if (current == CARD_FORMAT) {
-                if (radioPS.isSelected())
-                    showCard(CARD_PS);
-                else if (radioGML.isSelected())
-                    showCard(CARD_GML);
-                else
-                    showCard(CARD_FILE);
-            } else
+            if (current == CARD_FORMAT)
                 showCard(CARD_FILE);
         } else if (source == backButton) {
-            if (current == CARD_PS  ||  current == CARD_GML)
                 showCard(CARD_FORMAT);
-            else if (radioPS.isSelected())
-                showCard(CARD_PS);
-            else if (radioGML.isSelected())
-                showCard(CARD_GML);
-            else
-                showCard(CARD_FORMAT);
-        } else if (source == gmlYed) {
-            gmlHtml.setEnabled(true);
-            gmlLatex.setEnabled(true);
-        } else if (source == gmlPlain) {
-            gmlHtml.setEnabled(false);
-            gmlLatex.setEnabled(false);
         } else if (e.getActionCommand() == JFileChooser.APPROVE_SELECTION) {
             if (export())
                 closeDialog();
@@ -345,24 +238,41 @@ public class ExportDialog extends JDialog implements ActionListener {
      * Export using the entered settings. Return true iff no error occured.
      */
     protected boolean export() {
+        
         boolean res = true;
         FileOutputStream f;
         try {
             f = new FileOutputStream(file.getSelectedFile());
         } catch (Exception e) {
             e.printStackTrace();
-            MessageDialog.error(parent, "Cannot open file for writing:\n"+
-                file.getSelectedFile().getPath());
+            MessageDialog.error(parent, "Cannot open file for writing:\n" 
+                + file.getSelectedFile().getPath());
             return false;
         }
 
         try {
-            if (radioPS.isSelected())
-                exportPS(f);
-            else if (radioGML.isSelected())
-                exportGML(f);
-            else if (radioSVG.isSelected())
-                exportSVG(f);
+            DrawingLibraryInterface drawInterface 
+                = parent.getTabbedPane().getActiveDrawingLibraryInterface();
+            String chosenFormat = "";
+            Enumeration<AbstractButton> buttons = formats.getElements();
+            for (int i = 0; i < formats.getButtonCount(); i++) {
+                if (buttons.nextElement().getModel()
+                        .equals(formats.getSelection())) {
+                    chosenFormat 
+                        = drawInterface.getAvailableExportFormats()[i];
+                }
+            }
+            String test = file.getSelectedFile().getName();
+            test = file.getSelectedFile().getPath();
+            if (!file.getSelectedFile().getName().endsWith("." 
+                    + chosenFormat)) {
+                drawInterface.export(chosenFormat
+                        , file.getSelectedFile().getPath()  
+                        + "." + chosenFormat);
+            } else {
+                drawInterface.export(chosenFormat
+                        , file.getSelectedFile().getPath());
+            }
         } catch (Exception e) {
             res = false;
             e.printStackTrace();
@@ -371,87 +281,6 @@ public class ExportDialog extends JDialog implements ActionListener {
         }
         return res;
     }
-
-
-    /**
-     * Export to Postscript.
-     */
-    protected void exportPS(FileOutputStream f) throws Exception {
-        Exception res = null;
-        String outstr;
-        DataOutputStream out = null;
-        
-        try {
-            out = new DataOutputStream(f);
-            PSGraphics g = new PSGraphics((String) papersize.getSelectedItem(),
-                    fittopage.isSelected(), keepsideratio.isSelected(),
-                    rotate.isSelected(), color.isSelected());
-
-            parent.getTabbedPane().getSelectedComponent().paint(g);
-            outstr = g.getContent();
-            g.dispose();
-            out.writeBytes(outstr);
-        } catch (IOException ex)  {
-            res = ex;
-        } finally {
-            out.close();
-        }
-        
-        if (res != null)
-            throw res;
-    }
-
-    /**
-     * Export to GraphML.
-     */
-    protected void exportGML(FileOutputStream f) throws Exception {
-        DrawingLibraryInterface graphInterface 
-            = parent.getTabbedPane().getActiveDrawingLibraryInterface();
-        Exception res = null;
-        Writer out = null;
-        
-        try {
-            graphInterface.export("grpahml", file.getSelectedFile().getPath());
-        } catch (Exception ex)  {
-            res = ex;
-        } finally {
-            out.close();
-        }
-        
-        if (res != null) {
-            throw res;
-        }
-    }
-
-
-    /**
-     * Export to SVG.
-     */
-    protected void exportSVG(FileOutputStream f) throws Exception {
-        Exception res = null;
-        String outstr;
-        Writer out = null;
-        
-        try {
-            out = new OutputStreamWriter(f, "UTF-8");
-            SVGGraphics g = new SVGGraphics();
-
-            parent.getTabbedPane().getSelectedComponent().paint(g);            
-            
-            outstr = g.getContent();
-            g.dispose();
-            out.write(outstr, 0, outstr.length());
-        } catch (IOException ex)  {
-            res = ex;
-        } finally {
-            out.close();
-        }
-        
-        if (res != null) {
-            throw res;
-        }
-    }
-
 }
 
 /* EOF */
