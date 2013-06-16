@@ -89,8 +89,10 @@ public abstract class UserSettings {
      * @param tabPlacement
      */
     public static void setTabPlacement(int tabPlacement) {
-        tabOrientation = tabPlacement;
-        updateSettings();
+        if (tabOrientation != tabPlacement) {
+            tabOrientation = tabPlacement;
+            updateSettings();
+        }
     }
 
     /**
@@ -116,8 +118,10 @@ public abstract class UserSettings {
      * @param toolbarSetting
      */
     public static void setToolbarSetting(boolean toolbarSetting) {
-        toolbarShowHide = toolbarSetting;
-        updateSettings();
+        if (toolbarShowHide != toolbarSetting) {
+            toolbarShowHide = toolbarSetting;
+            updateSettings();
+        }
     }
 
     /**
@@ -143,8 +147,10 @@ public abstract class UserSettings {
      * @param newTheme
      */
     public static void setTheme(String newTheme) {
-        theme = newTheme;
-        updateSettings();
+        if (!theme.equals(newTheme)) {
+            theme = newTheme;
+            updateSettings();
+        }
     }
 
     /**
@@ -157,9 +163,10 @@ public abstract class UserSettings {
     }
 
     /**
-     * Returns the zoomlevel for new drawn graphs.
+     * Getter for {@link #zoomLevel}.
      * 
      * @return
+     *          The zoomlevel for new drawn graphs.
      */
     public static int getCurrentZoomLevel() {
         return zoomLevel;
@@ -171,8 +178,10 @@ public abstract class UserSettings {
      * @param newZoomLevel
      */
     public static void setZoomLevel(int newZoomLevel) {
-        zoomLevel = newZoomLevel;
-        updateSettings();
+        if (zoomLevel != newZoomLevel) {
+            zoomLevel = newZoomLevel;
+            updateSettings();
+        }
     }
 
     /**
@@ -185,8 +194,10 @@ public abstract class UserSettings {
      *            the new color for the given complexity
      */
     public static void setColor(Complexity complexity, Color color) {
-        complexityToColor.put(complexity, color);
-        updateSettings();
+        if (!color.equals(complexityToColor.get(complexity))) {
+            complexityToColor.put(complexity, color);
+            updateSettings();
+        }
     }
 
     /**
@@ -219,6 +230,7 @@ public abstract class UserSettings {
         for (Complexity complexity : colorScheme.keySet()) {
             complexityToColor.put(complexity, colorScheme.get(complexity));
         }
+        
         updateSettings();
     }
 
@@ -291,7 +303,7 @@ public abstract class UserSettings {
      *            the new default naming preference
      */
     public static void setNamingPref(Algo.NamePref namepref) {
-        if (namepref != null) {
+        if (namepref != null && defaultNamePref != namepref) {
             defaultNamePref = namepref;
             updateSettings();
         }
@@ -306,9 +318,14 @@ public abstract class UserSettings {
         return defaultNamePref;
     }
 
-    // Subscribe / Unsubscribe
+    // Updatable
     // ------------------------------------------------
-
+    
+    /**
+     * The objects that have to be notified when a setting changes.
+     */
+    private static List<Updatable> updatables = new LinkedList<Updatable>();
+    
     /**
      * TODO marc.
      * 
@@ -328,11 +345,6 @@ public abstract class UserSettings {
     public static void unsubscribeFromOptionChanges(Updatable instance) {
         updatables.remove(instance);
     }
-
-    /**
-     * The objects that have to be notified when a setting changes.
-     */
-    private static List<Updatable> updatables = new LinkedList<Updatable>();
 
     /**
      * Notifies all subscribed objects of a change in the UserSettings.
