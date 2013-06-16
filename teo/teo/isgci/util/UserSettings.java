@@ -316,7 +316,6 @@ public abstract class UserSettings {
      *            TODO marc
      */
     public static void subscribeToOptionChanges(Updatable instance) {
-        System.out.println("bla");
         updatables.add(instance);
     }
 
