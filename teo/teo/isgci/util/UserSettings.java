@@ -16,7 +16,6 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 
-import javax.swing.JComponent;
 import javax.swing.JTabbedPane;
 import javax.swing.UIManager;
 
@@ -24,8 +23,8 @@ import teo.isgci.db.Algo;
 import teo.isgci.problem.Complexity;
 
 /**
- * Manages all UserSettings with public getter and setter. If a setting changes,
- * it notifies all subscribed objects via the {@link #Updatable}
+ * Manages all UserSettings with public getter and setter. If a setting 
+ * changes, it notifies all subscribed objects via the {@link #Updatable}
  */
 public abstract class UserSettings {
 
@@ -35,7 +34,8 @@ public abstract class UserSettings {
     /**
      * Maps a complexity to the corresponding color.
      */
-    private static HashMap<Complexity, Color> complexityToColor = getDefaultColorScheme();
+    private static HashMap<Complexity, Color> complexityToColor 
+        = getDefaultColorScheme();
 
     /**
      * The default naming preference which is used for new tabs.
@@ -66,9 +66,10 @@ public abstract class UserSettings {
     // ------------------------------------------------
 
     /**
-     * Returns the default tabline placement.
+     * Getter for default tabline placement.
      * 
      * @return
+     *          Returns the default tabline placement.
      */
     public static int getDefaultTabPlacement() {
         return JTabbedPane.TOP;
@@ -89,10 +90,11 @@ public abstract class UserSettings {
      */
     public static void setTabPlacement(int tabPlacement) {
         tabOrientation = tabPlacement;
+        updateSettings();
     }
 
     /**
-     * Returns the default visibility setting;
+     * Returns the default visibility setting.
      * 
      * @return
      */
@@ -115,6 +117,7 @@ public abstract class UserSettings {
      */
     public static void setToolbarSetting(boolean toolbarSetting) {
         toolbarShowHide = toolbarSetting;
+        updateSettings();
     }
 
     /**
@@ -141,6 +144,7 @@ public abstract class UserSettings {
      */
     public static void setTheme(String newTheme) {
         theme = newTheme;
+        updateSettings();
     }
 
     /**
@@ -168,6 +172,7 @@ public abstract class UserSettings {
      */
     public static void setZoomLevel(int newZoomLevel) {
         zoomLevel = newZoomLevel;
+        updateSettings();
     }
 
     /**
@@ -223,7 +228,8 @@ public abstract class UserSettings {
      * @return a hashmap in which each complexity is mapped to a color.
      */
     public static HashMap<Complexity, Color> getDefaultColorScheme() {
-        HashMap<Complexity, Color> defaultComplexityToColor = new HashMap<Complexity, Color>();
+        HashMap<Complexity, Color> defaultComplexityToColor 
+            = new HashMap<Complexity, Color>();
 
         defaultComplexityToColor.put(Complexity.LINEAR, Color.green);
 
@@ -248,24 +254,32 @@ public abstract class UserSettings {
      * 
      * @return a hashmap in which each complexity is mapped to a color.
      */
-    public static HashMap<Complexity, Color> getDefaultColorBlindColorScheme() {
-        HashMap<Complexity, Color> defaultComplexityToColor = new HashMap<Complexity, Color>();
+    public static HashMap<Complexity, Color> 
+        getDefaultColorBlindColorScheme() {
+        HashMap<Complexity, Color> defaultComplexityToColor 
+            = new HashMap<Complexity, Color>();
 
-        defaultComplexityToColor.put(Complexity.LINEAR,
-                new Color(253, 184, 99));
+        final Color linearcolor = new Color(253, 184, 99);
+        final Color pcolor = new Color(230, 97, 1);
+        final Color conpccolor = new Color(94, 60, 153);
+        final Color npccolor = new Color(94, 60, 153);
+        final Color nphcolor = new Color(94, 60, 153);
+        final Color giccolor = new Color(178, 171, 210);
+        
+        defaultComplexityToColor.put(Complexity.LINEAR, linearcolor);
 
         defaultComplexityToColor.put(Complexity.UNKNOWN, Color.white);
         defaultComplexityToColor.put(Complexity.OPEN, Color.white);
 
         defaultComplexityToColor.put(null, Color.white);
 
-        defaultComplexityToColor.put(Complexity.P, new Color(230, 97, 1));
+        defaultComplexityToColor.put(Complexity.P, pcolor);
 
-        defaultComplexityToColor.put(Complexity.CONPC, new Color(94, 60, 153));
-        defaultComplexityToColor.put(Complexity.NPC, new Color(94, 60, 153));
-        defaultComplexityToColor.put(Complexity.NPH, new Color(94, 60, 153));
+        defaultComplexityToColor.put(Complexity.CONPC, conpccolor);
+        defaultComplexityToColor.put(Complexity.NPC, npccolor);
+        defaultComplexityToColor.put(Complexity.NPH, nphcolor);
 
-        defaultComplexityToColor.put(Complexity.GIC, new Color(178, 171, 210));
+        defaultComplexityToColor.put(Complexity.GIC, giccolor);
 
         return defaultComplexityToColor;
     }
@@ -302,6 +316,7 @@ public abstract class UserSettings {
      *            TODO marc
      */
     public static void subscribeToOptionChanges(Updatable instance) {
+        System.out.println("bla");
         updatables.add(instance);
     }
 

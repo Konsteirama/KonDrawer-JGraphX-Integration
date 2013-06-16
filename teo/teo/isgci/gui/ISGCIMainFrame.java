@@ -28,6 +28,9 @@ import javax.swing.JFrame;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
+import javax.swing.SwingUtilities;
+import javax.swing.UIManager;
+import javax.swing.UnsupportedLookAndFeelException;
 
 import org.jgrapht.Graphs;
 import org.jgrapht.graph.SimpleDirectedGraph;
@@ -38,6 +41,8 @@ import teo.isgci.gc.GraphClass;
 import teo.isgci.grapht.GAlg;
 import teo.isgci.grapht.Inclusion;
 import teo.isgci.problem.Problem;
+import teo.isgci.util.Updatable;
+import teo.isgci.util.UserSettings;
 import teo.isgci.xml.GraphMLWriter;
 
 /*import teo.isgci.gc.GraphClass;
@@ -46,7 +51,8 @@ import teo.isgci.xml.GraphMLWriter;
 /**
  * The main frame of the application.
  */
-public class ISGCIMainFrame extends JFrame implements WindowListener {
+public class ISGCIMainFrame extends JFrame 
+            implements WindowListener, Updatable {
 
     /**
      * This should change each time the mainframe is changed.
@@ -99,6 +105,9 @@ public class ISGCIMainFrame extends JFrame implements WindowListener {
         PSGraphics.init(teoloader);
         LatexGraphics.init(teoloader);
 
+        // subscribe to option changes
+        UserSettings.subscribeToOptionChanges(this);
+        
         boolean createMaps = false;
         try {
             createMaps = System.getProperty("org.isgci.mappath") != null;
@@ -553,6 +562,18 @@ public class ISGCIMainFrame extends JFrame implements WindowListener {
         JDialog search = new SearchDialog(this);
         search.setLocation(DEFAULTPOSITION);
         search.setVisible(true);
+    }
+
+    @Override
+    public void updateOptions() {
+        try {
+            UIManager.setLookAndFeel(UserSettings.getCurrentTheme());
+        } catch (Exception e) {
+            e.printStackTrace();
+        } 
+        
+        SwingUtilities.updateComponentTreeUI(this);
+        pack();
     }
 }
 

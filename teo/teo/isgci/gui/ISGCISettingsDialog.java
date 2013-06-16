@@ -115,7 +115,7 @@ public class ISGCISettingsDialog extends JDialog {
     private Algo.NamePref namepref;
     
     /** TODO marc JAVADOCS. */
-    private Boolean setToolbar, setTheme, setZoom, setTabOrientation, 
+    private boolean setToolbar, setTheme, setZoom, setTabOrientation, 
                     setNamingPreferences;
 
     /**
@@ -330,12 +330,18 @@ public class ISGCISettingsDialog extends JDialog {
                     if (info.getName().equals(
                             themeSelector.getSelectedItem())) {
                         javaTheme = info.getClassName();
-                        // found the correct one, no need to search furhter
+                        // found the correct one, no need to search further
                         break;
                     }
                 }
-
-                SwingUtilities.updateComponentTreeUI(dialog);
+                
+                if (!javaTheme.equals(UserSettings.getCurrentTheme())) {
+                    enableApplyButton();
+                    setTheme = true;
+                } else {
+                    setTheme = false;
+                }
+                
             }
         });
 
