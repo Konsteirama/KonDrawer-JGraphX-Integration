@@ -10,7 +10,9 @@
 
 package teo.isgci.gui;
 
+import java.awt.BorderLayout;
 import java.awt.Color;
+import java.awt.FlowLayout;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
@@ -136,8 +138,42 @@ public class ISGCISettingsDialog extends JDialog implements ActionListener,
         options.add("Canvas", tabCanvas);
         options.addTab("User Interface", tabUserInterface);
         options.addTab("Graph Colours", tabGraphColours);
-        this.add(options);
+        
+       
 
+        // sebi
+        setLayout(new BorderLayout());
+        add(options, BorderLayout.CENTER);
+        
+        // bottomleft
+        // to make the button as small as the right buttons
+        JPanel bottomLeftPanel = new JPanel(new FlowLayout());
+        
+        uiSetDefaultButton = new JButton("Default settings");
+        bottomLeftPanel.add(uiSetDefaultButton, BorderLayout.LINE_START);
+
+        
+        // bottomright
+        JPanel bottomRightPanel = new JPanel(new FlowLayout());
+
+        okButton = new JButton("Ok");
+        bottomRightPanel.add(okButton, c);
+
+        cancelButton = new JButton("Cancel");
+        bottomRightPanel.add(cancelButton, c);
+
+        applyButton = new JButton("Apply");
+        applyButton.setEnabled(false);
+        bottomRightPanel.add(applyButton, c);
+        
+        // merge bottom and add to general layout
+        JPanel bottomPanel = new JPanel(new BorderLayout());
+        bottomPanel.add(bottomLeftPanel, BorderLayout.LINE_START);
+        bottomPanel.add(bottomRightPanel, BorderLayout.LINE_END);
+        add(bottomPanel, BorderLayout.PAGE_END);
+        
+        // ~sebi
+        
         /*
          * userinterface tab
          */
@@ -223,35 +259,6 @@ public class ISGCISettingsDialog extends JDialog implements ActionListener,
         namingPreference.setSelectedIndex(0);
         namingPreference.setSize(30, 10);
         userInterface.add(namingPreference, c);
-
-        /*
-         * Buttons fixen, apply??
-         */
-        c.anchor = GridBagConstraints.WEST;
-        c.fill = GridBagConstraints.NONE;
-        c.weightx = 0.0;
-        c.weighty = 0.0;
-        c.insets = new Insets(0, 5, 10, 40);
-        c.gridwidth = 1;
-        uiSetDefaultButton = new JButton("Default settings");
-        tabUserInterface.add(uiSetDefaultButton, c);
-
-        c.anchor = GridBagConstraints.EAST;
-        c.insets = new Insets(0, 5, 10, 5);
-        c.gridwidth = GridBagConstraints.RELATIVE;
-        okButton = new JButton("Ok");
-        tabUserInterface.add(okButton, c);
-
-        c.anchor = GridBagConstraints.WEST;
-        c.gridwidth = GridBagConstraints.RELATIVE;
-        cancelButton = new JButton("Cancel");
-        tabUserInterface.add(cancelButton, c);
-
-        c.anchor = GridBagConstraints.WEST;
-        c.gridwidth = GridBagConstraints.REMAINDER;
-        applyButton = new JButton("Apply");
-        applyButton.setEnabled(false);
-        tabUserInterface.add(applyButton, c);
 
         /*
          * graph colours tab
