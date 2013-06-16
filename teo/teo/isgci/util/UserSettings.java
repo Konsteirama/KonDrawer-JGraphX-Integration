@@ -295,7 +295,7 @@ public abstract class UserSettings {
 
         return defaultComplexityToColor;
     }
-
+    
     /**
      * Sets the default naming preference.
      * 
@@ -314,7 +314,7 @@ public abstract class UserSettings {
      * 
      * @return the default naming preference
      */
-    public static Algo.NamePref getNamingPref() {
+    public static Algo.NamePref getDefaultNamingPref() {
         return defaultNamePref;
     }
 

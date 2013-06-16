@@ -99,7 +99,7 @@ public class ISGCITabbedPane extends JTabbedPane implements Updatable {
     /**
      * The mode which indicates the default preferred name of a Node.
      */
-    private Algo.NamePref defaultMode = UserSettings.getNamingPref();
+    private Algo.NamePref defaultMode = UserSettings.getDefaultNamingPref();
     
 
     /**
@@ -533,8 +533,8 @@ public class ISGCITabbedPane extends JTabbedPane implements Updatable {
         for (Component tab : this.getComponents()) {
             setProblem(getProblem(tab), tab);
         }        
-        setNamingPref(UserSettings.getNamingPref());
-        setNamingPref(UserSettings.getNamingPref(), getSelectedComponent());
+        setNamingPref(UserSettings.getDefaultNamingPref());
+        setNamingPref(UserSettings.getDefaultNamingPref(), getSelectedComponent());
     }
 }
 
