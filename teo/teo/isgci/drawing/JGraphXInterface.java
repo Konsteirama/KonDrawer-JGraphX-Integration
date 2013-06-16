@@ -103,13 +103,13 @@ class JGraphXInterface<V, E> implements DrawingLibraryInterface<V, E> {
                     LatexLabel ll = new LatexLabel(label);
                     ll.setBackground(new Color(0, 0, 0, 0));
                     
-                    
                     return new Component[]{ ll };
                 }
                 return null;
             };
         };
         
+        // make background white
         graphComponent.getViewport().setOpaque(true);
         graphComponent.getViewport().setBackground(Color.white);
 
@@ -324,7 +324,7 @@ class JGraphXInterface<V, E> implements DrawingLibraryInterface<V, E> {
         }
 
         BufferedImage image = new BufferedImage(d.width, d.height,
-                BufferedImage.TYPE_INT_ARGB);
+                BufferedImage.TYPE_INT_RGB);
 
         Graphics2D g = image.createGraphics();
         graphComponent.getGraphControl().paint(g);
@@ -402,7 +402,7 @@ class JGraphXInterface<V, E> implements DrawingLibraryInterface<V, E> {
     @Override
     public V getNodeAt(Point p) {
         mxCell cell = (mxCell)graphComponent.getCellAt((int)p.getX(),
-                (int)p.getY());
+                (int) p.getY());
         if(cell != null && cell.isVertex())
             return graphAdapter.getCellToVertexMap().get(cell);
         else
@@ -418,7 +418,7 @@ class JGraphXInterface<V, E> implements DrawingLibraryInterface<V, E> {
     @Override
     public E getEdgeAt(Point p) {
         mxCell cell = (mxCell)graphComponent.getCellAt((int)p.getX(),
-                (int)p.getY());
+                (int) p.getY());
         if(cell != null && cell.isEdge())
             return graphAdapter.getCellToEdgeMap().get(cell);
         else

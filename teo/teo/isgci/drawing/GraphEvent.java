@@ -23,8 +23,9 @@ class GraphEvent implements GraphEventInterface {
      */
     @Override
     public void registerMouseAdapter(MouseAdapter adapter) {
-        graphComponent.addMouseListener(adapter);        
+        graphComponent.addMouseListener(adapter);
         graphComponent.getGraphControl().addMouseListener(adapter);
         graphComponent.addMouseWheelListener(adapter);
+        graphComponent.getGraphControl().addMouseWheelListener(adapter);
     }
 }
