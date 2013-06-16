@@ -12,6 +12,7 @@ package teo.isgci.gui;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
+import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
@@ -53,43 +54,33 @@ public class ISGCISettingsDialog extends JDialog {
     private JButton applyButton;
     
     /** TODO marc JAVADOCS. */
-    private JList colorOptionsList;
+    private JList colorList;
     
     /** TODO marc JAVADOCS. */
     private JComboBox tabOrientation, themeSelector, 
                       namingPreference;
     
     /** TODO marc JAVADOCS. */
-    private Vector<String> availableThemes;
+    private HashMap<String, String> nameToTheme;
     
+    /** TODO . */
+    private HashMap<String, Color> nameToColor;
+   
     /** TODO marc JAVADOCS. */
-    private String[] problems = new String[] { "Font",
-            "Background", "Unkown complexity",
-            "Graph-isomorphism-complete", "NP-complete", "Lineartime solvable",
-            "P", "Open classes", "CONPC", "NPH", "none" };
-    
-    /** TODO marc JAVADOCS. */
-    private JCheckBox toolbarCheck, groupcolors;
+    private JCheckBox toolbarCheck, groupColors;
     
     /** TODO marc JAVADOCS. */
     private JSlider zoomSlider;
     
     /** TODO marc JAVADOCS. */
-    private Color unknown, gic, npc, linear, p, open, conpc, nph, empty, text,
-                  background;
-    
-    /** TODO marc JAVADOCS. */
-    private HashMap<Complexity, Color> colorscheme 
-        = new HashMap<Complexity, Color>();
-    
-    /** TODO marc JAVADOCS. */
-    private boolean group;
+//    private HashMap<Complexity, Color> colorscheme 
+//        = new HashMap<Complexity, Color>();
 
     /**
      * This field should change every time the class is changed - once it is
      * actually deployed.
      */
-    private static final long serialVersionUID = 2L;
+    private static final long serialVersionUID = 3L;
 
     /**
      * Creates a new options dialogue.
@@ -100,24 +91,25 @@ public class ISGCISettingsDialog extends JDialog {
         super(parent, "Settings", true);
 
         // get available themes
-        availableThemes = new Vector<String>();
+        nameToTheme = new HashMap<String, String>();
         
         UIManager.LookAndFeelInfo[] lookAndFeelInfos 
             = UIManager.getInstalledLookAndFeels();
         for (UIManager.LookAndFeelInfo lookAndFeelInfo : lookAndFeelInfos) {
-            availableThemes.add(lookAndFeelInfo.getName());
+            nameToTheme.put(lookAndFeelInfo.getName(),
+                              lookAndFeelInfo.getClassName());
         }
         
-        // group
-        unknown = UserSettings.getColor(Complexity.UNKNOWN);
-        gic = UserSettings.getColor(Complexity.GIC);
-        npc = UserSettings.getColor(Complexity.NPC);
-        linear = UserSettings.getColor(Complexity.LINEAR);
-        p = UserSettings.getColor(Complexity.P);
-        open = UserSettings.getColor(Complexity.OPEN);
-        conpc = UserSettings.getColor(Complexity.CONPC);
-        nph = UserSettings.getColor(Complexity.NPH);
-        empty = UserSettings.getColor(null);
+        // initialize colors
+        nameToColor = new HashMap<String, Color>();
+        
+        nameToColor.put("Background", 
+                UserSettings.getCurrentBackgroundColor());
+        nameToColor.put("Font", UserSettings.getCurrentFontColor());
+        
+        for (Complexity c : Complexity.values()) {
+            nameToColor.put(c.getComplexityString(), UserSettings.getColor(c));
+        }
         
         // Initialize tab 
         JTabbedPane tabContainer 
@@ -285,8 +277,18 @@ public class ISGCISettingsDialog extends JDialog {
         c.fill = GridBagConstraints.NONE;
         c.weightx = 0.0;
         c.gridwidth = GridBagConstraints.REMAINDER;
-        themeSelector = new JComboBox(availableThemes);
-        themeSelector.setSelectedIndex(0);
+        themeSelector = new JComboBox(nameToTheme.keySet().toArray());
+        
+        // search for current theme name
+        String defaultThemeName = "";
+        for (String name : nameToTheme.keySet()) {
+            if (nameToTheme.get(name).equals(UserSettings.getCurrentTheme())) {
+                defaultThemeName = name;
+                break;
+            }
+        }
+        themeSelector.setSelectedItem(defaultThemeName);
+        
         themeSelector.setSize(width, height);
         userInterface.add(themeSelector, c);
                
@@ -305,14 +307,14 @@ public class ISGCISettingsDialog extends JDialog {
         c.fill = GridBagConstraints.BOTH;
         c.weightx = 0.0;
         c.gridwidth = GridBagConstraints.RELATIVE;
-        label = new JLabel("Set naming preference", JLabel.LEFT);
+        label = new JLabel("Set default naming preference", JLabel.LEFT);
         gridbag.setConstraints(label, c);
         userInterface.add(label);
         c.fill = GridBagConstraints.NONE;
         c.weightx = 0.0;
         c.gridwidth = GridBagConstraints.REMAINDER;
         namingPreference = new JComboBox(Algo.NamePref.values());
-        namingPreference.setSelectedIndex(0);
+        namingPreference.setSelectedItem(0);
         namingPreference.setSize(width, height);
         userInterface.add(namingPreference, c);
         
@@ -371,19 +373,19 @@ public class ISGCISettingsDialog extends JDialog {
         
         final JColorChooser colorChooser = new JColorChooser();
         c.gridwidth = GridBagConstraints.RELATIVE;
-        colorOptionsList = new JList(problems);
-        colorOptionsList.setSelectedIndex(1);
-        graphcolors.add(colorOptionsList, c);
+        colorList = new JList(nameToColor.keySet().toArray());
+        colorList.setSelectedIndex(1);
+        graphcolors.add(colorList, c);
         c.gridwidth = GridBagConstraints.REMAINDER;
         c.insets = new Insets(bigGap, gap, bigGap, gap);
         graphcolors.add(colorChooser, c);
         c.anchor = GridBagConstraints.WEST;
-        groupcolors = new JCheckBox("Group problems");
-        groupcolors.setSelected(true);
+        groupColors = new JCheckBox("Group problems");
+        groupColors.setSelected(true);
         c.weightx = 0.0;
         c.weighty = 0.0;
         c.gridwidth = GridBagConstraints.REMAINDER;
-        graphcolors.add(groupcolors, c);
+        graphcolors.add(groupColors, c);
 
         colorChooser.getSelectionModel().addChangeListener(
                 new ChangeListener() {
@@ -391,111 +393,17 @@ public class ISGCISettingsDialog extends JDialog {
             @Override
             public void stateChanged(ChangeEvent e) {
                 Color newColor = colorChooser.getColor();
-                int s = colorOptionsList.getSelectedIndex();
-                if (s == 0) {
-                    if (newColor != text) {
-                        text = newColor;
-                        enableApplyButton();
-                    }
-                } else if (s == 1) {
-                    if (newColor != background) {
-                        background = newColor;
-                        enableApplyButton();
-                    }
-                } else if (s == 2) {
-                    if (newColor != unknown) {
-                        unknown = newColor;
-                        colorscheme.remove(unknown);
-                        colorscheme.put(Complexity.UNKNOWN, unknown);
-                        enableApplyButton();
-                    }
-                    if (group) {
-                        empty = newColor;
-                        open = newColor;
-                    }
-                } else if (s == 3) {
-                    if (newColor != gic) {
-                        gic = newColor;
-                        colorscheme.remove(gic);
-                        colorscheme.put(Complexity.GIC, gic);
-                        enableApplyButton();
-                    }
-                } else if (s == 4) {
-                    if (newColor != npc) {
-                        npc = newColor;
-                        colorscheme.remove(npc);
-                        colorscheme.put(Complexity.NPC, npc);
-                        enableApplyButton();
-                    }
-                    if (group) {
-                        nph = newColor;
-                        conpc = newColor;
-                    }
-                } else if (s == 5) {
-                    if (newColor != linear) {
-                        linear = newColor;
-                        colorscheme.remove(linear);
-                        colorscheme.put(Complexity.LINEAR, linear);
-                        enableApplyButton();
-                    }
-                } else if (s == 6) {
-                    if (newColor != p) {
-                        p = newColor;
-                        colorscheme.remove(p);
-                        colorscheme.put(Complexity.P, p);
-                        enableApplyButton();
-                    }
-                } else if (s == 7) {
-                    if (newColor != open) {
-                        open = newColor;
-                        colorscheme.remove(open);
-                        colorscheme.put(Complexity.OPEN, open);
-                        enableApplyButton();
-                    }
-                    if (group) {
-                        unknown = newColor;
-                        empty = newColor;
-                    }
-                } else if (s == 8) {
-                    if (newColor != conpc) {
-                        conpc = newColor;
-                        colorscheme.remove(conpc);
-                        colorscheme.put(Complexity.CONPC, conpc);
-                        enableApplyButton();
-                    }
-                    if (group) {
-                        nph = newColor;
-                        npc = newColor;
-                    }
-                } else if (s == 9) {
-                    if (newColor != nph) {
-                        nph = newColor;
-                        colorscheme.remove(nph);
-                        colorscheme.put(Complexity.NPH, nph);
-                        enableApplyButton();
-                    }
-                    if (group) {
-                        npc = newColor;
-                        conpc = newColor;
-                    }
-                } else if (s == 10) {
-                    if (newColor != empty) {
-                        empty = newColor;
-                        colorscheme.remove(empty);
-                        colorscheme.put(null, empty);
-                        enableApplyButton();
-                    }
-                    if (group) {
-                        unknown = newColor;
-                        open = newColor;
-                    }
+                int s = colorList.getSelectedIndex();
+                String name = (String) colorList.getSelectedValue();
+                
+                if (newColor != nameToColor.get(name)) {
+                    nameToColor.put(name, newColor);
                 }
 
             }
         });
         
-        colorOptionsList
-                .addListSelectionListener(new ListSelectionListener() {
+        colorList.addListSelectionListener(new ListSelectionListener() {
 
                     /*
                      * Changes the color chooser to the color of the
@@ -504,38 +412,14 @@ public class ISGCISettingsDialog extends JDialog {
                     
                     @Override
                     public void valueChanged(ListSelectionEvent e) {
-                        int i = colorOptionsList.getSelectedIndex();
-                        if (i == 0) {
-                            colorChooser.setColor(text);
-                        } else if (i == 1) {
-                            colorChooser.setColor(background);
-                        } else if (i == 2) {
-                            colorChooser.setColor(unknown);
-                        } else if (i == 3) {
-                            colorChooser.setColor(gic);
-                        } else if (i == 4) {
-                            colorChooser.setColor(npc);
-                        } else if (i == 5) {
-                            colorChooser.setColor(linear);
-                        } else if (i == 6) {
-                            colorChooser.setColor(p);
-                        } else if (i == 7) {
-                            colorChooser.setColor(open);
-                        } else if (i == 8) {
-                            colorChooser.setColor(conpc);
-                        } else if (i == 9) {
-                            colorChooser.setColor(nph);
-                        } else if (i == 10) {
-                            colorChooser.setColor(empty);
-                        }
-
+                        String name 
+                            = (String) colorList.getSelectedValue();
+                        
+                        colorChooser.setColor(nameToColor.get(name));
                     }
                 });
 
-        /*
-         * Adds a button to the graph colors tab to get back the default 
-         * colorsetting.
-         */
+        // DEFAULT COLOR BUTTON
         c.anchor = GridBagConstraints.WEST;
         c.fill = GridBagConstraints.NONE;
         c.weightx = 0.0;
@@ -549,43 +433,29 @@ public class ISGCISettingsDialog extends JDialog {
             
             @Override
             public void actionPerformed(ActionEvent e) {
-                /*
-                 * Set default color scheme.
-                 */
-                colorscheme = UserSettings.getDefaultColorScheme();
-                for (Complexity complexity : colorscheme.keySet()) {
-                    if (complexity == Complexity.UNKNOWN) {
-                        unknown = colorscheme.get(complexity);
-                    } else if (complexity == Complexity.CONPC) {
-                        conpc = colorscheme.get(complexity);
-                    } else if (complexity == Complexity.NPC) {
-                        npc = colorscheme.get(complexity);
-                    } else if (complexity == Complexity.NPH) {
-                        nph = colorscheme.get(complexity);
-                    } else if (complexity == null) {
-                        empty = colorscheme.get(complexity);
-                    } else if (complexity == Complexity.P) {
-                        p = colorscheme.get(complexity);
-                    } else if (complexity == Complexity.GIC) {
-                        gic = colorscheme.get(complexity);
-                    } else if (complexity == Complexity.LINEAR) {
-                        linear = colorscheme.get(complexity);
-                    } else if (complexity == Complexity.OPEN) {
-                        open = colorscheme.get(complexity);
-                    }
+                // Set default color scheme.
+                HashMap<Complexity, Color> colorscheme 
+                    = UserSettings.getDefaultColorScheme();
+                
+                // DO NOT USE colorScheme.keySet() - it's null with enums!
+                for (Complexity complexity : Complexity.values()) {
+                    nameToColor.put(complexity.getComplexityString(), 
+                            colorscheme.get(complexity));
                 }
-                groupcolors.setSelected(true);
-                int i = colorOptionsList.getSelectedIndex();
-                colorOptionsList.clearSelection();
-                colorOptionsList.setSelectedIndex(i);
-
+                
+                // special colors
+                nameToColor.put("Font", UserSettings.getDefaultFontColor());
+                nameToColor.put("Background", 
+                        UserSettings.getDefaultBackgroundColor());
+                
+                
+                String name = (String) colorList.getSelectedValue();
+                colorChooser.setColor(nameToColor.get(name));
+                
             }
         });
 
-        /*
-         * Adds a button to the graph colors tab to get the color blind 
-         * color setting.
-         */
+        // COLORBLIND BUTTON
         c.anchor = GridBagConstraints.EAST;
         c.insets = new Insets(0, gap, bigGap, gap);
         c.gridwidth = GridBagConstraints.RELATIVE;
@@ -598,31 +468,23 @@ public class ISGCISettingsDialog extends JDialog {
             
             @Override
             public void actionPerformed(ActionEvent e) {
-                colorscheme = UserSettings.getDefaultColorBlindColorScheme();
-                for (Complexity complexity : colorscheme.keySet()) {
-                    if (complexity == Complexity.UNKNOWN) {
-                        unknown = colorscheme.get(complexity);
-                    } else if (complexity == Complexity.CONPC) {
-                        conpc = colorscheme.get(complexity);
-                    } else if (complexity == Complexity.NPC) {
-                        npc = colorscheme.get(complexity);
-                    } else if (complexity == Complexity.NPH) {
-                        nph = colorscheme.get(complexity);
-                    } else if (complexity == null) {
-                        empty = colorscheme.get(complexity);
-                    } else if (complexity == Complexity.P) {
-                        p = colorscheme.get(complexity);
-                    } else if (complexity == Complexity.GIC) {
-                        gic = colorscheme.get(complexity);
-                    } else if (complexity == Complexity.LINEAR) {
-                        linear = colorscheme.get(complexity);
-                    } else if (complexity == Complexity.OPEN) {
-                        open = colorscheme.get(complexity);
-                    }
+                
+                HashMap<Complexity, Color> colorscheme 
+                    = UserSettings.getDefaultColorBlindColorScheme();
+                
+                // DO NOT USE colorScheme.keySet() - it's null with enums!
+                for (Complexity complexity : Complexity.values()) {
+                    nameToColor.put(complexity.getComplexityString(), 
+                            colorscheme.get(complexity));
                 }
-                int i = colorOptionsList.getSelectedIndex();
-                colorOptionsList.clearSelection();
-                colorOptionsList.setSelectedIndex(i);
+                
+                // special colors
+                nameToColor.put("Font", UserSettings.getDefaultFontColor());
+                nameToColor.put("Background", 
+                        UserSettings.getDefaultBackgroundColor());
+                
+                String name = (String) colorList.getSelectedValue();
+                colorChooser.setColor(nameToColor.get(name));
             }
         });
         
@@ -703,17 +565,10 @@ public class ISGCISettingsDialog extends JDialog {
 
                 // Retrieve java theme
                 String javaTheme = "";
-                UIManager.LookAndFeelInfo[] lookAndFeelInfos = UIManager
-                        .getInstalledLookAndFeels();
                 
-                // search for matching look and feel
-                for (UIManager.LookAndFeelInfo info : lookAndFeelInfos) {
-                    if (info.getName().equals(
-                            themeSelector.getSelectedItem())) {
-                        javaTheme = info.getClassName();
-                        // found the correct one, no need to search further
-                        break;
-                    }
+                Object themeName = themeSelector.getSelectedItem();
+                if (nameToTheme.containsKey(themeName)) {
+                    javaTheme = nameToTheme.get(themeName);
                 }
                 
                 // Saves all changes.
@@ -725,8 +580,27 @@ public class ISGCISettingsDialog extends JDialog {
                 UserSettings.setTheme(javaTheme);
                 UserSettings.setZoomLevel((int) zoomSlider.getValue());
                 UserSettings.setToolbarSetting(toolbarCheck.isSelected());
-                UserSettings.setColorScheme(colorscheme);
-                colorscheme.clear();
+                
+                // set font and background color separately because they're
+                // not enums
+                UserSettings.setCurrentFontColor(nameToColor.get("Font"));
+                UserSettings.setCurrentFontColor(
+                        nameToColor.get("Background"));
+                
+                // build a new colorscheme
+                HashMap<Complexity, Color> colorScheme 
+                    = new HashMap<Complexity, Color>();
+                
+                for (String name : nameToColor.keySet()) {
+                    Complexity c = Complexity.getComplexity(name);
+                    
+                    // Can be null because of font or background
+                    if (c != null) {
+                        colorScheme.put(c, nameToColor.get(name));
+                    }
+                }
+                
+                UserSettings.setColorScheme(colorScheme);
             }
         });
 

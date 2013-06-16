@@ -61,10 +61,80 @@ public abstract class UserSettings {
      * The zoomlevel for the graphs, that are drawn in new tabs.
      */
     private static int zoomLevel = getDefaultZoomLevel();
-
+    
+    /**
+     * The color of the font of all drawn vertices.
+     */
+    private static Color fontcolor = getDefaultFontColor();
+    
+    /**
+     * The color of the font of all drawn vertices.
+     */
+    private static Color backgroundcolor = getDefaultBackgroundColor();
+    
     // Getter / Setter
     // ------------------------------------------------
 
+    /**
+     * Getter for default font color.
+     * 
+     * @return
+     *          The default font color.
+     */
+    public static Color getDefaultFontColor() {
+        return Color.black;
+    }
+    
+    /**
+     * Setter for {@link #fontcolor}.
+     * 
+     * @param color
+     *          The font color.
+     */
+    public static void setCurrentFontColor(Color color) {
+        fontcolor = color;
+    }
+    
+    /**
+     * Getter for {@link #fontcolor}.
+     * 
+     * @return
+     *          The current font color.
+     */
+    public static Color getCurrentFontColor() {
+        return fontcolor;
+    }
+    
+    /**
+     * Getter for default background color.
+     * 
+     * @return
+     *          The default background color.
+     */
+    public static Color getDefaultBackgroundColor() {
+        return Color.white;
+    }
+    
+    /**
+     * Setter for {@link #backgroundcolor}.
+     * 
+     * @param color
+     *          The background color.
+     */
+    public static void setCurrentBackgroundColor(Color color) {
+        backgroundcolor = color;
+    }
+    
+    /**
+     * Getter for {@link #backgroundcolor}.
+     * 
+     * @return
+     *          The current font color.
+     */
+    public static Color getCurrentBackgroundColor() {
+        return backgroundcolor;
+    }
+    
     /**
      * Getter for default tabline placement.
      * 
@@ -227,7 +297,8 @@ public abstract class UserSettings {
      *            the new color scheme
      */
     public static void setColorScheme(HashMap<Complexity, Color> colorScheme) {
-        for (Complexity complexity : colorScheme.keySet()) {
+        // DO NOT USE colorScheme.keySet() - it's null with enums!
+        for (Complexity complexity : Complexity.values()) {
             complexityToColor.put(complexity, colorScheme.get(complexity));
         }
         
