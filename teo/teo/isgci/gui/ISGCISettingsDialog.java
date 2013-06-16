@@ -33,10 +33,8 @@ import javax.swing.JTabbedPane;
 import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
 import javax.swing.UIManager.LookAndFeelInfo;
-import javax.swing.UnsupportedLookAndFeelException;
 import javax.swing.border.BevelBorder;
 import javax.swing.border.Border;
-import javax.swing.colorchooser.AbstractColorChooserPanel;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import javax.swing.event.ListSelectionEvent;
@@ -53,47 +51,86 @@ import teo.isgci.util.UserSettings;
 public class ISGCISettingsDialog extends JDialog implements ActionListener,
         ListSelectionListener, ChangeListener {
 
-    protected JPanel graphColours;
-    protected ISGCIMainFrame parent;
-    protected JTabbedPane options;
-    protected JButton cancelButton, applyButton, okButton, uiSetDefaultButton;
-    protected JButton gcSetDefaultButton, gcColorBlind;
-    protected JList colourOptions;
-    protected JColorChooser colours;
-    protected JComboBox tabOrientation, theme, namingPreference;// nachschlagen
+    /** TODO marc JAVADOCS. */
+    private JTabbedPane options;
+    
+    /** TODO marc JAVADOCS. */
+    private JButton applyButton, uiSetDefaultButton;
+    
+    /** TODO marc JAVADOCS. */
+    private JButton gcSetDefaultButton, gcColorBlind;
+    
+    /** TODO marc JAVADOCS. */
+    private JList colourOptions;
+    
+    /** TODO marc JAVADOCS. */
+    private JColorChooser colours;
+    
+    /** TODO marc JAVADOCS. */
+    private JComboBox tabOrientation, theme, namingPreference; // nachschlagen
+    
+    /** TODO marc JAVADOCS. */
     private String[] tabs = new String[] { "Top", "East", "West", "Bottom" };
+    
+    /** TODO marc JAVADOCS. */
     private String[] themes = new String[] { "Metal", "Nimbus",
             "Platform standard" };
+    
+    /** TODO marc JAVADOCS. */
     private String[] problemes = new String[] { "font colour",
             "backgroundcolour", "unkown complexity",
             "GraphIsomorphism-complete", "NP-complete", "lineartime solvable",
             "P", "open classes", "CONPC", "NPH", "keine" };
+    
+    /** TODO marc JAVADOCS. */
     private String[] naming = new String[] { "Basic", "Forbidden", "Derived" };
-    protected JCheckBox toolbar, groupColours;
-    protected JSlider zoomLevel;
+    
+    /** TODO marc JAVADOCS. */
+    private JCheckBox toolbar, groupColours;
+    
+    /** TODO marc JAVADOCS. */
+    private JSlider zoomLevel;
+    
+    /** TODO marc JAVADOCS. */
     private Color unknown, gic, npc, linear, p, open, conpc, nph, empty, text,
-            background;
-    private HashMap<Complexity, Color> colorscheme = new HashMap<Complexity, Color>();
+                  background;
+    
+    /** TODO marc JAVADOCS. */
+    private HashMap<Complexity, Color> colorscheme 
+        = new HashMap<Complexity, Color>();
+    
+    /** TODO marc JAVADOCS. */
     private Boolean group, tb;
+    
+    /** TODO marc JAVADOCS. */
     private int zoom;
+    
+    /** TODO marc JAVADOCS. */
     private int tabPlacement;
+
+    /** TODO marc JAVADOCS. */
     private String javaTheme;
+    
+    /** TODO marc JAVADOCS. */
     private Algo.NamePref namepref;
-    private Boolean setToolbar = false, setTheme = false, setZoom = false,
-            setTabOrientation = false, setNamingPreferences = false;
+    
+    /** TODO marc JAVADOCS. */
+    private Boolean setToolbar, setTheme, setZoom, setTabOrientation, 
+                    setNamingPreferences;
 
     /**
      * This field should change every time the class is changed - once it is
-     * actually deployed. (TODO marc)
+     * actually deployed.
      */
-    private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 2L;
 
     /**
      * Creates a new options dialogue.
+     * @param parent
+     *          The mainframe from which the dialog is created.
      */
     public ISGCISettingsDialog(ISGCIMainFrame parent) {
         super(parent, "Settings", true);
-        this.parent = parent;
 
         // group
         zoom = UserSettings.getCurrentZoomLevel();
@@ -110,71 +147,51 @@ public class ISGCISettingsDialog extends JDialog implements ActionListener,
         empty = UserSettings.getColor(null);
 
         colours = new JColorChooser();
-        // Retrieve the current set of panels
-        AbstractColorChooserPanel[] oldPanels = colours.getChooserPanels();
 
-        // Remove panels
-        for (int i = 0; i < oldPanels.length; i++) {
-            String clsName = oldPanels[i].getClass().getName();
-            if (clsName
-                    .equals("javax.swing.colorchooser.DefaultSwatchChooserPanel")) {
-                // Remove swatch chooser
-                colours.removeChooserPanel(oldPanels[i]);
-            } else if (clsName
-                    .equals("javax.swing.colorchooser.DefaultRGBChooserPanel")) {
-                // Remove rgb chooser
-                colours.removeChooserPanel(oldPanels[i]);
-            }
-        }
-
-        // JColorChooser.createDialog(null, "Dialog Title", false, colours,
-        // null, null).setVisible(true);
+        createLayout();
 
         /*
          * Creates the tabs and the integrated panels.
          */
+        options.addTab("User Interface", createUserInterfaceTab());
+        options.addTab("Graph Colours", createColorTab());
+
+        setDefaultCloseOperation(DISPOSE_ON_CLOSE);
+
+        /*
+         * Add action listeners to all components.
+         */
+        uiSetDefaultButton.addActionListener(this);
+        gcSetDefaultButton.addActionListener(this);
+        gcColorBlind.addActionListener(this);
+        groupColours.addActionListener(this);
+        tabOrientation.addActionListener(this);
+        theme.addActionListener(this);
+        toolbar.addActionListener(this);
+        colourOptions.addListSelectionListener(this);
+        colours.getSelectionModel().addChangeListener(this);
+        namingPreference.addActionListener(this);
+        zoomLevel.addChangeListener(this);
+    }
+
+    /**
+     * Creates a panel where the user can change settings related to the
+     * UserInterface.
+     * @return
+     *          Panel with various sliders and boxes.
+     */
+    private JPanel createUserInterfaceTab() {
         GridBagLayout gridbag = new GridBagLayout();
         GridBagConstraints c = new GridBagConstraints();
         JPanel tabUserInterface = new JPanel(gridbag);
-        JPanel tabGraphColours = new JPanel(gridbag);
         JPanel userInterface = new JPanel(gridbag);
-        JPanel graphColours = new JPanel(gridbag);
-
-        /*
-         * Adds the tabs to the tabline.
-         */
-        options.addTab("User Interface", tabUserInterface);
-        options.addTab("Graph Colours", tabGraphColours);
-
-        setLayout(new BorderLayout());
-        add(options, BorderLayout.CENTER);
-
-        // bottomleft
-        // to make the button as small as the right buttons
-        JPanel bottomLeftPanel = new JPanel(new FlowLayout());
-
-        uiSetDefaultButton = new JButton("Default settings");
-        bottomLeftPanel.add(uiSetDefaultButton, BorderLayout.LINE_START);
-
-        // bottomright
-        JPanel bottomRightPanel = new JPanel(new FlowLayout());
-
-        okButton = new JButton("Ok");
-        bottomRightPanel.add(okButton, c);
-
-        cancelButton = new JButton("Cancel");
-        bottomRightPanel.add(cancelButton, c);
-
-        applyButton = new JButton("Apply");
-        applyButton.setEnabled(false);
-        bottomRightPanel.add(applyButton, c);
-
-        // merge bottom and add to general layout
-        JPanel bottomPanel = new JPanel(new BorderLayout());
-        bottomPanel.add(bottomLeftPanel, BorderLayout.LINE_START);
-        bottomPanel.add(bottomRightPanel, BorderLayout.LINE_END);
-        add(bottomPanel, BorderLayout.PAGE_END);
-
+        
+        // CONSTANTS
+        final int gap = 5;
+        final int bigGap = 10;
+        final int width = 30;
+        final int height = 10;
+        
         /*
          * Adds the user interface panel to the user interface tab.
          */
@@ -182,9 +199,10 @@ public class ISGCISettingsDialog extends JDialog implements ActionListener,
         userInterface.setBorder(ui);
         c.anchor = GridBagConstraints.WEST;
         c.fill = GridBagConstraints.BOTH;
-        c.insets = new Insets(5, 5, 20, 5);
+        c.insets = new Insets(gap, gap, bigGap, gap);
         c.weightx = 1.0;
-        c.weighty = 0.85;
+        final double weighty = 0.85;
+        c.weighty = weighty;
         c.gridwidth = GridBagConstraints.REMAINDER;
         tabUserInterface.add(userInterface, c);
 
@@ -192,6 +210,8 @@ public class ISGCISettingsDialog extends JDialog implements ActionListener,
          * Adds a description and a slider to the user interface panel to set
          * the standard zoom level.
          */
+        final int majorSpacing = 10;
+        
         c.anchor = GridBagConstraints.WEST;
         c.fill = GridBagConstraints.BOTH;
         c.weightx = 1.0;
@@ -202,15 +222,15 @@ public class ISGCISettingsDialog extends JDialog implements ActionListener,
         c.fill = GridBagConstraints.NONE;
         c.weightx = 0.0;
         c.gridwidth = GridBagConstraints.REMAINDER;
-        zoomLevel = new JSlider(JSlider.HORIZONTAL, -20, 20, 0);
-        zoomLevel.setMajorTickSpacing(10);
+        zoomLevel = new JSlider(JSlider.HORIZONTAL, -bigGap, bigGap, 0);
+        zoomLevel.setMajorTickSpacing(majorSpacing);
         zoomLevel.setMinorTickSpacing(1);
         zoomLevel.setPaintTicks(true);
         userInterface.add(zoomLevel, c);
 
         /*
-         * Adds a description and a checkbox to the user interface panel to show
-         * or hide the toolbar.
+         * Adds a description and a checkbox to the user interface panel to 
+         * show or hide the toolbar.
          */
         c.fill = GridBagConstraints.BOTH;
         c.weightx = 0.0;
@@ -245,7 +265,7 @@ public class ISGCISettingsDialog extends JDialog implements ActionListener,
         } else if (tabPlacement == JTabbedPane.BOTTOM) {
             tabOrientation.setSelectedIndex(3);
         }
-        tabOrientation.setSize(30, 10);
+        tabOrientation.setSize(width, height);
         userInterface.add(tabOrientation, c);
 
         /*
@@ -263,7 +283,7 @@ public class ISGCISettingsDialog extends JDialog implements ActionListener,
         c.gridwidth = GridBagConstraints.REMAINDER;
         theme = new JComboBox(themes);
         theme.setSelectedIndex(0);
-        theme.setSize(30, 10);
+        theme.setSize(width, height);
         userInterface.add(theme, c);
 
         /*
@@ -281,9 +301,28 @@ public class ISGCISettingsDialog extends JDialog implements ActionListener,
         c.gridwidth = GridBagConstraints.REMAINDER;
         namingPreference = new JComboBox(naming);
         namingPreference.setSelectedIndex(0);
-        namingPreference.setSize(30, 10);
+        namingPreference.setSize(width, height);
         userInterface.add(namingPreference, c);
-
+        
+        return userInterface;
+    }
+    
+    
+    /**
+     * Creates a panel where the user can change colors.
+     * @return
+     *          Panel with colorchooser and list.
+     */
+    private JPanel createColorTab() {
+        JPanel graphColours = new JPanel(new GridBagLayout());
+        JPanel tabGraphColours = new JPanel(new GridBagLayout());
+        GridBagConstraints c = new GridBagConstraints();
+        
+        // CONSTANTS
+        final int gap = 5;
+        final int bigGap = 20;
+        final int hugeGap = 40;
+        
         /*
          * Adds the graph colours panel to the graph colours tab.
          */
@@ -291,7 +330,7 @@ public class ISGCISettingsDialog extends JDialog implements ActionListener,
         graphColours.setBorder(graph);
         c.anchor = GridBagConstraints.WEST;
         c.fill = GridBagConstraints.BOTH;
-        c.insets = new Insets(5, 5, 20, 5);
+        c.insets = new Insets(gap, gap, bigGap, gap);
         c.weightx = 1.0;
         c.weighty = 0.85;
         c.gridwidth = GridBagConstraints.REMAINDER;
@@ -309,7 +348,7 @@ public class ISGCISettingsDialog extends JDialog implements ActionListener,
         colourOptions.setSelectedIndex(1);
         graphColours.add(colourOptions, c);
         c.gridwidth = GridBagConstraints.REMAINDER;
-        c.insets = new Insets(10, 5, 10, 5);
+        c.insets = new Insets(bigGap, gap, bigGap, gap);
         graphColours.add(colours, c);
         c.anchor = GridBagConstraints.WEST;
         groupColours = new JCheckBox("Group problems");
@@ -320,85 +359,142 @@ public class ISGCISettingsDialog extends JDialog implements ActionListener,
         graphColours.add(groupColours, c);
 
         /*
-         * Adds a button to the graph colours tab to get back the default colour
-         * setting.
+         * Adds a button to the graph colours tab to get back the default 
+         * coloursetting.
          */
         c.anchor = GridBagConstraints.WEST;
         c.fill = GridBagConstraints.NONE;
         c.weightx = 0.0;
         c.weighty = 0.0;
-        c.insets = new Insets(0, 5, 10, 40);
+        c.insets = new Insets(0, gap, bigGap, hugeGap);
         c.gridwidth = 1;
         gcSetDefaultButton = new JButton("Default Colours");
         tabGraphColours.add(gcSetDefaultButton, c);
 
         /*
-         * Adds a button to the graph colours tab to get the colour blind colour
-         * setting.
+         * Adds a button to the graph colours tab to get the colour blind 
+         * colour setting.
          */
         c.anchor = GridBagConstraints.EAST;
-        c.insets = new Insets(0, 5, 10, 5);
+        c.insets = new Insets(0, gap, bigGap, gap);
         c.gridwidth = GridBagConstraints.RELATIVE;
         gcColorBlind = new JButton("Set scheme for color blind");
         tabGraphColours.add(gcColorBlind, c);
-
-        setDefaultCloseOperation(DISPOSE_ON_CLOSE);
-
-        /*
-         * Add action listeners to all components.
-         */
-        cancelButton.addActionListener(this);
-        okButton.addActionListener(this);
-        applyButton.addActionListener(this);
-        uiSetDefaultButton.addActionListener(this);
-        gcSetDefaultButton.addActionListener(this);
-        gcColorBlind.addActionListener(this);
-        groupColours.addActionListener(this);
-        tabOrientation.addActionListener(this);
-        theme.addActionListener(this);
-        toolbar.addActionListener(this);
-        colourOptions.addListSelectionListener(this);
-        colours.getSelectionModel().addChangeListener(this);
-        namingPreference.addActionListener(this);
-        zoomLevel.addChangeListener(this);
+        
+        return tabGraphColours;
     }
+    
+    /**
+     * Creates the basic layout with tabbedpane and apply etc buttons.
+     */
+    private void createLayout() {
+        setLayout(new BorderLayout());
+        add(options, BorderLayout.CENTER);
 
+        // bottomleft
+        // to make the button as small as the right buttons
+        JPanel bottomLeftPanel = new JPanel(new FlowLayout());
+
+        uiSetDefaultButton = new JButton("Default settings");
+        bottomLeftPanel.add(uiSetDefaultButton, BorderLayout.LINE_START);
+
+        // bottomright
+        JPanel bottomRightPanel = new JPanel(new FlowLayout());
+
+        // OK Button
+        JButton okButton = new JButton("Ok");
+        bottomRightPanel.add(okButton);
+
+        okButton.addActionListener(new ActionListener() {
+            
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                
+                // Saves all changes and close the dialogue.
+                if (applyButton.isEnabled()) {
+                    applyButton.doClick();
+                }
+                closeDialog();
+            }
+        });
+        
+        // Cancel button
+        JButton cancelButton = new JButton("Cancel");
+        bottomRightPanel.add(cancelButton);
+        
+        cancelButton.addActionListener(new ActionListener() {
+            
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                closeDialog();
+            }
+        });
+
+        // Apply button
+        applyButton = new JButton("Apply");
+        applyButton.setEnabled(false);
+        bottomRightPanel.add(applyButton);
+        
+        applyButton.addActionListener(new ActionListener() {
+            
+            @Override
+            public void actionPerformed(ActionEvent e) {
+
+                // Saves all changes.
+                applyButton.setEnabled(false);
+                if (setNamingPreferences) {
+                    UserSettings.setNamingPref(namepref);
+                }
+                if (setTabOrientation) {
+                    UserSettings.setTabPlacement(tabPlacement);
+                }
+                if (setTheme) {
+                    UserSettings.setTheme(javaTheme);
+                }
+                if (setZoom) {
+                    UserSettings.setZoomLevel(zoom);
+                }
+                if (setToolbar) {
+                    UserSettings.setToolbarSetting(toolbar.isSelected());
+                }
+                if (!colorscheme.isEmpty()) {
+                    UserSettings.setColorScheme(colorscheme);
+                    colorscheme.clear();
+                }
+            }
+        });
+
+        // merge bottom and add to general layout
+        JPanel bottomPanel = new JPanel(new BorderLayout());
+        bottomPanel.add(bottomLeftPanel, BorderLayout.LINE_START);
+        bottomPanel.add(bottomRightPanel, BorderLayout.LINE_END);
+        add(bottomPanel, BorderLayout.PAGE_END);
+    }
+    
     /**
      * Defines the action a button, combobox or checkbox executes when pressed.
      */
+    @Override
     public void actionPerformed(ActionEvent event) {
         Object source = event.getSource();
-        /*
-         * Discard all changes and close the dialogue.
-         */
-        if (source == cancelButton) {
-            closeDialog();
-        }
-        /*
-         * Saves all changes and close the dialogue.
-         */
-        else if (source == okButton) {
-            if (applyButton.isEnabled()) {
-                applyButton.doClick();
-            }
-            closeDialog();
-        }
-        /*
-         * Set all user interface options to default.
-         */
-        else if (source == uiSetDefaultButton) {
-            zoom = UserSettings.getDefaultZoomLevel();
-            zoomLevel.setValue(zoom);
-            tabOrientation.setSelectedIndex(0);
-            namingPreference.setSelectedIndex(0);
-            // group
-            theme.setSelectedIndex(0);
-            toolbar.setSelected(true);
-        }
+
+                /*
+                 * Set all user interface options to default.
+                 */
+                if (source == uiSetDefaultButton) {
+                    zoom = UserSettings.getDefaultZoomLevel();
+                    zoomLevel.setValue(zoom);
+                    tabOrientation.setSelectedIndex(0);
+                    namingPreference.setSelectedIndex(0);
+                    // group
+                    theme.setSelectedIndex(0);
+                    toolbar.setSelected(true);
+                }
+
         /*
          * Set colour blind colour scheme.
          */
-        else if (source == gcColorBlind) {
+        if (source == gcColorBlind) {
             colorscheme = UserSettings.getDefaultColorBlindColorScheme();
             for (Complexity complexity : colorscheme.keySet()) {
                 if (complexity == Complexity.UNKNOWN) {
@@ -424,31 +520,6 @@ public class ISGCISettingsDialog extends JDialog implements ActionListener,
             int i = colourOptions.getSelectedIndex();
             colourOptions.clearSelection();
             colourOptions.setSelectedIndex(i);
-        }
-        /*
-         * Saves all changes.
-         */
-        else if (source == applyButton) {
-            applyButton.setEnabled(false);
-            if (setNamingPreferences) {
-                UserSettings.setNamingPref(namepref);
-            }
-            if (setTabOrientation) {
-                UserSettings.setTabPlacement(tabPlacement);
-            }
-            if (setTheme) {
-                UserSettings.setTheme(javaTheme);
-            }
-            if (setZoom) {
-                UserSettings.setZoomLevel(zoom);
-            }
-            if (setToolbar) {
-                UserSettings.setToolbarSetting(toolbar.isSelected());
-            }
-            if (!colorscheme.isEmpty()) {
-                UserSettings.setColorScheme(colorscheme);
-                colorscheme.clear();
-            }
         }
         /*
          * Set default colour scheme.
@@ -515,13 +586,7 @@ public class ISGCISettingsDialog extends JDialog implements ActionListener,
                             .getCrossPlatformLookAndFeelClassName();
                     UIManager.setLookAndFeel(UIManager
                             .getCrossPlatformLookAndFeelClassName());
-                } catch (ClassNotFoundException e) {
-                    e.printStackTrace();
-                } catch (InstantiationException e) {
-                    e.printStackTrace();
-                } catch (IllegalAccessException e) {
-                    e.printStackTrace();
-                } catch (UnsupportedLookAndFeelException e) {
+                } catch (Exception e) {
                     e.printStackTrace();
                 }
                 SwingUtilities.updateComponentTreeUI(this);
@@ -533,34 +598,24 @@ public class ISGCISettingsDialog extends JDialog implements ActionListener,
                         try {
                             javaTheme = info.getName();
                             UIManager.setLookAndFeel(info.getClassName());
-                        } catch (ClassNotFoundException e) {
-                            e.printStackTrace();
-                        } catch (InstantiationException e) {
-                            e.printStackTrace();
-                        } catch (IllegalAccessException e) {
-                            e.printStackTrace();
-                        } catch (UnsupportedLookAndFeelException e) {
+                        } catch (Exception e) {
                             e.printStackTrace();
                         }
+                        
                         break;
                     }
                 }
                 SwingUtilities.updateComponentTreeUI(this);
-                this.pack();
+                pack();
             } else if (i == 2) {
                 try {
                     javaTheme = UIManager.getSystemLookAndFeelClassName();
                     UIManager.setLookAndFeel(UIManager
                             .getSystemLookAndFeelClassName());
-                } catch (ClassNotFoundException e) {
+                } catch (Exception e) {
                     e.printStackTrace();
-                } catch (InstantiationException e) {
-                    e.printStackTrace();
-                } catch (IllegalAccessException e) {
-                    e.printStackTrace();
-                } catch (UnsupportedLookAndFeelException e) {
-                    e.printStackTrace();
-                }
+                } 
+                
                 SwingUtilities.updateComponentTreeUI(this);
                 this.pack();
             }
@@ -618,6 +673,7 @@ public class ISGCISettingsDialog extends JDialog implements ActionListener,
      * Changes the colour chooser to the colour of the corresponding selection
      * choosen in the list.
      */
+    @Override
     public void valueChanged(ListSelectionEvent event) {
         int i = colourOptions.getSelectedIndex();
         if (i == 0) {
@@ -649,6 +705,7 @@ public class ISGCISettingsDialog extends JDialog implements ActionListener,
      * Defines the action the colour chooser and slider does when a new colour
      * is choosen or the slider is moved.
      */
+    @Override
     public void stateChanged(ChangeEvent event) {
         Object source = event.getSource();
         if (source == colours) {
@@ -759,6 +816,5 @@ public class ISGCISettingsDialog extends JDialog implements ActionListener,
             }
         }
     }
-
 }
 /* EOF */
