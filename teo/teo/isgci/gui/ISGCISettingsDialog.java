@@ -393,6 +393,7 @@ public class ISGCISettingsDialog extends JDialog {
                     nameToColor.put(name, newColor);
                 }
 
+                enableApplyButton();
             }
         });
         
@@ -602,7 +603,7 @@ public class ISGCISettingsDialog extends JDialog {
         UserSettings.setCurrentFontColor(
                 nameToColor.get("Background"));
         
-        // build a new colorscheme
+        // build a new colorscheme and set colors
         HashMap<Complexity, Color> colorScheme 
             = new HashMap<Complexity, Color>();
         
@@ -611,6 +612,7 @@ public class ISGCISettingsDialog extends JDialog {
             
             // Can be null because of font or background
             if (c != null) {
+                UserSettings.setColor(c, nameToColor.get(name));
                 colorScheme.put(c, nameToColor.get(name));
             }
         }
