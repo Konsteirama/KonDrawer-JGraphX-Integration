@@ -12,7 +12,6 @@ package teo.isgci.gui;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
-import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
@@ -20,7 +19,6 @@ import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.HashMap;
-import java.util.Vector;
 
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
@@ -57,13 +55,12 @@ public class ISGCISettingsDialog extends JDialog {
     private JList colorList;
     
     /** TODO marc JAVADOCS. */
-    private JComboBox tabOrientation, themeSelector, 
-                      namingPreference;
+    private JComboBox tabOrientation, themeSelector, namingPreference;
     
-    /** TODO marc JAVADOCS. */
+    /** Maps a name to a java look and feel theme. */
     private HashMap<String, String> nameToTheme;
     
-    /** TODO . */
+    /** Maps a name to a specific color, includes all complexities. */
     private HashMap<String, Color> nameToColor;
    
     /** TODO marc JAVADOCS. */
@@ -72,10 +69,6 @@ public class ISGCISettingsDialog extends JDialog {
     /** TODO marc JAVADOCS. */
     private JSlider zoomSlider;
     
-    /** TODO marc JAVADOCS. */
-//    private HashMap<Complexity, Color> colorscheme 
-//        = new HashMap<Complexity, Color>();
-
     /**
      * This field should change every time the class is changed - once it is
      * actually deployed.
@@ -393,7 +386,7 @@ public class ISGCISettingsDialog extends JDialog {
             @Override
             public void stateChanged(ChangeEvent e) {
                 Color newColor = colorChooser.getColor();
-                int s = colorList.getSelectedIndex();
+
                 String name = (String) colorList.getSelectedValue();
                 
                 if (newColor != nameToColor.get(name)) {
@@ -535,7 +528,7 @@ public class ISGCISettingsDialog extends JDialog {
                 
                 // Saves all changes and close the dialogue.
                 if (applyButton.isEnabled()) {
-                    applyButton.doClick();
+                    applySettings();
                 }
                 closeDialog();
             }
@@ -562,45 +555,7 @@ public class ISGCISettingsDialog extends JDialog {
             
             @Override
             public void actionPerformed(ActionEvent e) {
-
-                // Retrieve java theme
-                String javaTheme = "";
-                
-                Object themeName = themeSelector.getSelectedItem();
-                if (nameToTheme.containsKey(themeName)) {
-                    javaTheme = nameToTheme.get(themeName);
-                }
-                
-                // Saves all changes.
-                applyButton.setEnabled(false);
-                UserSettings.setNamingPref(
-                        (Algo.NamePref) namingPreference.getSelectedItem());
-                UserSettings.setTabPlacement(
-                        tabOrientation.getSelectedIndex() + 1);
-                UserSettings.setTheme(javaTheme);
-                UserSettings.setZoomLevel((int) zoomSlider.getValue());
-                UserSettings.setToolbarSetting(toolbarCheck.isSelected());
-                
-                // set font and background color separately because they're
-                // not enums
-                UserSettings.setCurrentFontColor(nameToColor.get("Font"));
-                UserSettings.setCurrentFontColor(
-                        nameToColor.get("Background"));
-                
-                // build a new colorscheme
-                HashMap<Complexity, Color> colorScheme 
-                    = new HashMap<Complexity, Color>();
-                
-                for (String name : nameToColor.keySet()) {
-                    Complexity c = Complexity.getComplexity(name);
-                    
-                    // Can be null because of font or background
-                    if (c != null) {
-                        colorScheme.put(c, nameToColor.get(name));
-                    }
-                }
-                
-                UserSettings.setColorScheme(colorScheme);
+                applySettings();
             }
         });
 
@@ -616,6 +571,51 @@ public class ISGCISettingsDialog extends JDialog {
      */
     private void enableApplyButton() {
         applyButton.setEnabled(true);
+    }
+    
+    /**
+     * Writes all settings the UserSettings.
+     */
+    private void applySettings() {
+
+        // Retrieve java theme
+        String javaTheme = "";
+        
+        Object themeName = themeSelector.getSelectedItem();
+        if (nameToTheme.containsKey(themeName)) {
+            javaTheme = nameToTheme.get(themeName);
+        }
+        
+        // Saves all changes.
+        applyButton.setEnabled(false);
+        UserSettings.setNamingPref(
+                (Algo.NamePref) namingPreference.getSelectedItem());
+        UserSettings.setTabPlacement(
+                tabOrientation.getSelectedIndex() + 1);
+        UserSettings.setTheme(javaTheme);
+        UserSettings.setZoomLevel((int) zoomSlider.getValue());
+        UserSettings.setToolbarSetting(toolbarCheck.isSelected());
+        
+        // set font and background color separately because they're
+        // not enums
+        UserSettings.setCurrentFontColor(nameToColor.get("Font"));
+        UserSettings.setCurrentFontColor(
+                nameToColor.get("Background"));
+        
+        // build a new colorscheme
+        HashMap<Complexity, Color> colorScheme 
+            = new HashMap<Complexity, Color>();
+        
+        for (String name : nameToColor.keySet()) {
+            Complexity c = Complexity.getComplexity(name);
+            
+            // Can be null because of font or background
+            if (c != null) {
+                colorScheme.put(c, nameToColor.get(name));
+            }
+        }
+        
+        UserSettings.setColorScheme(colorScheme);
     }
     
     /**
