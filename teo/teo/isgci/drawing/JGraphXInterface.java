@@ -374,7 +374,7 @@ class JGraphXInterface<V, E> implements DrawingLibraryInterface<V, E> {
      */
     @Override
     public final String[] getAvailableExportFormats() {
-        return new String[]{"ps", "svg", "graphml", "jpg", "png"};
+        return new String[]{"eps", "svg", "graphml", "jpg", "png"};
     }
 
     @Override
