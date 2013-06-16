@@ -60,7 +60,7 @@ public abstract class UserSettings {
     /**
      * The zoomlevel for the graphs, that are drawn in new tabs.
      */
-    private static double zoomLevel = getDefaultZoomLevel();
+    private static int zoomLevel = getDefaultZoomLevel();
 
     // Getter / Setter
     // ------------------------------------------------
@@ -148,8 +148,8 @@ public abstract class UserSettings {
      * 
      * @return
      */
-    public static double getDefaultZoomLevel() {
-        return 0.0;
+    public static int getDefaultZoomLevel() {
+        return 0;
     }
 
     /**
@@ -157,7 +157,7 @@ public abstract class UserSettings {
      * 
      * @return
      */
-    public static double getCurrentZoomLevel() {
+    public static int getCurrentZoomLevel() {
         return zoomLevel;
     }
 
@@ -166,7 +166,7 @@ public abstract class UserSettings {
      * 
      * @param newZoomLevel
      */
-    public static void setZoomLevel(double newZoomLevel) {
+    public static void setZoomLevel(int newZoomLevel) {
         zoomLevel = newZoomLevel;
     }
 
