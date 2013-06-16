@@ -151,8 +151,6 @@ public class ISGCITabbedPane extends JTabbedPane implements Updatable {
      * On right-click it opens a popup window if the clicked object is a node
      * or a edge.
      */
-    
-    
     private MouseAdapter mouseAdapter = new MouseAdapter() {        
         public void mouseClicked(MouseEvent e) {  
             
@@ -342,6 +340,9 @@ public class ISGCITabbedPane extends JTabbedPane implements Updatable {
      */
     public void setNamingPref(NamePref pref) {
         this.defaultMode = pref;
+        for (Component tab : panelToNamingPref.keySet()) {
+            setNamingPref(pref, tab);
+        }
     }
     
     /**
