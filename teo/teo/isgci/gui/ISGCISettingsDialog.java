@@ -48,23 +48,16 @@ import teo.isgci.util.UserSettings;
  * A dialog where the user can change various settings.
  * 
  */
-public class ISGCISettingsDialog extends JDialog implements ActionListener,
-        ListSelectionListener, ChangeListener {
+public class ISGCISettingsDialog extends JDialog {
 
     /** TODO marc JAVADOCS. */
-    private JTabbedPane options;
+    private JTabbedPane tabContainer;
     
     /** TODO marc JAVADOCS. */
-    private JButton applyButton, uiSetDefaultButton;
+    private JButton applyButton;
     
     /** TODO marc JAVADOCS. */
-    private JButton gcSetDefaultButton, gcColorBlind;
-    
-    /** TODO marc JAVADOCS. */
-    private JList colourOptions;
-    
-    /** TODO marc JAVADOCS. */
-    private JColorChooser colours;
+    private JList colorOptionsList;
     
     /** TODO marc JAVADOCS. */
     private JComboBox tabOrientation, theme, namingPreference; // nachschlagen
@@ -77,8 +70,8 @@ public class ISGCISettingsDialog extends JDialog implements ActionListener,
             "Platform standard" };
     
     /** TODO marc JAVADOCS. */
-    private String[] problemes = new String[] { "font colour",
-            "backgroundcolour", "unkown complexity",
+    private String[] problemes = new String[] { "font color",
+            "backgroundcolor", "unkown complexity",
             "GraphIsomorphism-complete", "NP-complete", "lineartime solvable",
             "P", "open classes", "CONPC", "NPH", "keine" };
     
@@ -86,7 +79,7 @@ public class ISGCISettingsDialog extends JDialog implements ActionListener,
     private String[] naming = new String[] { "Basic", "Forbidden", "Derived" };
     
     /** TODO marc JAVADOCS. */
-    private JCheckBox toolbar, groupColours;
+    private JCheckBox toolbar, groupcolors;
     
     /** TODO marc JAVADOCS. */
     private JSlider zoomLevel;
@@ -100,7 +93,7 @@ public class ISGCISettingsDialog extends JDialog implements ActionListener,
         = new HashMap<Complexity, Color>();
     
     /** TODO marc JAVADOCS. */
-    private Boolean group, tb;
+    private Boolean group;
     
     /** TODO marc JAVADOCS. */
     private int zoom;
@@ -134,7 +127,7 @@ public class ISGCISettingsDialog extends JDialog implements ActionListener,
 
         // group
         zoom = UserSettings.getCurrentZoomLevel();
-        options = new JTabbedPane(UserSettings.getCurrentTabPlacement());
+        tabContainer = new JTabbedPane(UserSettings.getCurrentTabPlacement());
         tabPlacement = UserSettings.getCurrentTabPlacement();
         unknown = UserSettings.getColor(Complexity.UNKNOWN);
         gic = UserSettings.getColor(Complexity.GIC);
@@ -146,32 +139,15 @@ public class ISGCISettingsDialog extends JDialog implements ActionListener,
         nph = UserSettings.getColor(Complexity.NPH);
         empty = UserSettings.getColor(null);
 
-        colours = new JColorChooser();
-
         createLayout();
 
         /*
          * Creates the tabs and the integrated panels.
          */
-        options.addTab("User Interface", createUserInterfaceTab());
-        options.addTab("Graph Colours", createColorTab());
+        tabContainer.addTab("User Interface", createUserInterfaceTab());
+        tabContainer.addTab("Graph colors", createColorTab());
 
         setDefaultCloseOperation(DISPOSE_ON_CLOSE);
-
-        /*
-         * Add action listeners to all components.
-         */
-        uiSetDefaultButton.addActionListener(this);
-        gcSetDefaultButton.addActionListener(this);
-        gcColorBlind.addActionListener(this);
-        groupColours.addActionListener(this);
-        tabOrientation.addActionListener(this);
-        theme.addActionListener(this);
-        toolbar.addActionListener(this);
-        colourOptions.addListSelectionListener(this);
-        colours.getSelectionModel().addChangeListener(this);
-        namingPreference.addActionListener(this);
-        zoomLevel.addChangeListener(this);
     }
 
     /**
@@ -228,6 +204,19 @@ public class ISGCISettingsDialog extends JDialog implements ActionListener,
         zoomLevel.setPaintTicks(true);
         userInterface.add(zoomLevel, c);
 
+        zoomLevel.addChangeListener(new ChangeListener() {
+            
+            @Override
+            public void stateChanged(ChangeEvent e) {
+                
+                if (!zoomLevel.getValueIsAdjusting()) {
+                    int zoomlvl = (int) zoomLevel.getValue();
+                    zoom = zoomlvl;
+                    enableApplyButton();
+                }
+            }
+        });
+        
         /*
          * Adds a description and a checkbox to the user interface panel to 
          * show or hide the toolbar.
@@ -238,11 +227,25 @@ public class ISGCISettingsDialog extends JDialog implements ActionListener,
         label = new JLabel("Display Toolbar", JLabel.LEFT);
         gridbag.setConstraints(label, c);
         userInterface.add(label);
+        
         toolbar = new JCheckBox();
         toolbar.setSelected(true);
         c.weightx = 0.0;
         c.gridwidth = GridBagConstraints.REMAINDER;
         userInterface.add(toolbar, c);
+        
+        toolbar.addActionListener(new ActionListener() {
+            
+            /*
+             * Enables or disables the toolbar 
+             */
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                toolbar.setSelected(toolbar.isSelected());
+                setToolbar = (!setToolbar);
+                enableApplyButton();
+            }
+        });
 
         /*
          * Adds a description and a combobox to the user interface panel to
@@ -267,6 +270,30 @@ public class ISGCISettingsDialog extends JDialog implements ActionListener,
         }
         tabOrientation.setSize(width, height);
         userInterface.add(tabOrientation, c);
+        
+        tabOrientation.addActionListener(new ActionListener() {
+            
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                int x = tabOrientation.getSelectedIndex();
+                if (x == 0) {
+                    tabPlacement = JTabbedPane.TOP;
+                    tabContainer.setTabPlacement(JTabbedPane.TOP);
+                } else if (x == 1) {
+                    tabPlacement = JTabbedPane.RIGHT;
+                    tabContainer.setTabPlacement(JTabbedPane.RIGHT);
+                } else if (x == 2) {
+                    tabPlacement = JTabbedPane.LEFT;
+                    tabContainer.setTabPlacement(JTabbedPane.LEFT);
+                } else if (x == 3) {
+                    tabPlacement = JTabbedPane.BOTTOM;
+                    tabContainer.setTabPlacement(JTabbedPane.BOTTOM);
+                }
+                setTabOrientation = true;
+                enableApplyButton();
+                
+            }
+        });
 
         /*
          * Adds a description and a combobox to the user interface panel to
@@ -285,6 +312,59 @@ public class ISGCISettingsDialog extends JDialog implements ActionListener,
         theme.setSelectedIndex(0);
         theme.setSize(width, height);
         userInterface.add(theme, c);
+        
+        // needed for reference in actionlistener
+        final ISGCISettingsDialog dialog = this;
+        
+        theme.addActionListener(new ActionListener() {
+            
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                int i = theme.getSelectedIndex();
+                if (i == 0) {
+                    try {
+                        javaTheme = UIManager
+                                .getCrossPlatformLookAndFeelClassName();
+                        UIManager.setLookAndFeel(UIManager
+                                .getCrossPlatformLookAndFeelClassName());
+                    } catch (Exception ex) {
+                        ex.printStackTrace();
+                    }
+                    SwingUtilities.updateComponentTreeUI(dialog);
+                    pack();
+                } else if (i == 1) {
+                    for (LookAndFeelInfo info : UIManager
+                            .getInstalledLookAndFeels()) {
+                        if ("Nimbus".equals(info.getName())) {
+                            try {
+                                javaTheme = info.getName();
+                                UIManager.setLookAndFeel(info.getClassName());
+                            } catch (Exception ex) {
+                                ex.printStackTrace();
+                            }
+                            
+                            break;
+                        }
+                    }
+                    SwingUtilities.updateComponentTreeUI(dialog);
+                    pack();
+                } else if (i == 2) {
+                    try {
+                        javaTheme = UIManager.getSystemLookAndFeelClassName();
+                        UIManager.setLookAndFeel(UIManager
+                                .getSystemLookAndFeelClassName());
+                    } catch (Exception ex) {
+                        ex.printStackTrace();
+                    } 
+                    
+                    SwingUtilities.updateComponentTreeUI(dialog);
+                    pack();
+                }
+                setTheme = true;
+                enableApplyButton();
+                
+            }
+        });
 
         /*
          * Adds a description and a combobox to the user interface panel to
@@ -304,6 +384,27 @@ public class ISGCISettingsDialog extends JDialog implements ActionListener,
         namingPreference.setSize(width, height);
         userInterface.add(namingPreference, c);
         
+        namingPreference.addActionListener(new ActionListener() {
+            
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                int i = namingPreference.getSelectedIndex();
+                if (i == 0) {
+                    namepref = Algo.NamePref.BASIC;
+                } else if (i == 1) {
+                    namepref = Algo.NamePref.FORBIDDEN;
+                } else if (i == 2) {
+                    namepref = Algo.NamePref.DERIVED;
+                }
+                if (namepref != UserSettings.getNamingPref()) {
+                    setNamingPreferences = true;
+                    
+                    enableApplyButton();
+                }
+            }
+        });
+        
+        
         return userInterface;
     }
     
@@ -314,8 +415,8 @@ public class ISGCISettingsDialog extends JDialog implements ActionListener,
      *          Panel with colorchooser and list.
      */
     private JPanel createColorTab() {
-        JPanel graphColours = new JPanel(new GridBagLayout());
-        JPanel tabGraphColours = new JPanel(new GridBagLayout());
+        JPanel graphcolors = new JPanel(new GridBagLayout());
+        JPanel tabGraphcolors = new JPanel(new GridBagLayout());
         GridBagConstraints c = new GridBagConstraints();
         
         // CONSTANTS
@@ -324,43 +425,192 @@ public class ISGCISettingsDialog extends JDialog implements ActionListener,
         final int hugeGap = 40;
         
         /*
-         * Adds the graph colours panel to the graph colours tab.
+         * Adds the graph colors panel to the graph colors tab.
          */
         Border graph = new BevelBorder(BevelBorder.RAISED);
-        graphColours.setBorder(graph);
+        graphcolors.setBorder(graph);
         c.anchor = GridBagConstraints.WEST;
         c.fill = GridBagConstraints.BOTH;
         c.insets = new Insets(gap, gap, bigGap, gap);
         c.weightx = 1.0;
         c.weighty = 0.85;
         c.gridwidth = GridBagConstraints.REMAINDER;
-        tabGraphColours.add(graphColours, c);
+        tabGraphcolors.add(graphcolors, c);
 
         /*
-         * Adds a list, a colour chooser and a checkbox to the graph colours
+         * Adds a list, a color chooser and a checkbox to the graph colors
          * panel. The list holds the different problems, for which the user can
-         * colour the graph. With the colour chooser the user can set colours
+         * color the graph. With the color chooser the user can set colors
          * for the options in the list. If the checkbox is activated, the
-         * default grouping of problem colours is set.
+         * default grouping of problem colors is set.
          */
+        
+        final JColorChooser colorChooser = new JColorChooser();
         c.gridwidth = GridBagConstraints.RELATIVE;
-        colourOptions = new JList(problemes);
-        colourOptions.setSelectedIndex(1);
-        graphColours.add(colourOptions, c);
+        colorOptionsList = new JList(problemes);
+        colorOptionsList.setSelectedIndex(1);
+        graphcolors.add(colorOptionsList, c);
         c.gridwidth = GridBagConstraints.REMAINDER;
         c.insets = new Insets(bigGap, gap, bigGap, gap);
-        graphColours.add(colours, c);
+        graphcolors.add(colorChooser, c);
         c.anchor = GridBagConstraints.WEST;
-        groupColours = new JCheckBox("Group problems");
-        groupColours.setSelected(true);
+        groupcolors = new JCheckBox("Group problems");
+        groupcolors.setSelected(true);
         c.weightx = 0.0;
         c.weighty = 0.0;
         c.gridwidth = GridBagConstraints.REMAINDER;
-        graphColours.add(groupColours, c);
+        graphcolors.add(groupcolors, c);
+
+        colorChooser.getSelectionModel().addChangeListener(
+                new ChangeListener() {
+
+            @Override
+            public void stateChanged(ChangeEvent e) {
+                Color newColor = colorChooser.getColor();
+                int s = colorOptionsList.getSelectedIndex();
+                if (s == 0) {
+                    if (newColor != text) {
+                        text = newColor;
+                        enableApplyButton();
+                    }
+                } else if (s == 1) {
+                    if (newColor != background) {
+                        background = newColor;
+                        enableApplyButton();
+                    }
+                } else if (s == 2) {
+                    if (newColor != unknown) {
+                        unknown = newColor;
+                        colorscheme.remove(unknown);
+                        colorscheme.put(Complexity.UNKNOWN, unknown);
+                        enableApplyButton();
+                    }
+                    if (group) {
+                        empty = newColor;
+                        open = newColor;
+                    }
+                } else if (s == 3) {
+                    if (newColor != gic) {
+                        gic = newColor;
+                        colorscheme.remove(gic);
+                        colorscheme.put(Complexity.GIC, gic);
+                        enableApplyButton();
+                    }
+                } else if (s == 4) {
+                    if (newColor != npc) {
+                        npc = newColor;
+                        colorscheme.remove(npc);
+                        colorscheme.put(Complexity.NPC, npc);
+                        enableApplyButton();
+                    }
+                    if (group) {
+                        nph = newColor;
+                        conpc = newColor;
+                    }
+                } else if (s == 5) {
+                    if (newColor != linear) {
+                        linear = newColor;
+                        colorscheme.remove(linear);
+                        colorscheme.put(Complexity.LINEAR, linear);
+                        enableApplyButton();
+                    }
+                } else if (s == 6) {
+                    if (newColor != p) {
+                        p = newColor;
+                        colorscheme.remove(p);
+                        colorscheme.put(Complexity.P, p);
+                        enableApplyButton();
+                    }
+                } else if (s == 7) {
+                    if (newColor != open) {
+                        open = newColor;
+                        colorscheme.remove(open);
+                        colorscheme.put(Complexity.OPEN, open);
+                        enableApplyButton();
+                    }
+                    if (group) {
+                        unknown = newColor;
+                        empty = newColor;
+                    }
+                } else if (s == 8) {
+                    if (newColor != conpc) {
+                        conpc = newColor;
+                        colorscheme.remove(conpc);
+                        colorscheme.put(Complexity.CONPC, conpc);
+                        enableApplyButton();
+                    }
+                    if (group) {
+                        nph = newColor;
+                        npc = newColor;
+                    }
+                } else if (s == 9) {
+                    if (newColor != nph) {
+                        nph = newColor;
+                        colorscheme.remove(nph);
+                        colorscheme.put(Complexity.NPH, nph);
+                        enableApplyButton();
+                    }
+                    if (group) {
+                        npc = newColor;
+                        conpc = newColor;
+                    }
+                } else if (s == 10) {
+                    if (newColor != empty) {
+                        empty = newColor;
+                        colorscheme.remove(empty);
+                        colorscheme.put(null, empty);
+                        enableApplyButton();
+                    }
+                    if (group) {
+                        unknown = newColor;
+                        open = newColor;
+                    }
+                }
+
+            }
+        });
+        
+        colorOptionsList
+                .addListSelectionListener(new ListSelectionListener() {
+
+                    /*
+                     * Changes the color chooser to the color of the
+                     * corresponding selection choosen in the list.
+                     */
+                    
+                    @Override
+                    public void valueChanged(ListSelectionEvent e) {
+                        int i = colorOptionsList.getSelectedIndex();
+                        if (i == 0) {
+                            colorChooser.setColor(text);
+                        } else if (i == 1) {
+                            colorChooser.setColor(background);
+                        } else if (i == 2) {
+                            colorChooser.setColor(unknown);
+                        } else if (i == 3) {
+                            colorChooser.setColor(gic);
+                        } else if (i == 4) {
+                            colorChooser.setColor(npc);
+                        } else if (i == 5) {
+                            colorChooser.setColor(linear);
+                        } else if (i == 6) {
+                            colorChooser.setColor(p);
+                        } else if (i == 7) {
+                            colorChooser.setColor(open);
+                        } else if (i == 8) {
+                            colorChooser.setColor(conpc);
+                        } else if (i == 9) {
+                            colorChooser.setColor(nph);
+                        } else if (i == 10) {
+                            colorChooser.setColor(empty);
+                        }
+
+                    }
+                });
 
         /*
-         * Adds a button to the graph colours tab to get back the default 
-         * coloursetting.
+         * Adds a button to the graph colors tab to get back the default 
+         * colorsetting.
          */
         c.anchor = GridBagConstraints.WEST;
         c.fill = GridBagConstraints.NONE;
@@ -368,20 +618,91 @@ public class ISGCISettingsDialog extends JDialog implements ActionListener,
         c.weighty = 0.0;
         c.insets = new Insets(0, gap, bigGap, hugeGap);
         c.gridwidth = 1;
-        gcSetDefaultButton = new JButton("Default Colours");
-        tabGraphColours.add(gcSetDefaultButton, c);
+        JButton gcSetDefaultButton = new JButton("Default colors");
+        tabGraphcolors.add(gcSetDefaultButton, c);
+        
+        gcSetDefaultButton.addActionListener(new ActionListener() {
+            
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                /*
+                 * Set default color scheme.
+                 */
+                colorscheme = UserSettings.getDefaultColorScheme();
+                for (Complexity complexity : colorscheme.keySet()) {
+                    if (complexity == Complexity.UNKNOWN) {
+                        unknown = colorscheme.get(complexity);
+                    } else if (complexity == Complexity.CONPC) {
+                        conpc = colorscheme.get(complexity);
+                    } else if (complexity == Complexity.NPC) {
+                        npc = colorscheme.get(complexity);
+                    } else if (complexity == Complexity.NPH) {
+                        nph = colorscheme.get(complexity);
+                    } else if (complexity == null) {
+                        empty = colorscheme.get(complexity);
+                    } else if (complexity == Complexity.P) {
+                        p = colorscheme.get(complexity);
+                    } else if (complexity == Complexity.GIC) {
+                        gic = colorscheme.get(complexity);
+                    } else if (complexity == Complexity.LINEAR) {
+                        linear = colorscheme.get(complexity);
+                    } else if (complexity == Complexity.OPEN) {
+                        open = colorscheme.get(complexity);
+                    }
+                }
+                groupcolors.setSelected(true);
+                int i = colorOptionsList.getSelectedIndex();
+                colorOptionsList.clearSelection();
+                colorOptionsList.setSelectedIndex(i);
+
+            }
+        });
 
         /*
-         * Adds a button to the graph colours tab to get the colour blind 
-         * colour setting.
+         * Adds a button to the graph colors tab to get the color blind 
+         * color setting.
          */
         c.anchor = GridBagConstraints.EAST;
         c.insets = new Insets(0, gap, bigGap, gap);
         c.gridwidth = GridBagConstraints.RELATIVE;
-        gcColorBlind = new JButton("Set scheme for color blind");
-        tabGraphColours.add(gcColorBlind, c);
+        JButton gcColorBlind = new JButton("Set scheme for color blind");
+        tabGraphcolors.add(gcColorBlind, c);
         
-        return tabGraphColours;
+        gcColorBlind.addActionListener(new ActionListener() {
+            
+            //Set color blind color scheme.
+            
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                colorscheme = UserSettings.getDefaultColorBlindColorScheme();
+                for (Complexity complexity : colorscheme.keySet()) {
+                    if (complexity == Complexity.UNKNOWN) {
+                        unknown = colorscheme.get(complexity);
+                    } else if (complexity == Complexity.CONPC) {
+                        conpc = colorscheme.get(complexity);
+                    } else if (complexity == Complexity.NPC) {
+                        npc = colorscheme.get(complexity);
+                    } else if (complexity == Complexity.NPH) {
+                        nph = colorscheme.get(complexity);
+                    } else if (complexity == null) {
+                        empty = colorscheme.get(complexity);
+                    } else if (complexity == Complexity.P) {
+                        p = colorscheme.get(complexity);
+                    } else if (complexity == Complexity.GIC) {
+                        gic = colorscheme.get(complexity);
+                    } else if (complexity == Complexity.LINEAR) {
+                        linear = colorscheme.get(complexity);
+                    } else if (complexity == Complexity.OPEN) {
+                        open = colorscheme.get(complexity);
+                    }
+                }
+                int i = colorOptionsList.getSelectedIndex();
+                colorOptionsList.clearSelection();
+                colorOptionsList.setSelectedIndex(i);
+            }
+        });
+        
+        return tabGraphcolors;
     }
     
     /**
@@ -389,14 +710,31 @@ public class ISGCISettingsDialog extends JDialog implements ActionListener,
      */
     private void createLayout() {
         setLayout(new BorderLayout());
-        add(options, BorderLayout.CENTER);
+        add(tabContainer, BorderLayout.CENTER);
 
         // bottomleft
         // to make the button as small as the right buttons
         JPanel bottomLeftPanel = new JPanel(new FlowLayout());
 
-        uiSetDefaultButton = new JButton("Default settings");
+        JButton uiSetDefaultButton = new JButton("Default settings");
         bottomLeftPanel.add(uiSetDefaultButton, BorderLayout.LINE_START);
+        
+        uiSetDefaultButton.addActionListener(new ActionListener() {
+
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                
+                //Set all user interface options to default.
+                zoom = UserSettings.getDefaultZoomLevel();
+                zoomLevel.setValue(zoom);
+                tabOrientation.setSelectedIndex(0);
+                namingPreference.setSelectedIndex(0);
+                // group
+                theme.setSelectedIndex(0);
+                toolbar.setSelected(true);
+            }
+        });
+        
 
         // bottomright
         JPanel bottomRightPanel = new JPanel(new FlowLayout());
@@ -472,195 +810,12 @@ public class ISGCISettingsDialog extends JDialog implements ActionListener,
     }
     
     /**
-     * Defines the action a button, combobox or checkbox executes when pressed.
+     * Enables the apply button.
      */
-    @Override
-    public void actionPerformed(ActionEvent event) {
-        Object source = event.getSource();
-
-                /*
-                 * Set all user interface options to default.
-                 */
-                if (source == uiSetDefaultButton) {
-                    zoom = UserSettings.getDefaultZoomLevel();
-                    zoomLevel.setValue(zoom);
-                    tabOrientation.setSelectedIndex(0);
-                    namingPreference.setSelectedIndex(0);
-                    // group
-                    theme.setSelectedIndex(0);
-                    toolbar.setSelected(true);
-                }
-
-        /*
-         * Set colour blind colour scheme.
-         */
-        if (source == gcColorBlind) {
-            colorscheme = UserSettings.getDefaultColorBlindColorScheme();
-            for (Complexity complexity : colorscheme.keySet()) {
-                if (complexity == Complexity.UNKNOWN) {
-                    unknown = colorscheme.get(complexity);
-                } else if (complexity == Complexity.CONPC) {
-                    conpc = colorscheme.get(complexity);
-                } else if (complexity == Complexity.NPC) {
-                    npc = colorscheme.get(complexity);
-                } else if (complexity == Complexity.NPH) {
-                    nph = colorscheme.get(complexity);
-                } else if (complexity == null) {
-                    empty = colorscheme.get(complexity);
-                } else if (complexity == Complexity.P) {
-                    p = colorscheme.get(complexity);
-                } else if (complexity == Complexity.GIC) {
-                    gic = colorscheme.get(complexity);
-                } else if (complexity == Complexity.LINEAR) {
-                    linear = colorscheme.get(complexity);
-                } else if (complexity == Complexity.OPEN) {
-                    open = colorscheme.get(complexity);
-                }
-            }
-            int i = colourOptions.getSelectedIndex();
-            colourOptions.clearSelection();
-            colourOptions.setSelectedIndex(i);
-        }
-        /*
-         * Set default colour scheme.
-         */
-        else if (source == gcSetDefaultButton) {
-            colorscheme = UserSettings.getDefaultColorScheme();
-            for (Complexity complexity : colorscheme.keySet()) {
-                if (complexity == Complexity.UNKNOWN) {
-                    unknown = colorscheme.get(complexity);
-                } else if (complexity == Complexity.CONPC) {
-                    conpc = colorscheme.get(complexity);
-                } else if (complexity == Complexity.NPC) {
-                    npc = colorscheme.get(complexity);
-                } else if (complexity == Complexity.NPH) {
-                    nph = colorscheme.get(complexity);
-                } else if (complexity == null) {
-                    empty = colorscheme.get(complexity);
-                } else if (complexity == Complexity.P) {
-                    p = colorscheme.get(complexity);
-                } else if (complexity == Complexity.GIC) {
-                    gic = colorscheme.get(complexity);
-                } else if (complexity == Complexity.LINEAR) {
-                    linear = colorscheme.get(complexity);
-                } else if (complexity == Complexity.OPEN) {
-                    open = colorscheme.get(complexity);
-                }
-            }
-            groupColours.setSelected(true);
-            int i = colourOptions.getSelectedIndex();
-            colourOptions.clearSelection();
-            colourOptions.setSelectedIndex(i);
-        }
-        /*
-         * Set choosen tab placement.
-         */
-        else if (source == tabOrientation) {
-            int x = tabOrientation.getSelectedIndex();
-            if (x == 0) {
-                tabPlacement = JTabbedPane.TOP;
-                options.setTabPlacement(JTabbedPane.TOP);
-            } else if (x == 1) {
-                tabPlacement = JTabbedPane.RIGHT;
-                options.setTabPlacement(JTabbedPane.RIGHT);
-            } else if (x == 2) {
-                tabPlacement = JTabbedPane.LEFT;
-                options.setTabPlacement(JTabbedPane.LEFT);
-            } else if (x == 3) {
-                tabPlacement = JTabbedPane.BOTTOM;
-                options.setTabPlacement(JTabbedPane.BOTTOM);
-            }
-            setTabOrientation = true;
-            if (!applyButton.isEnabled()) {
-                applyButton.setEnabled(true);
-            }
-        }
-        /*
-         * Set choosen java theme.
-         */
-        else if (source == theme) {
-            int i = theme.getSelectedIndex();
-            if (i == 0) {
-                try {
-                    javaTheme = UIManager
-                            .getCrossPlatformLookAndFeelClassName();
-                    UIManager.setLookAndFeel(UIManager
-                            .getCrossPlatformLookAndFeelClassName());
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-                SwingUtilities.updateComponentTreeUI(this);
-                this.pack();
-            } else if (i == 1) {
-                for (LookAndFeelInfo info : UIManager
-                        .getInstalledLookAndFeels()) {
-                    if ("Nimbus".equals(info.getName())) {
-                        try {
-                            javaTheme = info.getName();
-                            UIManager.setLookAndFeel(info.getClassName());
-                        } catch (Exception e) {
-                            e.printStackTrace();
-                        }
-                        
-                        break;
-                    }
-                }
-                SwingUtilities.updateComponentTreeUI(this);
-                pack();
-            } else if (i == 2) {
-                try {
-                    javaTheme = UIManager.getSystemLookAndFeelClassName();
-                    UIManager.setLookAndFeel(UIManager
-                            .getSystemLookAndFeelClassName());
-                } catch (Exception e) {
-                    e.printStackTrace();
-                } 
-                
-                SwingUtilities.updateComponentTreeUI(this);
-                this.pack();
-            }
-            setTheme = true;
-            if (!applyButton.isEnabled()) {
-                applyButton.setEnabled(true);
-            }
-        }
-        /*
-         * Enables or disables the toolbar.
-         */
-        else if (source == toolbar) {
-            toolbar.setSelected(toolbar.isSelected());
-            setToolbar = (!setToolbar);
-            if (!applyButton.isEnabled()) {
-                applyButton.setEnabled(true);
-            }
-        }
-        /*
-         * Enables the default grouping of the problems.
-         */
-        else if (source == groupColours) {
-            group = groupColours.isSelected();
-        }
-        /*
-         * Set the naming preference.
-         */
-        else if (source == namingPreference) {
-            int i = namingPreference.getSelectedIndex();
-            if (i == 0) {
-                namepref = Algo.NamePref.BASIC;
-            } else if (i == 1) {
-                namepref = Algo.NamePref.FORBIDDEN;
-            } else if (i == 2) {
-                namepref = Algo.NamePref.DERIVED;
-            }
-            if (namepref != UserSettings.getNamingPref()) {
-                setNamingPreferences = true;
-                if (!applyButton.isEnabled()) {
-                    applyButton.setEnabled(true);
-                }
-            }
-        }
+    private void enableApplyButton() {
+        applyButton.setEnabled(true);
     }
-
+    
     /**
      * Close and dispose the dialogue.
      */
@@ -669,152 +824,5 @@ public class ISGCISettingsDialog extends JDialog implements ActionListener,
         dispose();
     }
 
-    /**
-     * Changes the colour chooser to the colour of the corresponding selection
-     * choosen in the list.
-     */
-    @Override
-    public void valueChanged(ListSelectionEvent event) {
-        int i = colourOptions.getSelectedIndex();
-        if (i == 0) {
-            colours.setColor(text);
-        } else if (i == 1) {
-            colours.setColor(background);
-        } else if (i == 2) {
-            colours.setColor(unknown);
-        } else if (i == 3) {
-            colours.setColor(gic);
-        } else if (i == 4) {
-            colours.setColor(npc);
-        } else if (i == 5) {
-            colours.setColor(linear);
-        } else if (i == 6) {
-            colours.setColor(p);
-        } else if (i == 7) {
-            colours.setColor(open);
-        } else if (i == 8) {
-            colours.setColor(conpc);
-        } else if (i == 9) {
-            colours.setColor(nph);
-        } else if (i == 10) {
-            colours.setColor(empty);
-        }
-    }
-
-    /**
-     * Defines the action the colour chooser and slider does when a new colour
-     * is choosen or the slider is moved.
-     */
-    @Override
-    public void stateChanged(ChangeEvent event) {
-        Object source = event.getSource();
-        if (source == colours) {
-            Color newColor = colours.getColor();
-            int s = colourOptions.getSelectedIndex();
-            if (s == 0) {
-                if (newColor != text) {
-                    text = newColor;
-                    applyButton.setEnabled(true);
-                }
-            } else if (s == 1) {
-                if (newColor != background) {
-                    background = newColor;
-                    applyButton.setEnabled(true);
-                }
-            } else if (s == 2) {
-                if (newColor != unknown) {
-                    unknown = newColor;
-                    colorscheme.remove(unknown);
-                    colorscheme.put(Complexity.UNKNOWN, unknown);
-                    applyButton.setEnabled(true);
-                }
-                if (group) {
-                    empty = newColor;
-                    open = newColor;
-                }
-            } else if (s == 3) {
-                if (newColor != gic) {
-                    gic = newColor;
-                    colorscheme.remove(gic);
-                    colorscheme.put(Complexity.GIC, gic);
-                    applyButton.setEnabled(true);
-                }
-            } else if (s == 4) {
-                if (newColor != npc) {
-                    npc = newColor;
-                    colorscheme.remove(npc);
-                    colorscheme.put(Complexity.NPC, npc);
-                    applyButton.setEnabled(true);
-                }
-                if (group) {
-                    nph = newColor;
-                    conpc = newColor;
-                }
-            } else if (s == 5) {
-                if (newColor != linear) {
-                    linear = newColor;
-                    colorscheme.remove(linear);
-                    colorscheme.put(Complexity.LINEAR, linear);
-                    applyButton.setEnabled(true);
-                }
-            } else if (s == 6) {
-                if (newColor != p) {
-                    p = newColor;
-                    colorscheme.remove(p);
-                    colorscheme.put(Complexity.P, p);
-                    applyButton.setEnabled(true);
-                }
-            } else if (s == 7) {
-                if (newColor != open) {
-                    open = newColor;
-                    colorscheme.remove(open);
-                    colorscheme.put(Complexity.OPEN, open);
-                    applyButton.setEnabled(true);
-                }
-                if (group) {
-                    unknown = newColor;
-                    empty = newColor;
-                }
-            } else if (s == 8) {
-                if (newColor != conpc) {
-                    conpc = newColor;
-                    colorscheme.remove(conpc);
-                    colorscheme.put(Complexity.CONPC, conpc);
-                    applyButton.setEnabled(true);
-                }
-                if (group) {
-                    nph = newColor;
-                    npc = newColor;
-                }
-            } else if (s == 9) {
-                if (newColor != nph) {
-                    nph = newColor;
-                    colorscheme.remove(nph);
-                    colorscheme.put(Complexity.NPH, nph);
-                    applyButton.setEnabled(true);
-                }
-                if (group) {
-                    npc = newColor;
-                    conpc = newColor;
-                }
-            } else if (s == 10) {
-                if (newColor != empty) {
-                    empty = newColor;
-                    colorscheme.remove(empty);
-                    colorscheme.put(null, empty);
-                    applyButton.setEnabled(true);
-                }
-                if (group) {
-                    unknown = newColor;
-                    open = newColor;
-                }
-            }
-        } else if (source == zoomLevel) {
-            if (!zoomLevel.getValueIsAdjusting()) {
-                int zoomlvl = (int) zoomLevel.getValue();
-                zoom = zoomlvl;
-            }
-        }
-    }
 }
 /* EOF */
