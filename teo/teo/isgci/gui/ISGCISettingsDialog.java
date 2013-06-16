@@ -113,10 +113,6 @@ public class ISGCISettingsDialog extends JDialog {
     
     /** TODO marc JAVADOCS. */
     private Algo.NamePref namepref;
-    
-    /** TODO marc JAVADOCS. */
-    private boolean setToolbar, setTheme, setZoom, setTabOrientation, 
-                    setNamingPreferences;
 
     /**
      * This field should change every time the class is changed - once it is
@@ -263,7 +259,6 @@ public class ISGCISettingsDialog extends JDialog {
             @Override
             public void actionPerformed(ActionEvent e) {
                 toolbar.setSelected(toolbar.isSelected());
-                setToolbar = (!setToolbar);
                 enableApplyButton();
             }
         });
@@ -292,7 +287,6 @@ public class ISGCISettingsDialog extends JDialog {
             public void actionPerformed(ActionEvent e) {
                 
                 tabPlacement = tabOrientation.getSelectedIndex() + 1;
-                setTabOrientation = true;
                 enableApplyButton();
             }
         });
@@ -337,10 +331,7 @@ public class ISGCISettingsDialog extends JDialog {
                 
                 if (!javaTheme.equals(UserSettings.getCurrentTheme())) {
                     enableApplyButton();
-                    setTheme = true;
-                } else {
-                    setTheme = false;
-                }
+                } 
                 
             }
         });
@@ -370,8 +361,6 @@ public class ISGCISettingsDialog extends JDialog {
                 namepref = (Algo.NamePref) namingPreference.getSelectedItem();
 
                 if (namepref != UserSettings.getNamingPref()) {
-                    setNamingPreferences = true;
-
                     enableApplyButton();
                 }
             }
@@ -752,25 +741,13 @@ public class ISGCISettingsDialog extends JDialog {
 
                 // Saves all changes.
                 applyButton.setEnabled(false);
-                if (setNamingPreferences) {
-                    UserSettings.setNamingPref(namepref);
-                }
-                if (setTabOrientation) {
-                    UserSettings.setTabPlacement(tabPlacement);
-                }
-                if (setTheme) {
-                    UserSettings.setTheme(javaTheme);
-                }
-                if (setZoom) {
-                    UserSettings.setZoomLevel(zoom);
-                }
-                if (setToolbar) {
-                    UserSettings.setToolbarSetting(toolbar.isSelected());
-                }
-                if (!colorscheme.isEmpty()) {
-                    UserSettings.setColorScheme(colorscheme);
-                    colorscheme.clear();
-                }
+                UserSettings.setNamingPref(namepref);
+                UserSettings.setTabPlacement(tabPlacement);
+                UserSettings.setTheme(javaTheme);
+                UserSettings.setZoomLevel(zoom);
+                UserSettings.setToolbarSetting(toolbar.isSelected());
+                UserSettings.setColorScheme(colorscheme);
+                colorscheme.clear();
             }
         });
 
