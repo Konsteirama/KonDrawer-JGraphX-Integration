@@ -47,18 +47,14 @@ import teo.isgci.util.UserSettings;
 /**
  * A dialog where the user can change various settings.
  * 
- * @param <E>
- * 
  */
 public class ISGCISettingsDialog extends JDialog implements ActionListener,
         ListSelectionListener, ChangeListener {
 
     protected JPanel graphColours;
     protected ISGCIMainFrame parent;
-    protected JTabbedPane options = new JTabbedPane(/*
-                                                     * UserSettings.getTabPlacement
-                                                     * ()
-                                                     */JTabbedPane.TOP);
+    protected JTabbedPane options = new JTabbedPane(
+            UserSettings.getCurrentTabPlacement());
     protected JButton cancelButton, applyButton, okButton, uiSetDefaultButton;
     protected JButton gcSetDefaultButton, gcColorBlind;
     protected JList colourOptions;
@@ -95,13 +91,11 @@ public class ISGCISettingsDialog extends JDialog implements ActionListener,
     private static final long serialVersionUID = 1L;
 
     /**
-     * Creates a new dialog. TODO marc
+     * Creates a new options dialogue.
      */
     public ISGCISettingsDialog(ISGCIMainFrame parent) {
         super(parent, "Settings", true);
         this.parent = parent;
-        // TODO marc
-        // sketch coming soon
 
         colours = new JColorChooser();
         // Retrieve the current set of panels
@@ -124,22 +118,27 @@ public class ISGCISettingsDialog extends JDialog implements ActionListener,
         // JColorChooser.createDialog(null, "Dialog Title", false, colours,
         // null, null).setVisible(true);
 
+        /*
+         * Creates the tabs and the integrated panels.
+         */
         GridBagLayout gridbag = new GridBagLayout();
         GridBagConstraints c = new GridBagConstraints();
         JPanel tabCanvas = new JPanel(gridbag);
         JPanel tabUserInterface = new JPanel(gridbag);
         JPanel tabGraphColours = new JPanel(gridbag);
         JPanel userInterface = new JPanel(gridbag);
-        JPanel canvas = new JPanel(gridbag);
         JPanel graphColours = new JPanel(gridbag);
 
+        /*
+         * Adds the tabs to the tabline.
+         */
         options.add("Canvas", tabCanvas);
         options.addTab("User Interface", tabUserInterface);
         options.addTab("Graph Colours", tabGraphColours);
         this.add(options);
 
         /*
-         * userinterface tab
+         * Adds the user interface panel to the user interface tab.
          */
         Border ui = new BevelBorder(BevelBorder.RAISED);
         // userInterface.setBackground(Color.WHITE);
@@ -152,7 +151,9 @@ public class ISGCISettingsDialog extends JDialog implements ActionListener,
         c.gridwidth = GridBagConstraints.REMAINDER;
         tabUserInterface.add(userInterface, c);
 
-        // Set default zoom level option
+        /*
+         * Adds a description and a slider to the user interface panel.
+         */
         c.anchor = GridBagConstraints.WEST;
         c.fill = GridBagConstraints.BOTH;
         c.weightx = 1.0;
