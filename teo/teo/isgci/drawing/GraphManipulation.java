@@ -225,7 +225,7 @@ class GraphManipulation<V, E> implements GraphManipulationInterface<V, E> {
         graph.getModel().beginUpdate();
 
         graph.setCellStyles(mxConstants.STYLE_STROKECOLOR,
-                mxUtils.hexString(null), getCellsFromEdges(edges));
+                null , getCellsFromEdges(edges));
 
         graph.getModel().endUpdate();
     }
