@@ -314,20 +314,9 @@ public abstract class UserSettings {
         HashMap<Complexity, Color> defaultComplexityToColor 
             = new HashMap<Complexity, Color>();
 
-        defaultComplexityToColor.put(Complexity.LINEAR, Color.green);
-
-        defaultComplexityToColor.put(Complexity.UNKNOWN, Color.white);
-        defaultComplexityToColor.put(Complexity.OPEN, Color.white);
-
-        defaultComplexityToColor.put(null, Color.white);
-
-        defaultComplexityToColor.put(Complexity.P, Color.green.darker());
-
-        defaultComplexityToColor.put(Complexity.CONPC, Color.red);
-        defaultComplexityToColor.put(Complexity.NPC, Color.red);
-        defaultComplexityToColor.put(Complexity.NPH, Color.red);
-
-        defaultComplexityToColor.put(Complexity.GIC, Color.red.brighter());
+        for (Complexity c : Complexity.values()) {
+            defaultComplexityToColor.put(c, c.getDefaultColor());
+        }
 
         return defaultComplexityToColor;
     }
