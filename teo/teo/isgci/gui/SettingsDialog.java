@@ -478,7 +478,7 @@ public class SettingsDialog extends JDialog implements Updatable {
         JPanel bottomLeftPanel = new JPanel(new FlowLayout());
 
         JButton uiSetDefaultButton = new JButton("Default settings");
-        uiSetDefaultButton.setToolTipText("Chose default settings");
+        uiSetDefaultButton.setToolTipText("Reset to default settings");
         bottomLeftPanel.add(uiSetDefaultButton, BorderLayout.LINE_START);
         
         uiSetDefaultButton.addActionListener(new ActionListener() {

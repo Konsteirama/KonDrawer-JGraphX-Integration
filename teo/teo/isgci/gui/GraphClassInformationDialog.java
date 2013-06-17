@@ -201,13 +201,16 @@ public class GraphClassInformationDialog extends JDialog
         //---- Buttons ----
         JPanel okPanel = new JPanel();
         classButton = new JButton("Class details");
-        classButton.setToolTipText("Show more information about this graphclass");
+        classButton.setToolTipText("Show more information about this " 
+                     + "graphclass");
         okPanel.add(classButton);
         inclButton = new JButton("Inclusion info");
-        inclButton.setToolTipText("Show inclusions of this graphclass");
+        inclButton.setToolTipText("Show inclusions of selected "
+         + "graphclasses; needs two classes to be selected");
         okPanel.add(inclButton);
         drawButton = new JButton("Draw");
-        drawButton.setToolTipText("Draw this graphclass and its subclasses/superclasses; opens a dialogue");
+        drawButton.setToolTipText("Draw this graphclass and its "
+    + "subclasses/superclasses; opens a dialogue");
         okPanel.add(drawButton);
         okButton = new JButton("Close");
         okButton.setToolTipText("Close this dialogue");
