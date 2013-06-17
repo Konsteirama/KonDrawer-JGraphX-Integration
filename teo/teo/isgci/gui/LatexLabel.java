@@ -16,14 +16,13 @@ import java.awt.Graphics;
 import java.awt.Insets;
 
 import javax.swing.BorderFactory;
-import javax.swing.JComponent;
 import javax.swing.JLabel;
 
 /**
  * A Label that can depict a subset of latex. drawLatexString can also
  * be called from other classes.
  */
-public class LatexLabel extends JComponent {   
+public class LatexLabel extends JLabel {   
     /** Contents of this label. */
     private String text;
 
