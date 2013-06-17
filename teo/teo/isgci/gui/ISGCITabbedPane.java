@@ -122,6 +122,8 @@ public class ISGCITabbedPane extends JTabbedPane implements Updatable {
      * A listener which triggers if a tab is changed and then adjusts the
      * state of the drawUnproper menu item in the mainframe to match the
      * drawUnproper state of the tab.
+     * Also adjusts the selection of the color problem menu to match the
+     * problem of the currently active tab.
      */
     private ChangeListener changeListener = new ChangeListener() {
         public void stateChanged(ChangeEvent changeEvent) {
@@ -129,6 +131,7 @@ public class ISGCITabbedPane extends JTabbedPane implements Updatable {
             if (!startpageActive && getSelectedIndex() >= 0) {
                 mainframe.setDrawUnproper(
                         getDrawUnproper(getSelectedComponent()));
+                mainframe.setColorProblem(getProblem(getSelectedComponent()));
             }
         }
     };
@@ -489,6 +492,8 @@ public class ISGCITabbedPane extends JTabbedPane implements Updatable {
      * state.
      */
     private void setProperness() {
+        if (startpageActive || getActiveDrawingLibraryInterface() == null) {
+            return; }
         Graph graph = getActiveDrawingLibraryInterface().getGraph();
         List<DefaultEdge> markEdges = new ArrayList<DefaultEdge>();
         List<DefaultEdge> unmarkEdges = new ArrayList<DefaultEdge>();

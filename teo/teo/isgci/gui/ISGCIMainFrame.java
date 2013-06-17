@@ -86,6 +86,8 @@ public class ISGCIMainFrame extends JFrame
     /** Indicates whether or not the graph should draw unproper edges. */
     private JMenuItem miDrawUnproper;
 
+    private JMenuItem miColourProblem;
+
     /**
      * Creates the frame.
      * 
@@ -378,7 +380,7 @@ public class ISGCIMainFrame extends JFrame
         final ISGCIMainFrame mainframe = this;
         
         JMenuItem miOpenProblem = new JMenu("Boundary/Open classes");
-        JMenuItem miColourProblem = new ProblemsMenu(this,
+        miColourProblem = new ProblemsMenu(this,
                 "Colour for problem");
         
         JMenu problemsMenu = new JMenu("Problems");
@@ -500,6 +502,22 @@ public class ISGCIMainFrame extends JFrame
      */
     public void setDrawUnproper(boolean state) {
         miDrawUnproper.setSelected(state);
+    }
+    
+    /**
+     * Sets the state of the color for problem radiobox.
+     * 
+     * @param problem
+     *            the new problem which is active.
+     */
+    public void setColorProblem(Problem problem) {
+        String name;
+        if (problem == null) {
+            name = "None";
+        } else {
+            name = problem.getName();
+        }
+        ((ProblemsMenu) miColourProblem).setProblem(name);        
     }
 
     /**
