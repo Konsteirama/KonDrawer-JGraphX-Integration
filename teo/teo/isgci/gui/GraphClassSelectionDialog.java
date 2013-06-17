@@ -310,7 +310,6 @@ public class GraphClassSelectionDialog extends JDialog implements
         } 
         
         SwingUtilities.updateComponentTreeUI(this);
-        pack();
     }
 }
 

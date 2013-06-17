@@ -58,7 +58,13 @@ public class SettingsDialog extends JDialog implements Updatable {
     private JList colorList;
     
     /** TODO marc JAVADOCS. */
-    private JComboBox tabOrientation, themeSelector, namingComboBox;
+    private JComboBox tabOrientation;
+    
+    /** TODO marc JAVADOCS. */
+    private JComboBox themeSelector;
+    
+    /** TODO marc JAVADOCS. */
+    private JComboBox namingComboBox;
     
     /** Maps a name to a java look and feel theme. */
     private HashMap<String, String> nameToTheme;
@@ -67,7 +73,7 @@ public class SettingsDialog extends JDialog implements Updatable {
     private HashMap<String, Color> nameToColor;
    
     /** TODO marc JAVADOCS. */
-    private JCheckBox toolbarCheck; //, groupColorsCheckBox;
+    private JCheckBox toolbarCheck;
     
     /** TODO marc JAVADOCS. */
     private JSlider zoomSlider;
@@ -135,8 +141,9 @@ public class SettingsDialog extends JDialog implements Updatable {
         setMinimumSize(windowSize);
         setPreferredSize(windowSize);
 
-        
         setDefaultCloseOperation(DISPOSE_ON_CLOSE);
+        
+        UserSettings.subscribeToOptionChanges(this);
     }
 
     /**
@@ -599,6 +606,7 @@ public class SettingsDialog extends JDialog implements Updatable {
      * Close and dispose the dialogue.
      */
     public void closeDialog() {
+        UserSettings.unsubscribe(this);
         setVisible(false);
         dispose();
     }
@@ -613,7 +621,6 @@ public class SettingsDialog extends JDialog implements Updatable {
         } 
         
         SwingUtilities.updateComponentTreeUI(this);
-        pack();
         
         // Set tabs
         tabbedPane.setTabPlacement(UserSettings.getCurrentTabPlacement());
