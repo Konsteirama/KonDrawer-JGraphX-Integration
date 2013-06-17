@@ -40,7 +40,7 @@ import teo.isgci.util.UserSettings;
  * displayed once a new window is opened. It displays logo, most common
  * functions and news.
  */
-class ISGCIStartPanel extends JPanel {
+class StartPanel extends JPanel {
 
     /**
      * Should be changed each time this class changes.
@@ -64,7 +64,7 @@ class ISGCIStartPanel extends JPanel {
      * @param parent
      *          The reference to the window containing this panel.
      */
-    public ISGCIStartPanel(final ISGCIMainFrame parent) {
+    public StartPanel(final ISGCIMainFrame parent) {
         // Create a graphcanvas with ISGCI logo
         
         // space => make nodes bigger

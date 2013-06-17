@@ -67,7 +67,7 @@ public class ISGCITabbedPane extends JTabbedPane implements Updatable {
     /**
      * The startpage that is displayed upon start of the window. 
      */
-    private ISGCIStartPanel startpage;
+    private StartPanel startpage;
 
     /**
      * Maps the content of the tabs to their corresponding
@@ -202,7 +202,7 @@ public class ISGCITabbedPane extends JTabbedPane implements Updatable {
         
         startpageActive = true;
         
-        startpage = new ISGCIStartPanel(mainframe);
+        startpage = new StartPanel(mainframe);
         addTab("", startpage);
         setSelectedComponent(startpage);
         ISGCITabComponent closeButton 
