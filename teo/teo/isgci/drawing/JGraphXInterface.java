@@ -78,6 +78,8 @@ class JGraphXInterface<V, E> implements DrawingLibraryInterface<V, E> {
         // Convert to JGraphT-Graph
         graphAdapter = createNewAdapter(g);
 
+        applyCustomGraphSettings();
+
         // Create the mxGraphComponent used to draw the graph
         // Also overrides the default behavior of JGraphX panning
         // implementation so the users are not required to hold down shift
@@ -111,13 +113,8 @@ class JGraphXInterface<V, E> implements DrawingLibraryInterface<V, E> {
                     return new Component[]{labelComponent};
                 }
                 return null;
-            }
+            };
         };
-        
-        // make background white
-        graphComponent.getViewport().setOpaque(true);
-        graphComponent.getViewport().setBackground(Color.white);
-
 
         graphManipulation =
                 new GraphManipulation<V, E>(graphComponent);
@@ -128,15 +125,14 @@ class JGraphXInterface<V, E> implements DrawingLibraryInterface<V, E> {
         graphComponent.setCenterZoom(false);
         graphComponent.setConnectable(false);
 
+        // make background white
+        graphComponent.getViewport().setOpaque(true);
+        graphComponent.getViewport().setBackground(Color.white);
+
         graphEvent.registerMouseAdapter(
                 new InternalMouseAdapter(graphComponent, graphManipulation));
 
         graphManipulation.reapplyHierarchicalLayout();
-
-        applyCustomGraphSettings();
-
-        graphComponent.refresh();
-        graphComponent.repaint();
     }
 
     /**
