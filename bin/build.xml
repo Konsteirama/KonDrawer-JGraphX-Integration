@@ -212,7 +212,7 @@
     </target>
 
 
-    <target name="jar"
+    <target name="jar" depends="compile"
             description="Create a jar file containing the ISGCI application">
 
         <delete file="${isgci.jar}" />
@@ -531,6 +531,7 @@
     </target>
 
 
+
     <target name="static.html"
             description="Creates all web data other than classes/smallgraphs">
 
@@ -699,13 +700,9 @@
         </outofdate>
     </target>
 
-    <target name="run" description="Run isgci">
+    <target name="run" description="Run isgci" depends="jar">
 
         <java jar="${isgci.jar}" fork="true">
-            <classpath>
-                <path location="${jarlib.dir}/jgraphx.jar" />
-            </classpath>
-            
             <arg value="file://${web.dir}/" />
         </java>
     </target>
