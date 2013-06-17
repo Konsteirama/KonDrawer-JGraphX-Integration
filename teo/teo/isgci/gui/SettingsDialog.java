@@ -46,7 +46,7 @@ import teo.isgci.util.UserSettings;
  * A dialog where the user can change various settings.
  * 
  */
-public class ISGCISettingsDialog extends JDialog {
+public class SettingsDialog extends JDialog {
     
     /** TODO marc JAVADOCS. */
     private JButton applyButton;
@@ -80,7 +80,7 @@ public class ISGCISettingsDialog extends JDialog {
      * @param parent
      *          The mainframe from which the dialog is created.
      */
-    public ISGCISettingsDialog(ISGCIMainFrame parent) {
+    public SettingsDialog(ISGCIMainFrame parent) {
         super(parent, "Settings", true);
 
         // get available themes

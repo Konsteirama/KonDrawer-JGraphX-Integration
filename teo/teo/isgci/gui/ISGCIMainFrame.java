@@ -541,7 +541,7 @@ public class ISGCIMainFrame extends JFrame
         final int width = 650;
         final int height = 550;
         
-        ISGCISettingsDialog settingsDialog = new ISGCISettingsDialog(this);
+        SettingsDialog settingsDialog = new SettingsDialog(this);
         settingsDialog.setSize(width, height);
         settingsDialog.setVisible(true);
     }
