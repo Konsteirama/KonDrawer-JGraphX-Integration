@@ -12,6 +12,7 @@ package teo.isgci.gui;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
+import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
@@ -55,7 +56,7 @@ public class SettingsDialog extends JDialog {
     private JList colorList;
     
     /** TODO marc JAVADOCS. */
-    private JComboBox tabOrientation, themeSelector, namingPreference;
+    private JComboBox tabOrientation, themeSelector, namingComboBox;
     
     /** Maps a name to a java look and feel theme. */
     private HashMap<String, String> nameToTheme;
@@ -64,16 +65,19 @@ public class SettingsDialog extends JDialog {
     private HashMap<String, Color> nameToColor;
    
     /** TODO marc JAVADOCS. */
-    private JCheckBox toolbarCheck, groupColors;
+    private JCheckBox toolbarCheck; //, groupColorsCheckBox;
     
     /** TODO marc JAVADOCS. */
     private JSlider zoomSlider;
+    
+    /** Indicates the currently selected zoomlevel. */
+    private JLabel currentZoomLabel;
     
     /**
      * This field should change every time the class is changed - once it is
      * actually deployed.
      */
-    private static final long serialVersionUID = 3L;
+    private static final long serialVersionUID = 4L;
 
     /**
      * Creates a new options dialogue.
@@ -82,7 +86,7 @@ public class SettingsDialog extends JDialog {
      */
     public SettingsDialog(ISGCIMainFrame parent) {
         super(parent, "Settings", true);
-
+        
         // get available themes
         nameToTheme = new HashMap<String, String>();
         
@@ -120,7 +124,14 @@ public class SettingsDialog extends JDialog {
         tabContainer.addTab("User Interface", createUserInterfaceTab());
         tabContainer.addTab("Graph colors", createColorTab());
 
-        pack();
+        // set size
+        final Dimension windowSize = new Dimension(750, 100);
+        setSize(windowSize);
+        setMaximumSize(windowSize);
+        setMinimumSize(windowSize);
+        setPreferredSize(windowSize);
+
+        
         setDefaultCloseOperation(DISPOSE_ON_CLOSE);
     }
 
@@ -141,10 +152,8 @@ public class SettingsDialog extends JDialog {
         final int bigGap = 10;
         final int width = 30;
         final int height = 10;
-        
-        /*
-         * Adds the user interface panel to the user interface tab.
-         */
+
+        // BEVEL BORDER
         Border ui = new BevelBorder(BevelBorder.RAISED);
         userInterface.setBorder(ui);
         c.anchor = GridBagConstraints.WEST;
@@ -156,29 +165,31 @@ public class SettingsDialog extends JDialog {
         c.gridwidth = GridBagConstraints.REMAINDER;
         tabUserInterface.add(userInterface, c);
 
-        /*
-         * Adds a description and a slider to the user interface panel to set
-         * the standard zoom level.
-         */
-        final int majorSpacing = 10;
+        // ZOOMSLIDER
         final int minZoom = 0;
-        final int maxZoom = 1000;
+        final int maxZoom = 500;
+        final int tickSpacing = 100;
         
         c.anchor = GridBagConstraints.WEST;
         c.fill = GridBagConstraints.BOTH;
         c.weightx = 1.0;
         c.gridwidth = GridBagConstraints.RELATIVE;
-        JLabel label = new JLabel("Set default zoom level", JLabel.LEFT);
-        gridbag.setConstraints(label, c);
-        userInterface.add(label);
+        
+        currentZoomLabel = new JLabel(String.format(
+                "Set default zoom level, currently at %d %%)",
+                               UserSettings.getCurrentZoomLevel()));
+        
+        gridbag.setConstraints(currentZoomLabel, c);
+        userInterface.add(currentZoomLabel);
+        
         c.fill = GridBagConstraints.NONE;
         c.weightx = 0.0;
         c.gridwidth = GridBagConstraints.REMAINDER;
         zoomSlider = new JSlider(JSlider.HORIZONTAL, minZoom, maxZoom, 0);
         zoomSlider.setValue(UserSettings.getCurrentZoomLevel());
-        zoomSlider.setMajorTickSpacing(majorSpacing);
-        zoomSlider.setMinorTickSpacing(1);
+        zoomSlider.setMajorTickSpacing(tickSpacing);
         zoomSlider.setPaintTicks(true);
+        zoomSlider.setPaintLabels(true);
         userInterface.add(zoomSlider, c);
 
         zoomSlider.addChangeListener(new ChangeListener() {
@@ -189,17 +200,19 @@ public class SettingsDialog extends JDialog {
                 if (!zoomSlider.getValueIsAdjusting()) {
                     enableApplyButton();
                 }
+                
+                // change panel to inform user
+                currentZoomLabel.setText(String.format(
+                        "Set default zoom level, currently at %d %%)",
+                        zoomSlider.getValue()));
             }
         });
         
-        /*
-         * Adds a description and a checkbox to the user interface panel to 
-         * show or hide the toolbar.
-         */
+        // TOOLBAR
         c.fill = GridBagConstraints.BOTH;
         c.weightx = 0.0;
         c.gridwidth = GridBagConstraints.RELATIVE;
-        label = new JLabel("Display Toolbar", JLabel.LEFT);
+        JLabel label = new JLabel("Display Toolbar", JLabel.LEFT);
         gridbag.setConstraints(label, c);
         userInterface.add(label);
         
@@ -210,21 +223,13 @@ public class SettingsDialog extends JDialog {
         userInterface.add(toolbarCheck, c);
         
         toolbarCheck.addActionListener(new ActionListener() {
-            
-            /*
-             * Enables or disables the toolbar 
-             */
             @Override
             public void actionPerformed(ActionEvent e) {
-                toolbarCheck.setSelected(toolbarCheck.isSelected());
                 enableApplyButton();
             }
         });
 
-        /*
-         * Adds a description and a combobox to the user interface panel to
-         * choose the placement of the tab line.
-         */
+        // TAB ORIENTATION
         c.weightx = 0.0;
         c.gridwidth = GridBagConstraints.RELATIVE;
         label = new JLabel("Tab Orientation", JLabel.LEFT);
@@ -233,13 +238,8 @@ public class SettingsDialog extends JDialog {
         c.weightx = 0.0;
         c.gridwidth = GridBagConstraints.REMAINDER;
         
-        /* Needs to stay in that order, because
-         *  TOP == 1
-         *  LEFT == 2
-         *  BOTTOM == 3
-         *  RIGHT == 4 
-         *  ergo selectedindex == tabplacement - 1
-         */
+        // Needs to stay in that order, because TOP == 1 LEFT == 2
+        // BOTTOM == 3 RIGHT == 4  ergo selectedindex == tabplacement - 1
         tabOrientation = new JComboBox(
                 new String[] { "Top", "Left", "Bottom", "Right" });
         
@@ -250,17 +250,13 @@ public class SettingsDialog extends JDialog {
         userInterface.add(tabOrientation, c);
         
         tabOrientation.addActionListener(new ActionListener() {
-            
             @Override
             public void actionPerformed(ActionEvent e) {
                 enableApplyButton();
             }
         });
 
-        /*
-         * Adds a description and a combobox to the user interface panel to
-         * choose the java theme for all windows.
-         */
+        // JAVA THEME
         c.fill = GridBagConstraints.BOTH;
         c.weightx = 0.0;
         c.gridwidth = GridBagConstraints.RELATIVE;
@@ -286,17 +282,14 @@ public class SettingsDialog extends JDialog {
         userInterface.add(themeSelector, c);
                
         themeSelector.addActionListener(new ActionListener() {
-            
             @Override
             public void actionPerformed(ActionEvent e) {                
                     enableApplyButton();                
             }
         });
 
-        /*
-         * Adds a description and a combobox to the user interface panel to
-         * choose the naming preference.
-         */
+
+        // NAMING PREFERENCE
         c.fill = GridBagConstraints.BOTH;
         c.weightx = 0.0;
         c.gridwidth = GridBagConstraints.RELATIVE;
@@ -306,17 +299,16 @@ public class SettingsDialog extends JDialog {
         c.fill = GridBagConstraints.NONE;
         c.weightx = 0.0;
         c.gridwidth = GridBagConstraints.REMAINDER;
-        namingPreference = new JComboBox(Algo.NamePref.values());
-        namingPreference.setSelectedItem(0);
-        namingPreference.setSize(width, height);
-        userInterface.add(namingPreference, c);
+        namingComboBox = new JComboBox(Algo.NamePref.values());
+        namingComboBox.setSelectedItem(0);
+        namingComboBox.setSize(width, height);
+        userInterface.add(namingComboBox, c);
         
-        namingPreference.addActionListener(new ActionListener() {
-            
+        namingComboBox.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 Algo.NamePref namepref 
-                    = (Algo.NamePref) namingPreference.getSelectedItem();
+                    = (Algo.NamePref) namingComboBox.getSelectedItem();
 
                 if (namepref != UserSettings.getDefaultNamingPref()) {
                     enableApplyButton();
@@ -333,29 +325,10 @@ public class SettingsDialog extends JDialog {
      * @return
      *          Panel with colorchooser and list.
      */
-    private JPanel createColorTab() {
-        JPanel graphcolors = new JPanel(new GridBagLayout());
-        JPanel tabGraphcolors = new JPanel(new GridBagLayout());
-        GridBagConstraints c = new GridBagConstraints();
-        
+    private JPanel createColorTab() {       
         // CONSTANTS
-        final int gap = 5;
-        final int bigGap = 20;
-        final int hugeGap = 40;
+        final int gap = 10;
         
-        /*
-         * Adds the graph colors panel to the graph colors tab.
-         */
-        Border graph = new BevelBorder(BevelBorder.RAISED);
-        graphcolors.setBorder(graph);
-        c.anchor = GridBagConstraints.WEST;
-        c.fill = GridBagConstraints.BOTH;
-        c.insets = new Insets(gap, gap, bigGap, gap);
-        c.weightx = 1.0;
-        c.weighty = 0.85;
-        c.gridwidth = GridBagConstraints.REMAINDER;
-        tabGraphcolors.add(graphcolors, c);
-
         /*
          * Adds a list, a color chooser and a checkbox to the graph colors
          * panel. The list holds the different problems, for which the user can
@@ -363,23 +336,9 @@ public class SettingsDialog extends JDialog {
          * for the options in the list. If the checkbox is activated, the
          * default grouping of problem colors is set.
          */
-        
+               
+        // COLORCHOOSER
         final JColorChooser colorChooser = new JColorChooser();
-        c.gridwidth = GridBagConstraints.RELATIVE;
-        colorList = new JList(nameToColor.keySet().toArray());
-        colorList.setSelectedIndex(1);
-        graphcolors.add(colorList, c);
-        c.gridwidth = GridBagConstraints.REMAINDER;
-        c.insets = new Insets(bigGap, gap, bigGap, gap);
-        graphcolors.add(colorChooser, c);
-        c.anchor = GridBagConstraints.WEST;
-        groupColors = new JCheckBox("Group problems");
-        groupColors.setSelected(true);
-        c.weightx = 0.0;
-        c.weighty = 0.0;
-        c.gridwidth = GridBagConstraints.REMAINDER;
-        graphcolors.add(groupColors, c);
-
         colorChooser.getSelectionModel().addChangeListener(
                 new ChangeListener() {
 
@@ -397,33 +356,30 @@ public class SettingsDialog extends JDialog {
             }
         });
         
+        
+        // COLOR LIST
+        colorList = new JList(nameToColor.keySet().toArray());
+        colorList.setSelectedIndex(1);
+
         colorList.addListSelectionListener(new ListSelectionListener() {
 
-                    /*
-                     * Changes the color chooser to the color of the
-                     * corresponding selection choosen in the list.
-                     */
-                    
-                    @Override
-                    public void valueChanged(ListSelectionEvent e) {
-                        String name 
-                            = (String) colorList.getSelectedValue();
-                        
-                        colorChooser.setColor(nameToColor.get(name));
-                    }
-                });
+            /*
+             * Changes the color chooser to the color of the corresponding
+             * selection choosen in the list.
+             */
+
+            @Override
+            public void valueChanged(ListSelectionEvent e) {
+                String name = (String) colorList.getSelectedValue();
+
+                colorChooser.setColor(nameToColor.get(name));
+            }
+        });
 
         // DEFAULT COLOR BUTTON
-        c.anchor = GridBagConstraints.WEST;
-        c.fill = GridBagConstraints.NONE;
-        c.weightx = 0.0;
-        c.weighty = 0.0;
-        c.insets = new Insets(0, gap, bigGap, hugeGap);
-        c.gridwidth = 1;
-        JButton gcSetDefaultButton = new JButton("Default colors");
-        tabGraphcolors.add(gcSetDefaultButton, c);
+        JButton setDefaultButtonButton = new JButton("Default colors");
         
-        gcSetDefaultButton.addActionListener(new ActionListener() {
+        setDefaultButtonButton.addActionListener(new ActionListener() {
             
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -450,13 +406,9 @@ public class SettingsDialog extends JDialog {
         });
 
         // COLORBLIND BUTTON
-        c.anchor = GridBagConstraints.EAST;
-        c.insets = new Insets(0, gap, bigGap, gap);
-        c.gridwidth = GridBagConstraints.RELATIVE;
-        JButton gcColorBlind = new JButton("Set scheme for color blind");
-        tabGraphcolors.add(gcColorBlind, c);
-        
-        gcColorBlind.addActionListener(new ActionListener() {
+        JButton colorBlindButton = new JButton("Set scheme for color blind");
+
+        colorBlindButton.addActionListener(new ActionListener() {
             
             //Set color blind color scheme.
             
@@ -482,7 +434,26 @@ public class SettingsDialog extends JDialog {
             }
         });
         
-        return tabGraphcolors;
+        // Add layout
+        JPanel leftPanel = new JPanel(new BorderLayout(gap, gap));
+        leftPanel.add(colorList, BorderLayout.CENTER);
+        
+        JPanel bottomPanel = new JPanel(new BorderLayout(gap, gap));
+        bottomPanel.add(colorBlindButton, BorderLayout.LINE_START);
+        bottomPanel.add(setDefaultButtonButton, BorderLayout.LINE_END);
+        
+        
+        JPanel colorPanel = new JPanel(new BorderLayout(gap, gap));
+        colorPanel.add(colorChooser, BorderLayout.CENTER);
+        colorPanel.add(leftPanel, BorderLayout.LINE_START);
+        colorPanel.add(bottomPanel, BorderLayout.PAGE_END);
+        
+        // Add border around entire panel
+        JPanel bevelPanel = new JPanel();
+        bevelPanel.setBorder(new BevelBorder(BevelBorder.RAISED));
+        bevelPanel.add(colorPanel);
+        
+        return bevelPanel;
     }
     
     /**
@@ -505,7 +476,7 @@ public class SettingsDialog extends JDialog {
                 zoomSlider.setValue(UserSettings.getDefaultZoomLevel());
                 tabOrientation.setSelectedIndex(
                         UserSettings.getDefaultTabPlacement() - 1);
-                namingPreference.setSelectedItem(
+                namingComboBox.setSelectedItem(
                         UserSettings.getDefaultNamingPref());
                 
                 // group
@@ -590,7 +561,7 @@ public class SettingsDialog extends JDialog {
         // Saves all changes.
         applyButton.setEnabled(false);
         UserSettings.setNamingPref(
-                (Algo.NamePref) namingPreference.getSelectedItem());
+                (Algo.NamePref) namingComboBox.getSelectedItem());
         UserSettings.setTabPlacement(
                 tabOrientation.getSelectedIndex() + 1);
         UserSettings.setTheme(javaTheme);
