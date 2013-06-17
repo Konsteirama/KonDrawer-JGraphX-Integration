@@ -11,9 +11,7 @@
 
 package teo.isgci.gui;
 
-import java.awt.BorderLayout;
 import java.awt.Container;
-import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
@@ -31,6 +29,7 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.SwingUtilities;
+import javax.swing.UIManager;
 
 import org.jgrapht.Graphs;
 import org.jgrapht.graph.DefaultEdge;
@@ -44,13 +43,15 @@ import teo.isgci.grapht.GAlg;
 import teo.isgci.grapht.GraphWalker;
 import teo.isgci.grapht.Inclusion;
 import teo.isgci.grapht.RevBFSWalker;
+import teo.isgci.util.Updatable;
+import teo.isgci.util.UserSettings;
 
 /**
  * Display a list of graphclasses and change the drawing according to the
  * selection.
  */
 public class GraphClassSelectionDialog extends JDialog implements
-        ActionListener {
+        ActionListener, Updatable {
 
     protected ISGCIMainFrame parent;
     protected NodeList classesList;
@@ -139,6 +140,8 @@ public class GraphClassSelectionDialog extends JDialog implements
         addListeners();
         setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
 
+        UserSettings.subscribeToOptionChanges(this);
+        
         classesList.setListData(DataSet.getClasses());
         pack();
         setSize(500, 400);
@@ -153,6 +156,7 @@ public class GraphClassSelectionDialog extends JDialog implements
     }
 
     protected void closeDialog() {
+        UserSettings.unsubscribe(this);
         setVisible(false);
         dispose();
     }
@@ -295,6 +299,18 @@ public class GraphClassSelectionDialog extends JDialog implements
         }
 
         return result;
+    }
+
+    @Override
+    public void updateOptions() {
+        try {
+            UIManager.setLookAndFeel(UserSettings.getCurrentTheme());
+        } catch (Exception e) {
+            e.printStackTrace();
+        } 
+        
+        SwingUtilities.updateComponentTreeUI(this);
+        pack();
     }
 }
 

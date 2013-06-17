@@ -32,6 +32,7 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.ScrollPaneConstants;
 import javax.swing.SwingUtilities;
+import javax.swing.UIManager;
 import javax.swing.border.EmptyBorder;
 
 import org.jgrapht.graph.DefaultEdge;
@@ -47,11 +48,14 @@ import teo.isgci.gc.GraphClass;
 import teo.isgci.grapht.GAlg;
 import teo.isgci.grapht.Inclusion;
 import teo.isgci.util.LessLatex;
+import teo.isgci.util.Updatable;
+import teo.isgci.util.UserSettings;
 
 /**
  * Displays the relation between two graphclasses.
  */
-public class InclusionResultDialog extends JDialog implements ActionListener {
+public class InclusionResultDialog extends JDialog 
+    implements ActionListener, Updatable {
     protected ISGCIMainFrame parent;
     protected JButton okButton;
     protected JButton drawButton;
@@ -80,6 +84,8 @@ public class InclusionResultDialog extends JDialog implements ActionListener {
         constraints.gridwidth = GridBagConstraints.REMAINDER;
         constraints.fill = GridBagConstraints.NONE;
         constraints.anchor = GridBagConstraints.WEST;
+        
+        UserSettings.subscribeToOptionChanges(this);
     }
 
 
@@ -286,6 +292,8 @@ public class InclusionResultDialog extends JDialog implements ActionListener {
         drawNewTabButton.addActionListener(this);
         refButton.addActionListener(this);
         setDefaultCloseOperation(DISPOSE_ON_CLOSE);
+        
+        UserSettings.subscribeToOptionChanges(this);
     }
     
     
@@ -562,6 +570,7 @@ public class InclusionResultDialog extends JDialog implements ActionListener {
     
 
     protected void closeDialog() {
+        UserSettings.unsubscribe(this);
         setVisible(false);
         dispose();
     }
@@ -679,6 +688,19 @@ public class InclusionResultDialog extends JDialog implements ActionListener {
                     Math.min(size.height, 600));
         
         return dialog;
+    }
+
+
+    @Override
+    public void updateOptions() {
+        try {
+            UIManager.setLookAndFeel(UserSettings.getCurrentTheme());
+        } catch (Exception e) {
+            e.printStackTrace();
+        } 
+        
+        SwingUtilities.updateComponentTreeUI(this);
+        pack();
     }
 }
 

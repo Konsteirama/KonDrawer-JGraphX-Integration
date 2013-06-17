@@ -22,11 +22,15 @@ import javax.swing.JButton;
 import javax.swing.JDialog;
 import javax.swing.JPanel;
 import javax.swing.JRadioButton;
+import javax.swing.SwingUtilities;
+import javax.swing.UIManager;
 
 import teo.isgci.db.Algo;
+import teo.isgci.util.Updatable;
 import teo.isgci.util.UserSettings;
 
-public class NamingDialog extends JDialog implements ActionListener {
+public class NamingDialog extends JDialog 
+        implements ActionListener, Updatable {
     protected ISGCIMainFrame parent;
     protected ButtonGroup group;
     protected JRadioButton basicBox, derivedBox, forbiddenBox;
@@ -38,7 +42,8 @@ public class NamingDialog extends JDialog implements ActionListener {
         this.parent = parent;
         group = new ButtonGroup();
         
-        Algo.NamePref mode = this.parent.getTabbedPane().getNamingPref(parent.getTabbedPane().getSelectedComponent());
+        Algo.NamePref mode = this.parent.getTabbedPane().
+                getNamingPref(parent.getTabbedPane().getSelectedComponent());
 
         Container contents = getContentPane();
 
@@ -97,10 +102,13 @@ public class NamingDialog extends JDialog implements ActionListener {
         okButton.addActionListener(this);
         cancelButton.addActionListener(this);
         setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
+        
+        UserSettings.subscribeToOptionChanges(this);
     }
 
 
     protected void closeDialog() {
+        UserSettings.unsubscribe(this);
         setVisible(false);
         dispose();
     }
@@ -112,15 +120,29 @@ public class NamingDialog extends JDialog implements ActionListener {
         } else if (source == okButton) {
             Object c = group.getSelection();
             Algo.NamePref pref = Algo.NamePref.BASIC;
-            if (c == basicBox.getModel())
+            if (c == basicBox.getModel()) {
                 UserSettings.setNamingPref(Algo.NamePref.BASIC);
-            else if (c == forbiddenBox.getModel())
+            } else if (c == forbiddenBox.getModel()) {
                 UserSettings.setNamingPref(Algo.NamePref.FORBIDDEN);
-            else if (c == derivedBox.getModel())
-                UserSettings.setNamingPref(Algo.NamePref.DERIVED);                
+            } else if (c == derivedBox.getModel()) {
+                UserSettings.setNamingPref(Algo.NamePref.DERIVED);
+            }                
             
             closeDialog();
         }
+    }
+
+
+    @Override
+    public void updateOptions() {
+        try {
+            UIManager.setLookAndFeel(UserSettings.getCurrentTheme());
+        } catch (Exception e) {
+            e.printStackTrace();
+        } 
+        
+        SwingUtilities.updateComponentTreeUI(this);
+        pack();
     }
 
 }

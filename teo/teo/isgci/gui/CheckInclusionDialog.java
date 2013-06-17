@@ -23,17 +23,21 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.ListSelectionModel;
+import javax.swing.SwingUtilities;
+import javax.swing.UIManager;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
 import teo.isgci.db.DataSet;
+import teo.isgci.util.Updatable;
+import teo.isgci.util.UserSettings;
 
 /**
  * The dialog the checks for an inclusion between two graphclasses.
  * It contains two lists in single selection mode.
  */
 public class CheckInclusionDialog extends JDialog
-        implements ActionListener, ListSelectionListener {
+        implements ActionListener, ListSelectionListener, Updatable {
     
     protected ISGCIMainFrame parent;
     protected NodeList firstList, secondList;
@@ -133,6 +137,8 @@ public class CheckInclusionDialog extends JDialog
         gridbag.setConstraints(drawPanel, c);
         content.add(drawPanel);
 
+        UserSettings.subscribeToOptionChanges(this);
+        
         setDefaultCloseOperation(DISPOSE_ON_CLOSE);
         addListeners();
         handleButtons();
@@ -186,6 +192,7 @@ public class CheckInclusionDialog extends JDialog
 
     /** Close the dialog and release resources */
     public void closeDialog() {
+        UserSettings.unsubscribe(this);
         setVisible(false);
         dispose();
     }
@@ -198,6 +205,18 @@ public class CheckInclusionDialog extends JDialog
         InclusionResultDialog.newInstance(parent,
                 firstList.getSelectedNode(), secondList.getSelectedNode()
         ).setVisible(true);
+    }
+
+    @Override
+    public void updateOptions() {
+        try {
+            UIManager.setLookAndFeel(UserSettings.getCurrentTheme());
+        } catch (Exception e) {
+            e.printStackTrace();
+        } 
+        
+        SwingUtilities.updateComponentTreeUI(this);
+        pack();
     }
 
 }

@@ -287,8 +287,7 @@ public enum Complexity {
      *          The name of the complexity.
      * 
      * @return
-     *          The matching complexity. Throws an IllegalArgumentException
-     *          if none is found.
+     *          The matching complexity or null if none is found.
      */
     public static Complexity getComplexity(String s) {
         for (Complexity c : Complexity.values()) {
@@ -303,7 +302,7 @@ public enum Complexity {
             return NPC;
         }
         
-        throw new IllegalArgumentException(s);
+        return null;
     }
 }
 

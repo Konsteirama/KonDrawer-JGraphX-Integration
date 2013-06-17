@@ -28,12 +28,17 @@ import javax.swing.JDialog;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.ListSelectionModel;
+import javax.swing.SwingUtilities;
+import javax.swing.UIManager;
 
 import teo.isgci.db.Algo;
 import teo.isgci.gc.GraphClass;
 import teo.isgci.util.LessLatex;
+import teo.isgci.util.Updatable;
+import teo.isgci.util.UserSettings;
 
-public class SearchDialog extends JDialog implements ActionListener {
+public class SearchDialog extends JDialog 
+        implements ActionListener, Updatable {
     protected ISGCIMainFrame parent;
     protected ButtonGroup group;
     protected JCheckBox basicBox, derivedBox, forbiddenBox;
@@ -101,9 +106,11 @@ public class SearchDialog extends JDialog implements ActionListener {
         pack();
         setSize(300, 350);
 
+        UserSettings.subscribeToOptionChanges(this);
     }
 
     protected void closeDialog() {
+        UserSettings.unsubscribe(this);
         setVisible(false);
         dispose();
     }
@@ -126,6 +133,19 @@ public class SearchDialog extends JDialog implements ActionListener {
                     .getGraphManipulationInterface().centerNode(node);
             closeDialog();
         }
+    }
+
+    @Override
+    public void updateOptions() {
+        try {
+            UIManager.setLookAndFeel(UserSettings.getCurrentTheme());
+        } catch (Exception e) {
+            e.printStackTrace();
+        } 
+        
+        SwingUtilities.updateComponentTreeUI(this);
+        pack();
+        
     }
 }
 

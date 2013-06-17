@@ -31,6 +31,7 @@ import javax.swing.JList;
 import javax.swing.JPanel;
 import javax.swing.JSlider;
 import javax.swing.JTabbedPane;
+import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
 import javax.swing.border.BevelBorder;
 import javax.swing.border.Border;
@@ -41,13 +42,14 @@ import javax.swing.event.ListSelectionListener;
 
 import teo.isgci.db.Algo;
 import teo.isgci.problem.Complexity;
+import teo.isgci.util.Updatable;
 import teo.isgci.util.UserSettings;
 
 /**
  * A dialog where the user can change various settings.
  * 
  */
-public class SettingsDialog extends JDialog {
+public class SettingsDialog extends JDialog implements Updatable {
     
     /** TODO marc JAVADOCS. */
     private JButton applyButton;
@@ -72,6 +74,9 @@ public class SettingsDialog extends JDialog {
     
     /** Indicates the currently selected zoomlevel. */
     private JLabel currentZoomLabel;
+    
+    /** Contains all usersettings, needed if taborientation changes. */
+    private JTabbedPane tabbedPane;
     
     /**
      * This field should change every time the class is changed - once it is
@@ -109,11 +114,10 @@ public class SettingsDialog extends JDialog {
         }
         
         // Initialize tab 
-        JTabbedPane tabContainer 
-            = new JTabbedPane(UserSettings.getCurrentTabPlacement());
+        tabbedPane = new JTabbedPane(UserSettings.getCurrentTabPlacement());
         
         setLayout(new BorderLayout());
-        add(tabContainer, BorderLayout.CENTER);
+        add(tabbedPane, BorderLayout.CENTER);
 
         // Initialize buttons
         createBottomPanel();
@@ -121,8 +125,8 @@ public class SettingsDialog extends JDialog {
         /*
          * Creates the tabs and the integrated panels.
          */
-        tabContainer.addTab("User Interface", createUserInterfaceTab());
-        tabContainer.addTab("Graph colors", createColorTab());
+        tabbedPane.addTab("User Interface", createUserInterfaceTab());
+        tabbedPane.addTab("Graph colors", createColorTab());
 
         // set size
         final Dimension windowSize = new Dimension(750, 100);
@@ -597,6 +601,22 @@ public class SettingsDialog extends JDialog {
     public void closeDialog() {
         setVisible(false);
         dispose();
+    }
+
+    @Override
+    public void updateOptions() {
+        // Set UI
+        try {
+            UIManager.setLookAndFeel(UserSettings.getCurrentTheme());
+        } catch (Exception e) {
+            e.printStackTrace();
+        } 
+        
+        SwingUtilities.updateComponentTreeUI(this);
+        pack();
+        
+        // Set tabs
+        tabbedPane.setTabPlacement(UserSettings.getCurrentTabPlacement());
     }
 
 }

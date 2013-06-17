@@ -33,6 +33,8 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.ListSelectionModel;
+import javax.swing.SwingUtilities;
+import javax.swing.UIManager;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import javax.swing.table.AbstractTableModel;
@@ -42,6 +44,8 @@ import teo.isgci.db.DataSet;
 import teo.isgci.gc.GraphClass;
 import teo.isgci.problem.Problem;
 import teo.isgci.util.LessLatex;
+import teo.isgci.util.Updatable;
+import teo.isgci.util.UserSettings;
 
 
 /**
@@ -49,7 +53,7 @@ import teo.isgci.util.LessLatex;
  * sub- and equivalent classes.
  */
 public class GraphClassInformationDialog extends JDialog
-        implements ActionListener, ListSelectionListener {
+        implements ActionListener, ListSelectionListener, Updatable {
 
     protected ISGCIMainFrame parent;
     protected NodeList classesList;
@@ -234,6 +238,8 @@ public class GraphClassInformationDialog extends JDialog
         } else {
             showNode();
         }
+        
+        UserSettings.subscribeToOptionChanges(this);
     }
 
 
@@ -296,6 +302,7 @@ public class GraphClassInformationDialog extends JDialog
 
 
     protected void closeDialog() {
+        UserSettings.unsubscribe(this);
         setVisible(false);
         dispose();
     }
@@ -308,7 +315,8 @@ public class GraphClassInformationDialog extends JDialog
         if (e.getSource() == classesList) {
             ;
         }
-            showNode(classesList.getSelectedNode());
+        
+        showNode(classesList.getSelectedNode());
     }
 
 
@@ -338,6 +346,18 @@ public class GraphClassInformationDialog extends JDialog
             search.setListData(parent, classesList);
             showNode();
         }
+    }
+
+    @Override
+    public void updateOptions() {
+        try {
+            UIManager.setLookAndFeel(UserSettings.getCurrentTheme());
+        } catch (Exception e) {
+            e.printStackTrace();
+        } 
+        
+        SwingUtilities.updateComponentTreeUI(this);
+        pack();
     }
 
 }

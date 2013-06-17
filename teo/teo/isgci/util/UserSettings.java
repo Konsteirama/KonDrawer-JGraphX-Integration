@@ -12,10 +12,13 @@
 package teo.isgci.util;
 
 import java.awt.Color;
+import java.awt.Component;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Vector;
 
+import javax.swing.JComponent;
 import javax.swing.JTabbedPane;
 import javax.swing.UIManager;
 
@@ -402,17 +405,41 @@ public abstract class UserSettings {
      * @param instance
      *            TODO marc
      */
-    public static void unsubscribeFromOptionChanges(Updatable instance) {
+    public static void unsubscribe(Updatable instance) {
         updatables.remove(instance);
+        cleanUp();
     }
 
     /**
      * Notifies all subscribed objects of a change in the UserSettings.
      */
     private static void updateSettings() {
+        cleanUp();
+        
         for (Updatable instance : updatables) {
             instance.updateOptions();
         }
+    }
+    
+    /**
+     * Removes all non-visible references from this list, to make sure none
+     * are still in memory because they're here in this list although they were
+     * closed already.
+     */
+    private static void cleanUp() {
+
+        Vector<Updatable> deletable = new Vector<Updatable>();
+        
+        for (Updatable object : updatables) {
+            if (object instanceof Component) {
+                Component component = (Component) object;
+                if (!component.isVisible()) {
+                    deletable.add(object);
+                }
+            }
+        }
+        
+        updatables.removeAll(deletable);       
     }
 }
 

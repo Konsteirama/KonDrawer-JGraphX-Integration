@@ -532,9 +532,14 @@ public class ISGCITabbedPane extends JTabbedPane implements Updatable {
         // Reapply color, to change all nodes to the new color scheme
         for (Component tab : this.getComponents()) {
             setProblem(getProblem(tab), tab);
-        }        
-        setNamingPref(UserSettings.getDefaultNamingPref());
-        setNamingPref(UserSettings.getDefaultNamingPref(), getSelectedComponent());
+        }
+        
+        setTabPlacement(UserSettings.getCurrentTabPlacement());
+        
+        // TODO jannis throws error?
+        //setNamingPref(UserSettings.getDefaultNamingPref());
+        //setNamingPref(UserSettings.getDefaultNamingPref(), 
+        //        getSelectedComponent());
     }
 }
 
