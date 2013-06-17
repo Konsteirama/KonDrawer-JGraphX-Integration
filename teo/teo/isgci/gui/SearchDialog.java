@@ -79,7 +79,10 @@ public class SearchDialog extends JDialog
 
         JPanel p = new JPanel();
         searchButton = new JButton("Search");
+        searchButton.setToolTipText("Search in database; "
+                           + "needs connection to internet");
         cancelButton = new JButton("Cancel");
+        cancelButton.setToolTipText("Close this dialogue");
         p.add(searchButton);
         p.add(cancelButton);
         c.insets = new Insets(5, 0, 5, 0);

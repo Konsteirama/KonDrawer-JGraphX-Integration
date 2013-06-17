@@ -92,7 +92,9 @@ public class NamingDialog extends JDialog
 
         JPanel p = new JPanel();
         okButton = new JButton("OK");
+        okButton.setToolTipText("Apply selection and close dialogue");
         cancelButton = new JButton("Cancel");
+        cancelButton.setToolTipText("Discard selection and close dialogue");
         p.add(okButton);
         p.add(cancelButton);
         c.insets = new Insets(5, 0, 5, 0);

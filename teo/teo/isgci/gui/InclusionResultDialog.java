@@ -270,9 +270,13 @@ public class InclusionResultDialog extends JDialog
         
         JPanel p = new JPanel();
         refButton = new JButton("View references");
+        refButton.setToolTipText("Opens graphclasses.org website for references");
         drawButton = new JButton("Draw");
+        drawButton.setToolTipText("Draw selected class and subclasses/superclasses; opens a dialogue");
         drawNewTabButton = new JButton("Draw in new Tab");
+        drawNewTabButton.setToolTipText("Draw selected class and subclasses/superclasses in a new tab; opens a dialogue");
         okButton = new JButton("OK");
+        okButton.setToolTipText("Close dialogue");
         p.add(refButton);
         p.add(drawButton);
         p.add(drawNewTabButton);

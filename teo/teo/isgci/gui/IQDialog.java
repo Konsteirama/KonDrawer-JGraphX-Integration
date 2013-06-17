@@ -103,10 +103,15 @@ public class IQDialog extends JDialog
         //---- Relation buttons
         JPanel panel = new JPanel();
         ltButton = new JButton(LatexGlyph.getGlyph("subset").getUnicode());
+        ltButton.setToolTipText("Subset");
         leButton = new JButton(LatexGlyph.getGlyph("subseteq").getUnicode());
+        leButton.setToolTipText("Subset or equal");
         eqButton = new JButton(LatexGlyph.getGlyph("equiv").getUnicode());
+        eqButton.setToolTipText("Equivalent");
         gtButton = new JButton(LatexGlyph.getGlyph("supset").getUnicode());
+        gtButton.setToolTipText("Supset");
         geButton = new JButton(LatexGlyph.getGlyph("supseteq").getUnicode());
+        geButton.setToolTipText("Supset or equal");
         panel.add(ltButton);
         panel.add(leButton);
         panel.add(eqButton);
@@ -131,7 +136,9 @@ public class IQDialog extends JDialog
 
         JPanel buttonPanel = new JPanel();
         newButton = new JButton("New drawing");
+        newButton.setToolTipText("Draw a new hierarchy; opens a dialogue");
         cancelButton = new JButton("Cancel");
+        cancelButton.setToolTipText("Close this dialogue");
         buttonPanel.add(newButton);
         buttonPanel.add(cancelButton);
         c.insets = new Insets(5, 0, 5, 0);

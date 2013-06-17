@@ -77,8 +77,11 @@ public class ExportDialog extends JDialog
         cardPanel.setLayout(cardLayout);
 
         backButton = new JButton("< Back");
+        backButton.setToolTipText("Go to previous choice");
         nextButton = new JButton("Next >");
+        nextButton.setToolTipText("Continue to next choice");
         cancelButton = new JButton("Cancel");
+        cancelButton.setToolTipText("Close this dialogue");
 
         backButton.addActionListener(this);
         nextButton.addActionListener(this);

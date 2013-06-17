@@ -123,10 +123,15 @@ public class GraphClassSelectionDialog extends JDialog implements
 
         JPanel buttonPanel = new JPanel();
         newButton = new JButton("New drawing");
+        newButton.setToolTipText("Draw a new hierarchy in this tab; opens a dialogue");
         newTabButton = new JButton("Draw in new Tab");
+        newTabButton.setToolTipText("Draw an new hierarchy in a new tab; opens a dialogue");
         addButton = new JButton("Add to drawing");
+        addButton.setToolTipText("Add the selected item to the current drawing");
         removeButton = new JButton("Remove from drawing");
+        removeButton.setToolTipText("Remove the selected item from the current drawing");
         cancelButton = new JButton("Cancel");
+        cancelButton.setToolTipText("Close this dialogue");
 
         buttonPanel.add(newButton);
         buttonPanel.add(newTabButton);

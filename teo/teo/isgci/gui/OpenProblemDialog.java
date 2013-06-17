@@ -152,9 +152,14 @@ public class OpenProblemDialog extends JDialog implements ItemListener,
 
         JPanel buttonPanel = new JPanel();
         drawButton = new JButton("Draw");
+        drawButton.setToolTipText("Open drawing dialogue");
         drawNewTabButton = new JButton("Draw in New Tab");
+        drawNewTabButton.setToolTipText("Open draw dialogue and draw "
+              + "in new tab");
         showButton = new JButton("Class info");
+        showButton.setToolTipText("Show more details about this graphclass");
         closeButton = new JButton("Close");
+        closeButton.setToolTipText("Close this dialogue");
         buttonPanel.add(drawButton);
         buttonPanel.add(drawNewTabButton);
         buttonPanel.add(showButton);

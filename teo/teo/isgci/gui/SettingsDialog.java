@@ -389,7 +389,8 @@ public class SettingsDialog extends JDialog implements Updatable {
 
         // DEFAULT COLOR BUTTON
         JButton setDefaultButtonButton = new JButton("Default colors");
-        
+        setDefaultButtonButton.setToolTipText("Chose colors to be used "
+                              + "in drawing");
         setDefaultButtonButton.addActionListener(new ActionListener() {
             
             @Override
@@ -418,7 +419,8 @@ public class SettingsDialog extends JDialog implements Updatable {
 
         // COLORBLIND BUTTON
         JButton colorBlindButton = new JButton("Set scheme for color blind");
-
+        colorBlindButton.setToolTipText("Chose presentation of drawing for "
+                            + "color-blind people");
         colorBlindButton.addActionListener(new ActionListener() {
             
             //Set color blind color scheme.
@@ -476,6 +478,7 @@ public class SettingsDialog extends JDialog implements Updatable {
         JPanel bottomLeftPanel = new JPanel(new FlowLayout());
 
         JButton uiSetDefaultButton = new JButton("Default settings");
+        uiSetDefaultButton.setToolTipText("Chose default settings");
         bottomLeftPanel.add(uiSetDefaultButton, BorderLayout.LINE_START);
         
         uiSetDefaultButton.addActionListener(new ActionListener() {
@@ -502,6 +505,7 @@ public class SettingsDialog extends JDialog implements Updatable {
 
         // OK Button
         JButton okButton = new JButton("Ok");
+        okButton.setToolTipText("Apply changes and close this dialogue");
         bottomRightPanel.add(okButton);
 
         okButton.addActionListener(new ActionListener() {
@@ -519,6 +523,7 @@ public class SettingsDialog extends JDialog implements Updatable {
         
         // Cancel button
         JButton cancelButton = new JButton("Cancel");
+        cancelButton.setToolTipText("Discard changes and close this dialogue");
         bottomRightPanel.add(cancelButton);
         
         cancelButton.addActionListener(new ActionListener() {
@@ -531,6 +536,7 @@ public class SettingsDialog extends JDialog implements Updatable {
 
         // Apply button
         applyButton = new JButton("Apply");
+        applyButton.setToolTipText("Apply changes");
         applyButton.setEnabled(false);
         bottomRightPanel.add(applyButton);
         

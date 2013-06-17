@@ -102,6 +102,7 @@ public class AboutDialog extends JDialog implements Updatable {
 
         c.insets = new Insets(gap, 0, gap / 2, 0);
         JButton okButton = new JButton(" OK ");
+        okButton.setToolTipText("Close this dialogue");
         gridbag.setConstraints(okButton, c);
         content.add(okButton);
 

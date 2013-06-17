@@ -98,7 +98,7 @@ public class ISGCIToolBar extends JToolBar {
      */
     private void addGeneralButtons() {
         // NEW DRAWING
-        String newDrawingTooltip = "Open a dialog to create a new drawing";
+        String newDrawingTooltip = "Open a dialogue to create a new drawing";
         JButton newdrawingbutton  = IconButtonFactory.createImageButton(
                 IconButtonFactory.ADD_ICON, "Draw", newDrawingTooltip);
         add(newdrawingbutton);
@@ -113,7 +113,7 @@ public class ISGCIToolBar extends JToolBar {
         });
         
         // EXPORT
-        String exportTooltip = "Open the export dialog";
+        String exportTooltip = "Open the export dialogue";
         JButton exportbutton = IconButtonFactory.createImageButton(
                 IconButtonFactory.EXPORT_ICON, "Export", exportTooltip);
         add(exportbutton);
@@ -201,7 +201,7 @@ public class ISGCIToolBar extends JToolBar {
         });
         
         // REDO
-        String redoTooltip = "Redo the last undo action";
+        String redoTooltip = "Redo the last undone action";
         redoButton = IconButtonFactory.createImageButton(
                 IconButtonFactory.REDO_ICON, redoTooltip);
         // redoButton.setEnabled(false);
@@ -321,7 +321,7 @@ public class ISGCIToolBar extends JToolBar {
      */
     private void addMiscButtons() {
         // DELETE
-        String deleteTooltip = "?";
+        String deleteTooltip = "Discard current drawing";
         JButton deletebutton = IconButtonFactory.createImageButton(
                 IconButtonFactory.DELETE_ICON, deleteTooltip);
         add(deletebutton);

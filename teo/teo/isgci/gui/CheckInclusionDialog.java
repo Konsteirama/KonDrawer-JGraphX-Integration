@@ -130,7 +130,10 @@ public class CheckInclusionDialog extends JDialog
         content.add(scroller);
         JPanel drawPanel = new JPanel();
         cancelButton = new JButton("Close");
+        cancelButton.setToolTipText("Close this dialogue");
         inclusionCheckButton = new JButton("Find relation");
+        inclusionCheckButton.setToolTipText("Find relation between two "
+                     + "classes; needs two selected classes");
         drawPanel.add(inclusionCheckButton);
         drawPanel.add(cancelButton);
         c.weighty = 0.0;
