@@ -332,8 +332,10 @@ public class ISGCITabbedPane extends JTabbedPane implements Updatable {
      */
     public void setNamingPref(NamePref pref) {
         this.defaultMode = pref;
-        for (Component tab : panelToNamingPref.keySet()) {
-            setNamingPref(pref, tab);
+        if (panelToNamingPref.size() > 0){
+            for (Component tab : panelToNamingPref.keySet()) {
+                setNamingPref(pref, tab);
+            }
         }
     }
     
@@ -535,11 +537,7 @@ public class ISGCITabbedPane extends JTabbedPane implements Updatable {
         }
         
         setTabPlacement(UserSettings.getCurrentTabPlacement());
-        
-        // TODO jannis throws error?
-        //setNamingPref(UserSettings.getDefaultNamingPref());
-        //setNamingPref(UserSettings.getDefaultNamingPref(), 
-        //        getSelectedComponent());
+        setNamingPref(UserSettings.getDefaultNamingPref());
     }
 }
 
