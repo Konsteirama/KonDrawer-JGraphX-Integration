@@ -14,6 +14,7 @@ package teo.isgci.gui;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.List;
 
 import javax.swing.JButton;
 import javax.swing.JComboBox;
@@ -181,7 +182,7 @@ public class ISGCIToolBar extends JToolBar {
         });
 
 
-        // RESTORELAYOUT
+        // RESET
         String resetTooltip = "Reset the graph to its original state";
         JButton resetbutton = IconButtonFactory.createImageButton(
                 IconButtonFactory.RESET_ICON, resetTooltip);
@@ -318,10 +319,15 @@ public class ISGCIToolBar extends JToolBar {
     
     /**
      * Add controls that have no specific group.
+     * 
+     * @param <V>
+     *          The vertex class.
+     * @param <E>
+     *          The edge class.
      */
-    private void addMiscButtons() {
+    private <V, E> void addMiscButtons() {
         // DELETE
-        String deleteTooltip = "Discard current drawing";
+        String deleteTooltip = "Discard the selected nodes and their edges.";
         JButton deletebutton = IconButtonFactory.createImageButton(
                 IconButtonFactory.DELETE_ICON, deleteTooltip);
         add(deletebutton);
@@ -330,11 +336,88 @@ public class ISGCIToolBar extends JToolBar {
 
             @Override
             public void actionPerformed(ActionEvent e) {
-                getManipulationInterface();
-                // TODO
+                DrawingLibraryInterface<V, E> drawLib = 
+                        mainframe.getTabbedPane()
+                            .getActiveDrawingLibraryInterface();
+                
+                if (drawLib == null) {
+                    return;
+                }
+                
+                GraphManipulationInterface<V, E> manipulationInterface =
+                        drawLib.getGraphManipulationInterface();
+                
+                List<V> selectedNodes = drawLib.getSelectedNodes();
+                
+                for (V node : selectedNodes) {
+                    manipulationInterface.removeNode(node);
+                }
             }
         });
 
+        // HIGHLIGHT
+        String highlightTooltip = "Highlights the node and their neighbours.";
+        JButton highlightButton = IconButtonFactory.createImageButton(
+                IconButtonFactory.HELP_ICON, highlightTooltip);
+        add(highlightButton);
+        
+        highlightButton.addActionListener(new ActionListener() {
+            
+            @Override
+            public void actionPerformed(ActionEvent e) {                
+                DrawingLibraryInterface<V, E> drawLib = 
+                        mainframe.getTabbedPane()
+                            .getActiveDrawingLibraryInterface();
+                
+                if (drawLib == null) {
+                    return;
+                }
+                
+                GraphManipulationInterface<V, E> manipulationInterface =
+                        drawLib.getGraphManipulationInterface();
+                
+                List<V> selectedNodes = drawLib.getSelectedNodes();
+                
+                manipulationInterface.unHiglightAll();
+                
+                for (V node : selectedNodes) {
+                    manipulationInterface.highlightNode(node, true);
+                }
+            }
+        });
+        
+        // CENTER
+        String centerTooltip = "Centers the selected node.";
+        JButton centerButton = IconButtonFactory.createImageButton(
+                IconButtonFactory.ALIGN_CENTER_ICON, centerTooltip);
+        add(centerButton);
+        
+        centerButton.addActionListener(new ActionListener() {
+            
+            @Override
+            public void actionPerformed(ActionEvent e) {                
+                DrawingLibraryInterface<V, E> drawLib = 
+                        mainframe.getTabbedPane()
+                            .getActiveDrawingLibraryInterface();
+                
+                if (drawLib == null) {
+                    return;
+                }
+                
+                GraphManipulationInterface<V, E> manipulationInterface =
+                        drawLib.getGraphManipulationInterface();
+                
+                List<V> selectedNodes = drawLib.getSelectedNodes();
+                
+                if (selectedNodes.size() == 1) {
+                    manipulationInterface.centerNode(selectedNodes.get(0));
+                    manipulationInterface.highlightNode(
+                            selectedNodes.get(0), false);
+                }
+            }
+        });
+        
+        
         // SEARCH
         String searchTooltip = "Opens a dialog to search for a specific "
                                 + "graphclass in the drawing.";

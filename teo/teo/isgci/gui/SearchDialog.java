@@ -32,6 +32,8 @@ import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
 
 import teo.isgci.db.Algo;
+import teo.isgci.drawing.DrawingLibraryInterface;
+import teo.isgci.drawing.GraphManipulationInterface;
 import teo.isgci.gc.GraphClass;
 import teo.isgci.util.LessLatex;
 import teo.isgci.util.Updatable;
@@ -132,8 +134,21 @@ public class SearchDialog extends JDialog
                 if (names.contains(classesList.getSelectedValue()))
                     node = (Set<GraphClass>) object;
             }
-            parent.getTabbedPane().getActiveDrawingLibraryInterface()
-                    .getGraphManipulationInterface().centerNode(node);
+            
+            DrawingLibraryInterface drawLib
+                = parent.getTabbedPane().getActiveDrawingLibraryInterface(); 
+            
+            if (drawLib == null) {
+                return;
+            }
+            
+            GraphManipulationInterface manipulationInterface
+                = drawLib.getGraphManipulationInterface();
+            
+            manipulationInterface.centerNode(node);
+            manipulationInterface.unHiglightAll();
+            manipulationInterface.highlightNode(node, false);
+            
             closeDialog();
         }
     }

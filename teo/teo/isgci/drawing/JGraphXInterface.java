@@ -17,8 +17,8 @@ import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.Graphics2D;
 import java.awt.Point;
-import java.awt.event.ComponentEvent;
-import java.awt.event.ComponentListener;
+import java.awt.event.HierarchyBoundsListener;
+import java.awt.event.HierarchyEvent;
 import java.awt.event.MouseEvent;
 import java.awt.image.BufferedImage;
 import java.io.File;
@@ -65,14 +65,27 @@ import com.mxgraph.view.mxGraph;
  */
 class JGraphXInterface<V, E> implements DrawingLibraryInterface<V, E> {
 
-    /** */
+    /** The actual canvas. */
     private mxGraphComponent graphComponent;
-    /** */
+    
+    /** An interface to manipulate the canvas. */
     private GraphManipulation<V, E> graphManipulation;
-    /** */
+    
+    /** An simple interface to register 
+     *  an mouse adapter. 
+     */
     private GraphEvent graphEvent;
-    /** */
+    
+    /** An adapter, which transforms jgraphx in jgrapht 
+     *  and vice versa.
+     */
     private JGraphXAdapter<V, E> graphAdapter;
+    
+    /** The default font size for a latexlabel. */
+    public static final int DEFAULT_FONT_SIZE = 12;
+    
+    /** The Max-Height-Width for the eps export. */
+    public static final float EPS_MAX_HEIGHT_WIDTH = 16384f;
 
     /**
      * The constructor for JGraphXInterface.
@@ -106,30 +119,36 @@ class JGraphXInterface<V, E> implements DrawingLibraryInterface<V, E> {
             public Component[] createComponents(mxCellState state) {
                 if (getGraph().getModel().isVertex(state.getCell())) {
                     String label = state.getLabel();
+                    
                     // get rid of these nasty [] around all labels
                     label = label.replace("[", "");
                     label = label.replace("]", "");
 
+                    // Creates a new label and sets properties
                     final LatexLabel labelComponent = new LatexLabel(label);
                     labelComponent.setHorizontalAlignment(SwingConstants
                             .CENTER);
                     labelComponent.setVerticalAlignment(SwingConstants.CENTER);
                     labelComponent.setBackground(new Color(0, 0, 0, 0));
 
-                    labelComponent.addComponentListener(new ComponentListener() {
-                        @Override 
-                        public void componentShown(ComponentEvent e) { }   
-                        @Override 
-                        public void componentMoved(ComponentEvent e) { }
-                        @Override 
-                        public void componentHidden(ComponentEvent e) { }
+                    /* A Listener to resize the font in the latexComponent
+                     * when the graphComponent is being zoomed
+                     */ 
+                    labelComponent.addHierarchyBoundsListener(
+                            new HierarchyBoundsListener() {
+                        @Override
+                        public void ancestorResized(HierarchyEvent e) {
+                            double scale = graphComponent.getGraph().
+                                    getView().getScale();
+                            
+                            labelComponent.setFont(new Font(
+                                    "Dialog", Font.BOLD, 
+                                    (int) (DEFAULT_FONT_SIZE * scale)));
+                            
+                        }
                         
                         @Override
-                        public void componentResized(ComponentEvent e) {
-                            double scale = graphComponent.getGraph().getView().getScale();
-                            
-                            labelComponent.setFont(new Font("Dialog", Font.BOLD, (int) (12 * scale)));
-                        }
+                        public void ancestorMoved(HierarchyEvent e) { }
                     });
                     
                     return new Component[]{labelComponent};
@@ -160,8 +179,8 @@ class JGraphXInterface<V, E> implements DrawingLibraryInterface<V, E> {
     }
 
     /**
-     * Creates a new JGraphXAdapter form the given Graph with edge selection and
-     * movement disabled.
+     * Creates a new JGraphXAdapter form the given Graph with edge selection
+     * and movement disabled.
      *
      * @param g JGraphT graph
      * @return JGraphXAdapter
@@ -245,14 +264,12 @@ class JGraphXInterface<V, E> implements DrawingLibraryInterface<V, E> {
         EPSTranscoder transcoder = new EPSTranscoder();
 
         // Add Transcoding hints
-        float MAX_HEIGHT_WIDTH = 16384f;
-
         transcoder.addTranscodingHint(
                 EPSTranscoder.KEY_PIXEL_UNIT_TO_MILLIMETER, 1.0f);
         transcoder.addTranscodingHint(EPSTranscoder.KEY_MAX_HEIGHT,
-                MAX_HEIGHT_WIDTH);
+                EPS_MAX_HEIGHT_WIDTH);
         transcoder.addTranscodingHint(EPSTranscoder.KEY_MAX_WIDTH,
-                MAX_HEIGHT_WIDTH);
+                EPS_MAX_HEIGHT_WIDTH);
 
         String svgURI;
         try {
@@ -428,7 +445,7 @@ class JGraphXInterface<V, E> implements DrawingLibraryInterface<V, E> {
     }
 
     /**
-     * Returns the node located at the specified point
+     * Returns the node located at the specified point.
      *
      * @param p Location to look for a node
      * @return Node located at the given point or null if there is no node
@@ -437,14 +454,15 @@ class JGraphXInterface<V, E> implements DrawingLibraryInterface<V, E> {
     public V getNodeAt(Point p) {
         mxCell cell = (mxCell) graphComponent.getCellAt((int) p.getX(),
                 (int) p.getY());
-        if (cell != null && cell.isVertex())
+        if (cell != null && cell.isVertex()) {
             return graphAdapter.getCellToVertexMap().get(cell);
-        else
+        } else {
             return null;
+        }
     }
 
     /**
-     * Returns the edge located at the specified point
+     * Returns the edge located at the specified point.
      *
      * @param p Location to look for an edge
      * @return Edge located at the given point or null if there is no edge
@@ -453,10 +471,11 @@ class JGraphXInterface<V, E> implements DrawingLibraryInterface<V, E> {
     public E getEdgeAt(Point p) {
         mxCell cell = (mxCell) graphComponent.getCellAt((int) p.getX(),
                 (int) p.getY());
-        if (cell != null && cell.isEdge())
+        if (cell != null && cell.isEdge()) {
             return graphAdapter.getCellToEdgeMap().get(cell);
-        else
+        } else {
             return null;
+        }      
     }
 
     /**
@@ -487,29 +506,30 @@ class JGraphXInterface<V, E> implements DrawingLibraryInterface<V, E> {
     /**
      * Returns a list of the selected nodes.
      *
-     * @return
+     * @return Returns a list of all selected nodes
      */
     @Override
     public List<V> getSelectedNodes() {
         List<V> list = new ArrayList<V>(graphAdapter.getSelectionCount());
 
-        for(Object cell : graphAdapter.getSelectionCells())
-        {
+        for (Object cell : graphAdapter.getSelectionCells()) {
             list.add(graphAdapter.getCellToVertexMap().get(cell));
         }
+        
         return list;
     }
 
     /**
      * Sets the selection to the given nodes.
+     * 
+     * @param nodes : the nodes to be selected
      */
     @Override
     public void setSelectedNodes(List<V> nodes) {
 
         Collection<Object> col = new ArrayList<Object>(nodes.size());
 
-        for(V node : nodes)
-        {
+        for (V node : nodes) {
             col.add(graphAdapter.getVertexToCellMap().get(node));
         }
 
