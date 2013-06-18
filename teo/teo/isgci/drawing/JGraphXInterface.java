@@ -14,8 +14,11 @@ package teo.isgci.drawing;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
+import java.awt.Font;
 import java.awt.Graphics2D;
 import java.awt.Point;
+import java.awt.event.ComponentEvent;
+import java.awt.event.ComponentListener;
 import java.awt.event.MouseEvent;
 import java.awt.image.BufferedImage;
 import java.io.File;
@@ -25,6 +28,9 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.net.MalformedURLException;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
 
 import javax.imageio.ImageIO;
 import javax.swing.SwingConstants;
@@ -104,12 +110,28 @@ class JGraphXInterface<V, E> implements DrawingLibraryInterface<V, E> {
                     label = label.replace("[", "");
                     label = label.replace("]", "");
 
-                    LatexLabel labelComponent = new LatexLabel(label);
+                    final LatexLabel labelComponent = new LatexLabel(label);
                     labelComponent.setHorizontalAlignment(SwingConstants
                             .CENTER);
                     labelComponent.setVerticalAlignment(SwingConstants.CENTER);
                     labelComponent.setBackground(new Color(0, 0, 0, 0));
 
+                    labelComponent.addComponentListener(new ComponentListener() {
+                        @Override 
+                        public void componentShown(ComponentEvent e) { }   
+                        @Override 
+                        public void componentMoved(ComponentEvent e) { }
+                        @Override 
+                        public void componentHidden(ComponentEvent e) { }
+                        
+                        @Override
+                        public void componentResized(ComponentEvent e) {
+                            double scale = graphComponent.getGraph().getView().getScale();
+                            
+                            labelComponent.setFont(new Font("Dialog", Font.BOLD, (int) (12 * scale)));
+                        }
+                    });
+                    
                     return new Component[]{labelComponent};
                 }
                 return null;
@@ -133,6 +155,8 @@ class JGraphXInterface<V, E> implements DrawingLibraryInterface<V, E> {
                 new InternalMouseAdapter(graphComponent, graphManipulation));
 
         graphManipulation.reapplyHierarchicalLayout();
+
+
     }
 
     /**
@@ -178,6 +202,7 @@ class JGraphXInterface<V, E> implements DrawingLibraryInterface<V, E> {
         graphAdapter.setVertexLabelsMovable(false);
         graphAdapter.setConnectableEdges(false);
         graphAdapter.setAutoSizeCells(true);
+        graphAdapter.setDropEnabled(false);
 
         graphAdapter.getStylesheet().getDefaultVertexStyle()
                 .put(mxConstants.STYLE_NOLABEL, "1");
@@ -457,5 +482,37 @@ class JGraphXInterface<V, E> implements DrawingLibraryInterface<V, E> {
         applyCustomGraphSettings();
 
         graphManipulation.reapplyHierarchicalLayout();
+    }
+
+    /**
+     * Returns a list of the selected nodes.
+     *
+     * @return
+     */
+    @Override
+    public List<V> getSelectedNodes() {
+        List<V> list = new ArrayList<V>(graphAdapter.getSelectionCount());
+
+        for(Object cell : graphAdapter.getSelectionCells())
+        {
+            list.add(graphAdapter.getCellToVertexMap().get(cell));
+        }
+        return list;
+    }
+
+    /**
+     * Sets the selection to the given nodes.
+     */
+    @Override
+    public void setSelectedNodes(List<V> nodes) {
+
+        Collection<Object> col = new ArrayList<Object>(nodes.size());
+
+        for(V node : nodes)
+        {
+            col.add(graphAdapter.getVertexToCellMap().get(node));
+        }
+
+        graphAdapter.setSelectionCells(col);
     }
 }

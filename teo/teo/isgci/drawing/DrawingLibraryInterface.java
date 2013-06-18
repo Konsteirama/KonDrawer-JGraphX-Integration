@@ -12,13 +12,14 @@
 package teo.isgci.drawing;
 
 import java.awt.Point;
+import java.util.List;
 
 import org.jgrapht.Graph;
 
 import com.mxgraph.swing.mxGraphComponent;
 
 /**
- * Dumbed down version of the original, WIP DrawingLibraryInterface
+ * Dumbed down version of the original, WIP DrawingLibraryInterface.
  * TODO: replace this with the final one
  * @param <V> b.
  * @param <E> b.
@@ -71,15 +72,26 @@ public interface DrawingLibraryInterface<V, E> {
     E getEdgeAt(Point p);
 
     /**
-     * Set a new graph which should be drawn.
+     * Sets a new graph which should be drawn.
      * @param g The new graph
      */
     void setGraph(Graph<V, E> g);
-    
-    /**
-     * Returns the jgrapht graph that is currently drawn.
-     * @return The jgraphT graph associated with this interface.
-     */
-    Graph<V, E> getGraph();
-}
 
+    /**
+     * Returns the current graph.
+     * @return the current graph
+     */
+    Graph<V,E> getGraph();
+
+    /**
+     * Returns a list of the selected nodes.
+     * @return
+     */
+    List<V> getSelectedNodes();
+
+    /**
+     * Sets the selection to the given nodes.
+     */
+    void setSelectedNodes(List<V> nodes);
+    
+}

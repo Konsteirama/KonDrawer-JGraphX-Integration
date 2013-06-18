@@ -42,4 +42,8 @@ public interface GraphManipulationInterface<V, E> {
     void zoom(boolean zoomIn);
 
     void zoom(boolean zoomIn, Point center);
+
+    void highlightNode(V node, boolean hightlightNeighbors);
+
+    void unHiglightAll();
 }
