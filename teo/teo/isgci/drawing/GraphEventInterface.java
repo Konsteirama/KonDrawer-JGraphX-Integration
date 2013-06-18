@@ -1,10 +1,20 @@
+/*
+ * Interface for the registration of mouse events.
+ *
+ * $Header$
+ *
+ * This file is part of the Information System on Graph Classes and their
+ * Inclusions (ISGCI) at http://www.graphclasses.org.
+ * Email: isgci@graphclasses.org
+ */
+
+
 package teo.isgci.drawing;
 
 import java.awt.event.MouseAdapter;
 
 /**
- * Dumbed down version of the original, WIP GraphEventInterface.
- * TODO: replace this with the final one
+ * Interface for the registration of mouse events.
  */
 public interface GraphEventInterface {
 
@@ -15,3 +25,5 @@ public interface GraphEventInterface {
     void registerMouseAdapter(MouseAdapter adapter);
 
 }
+
+/* EOF */

@@ -707,7 +707,7 @@
         </java>
     </target>
 
-    <target name="debug" description="Debug isgci">
+    <target name="debug" description="Debug isgci" depends="jar">
 
         <java jar="${isgci.jar}" fork="true">
             <arg value="file://${web.dir}/" />

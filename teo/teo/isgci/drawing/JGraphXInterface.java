@@ -1,5 +1,6 @@
 /*
- * Replace this line with a (multi-line) description of this file...
+ * The actual implementation of a DrawingLibraryInterface,
+ * which is used to manipulate the canvas etc.
  *
  * $Header$
  *
@@ -7,7 +8,6 @@
  * Inclusions (ISGCI) at http://www.graphclasses.org.
  * Email: isgci@graphclasses.org
  */
-
 
 package teo.isgci.drawing;
 
@@ -60,8 +60,11 @@ import com.mxgraph.view.mxCellState;
 import com.mxgraph.view.mxGraph;
 
 /**
- * Dumbed down version of the original, WIP interface
- * TODO: replace this with the final one
+ * The actual implementation of a DrawingLibraryInterface,
+ * which is used to manipulate the canvas etc.
+ *
+ * @param <V> Vertices
+ * @param <E> Edges
  */
 class JGraphXInterface<V, E> implements DrawingLibraryInterface<V, E> {
 
@@ -143,8 +146,7 @@ class JGraphXInterface<V, E> implements DrawingLibraryInterface<V, E> {
                             
                             labelComponent.setFont(new Font(
                                     "Dialog", Font.BOLD, 
-                                    (int) (DEFAULT_FONT_SIZE * scale)));
-                            
+                                    (int) (DEFAULT_FONT_SIZE * scale))); 
                         }
                         
                         @Override
@@ -536,3 +538,5 @@ class JGraphXInterface<V, E> implements DrawingLibraryInterface<V, E> {
         graphAdapter.setSelectionCells(col);
     }
 }
+
+/* EOF */

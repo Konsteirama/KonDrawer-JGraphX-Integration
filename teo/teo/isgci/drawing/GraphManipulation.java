@@ -1,3 +1,16 @@
+/*
+ * This class implements the GraphManipulationInterface. It handles
+ * manipulations that are done on the JGraphX-graph that
+ * is viewed on the panel.
+ * Manipulation will be done by the user.
+ *
+ * $Header$
+ *
+ * This file is part of the Information System on Graph Classes and their
+ * Inclusions (ISGCI) at http://www.graphclasses.org.
+ * Email: isgci@graphclasses.org
+ */
+
 package teo.isgci.drawing;
 
 import java.awt.Color;
@@ -22,10 +35,13 @@ import com.mxgraph.util.mxUtils;
 import com.mxgraph.view.mxGraph;
 
 /**
- * Dumbed down version of the original, WIP GraphEventInterface.
- * TODO: replace this with the final one
- * @param <V>
- * @param <E>
+ * This class implements the GraphManipulationInterface. It handles
+ * manipulations that are done on the JGraphX-graph that
+ * is viewed on the panel.
+ * Manipulation will be done by the user.
+ *
+ * @param <V> : vertices of the graph
+ * @param <E> : edges of the graph
  */
 class GraphManipulation<V, E> implements GraphManipulationInterface<V, E> {
 
@@ -35,6 +51,7 @@ class GraphManipulation<V, E> implements GraphManipulationInterface<V, E> {
                     .getProperty("edit"));
         }
     };
+    
     /**
      * GraphComponent is the panel the graph is drawn in.
      */
@@ -45,7 +62,7 @@ class GraphManipulation<V, E> implements GraphManipulationInterface<V, E> {
     private mxUndoManager undoManager;
 
     /**
-     * Currently highlighted cells with their previous color
+     * Currently highlighted cells with their previous color.
      */
     private HashMap<mxICell, Color> markedCells;
 
@@ -53,10 +70,10 @@ class GraphManipulation<V, E> implements GraphManipulationInterface<V, E> {
      * Constructor of the class. Creates an instance of the GraphManipulation
      * class that operates on a given graphComponent.
      *
-     * @param graphComponent : a JGRaphX graphComponent, shown on the panel
+     * @param pGraphComponent : a JGRaphX graphComponent, shown on the panel
      */
-    public GraphManipulation(mxGraphComponent graphComponent) {
-        this.graphComponent = graphComponent;
+    public GraphManipulation(mxGraphComponent pGraphComponent) {
+        this.graphComponent = pGraphComponent;
 
         // initiation of undoManager variable
         this.undoManager = new mxUndoManager();
@@ -72,16 +89,17 @@ class GraphManipulation<V, E> implements GraphManipulationInterface<V, E> {
     }
 
     /**
-     * Returns the current graph adapter
+     * Returns the current graph adapter.
      *
      * @return The current graph adapter
      */
+    @SuppressWarnings("unchecked")
     private JGraphXAdapter<V, E> getGraphAdapter() {
         return (JGraphXAdapter<V, E>) graphComponent.getGraph();
     }
 
     /**
-     * Returns the cell associated with the given node
+     * Returns the cell associated with the given node.
      *
      * @param node
      * @return
@@ -91,7 +109,7 @@ class GraphManipulation<V, E> implements GraphManipulationInterface<V, E> {
     }
 
     /**
-     * Returns the cell associated with the given edge
+     * Returns the cell associated with the given edge.
      *
      * @param edge
      * @return
@@ -101,7 +119,7 @@ class GraphManipulation<V, E> implements GraphManipulationInterface<V, E> {
     }
 
     /**
-     * Returns the cells associated with the given nodes
+     * Returns the cells associated with the given nodes.
      *
      * @param nodes
      * @return
@@ -115,7 +133,7 @@ class GraphManipulation<V, E> implements GraphManipulationInterface<V, E> {
     }
 
     /**
-     * Returns the cells associated with the given edges
+     * Returns the cells associated with the given edges.
      *
      * @param edges
      * @return
@@ -129,10 +147,10 @@ class GraphManipulation<V, E> implements GraphManipulationInterface<V, E> {
     }
 
     /**
-     * Translates a point from graphComponent to graph
+     * Translates a point from graphComponent to graph.
      *
-     * @param p
-     * @return
+     * @param p : the point on the canvas
+     * @return the actual point on graph
      */
     private Point getPointOnGraph(Point p) {
         mxGraph graph = graphComponent.getGraph();
@@ -147,33 +165,16 @@ class GraphManipulation<V, E> implements GraphManipulationInterface<V, E> {
         return new Point((int) x, (int) y);
     }
 
-    /**
-     * Returns a boolean denoting whether the calling graph is able to perform
-     * a redo-operation.
-     *
-     * @return if false then there was no undoable action performed earlier
-     */
     @Override
     public boolean canRedo() {
         return undoManager.canRedo();
     }
 
-    /**
-     * Returns a boolean denoting whether the calling graph is able to perform
-     * an undo-operation.
-     *
-     * @return if true then there is an action that can be undone
-     */
     @Override
     public boolean canUndo() {
         return undoManager.canUndo();
     }
 
-    /**
-     * Centers the view of the panel on the selected node.
-     *
-     * @param node : a node of the graph
-     */
     @Override
     public void centerNode(V node) {
         mxGraph graph = graphComponent.getGraph();
@@ -185,12 +186,6 @@ class GraphManipulation<V, E> implements GraphManipulationInterface<V, E> {
         graph.getModel().endUpdate();
     }
 
-    /**
-     * Colors a given node in a given color.
-     *
-     * @param nodes : an array of nodes of the graph
-     * @param color : a color-parameter
-     */
     @Override
     public void colorNode(V[] nodes, Color color) {
 
@@ -204,12 +199,6 @@ class GraphManipulation<V, E> implements GraphManipulationInterface<V, E> {
         graph.getModel().endUpdate();
     }
 
-    /**
-     * Marks the edge between two given nodes by adding a small grey arrow and
-     * coloring the edge.
-     *
-     * @param edges : an array of edges of the graph
-     */
     @Override
     public void markEdge(E[] edges) {
 
@@ -223,12 +212,6 @@ class GraphManipulation<V, E> implements GraphManipulationInterface<V, E> {
         graph.getModel().endUpdate();
     }
 
-    /**
-     * Unmarks the edge between two given nodes by removing
-     * the small grey arrow and uncoloring the edge.
-     *
-     * @param edges : an array of edges of the graph
-     */
     @Override
     public void unmarkEdge(E[] edges) {
         mxGraph graph = graphComponent.getGraph();
@@ -236,14 +219,12 @@ class GraphManipulation<V, E> implements GraphManipulationInterface<V, E> {
         graph.getModel().beginUpdate();
 
         graph.setCellStyles(mxConstants.STYLE_STROKECOLOR,
-                mxUtils.hexString(new Color(100, 130, 185)), getCellsFromEdges(edges));
+                mxUtils.hexString(new Color(100, 130, 185)), 
+                getCellsFromEdges(edges));
 
         graph.getModel().endUpdate();
     }
 
-    /**
-     * Gives a hierarchical order to the displayed graph.
-     */
     @Override
     public void reapplyHierarchicalLayout() {
         mxGraph graph = graphComponent.getGraph();
@@ -256,20 +237,11 @@ class GraphManipulation<V, E> implements GraphManipulationInterface<V, E> {
         graph.getModel().endUpdate();
     }
 
-    /**
-     * Redoes a previously undone action on the graph.
-     */
     @Override
     public void redo() {
         undoManager.redo();
     }
 
-    /**
-     * Removes the given node from the graph. Removal only effects the
-     * JGraphX-graph.
-     *
-     * @param node : a JGraphX-graph node object
-     */
     @Override
     public void removeNode(V node) {
         mxGraph graph = graphComponent.getGraph();
@@ -289,10 +261,6 @@ class GraphManipulation<V, E> implements GraphManipulationInterface<V, E> {
         graph.getModel().endUpdate();
     }
 
-    /**
-     * Highlights a node and if specified its neighbors
-     * @param hightlightNeighbors
-     */
     @Override
     public void highlightNode(V node, boolean hightlightNeighbors) {
 
@@ -300,30 +268,34 @@ class GraphManipulation<V, E> implements GraphManipulationInterface<V, E> {
         mxICell cell = getCellFromNode(node);
         cells.add(cell);
 
-        if(hightlightNeighbors)
-        {
-            for(int i = 0; i < cell.getEdgeCount(); i++)
-            {
-                mxCell edge = (mxCell)cell.getEdgeAt(i);
+        if (hightlightNeighbors) {
+            for (int i = 0; i < cell.getEdgeCount(); i++) {
+                mxCell edge = (mxCell) cell.getEdgeAt(i);
                 markedCells.put(edge, mxUtils.getColor(getGraphAdapter()
                         .getCellStyle(edge), mxConstants.STYLE_STROKECOLOR));
 
                 mxICell source = edge.getSource();
                 mxICell target = edge.getTarget();
 
-                if(!markedCells.containsKey(source))
-                    markedCells.put(source, mxUtils.getColor(getGraphAdapter
-                            ().getCellStyle(source),
+                if (!markedCells.containsKey(source)) {
+                    markedCells.put(source, mxUtils.getColor(getGraphAdapter(
+                            ).getCellStyle(source),
                             mxConstants.STYLE_STROKECOLOR));
-                if(!markedCells.containsKey(target))
-                    markedCells.put(target, mxUtils.getColor(getGraphAdapter
-                            ().getCellStyle(target),
+                    cells.add(source);
+                }
+                
+                if (!markedCells.containsKey(target)) {
+                    markedCells.put(target, mxUtils.getColor(getGraphAdapter(
+                            ).getCellStyle(target),
                             mxConstants.STYLE_STROKECOLOR));
+                    cells.add(target);
+                }
             }
         }
 
-        getGraphAdapter().setCellStyles(mxConstants.STYLE_STROKECOLOR, mxUtils.getHexColorString
-                    (Color.yellow), cells.toArray());
+        getGraphAdapter().setCellStyles(mxConstants.STYLE_STROKECOLOR,
+                mxUtils.getHexColorString(
+                        Color.yellow), cells.toArray());
 
     }
 
@@ -331,8 +303,7 @@ class GraphManipulation<V, E> implements GraphManipulationInterface<V, E> {
     public void unHiglightAll() {
         graphComponent.getGraph().getModel().beginUpdate();
 
-        for(mxICell cell : markedCells.keySet())
-        {
+        for (mxICell cell : markedCells.keySet()) {
             getGraphAdapter().setCellStyles(mxConstants.STYLE_STROKECOLOR,
                     mxUtils.getHexColorString(markedCells.get(cell)),
                     new Object[]{cell});
@@ -340,13 +311,6 @@ class GraphManipulation<V, E> implements GraphManipulationInterface<V, E> {
         graphComponent.getGraph().getModel().endUpdate();
     }
 
-    /**
-     * Alters the attribute name of a given node by replacing it by a given new
-     * name. Renaming only effects the JGraphX-graph.
-     *
-     * @param node    : a node of the graph
-     * @param newName : the name the node is given
-     */
     @Override
     public void renameNode(V node, String newName) {
         mxGraph graph = graphComponent.getGraph();
@@ -360,45 +324,26 @@ class GraphManipulation<V, E> implements GraphManipulationInterface<V, E> {
         graph.getModel().endUpdate();
     }
 
-    /**
-     * Resets the layout of the JGrapgX-graph on the panel to the original
-     * JGraphT-graph.
-     */
     @Override
     public void resetLayout() {
         Graph<V, E> graphT = getGraphAdapter().getGraph();
 
         JGraphXAdapter<V, E> newGraphAdapter = new JGraphXAdapter<V, E>(graphT);
+        
     }
 
-    /**
-     * Undoes a previously performed action on the graph.
-     */
     @Override
     public void undo() {
         undoManager.undo();
     }
 
-    /**
-     * Zooms the panel to the given factor. It will magnify the graph, if the
-     * graph is too big for the panel only a section of the whole graph will be
-     * shown. This method zooms to the center of the panel.
-     *
-     * @param factor : a double that represents the zoom factor
-     *               (ranges from 0 to infinite, 1 is 100%)
-     */
+
     @Override
     public void zoomTo(double factor) {
         graphComponent.zoomTo(factor, true);
     }
 
-    /**
-     * Zooms the panel. It will magnify the graph, if the
-     * graph is too big for the panel only a section of the whole graph will be
-     * shown. This method zooms to the center of the panel.
-     *
-     * @param zoomIn : a boolean to zoom in or out
-     */
+
     @Override
     public void zoom(boolean zoomIn) {
         graphComponent.setCenterZoom(true);
@@ -410,12 +355,7 @@ class GraphManipulation<V, E> implements GraphManipulationInterface<V, E> {
         }
     }
 
-    /**
-     * Zooms the panel, centering on the given coordinates.
-     *
-     * @param zoomIn : a boolean to zoom in or out
-     * @param center : the point zoom centers on
-     */
+
     @Override
     public void zoom(boolean zoomIn, Point center) {
         Point pointOnCanvas = getPointOnGraph(center);
@@ -424,8 +364,8 @@ class GraphManipulation<V, E> implements GraphManipulationInterface<V, E> {
 
         Point newPointOnCanvas = getPointOnGraph(center);
 
-        double zoomFactor = zoomIn ? graphComponent.getZoomFactor() :
-                1 / graphComponent.getZoomFactor();
+        double zoomFactor = zoomIn ? graphComponent.getZoomFactor()
+                : 1 / graphComponent.getZoomFactor();
 
         Rectangle rect = graphComponent.getGraphControl().getVisibleRect();
 
@@ -446,3 +386,5 @@ class GraphManipulation<V, E> implements GraphManipulationInterface<V, E> {
         graphComponent.getGraphControl().scrollRectToVisible(rect, true);*/
     }
 }
+
+/* EOF */

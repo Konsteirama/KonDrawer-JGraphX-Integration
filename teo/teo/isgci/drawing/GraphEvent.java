@@ -1,19 +1,35 @@
-package teo.isgci.drawing;
+/*
+ * Implementation of the GraphEventInterface.
+ *
+ * $Header$
+ *
+ * This file is part of the Information System on Graph Classes and their
+ * Inclusions (ISGCI) at http://www.graphclasses.org.
+ * Email: isgci@graphclasses.org
+ */
 
-import java.awt.event.MouseAdapter;
+
+package teo.isgci.drawing;
 
 import com.mxgraph.swing.mxGraphComponent;
 
+import java.awt.event.MouseAdapter;
+
 /**
- * Dumbed down version of the original, WIP GraphEvent
- * TODO: replace this with the final one
+ * Implementation of the GraphEventInterface.
  */
 class GraphEvent implements GraphEventInterface {
 
+    /** The actual canvas. */
     private mxGraphComponent graphComponent;
 
-    protected GraphEvent(mxGraphComponent graphComponent) {
-        this.graphComponent = graphComponent;
+    /**
+     * Gets a canvas and saves it.
+     * 
+     * @param pGraphComponent : The canvas
+     */
+    protected GraphEvent(mxGraphComponent pGraphComponent) {
+        this.graphComponent = pGraphComponent;
     }
 
     /**
@@ -28,3 +44,5 @@ class GraphEvent implements GraphEventInterface {
         graphComponent.addMouseWheelListener(adapter);
     }
 }
+
+/* EOF */
