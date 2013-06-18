@@ -10,26 +10,24 @@
 
 package teo.isgci.gui;
 
-import java.awt.Component;
 import java.awt.Color;
-import java.awt.Graphics;
+import java.awt.Component;
 import java.awt.Dimension;
+import java.awt.Graphics;
 import java.awt.Point;
 import java.awt.Rectangle;
-import java.awt.event.*;
-import javax.swing.*;
-import java.util.Collection;
-import java.util.Collections;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
-import org.xml.sax.SAXException;
-import org.jgrapht.graph.SimpleDirectedGraph;
+
 import org.jgrapht.VertexFactory;
-import teo.isgci.db.DataSet;
-import teo.isgci.db.Algo;
-import teo.isgci.layout.*;
-import teo.isgci.xml.GraphMLWriter;
+import org.jgrapht.graph.SimpleDirectedGraph;
+import org.xml.sax.SAXException;
+
+import teo.isgci.layout.GraphDrawInfo;
+import teo.isgci.layout.HierarchyLayout;
 import teo.isgci.util.IntFunction;
+import teo.isgci.xml.GraphMLWriter;
 
 /**
  * Display a graph in a GraphCanvas.
@@ -39,7 +37,6 @@ public class GraphView<V,E> {
     protected Component parent;
     protected SimpleDirectedGraph<V,E> graph;
     protected HierarchyLayout<V,E> layouter;
-    protected LatexGraphics latexgraphics;
     protected boolean drawUnproper;
     /** NodeViews */
     protected List<NodeView<V,E> > views;
@@ -81,21 +78,6 @@ public class GraphView<V,E> {
      */
     public SimpleDirectedGraph<V,E> getGraph() {
         return graph;
-    }
-
-
-    /**
-     * Set the LatexGraphics to be used for formatting latex strings.
-     */
-    public void setLatexGraphics(LatexGraphics g) {
-        latexgraphics = g;
-    }
-
-    /**
-     * Return the LatexGraphics to be used for formatting latex strings.
-     */
-    LatexGraphics getLatexGraphics() {
-        return latexgraphics;
     }
 
     public void setDrawUnproper(boolean b) {

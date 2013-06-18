@@ -10,30 +10,52 @@
 
 package teo.isgci.gui;
 
-import java.awt.Cursor;
-import java.awt.GridBagLayout;
-import java.awt.GridBagConstraints;
-import java.awt.Dimension;
-import java.awt.Insets;
 import java.awt.Container;
-import java.awt.event.*;
-import javax.swing.*;
-import javax.swing.border.EmptyBorder;
-import java.util.Iterator;
+import java.awt.Dimension;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.awt.Insets;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.ArrayList;
 import java.util.List;
-import teo.isgci.gui.*;
+import java.util.Set;
+
+import javax.swing.Box;
+import javax.swing.JButton;
+import javax.swing.JComponent;
+import javax.swing.JDialog;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.ScrollPaneConstants;
+import javax.swing.SwingUtilities;
+import javax.swing.UIManager;
+import javax.swing.border.EmptyBorder;
+
+import org.jgrapht.graph.DefaultEdge;
+import org.jgrapht.graph.SimpleDirectedGraph;
+
+import teo.isgci.db.AbstractRelation;
+import teo.isgci.db.Algo;
+import teo.isgci.db.DataSet;
+import teo.isgci.db.Disjointness;
+import teo.isgci.db.Incomparability;
 import teo.isgci.gc.ForbiddenClass;
 import teo.isgci.gc.GraphClass;
-import teo.isgci.grapht.Inclusion;
 import teo.isgci.grapht.GAlg;
-import teo.isgci.db.*;
+import teo.isgci.grapht.Inclusion;
 import teo.isgci.util.LessLatex;
+import teo.isgci.util.Updatable;
+import teo.isgci.util.UserSettings;
 
-
-public class InclusionResultDialog extends JDialog implements ActionListener {
+/**
+ * Displays the relation between two graphclasses.
+ */
+public class InclusionResultDialog extends JDialog 
+    implements ActionListener, Updatable {
     protected ISGCIMainFrame parent;
     protected JButton okButton;
     protected JButton drawButton;
@@ -47,7 +69,7 @@ public class InclusionResultDialog extends JDialog implements ActionListener {
     protected static String nodeName1, nodeName2;
 
 
-    /** Creates the dialog
+    /** Creates the dialog.
      * @param parent parent of this dialog
      */
     protected InclusionResultDialog(ISGCIMainFrame parent) {
@@ -62,6 +84,8 @@ public class InclusionResultDialog extends JDialog implements ActionListener {
         constraints.gridwidth = GridBagConstraints.REMAINDER;
         constraints.fill = GridBagConstraints.NONE;
         constraints.anchor = GridBagConstraints.WEST;
+        
+        UserSettings.subscribeToOptionChanges(this);
     }
 
 
@@ -101,8 +125,8 @@ public class InclusionResultDialog extends JDialog implements ActionListener {
         gridbag.setConstraints(line1, constraints);
         content.add(line1);
 
-        LatexLabel line2 = new LatexLabel(parent.latex,
-                node1.toString() +" and "+ node2.toString()+".");
+        LatexLabel line2 = new LatexLabel(node1.toString() 
+                + " and " + node2.toString() + ".");
         //line2.setFont(new Font("TimesRoman",Font.PLAIN,14));
         gridbag.setConstraints(line2, constraints);
         content.add(line2);
@@ -157,18 +181,18 @@ public class InclusionResultDialog extends JDialog implements ActionListener {
         this(parent);
         upper = lower = null;
 
-        LatexLabel l = new LatexLabel(parent.latex, node1.toString());
+        LatexLabel l = new LatexLabel(node1.toString());
         //l.setFont(new Font("TimesRoman",Font.PLAIN,14));
         constraints.gridwidth = GridBagConstraints.REMAINDER;
         gridbag.setConstraints(l, constraints);
         content.add(l);
 
-        LatexLabel equiv = new LatexLabel(parent.latex, "$\\equiv$");
+        LatexLabel equiv = new LatexLabel("$\\equiv$");
         constraints.gridwidth = GridBagConstraints.REMAINDER;
         gridbag.setConstraints(equiv,constraints);
         content.add(equiv);
 
-        l = new LatexLabel(parent.latex, node2.toString());
+        l = new LatexLabel(node2.toString());
         //l.setFont(new Font("TimesRoman",Font.PLAIN,14));
         constraints.gridwidth = GridBagConstraints.REMAINDER;
         gridbag.setConstraints(l, constraints);
@@ -246,9 +270,13 @@ public class InclusionResultDialog extends JDialog implements ActionListener {
         
         JPanel p = new JPanel();
         refButton = new JButton("View references");
+        refButton.setToolTipText("Opens graphclasses.org website for references");
         drawButton = new JButton("Draw");
+        drawButton.setToolTipText("Draw selected class and subclasses/superclasses; opens a dialogue");
         drawNewTabButton = new JButton("Draw in new Tab");
+        drawNewTabButton.setToolTipText("Draw selected class and subclasses/superclasses in a new tab; opens a dialogue");
         okButton = new JButton("OK");
+        okButton.setToolTipText("Close dialogue");
         p.add(refButton);
         p.add(drawButton);
         p.add(drawNewTabButton);
@@ -268,6 +296,8 @@ public class InclusionResultDialog extends JDialog implements ActionListener {
         drawNewTabButton.addActionListener(this);
         refButton.addActionListener(this);
         setDefaultCloseOperation(DISPOSE_ON_CLOSE);
+        
+        UserSettings.subscribeToOptionChanges(this);
     }
     
     
@@ -347,7 +377,7 @@ public class InclusionResultDialog extends JDialog implements ActionListener {
             JComponent p = new JPanel();
             p.setAlignmentX(JComponent.LEFT_ALIGNMENT);
             p.add(new JLabel("by disjointness of"));
-            p.add(new LatexLabel(parent.latex, rel.get1()+" and "+rel.get2()));
+            p.add(new LatexLabel(rel.get1()+" and "+rel.get2()));
             res.add(p);
             refs = p;
         }
@@ -387,8 +417,8 @@ public class InclusionResultDialog extends JDialog implements ActionListener {
             JComponent p = new JPanel();
             p.setAlignmentX(JComponent.LEFT_ALIGNMENT);
             p.add(new JLabel("witnesses:"));
-            p.add(new LatexLabel(parent.latex, why1.toString()));
-            p.add(new LatexLabel(parent.latex, why2.toString()));
+            p.add(new LatexLabel(why1.toString()));
+            p.add(new LatexLabel(why2.toString()));
             res.add(p);
         } else {
             JPanel p = new JPanel();
@@ -433,7 +463,7 @@ public class InclusionResultDialog extends JDialog implements ActionListener {
                 JComponent p = new JPanel();
                 p.setAlignmentX(JComponent.LEFT_ALIGNMENT);
                 p.add(new JLabel("witness:"));
-                p.add(new LatexLabel(parent.latex, why.toString()));
+                p.add(new LatexLabel(why.toString()));
                 res.add(p);
                 return res;
             }
@@ -463,7 +493,7 @@ public class InclusionResultDialog extends JDialog implements ActionListener {
         c.anchor = GridBagConstraints.NORTHWEST;
 
         for (GraphClass gc : classes) {
-            label = new LatexLabel(parent.latex, gc.toString());
+            label = new LatexLabel(gc.toString());
             gridbag.setConstraints(label, c);
             panel.add(label);
         }
@@ -493,8 +523,7 @@ public class InclusionResultDialog extends JDialog implements ActionListener {
         constraints.anchor = GridBagConstraints.WEST;
         
         for (int i = path.size()-1; i >= 0; i--) {
-            LatexLabel l = new LatexLabel(parent.latex,
-                path.get(i).getSub().toString());
+            LatexLabel l = new LatexLabel(path.get(i).getSub().toString());
             constraints.gridwidth = 1;
             gridbag.setConstraints(l, constraints);
             compo.add(l);
@@ -509,31 +538,32 @@ public class InclusionResultDialog extends JDialog implements ActionListener {
 
             LatexLabel subset;
             if (details  &&
-                        DataSet.getEquivalentClasses(sup).contains(sub))
-                subset = new LatexLabel(parent.latex, "   $\\equiv$");
-            else if (details  &&  e.isProper())
-                subset = new LatexLabel(parent.latex, "   $\\subset$");
-            else
-                subset = new LatexLabel(parent.latex, "   $\\subseteq$");
+                        DataSet.getEquivalentClasses(sup).contains(sub)) {
+                subset = new LatexLabel("   $\\equiv$");
+            } else if (details  &&  e.isProper()) {
+                subset = new LatexLabel("   $\\subset$");
+            } else {
+                subset = new LatexLabel("   $\\subseteq$");
+            }
             constraints.gridwidth = 1;
-            gridbag.setConstraints(subset,constraints);
+            gridbag.setConstraints(subset, constraints);
             compo.add(subset);
                 
             StringBuffer s = new StringBuffer();
-            for (Object o : e.getRefs())
+            for (Object o : e.getRefs()) {
                 s.append(o);
-            JLabel label1=new JLabel(s.toString(), JLabel.CENTER);
+            }
+            JLabel label1 = new JLabel(s.toString(), JLabel.CENTER);
             constraints.gridwidth = GridBagConstraints.REMAINDER;
             gridbag.setConstraints(label1, constraints);
             compo.add(label1);
         }
 
-        LatexLabel l = new LatexLabel(parent.latex,
-            path.get(0).getSuper().toString());
+        LatexLabel l = new LatexLabel(path.get(0).getSuper().toString());
         constraints.gridwidth = 1;
         gridbag.setConstraints(l, constraints);
         compo.add(l);
-        JLabel label2=new JLabel("", JLabel.CENTER);
+        JLabel label2 = new JLabel("", JLabel.CENTER);
             constraints.gridwidth = GridBagConstraints.REMAINDER;
         gridbag.setConstraints(label2, constraints);
         compo.add(label2);
@@ -544,51 +574,89 @@ public class InclusionResultDialog extends JDialog implements ActionListener {
     
 
     protected void closeDialog() {
+        UserSettings.unsubscribe(this);
         setVisible(false);
         dispose();
     }
 
-
+    @Override
     public void actionPerformed(ActionEvent event) {
         Object source = event.getSource();
+        
         if (source == okButton) {
             closeDialog();
             return;
         } else if (source == drawButton) {
-            // TODO jannis
-            //newDrawing(parent.getActiveCanvas());
+         
+            okButton.setEnabled(false);
+            drawButton.setEnabled(false);
+            drawNewTabButton.setEnabled(false);
+            refButton.setEnabled(false);
+            
+            final String text = drawButton.getText(); 
+            drawButton.setText("Please wait");
+            
+            // Create runnable to execute later, so swing repaints the ui first
+            Runnable drawGraph = new Runnable() {
+
+                @Override
+                public void run() {
+                    SimpleDirectedGraph<Set<GraphClass>, DefaultEdge> graph 
+                        = Algo.createHierarchySubgraph(
+                                Algo.nodesBetween(upper, lower));
+                    parent.getTabbedPane().drawInActiveTab(graph,
+                            upper.toString() + "-" + lower.toString());
+                    
+                    // restore buttons
+                    okButton.setEnabled(true);
+                    drawButton.setEnabled(true);
+                    drawNewTabButton.setEnabled(true);
+                    refButton.setEnabled(true);
+                    
+                    drawButton.setText(text);
+                }
+            };
+
+            SwingUtilities.invokeLater(drawGraph);
+            
         } else if (source == drawNewTabButton) {
-            // TODO jannis
-            //newDrawing(parent.getNewCanvas());
+            
+            okButton.setEnabled(false);
+            drawButton.setEnabled(false);
+            drawNewTabButton.setEnabled(false);
+            refButton.setEnabled(false);
+            
+            final String text = drawNewTabButton.getText(); 
+            drawNewTabButton.setText("Please wait");
+            
+            // Create runnable to execute later, so swing repaints the ui first
+            Runnable drawGraph = new Runnable() {
+
+                @Override
+                public void run() {
+                    SimpleDirectedGraph<Set<GraphClass>, DefaultEdge> graph 
+                        = Algo.createHierarchySubgraph(
+                                Algo.nodesBetween(upper, lower));
+                    parent.getTabbedPane().drawInNewTab(graph,
+                            upper.toString() + "-" + lower.toString());
+                    
+                    // restore buttons
+                    okButton.setEnabled(true);
+                    drawButton.setEnabled(true);
+                    drawNewTabButton.setEnabled(true);
+                    refButton.setEnabled(true);
+                    
+                    drawNewTabButton.setText(text);
+                }
+            };
+
+            SwingUtilities.invokeLater(drawGraph);
+            
+
         } else if (source == refButton) {
             parent.loader.showDocument("classes/refs00.html");
         }
     }
-    
-    
-    /**
-     * Draws the selected Graph on a Canvas.
-     * @param canvas The canvas to be drawn on.
-     */
-    private void newDrawing(ISGCIGraphCanvas canvas){
-        Cursor oldcursor = parent.getCursor();
-        setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
-        canvas.drawHierarchy(Algo.nodesBetween(upper, lower));
-
-        NodeView node1 = canvas.findNode(
-                DataSet.getClass(nodeName1));
-        NodeView node2 = canvas.findNode(
-                DataSet.getClass(nodeName2));
-        if (node1 != null  && node2 != null) {
-            node1.setNameAndLabel(nodeName1);
-            node2.setNameAndLabel(nodeName2);
-        }
-        
-        setCursor(oldcursor);
-        closeDialog();
-        canvas.repaint();    	
-    }
-
 
     /**
      * Creates a window displaying the relation between the given classnames.
@@ -624,6 +692,19 @@ public class InclusionResultDialog extends JDialog implements ActionListener {
                     Math.min(size.height, 600));
         
         return dialog;
+    }
+
+
+    @Override
+    public void updateOptions() {
+        try {
+            UIManager.setLookAndFeel(UserSettings.getCurrentTheme());
+        } catch (Exception e) {
+            e.printStackTrace();
+        } 
+        
+        SwingUtilities.updateComponentTreeUI(this);
+        pack();
     }
 }
 

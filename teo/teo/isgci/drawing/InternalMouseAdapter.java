@@ -1,25 +1,46 @@
+/*
+ * Internal mouse adapter for double and right click support.
+ *
+ * $Header$
+ *
+ * This file is part of the Information System on Graph Classes and their
+ * Inclusions (ISGCI) at http://www.graphclasses.org.
+ * Email: isgci@graphclasses.org
+ */
+
 package teo.isgci.drawing;
+
+import com.mxgraph.swing.mxGraphComponent;
 
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseWheelEvent;
 
-import com.mxgraph.swing.mxGraphComponent;
+/**
+ * Internal mouse adapter for double and right click support.
+ */
+class InternalMouseAdapter extends MouseAdapter {
 
-public class InternalMouseAdapter extends MouseAdapter {
-
+    /** The parent object. */
+    private GraphManipulation<?, ?> graphManipulation;
+    
+    /** the actual canvas. */
     private mxGraphComponent graphComponent;
 
-    /**
-     * Constructor of the InternalMouseAdapter
-     * @param graphComponent
-     */
-    protected InternalMouseAdapter(mxGraphComponent graphComponent) {
-        this.graphComponent = graphComponent;
-    }
-
+    /** a boolean to handle the panning. */
     private boolean doPan;
-
+    
+    /**
+     * Constructor of the InternalMouseAdapter.
+     * 
+     * @param pGraphComponent : The actual canvas
+     * @param pGraphManipulation : The Interface to interact with the canvas
+     */
+    protected InternalMouseAdapter(mxGraphComponent pGraphComponent,
+            GraphManipulation<?, ?> pGraphManipulation) {
+        this.graphComponent = pGraphComponent;
+        this.graphManipulation = pGraphManipulation;
+    }
     @Override
     public void mousePressed(MouseEvent e) {
         super.mousePressed(e);
@@ -45,9 +66,11 @@ public class InternalMouseAdapter extends MouseAdapter {
     @Override
     public void mouseWheelMoved(MouseWheelEvent e) {
         if (e.getWheelRotation() < 0) {
-            graphComponent.zoomIn();
+            graphManipulation.zoom(true, e.getPoint());
         } else {
-            graphComponent.zoomOut();
+            graphManipulation.zoom(false, e.getPoint());
         }
     }
 }
+
+/* EOF */

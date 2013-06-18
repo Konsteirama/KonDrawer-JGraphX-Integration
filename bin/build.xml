@@ -78,6 +78,9 @@
         <pathelement location="${jarlib.dir}/mouse.jar" />
         <pathelement location="${jgrapht.jar}" />
         <pathelement location="${jarlib.dir}/jgraphx.jar" />
+        <pathelement location="${jarlib.dir}/batik-all-1.7.jar" />
+        <pathelement location="${jarlib.dir}/pdf-transcoder.jar" />
+        <pathelement location="${jarlib.dir}/xml-apis-ext.jar" />
     </path>
 
     <path id="run.classpath">
@@ -182,7 +185,8 @@
         <javac srcdir="."
                destdir="${build.classes.dir}"
                includeantruntime="false"
-               debug="yes">
+               debug="yes"
+               target="1.6" source="1.6">
             <classpath refid="compile.classpath" />
             <include name="**/*.java" />
             <exclude name="IQ.java" />
@@ -208,7 +212,7 @@
     </target>
 
 
-    <target name="jar"
+    <target name="jar" depends="compile"
             description="Create a jar file containing the ISGCI application">
 
         <delete file="${isgci.jar}" />
@@ -241,6 +245,7 @@
             </fileset>
             <fileset dir="${data.dir}">
                 <include name="images/*.gif" />
+                <include name="icons/*.gif" />
             </fileset>
         </jar>
         <signjar alias="isgci"
@@ -526,6 +531,7 @@
     </target>
 
 
+
     <target name="static.html"
             description="Creates all web data other than classes/smallgraphs">
 
@@ -694,18 +700,14 @@
         </outofdate>
     </target>
 
-    <target name="run" description="Run isgci">
+    <target name="run" description="Run isgci" depends="jar">
 
         <java jar="${isgci.jar}" fork="true">
-            <classpath>
-                <path location="${jarlib.dir}/jgraphx.jar" />
-            </classpath>
-            
             <arg value="file://${web.dir}/" />
         </java>
     </target>
 
-    <target name="debug" description="Debug isgci">
+    <target name="debug" description="Debug isgci" depends="jar">
 
         <java jar="${isgci.jar}" fork="true">
             <arg value="file://${web.dir}/" />

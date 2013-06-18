@@ -10,13 +10,14 @@
 
 package teo.isgci.gui;
 
-import java.awt.Graphics;
 import java.awt.Font;
 import java.awt.FontMetrics;
+import java.awt.Graphics;
 import java.awt.Image;
 import java.awt.MediaTracker;
-import teo.isgci.util.LatexGlyph;
+
 import teo.isgci.util.Latex;
+import teo.isgci.util.LatexGlyph;
 
 public class LatexGraphics extends Latex {
 
@@ -25,31 +26,72 @@ public class LatexGraphics extends Latex {
      */
     protected Font font;
 
+    /**
+     * The singleton instance of this class.
+     */
+    private static LatexGraphics latexgraphics;
+    
+    /**
+     * Indicates whether this class was initialized already.
+     */
+    private static boolean isInitialized;
 
-    public LatexGraphics() {
+    /**
+     * Creates a new instance of LatexGraphics. It's private because
+     * access will be handled over {@link #getInstance()} as part of
+     * the singleton design.
+     */
+    private LatexGraphics() {
         font = new Font(Font.SANS_SERIF, Font.PLAIN, 12);
     }
 
-
     /**
-     * Load the images for the glyphs
+     * Returns the current instance of LatexGraphics or creates a new
+     * one if none exists yet.
+     * 
+     * @return
+     *          The singleton LatexGraphics.
      */
-    public void init(teo.Loader loader) {
+    public static LatexGraphics getInstance() {
+        
+       if (latexgraphics == null) {
+           latexgraphics = new LatexGraphics();
+       }
+       
+       return latexgraphics;
+    }
+    
+    /**
+     * Load the images for the glyphs.
+     * 
+     * @param loader
+     *          The loader used to initialize this class.
+     */
+    public static void init(teo.Loader loader) {
+        // can only be initialized once
+        if (isInitialized) {
+            return;
+        }
+        
+        isInitialized = true;
+        
         MediaTracker tracker = null;
-        LatexGlyph glyphs[] = LatexGlyph.getGlyphs();
+        LatexGlyph[] glyphs = LatexGlyph.getGlyphs();
         try {
             for (int i = 0; i < glyphs.length; i++) {
-                if (glyphs[i].getImage() == null  &&
-                            !glyphs[i].getImageName().equals("")) {
+                if (glyphs[i].getImage() == null  
+                        && !glyphs[i].getImageName().equals("")) {
                     glyphs[i].setImage(loader.getImage(
-                                "images/"+ glyphs[i].getImageName() ));
-                    if (tracker == null)
+                                "images/" + glyphs[i].getImageName()));
+                    if (tracker == null) {
                         tracker = new MediaTracker(ISGCIMainFrame.tracker);
+                    }
                     tracker.addImage(glyphs[i].getImage(), 1);
                 }
             }
-            if (tracker != null)
+            if (tracker != null) {
                 tracker.waitForID(1);
+            }
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -58,14 +100,6 @@ public class LatexGraphics extends Latex {
 
     public Font getFont() {
         return font;
-    }
-
-
-    /**
-     * Create a new label that paints using this.
-     */
-    LatexLabel newLabel(String s) {
-        return new LatexLabel(this, s);
     }
 
     /**

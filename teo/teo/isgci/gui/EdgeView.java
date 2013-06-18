@@ -10,20 +10,20 @@
 
 package teo.isgci.gui;
 
-import java.awt.Graphics;
 import java.awt.Color;
+import java.awt.Graphics;
 import java.awt.Point;
 import java.awt.Rectangle;
-import javax.swing.*;
-import java.util.Set;
-import java.util.List;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Vector;
+
+import org.xml.sax.SAXException;
+
+import teo.isgci.xml.GraphMLWriter;
 //import teo.isgci.gc.GraphClass;
 //import teo.isgci.db.Algo;
 //import teo.isgci.db.DataSet;
-import teo.isgci.xml.GraphMLWriter;
-import org.xml.sax.SAXException;
 
 public class EdgeView<V,E> implements View {
     protected GraphView<V,E> parent;

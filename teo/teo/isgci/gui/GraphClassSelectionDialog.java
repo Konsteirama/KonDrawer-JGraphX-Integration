@@ -11,23 +11,14 @@
 
 package teo.isgci.gui;
 
-import teo.isgci.gc.GraphClass;
-import teo.isgci.grapht.BFSWalker;
-import teo.isgci.grapht.GAlg;
-import teo.isgci.grapht.Inclusion;
-import teo.isgci.grapht.RevBFSWalker;
-import teo.isgci.grapht.GraphWalker;
-import teo.isgci.db.Algo;
-import teo.isgci.db.DataSet;
-import java.awt.Cursor;
-import java.awt.GridBagLayout;
-import java.awt.GridBagConstraints;
-import java.awt.Insets;
 import java.awt.Container;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.util.HashSet;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -37,17 +28,30 @@ import javax.swing.JDialog;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
+import javax.swing.SwingUtilities;
+import javax.swing.UIManager;
 
+import org.jgrapht.Graphs;
 import org.jgrapht.graph.DefaultEdge;
 import org.jgrapht.graph.SimpleDirectedGraph;
-import org.jgrapht.Graphs;
+
+import teo.isgci.db.Algo;
+import teo.isgci.db.DataSet;
+import teo.isgci.gc.GraphClass;
+import teo.isgci.grapht.BFSWalker;
+import teo.isgci.grapht.GAlg;
+import teo.isgci.grapht.GraphWalker;
+import teo.isgci.grapht.Inclusion;
+import teo.isgci.grapht.RevBFSWalker;
+import teo.isgci.util.Updatable;
+import teo.isgci.util.UserSettings;
 
 /**
  * Display a list of graphclasses and change the drawing according to the
  * selection.
  */
 public class GraphClassSelectionDialog extends JDialog implements
-        ActionListener {
+        ActionListener, Updatable {
 
     protected ISGCIMainFrame parent;
     protected NodeList classesList;
@@ -95,7 +99,7 @@ public class GraphClassSelectionDialog extends JDialog implements
         c.weightx = 1.0;
         c.weighty = 1.0;
         c.fill = GridBagConstraints.BOTH;
-        classesList = new NodeList(parent.latex);
+        classesList = new NodeList();
         JScrollPane scroller = new JScrollPane(classesList);
         gridbag.setConstraints(scroller, c);
         contents.add(scroller);
@@ -119,10 +123,19 @@ public class GraphClassSelectionDialog extends JDialog implements
 
         JPanel buttonPanel = new JPanel();
         newButton = new JButton("New drawing");
+        newButton.setToolTipText("Draw a new hierarchy in this tab; "
+                       + "opens a dialogue");
         newTabButton = new JButton("Draw in new Tab");
+        newTabButton.setToolTipText("Draw an new hierarchy in a new tab; "
+           + "opens a dialogue");
         addButton = new JButton("Add to drawing");
+        addButton.setToolTipText("Add the selected item to the "
+               + "current drawing");
         removeButton = new JButton("Remove from drawing");
+        removeButton.setToolTipText("Remove the selected item "
+                  + "from the current drawing");
         cancelButton = new JButton("Cancel");
+        cancelButton.setToolTipText("Close this dialogue");
 
         buttonPanel.add(newButton);
         buttonPanel.add(newTabButton);
@@ -136,6 +149,8 @@ public class GraphClassSelectionDialog extends JDialog implements
         addListeners();
         setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
 
+        UserSettings.subscribeToOptionChanges(this);
+        
         classesList.setListData(DataSet.getClasses());
         pack();
         setSize(500, 400);
@@ -150,6 +165,7 @@ public class GraphClassSelectionDialog extends JDialog implements
     }
 
     protected void closeDialog() {
+        UserSettings.unsubscribe(this);
         setVisible(false);
         dispose();
     }
@@ -161,22 +177,67 @@ public class GraphClassSelectionDialog extends JDialog implements
         classesList.setSelectedValue(node, true);
     }
 
+    @Override
     public void actionPerformed(ActionEvent event) {
         Object source = event.getSource();
+        
         if (source == cancelButton) {
             closeDialog();
         } else if (source == newButton) {
-            SimpleDirectedGraph<Set<GraphClass>, DefaultEdge> graph 
-                = getGraph();
-            parent.getTabbedPane().drawInActiveTab(graph, classesList.getSelectedValue().toString());
-            closeDialog();
+            
+            // Disable all buttons
+            newButton.setEnabled(false);
+            newTabButton.setEnabled(false);
+            cancelButton.setEnabled(false);
+            
+            // Inform user
+            newButton.setText("Please wait");
+            
+            // Create runnable to execute later, so swing repaints the ui first
+            Runnable drawGraph = new Runnable() {
+
+                @Override
+                public void run() {
+                    SimpleDirectedGraph<Set<GraphClass>, DefaultEdge> graph 
+                    = getGraph();
+                parent.getTabbedPane().drawInActiveTab(graph,
+                        classesList.getSelectedValue().toString());
+                closeDialog();
+                }
+
+            };
+            
+            SwingUtilities.invokeLater(drawGraph);
+            
+
         } else if (source == search) {
             search.setListData(parent, classesList);
         } else if (source == newTabButton) {
-            SimpleDirectedGraph<Set<GraphClass>, DefaultEdge> graph 
-                = getGraph();
-            parent.getTabbedPane().drawInNewTab(graph,classesList.getSelectedValue().toString());
-            closeDialog();
+            
+            // Disable all buttons
+            newButton.setEnabled(false);
+            newTabButton.setEnabled(false);
+            cancelButton.setEnabled(false);
+            
+            // Inform user
+            newTabButton.setText("Please wait");
+            
+            // Create runnable to execute later, so swing repaints the ui first
+            Runnable drawGraph = new Runnable() {
+
+                @Override
+                public void run() {
+                    SimpleDirectedGraph<Set<GraphClass>, DefaultEdge> graph 
+                    = getGraph();
+                parent.getTabbedPane().drawInNewTab(graph,
+                        classesList.getSelectedValue().toString());
+                closeDialog();
+                }
+
+            };
+            
+            SwingUtilities.invokeLater(drawGraph);
+
         }
     }
 
@@ -223,7 +284,7 @@ public class GraphClassSelectionDialog extends JDialog implements
         boolean doSuper = superCheck.isSelected(), doSub = subCheck
                 .isSelected();
 
-        for (Object o : classesList.getSelectedValuesList()) {
+        for (Object o : classesList.getSelectedValues()) {
             GraphClass gc = (GraphClass) o;
             result.add(gc);
             if (doSuper) {
@@ -247,6 +308,17 @@ public class GraphClassSelectionDialog extends JDialog implements
         }
 
         return result;
+    }
+
+    @Override
+    public void updateOptions() {
+        try {
+            UIManager.setLookAndFeel(UserSettings.getCurrentTheme());
+        } catch (Exception e) {
+            e.printStackTrace();
+        } 
+        
+        SwingUtilities.updateComponentTreeUI(this);
     }
 }
 

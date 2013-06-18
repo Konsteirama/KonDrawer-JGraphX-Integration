@@ -11,11 +11,19 @@
 package teo.isgci.gui;
 
 //import.java.awt.*;
-import java.awt.event.*;
-import javax.swing.*;
+import java.awt.Button;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.util.Enumeration;
 import java.util.Vector;
-import teo.isgci.db.*;
-import teo.isgci.problem.*;
+
+import javax.swing.AbstractButton;
+import javax.swing.ButtonGroup;
+import javax.swing.JMenu;
+import javax.swing.JRadioButtonMenuItem;
+
+import teo.isgci.db.DataSet;
+import teo.isgci.problem.Problem;
 
 public class ProblemsMenu extends JMenu implements ActionListener {
     protected Vector items;
@@ -46,11 +54,26 @@ public class ProblemsMenu extends JMenu implements ActionListener {
         items.addElement(item);
         
     }
+    
+    /**
+     * Sets the active radio button to the given problem
+     * @param problem
+     *              the name of the new problem
+     */
+    public void setProblem(String problem){
+        Enumeration<AbstractButton> buttons = group.getElements();
+        for (int i = 0; i < group.getButtonCount(); i++) {
+            AbstractButton b = buttons.nextElement();
+            if(b.getText().equals(problem)) {
+                group.setSelected(b.getModel(), true);
+            }
+        }
+    }
 
     public void actionPerformed(ActionEvent event) {
-        // TODO jannis
-//        parent.getActiveCanvas().setProblem(
-//                DataSet.getProblem(event.getActionCommand()));
+        parent.getTabbedPane().setProblem(
+                DataSet.getProblem(event.getActionCommand()), 
+                parent.getTabbedPane().getSelectedComponent());
     }
 }
 

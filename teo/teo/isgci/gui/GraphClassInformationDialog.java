@@ -10,28 +10,42 @@
 
 package teo.isgci.gui;
 
-import java.io.IOException;
-import java.awt.Color;
-import java.awt.Dimension;
-import java.awt.FlowLayout;
 import java.awt.BorderLayout;
-import java.awt.GridBagLayout;
-import java.awt.GridBagConstraints;
-import java.awt.Insets;
+import java.awt.Color;
 import java.awt.Container;
-import java.awt.event.*;
-import javax.swing.*;
-import javax.swing.event.*;
-import javax.swing.table.AbstractTableModel;
-import java.util.Vector;
-import java.util.Iterator;
-import java.util.Collections;
+import java.awt.Dimension;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.awt.Insets;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.util.ArrayList;
-import teo.isgci.problem.*;
+import java.util.Collections;
+import java.util.Vector;
+
+import javax.swing.BorderFactory;
+import javax.swing.JButton;
+import javax.swing.JDialog;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.JTable;
+import javax.swing.ListSelectionModel;
+import javax.swing.SwingUtilities;
+import javax.swing.UIManager;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
+import javax.swing.table.AbstractTableModel;
+
 import teo.isgci.db.Algo;
 import teo.isgci.db.DataSet;
 import teo.isgci.gc.GraphClass;
+import teo.isgci.problem.Problem;
 import teo.isgci.util.LessLatex;
+import teo.isgci.util.Updatable;
+import teo.isgci.util.UserSettings;
 
 
 /**
@@ -39,7 +53,7 @@ import teo.isgci.util.LessLatex;
  * sub- and equivalent classes.
  */
 public class GraphClassInformationDialog extends JDialog
-        implements ActionListener, ListSelectionListener {
+        implements ActionListener, ListSelectionListener, Updatable {
 
     protected ISGCIMainFrame parent;
     protected NodeList classesList;
@@ -107,7 +121,7 @@ public class GraphClassInformationDialog extends JDialog
         c.weighty = 1.0;
         c.fill = GridBagConstraints.BOTH;
         c.gridwidth = GridBagConstraints.REMAINDER;
-        classesList = new NodeList(parent.latex);
+        classesList = new NodeList();
         classesList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         JScrollPane scroller = new JScrollPane(classesList);
         scroller.setPreferredSize(listdim);
@@ -157,14 +171,14 @@ public class GraphClassInformationDialog extends JDialog
         c.insets = new Insets(0, 5, 5, 5);
         c.gridwidth = 2;
         c.weighty = 1.0;
-        supClassesList = new NodeList(parent.latex);
+        supClassesList = new NodeList();
         scroller = new JScrollPane(supClassesList);
         scroller.setPreferredSize(listdim);
         scroller.setMinimumSize(listdim);
         gridbag.setConstraints(scroller, c);
         contents.add(scroller);
 
-        equClassesList = new NodeList(parent.latex);
+        equClassesList = new NodeList();
         scroller = new JScrollPane(equClassesList);
         scroller.setPreferredSize(listdim);
         scroller.setMinimumSize(listdim);
@@ -172,7 +186,7 @@ public class GraphClassInformationDialog extends JDialog
         contents.add(scroller);
 
         c.gridwidth = GridBagConstraints.REMAINDER;
-        subClassesList = new NodeList(parent.latex);
+        subClassesList = new NodeList();
         scroller = new JScrollPane(subClassesList);
         scroller.setPreferredSize(listdim);
         scroller.setMinimumSize(listdim);
@@ -187,15 +201,22 @@ public class GraphClassInformationDialog extends JDialog
         //---- Buttons ----
         JPanel okPanel = new JPanel();
         classButton = new JButton("Class details");
+        classButton.setToolTipText("Show more information about this " 
+                     + "graphclass");
         okPanel.add(classButton);
         inclButton = new JButton("Inclusion info");
+        inclButton.setToolTipText("Show inclusions of selected "
+         + "graphclasses; needs two classes to be selected");
         okPanel.add(inclButton);
-        drawButton = new JButton ("Draw");
+        drawButton = new JButton("Draw");
+        drawButton.setToolTipText("Draw this graphclass and its "
+    + "subclasses/superclasses; opens a dialogue");
         okPanel.add(drawButton);
         okButton = new JButton("Close");
+        okButton.setToolTipText("Close this dialogue");
         okPanel.add(okButton);
         c.weighty = 0.0;
-        c.insets = new Insets(5,0,0,0);
+        c.insets = new Insets(5, 0, 0, 0);
         c.gridwidth = GridBagConstraints.REMAINDER;
         gridbag.setConstraints(okPanel, c);
         contents.add(okPanel);
@@ -219,10 +240,13 @@ public class GraphClassInformationDialog extends JDialog
         equClassesList.addMouseListener(mouseAdapter);
         subClassesList.addMouseListener(mouseAdapter);
 
-        if (target != null)
+        if (target != null) {
             showNode(target);
-        else
+        } else {
             showNode();
+        }
+        
+        UserSettings.subscribeToOptionChanges(this);
     }
 
 
@@ -240,8 +264,9 @@ public class GraphClassInformationDialog extends JDialog
      */
     private void showNode() {
         GraphClass node = null;
-        if (classesList.getElementCount() > 0)
+        if (classesList.getElementCount() > 0) {
             node = (GraphClass) classesList.getModel().getElementAt(0);
+        }
         showNode(node);
         repaint();
     }
@@ -257,19 +282,17 @@ public class GraphClassInformationDialog extends JDialog
 
     /**
      * Update the information displayed in the super/sub/equiv lists.
-     * @param name graph classe of which to display the information
+     * @param target graph classe of which to display the information
      */
     private synchronized void updateLists(GraphClass target) {
         if (target == null) {
-            Vector empty = new Vector();
+            Vector<?> empty = new Vector<Object>();
             subClassesList.setListData(empty);
             supClassesList.setListData(empty);
             equClassesList.setListData(empty);
             return;
         }
 
-        Iterator iter;
-        int i;
         ArrayList<GraphClass> sup = Algo.superNodes(target);
         ArrayList<GraphClass> sub = Algo.subNodes(target);
         ArrayList<GraphClass> equ = Algo.equNodes(target);
@@ -286,31 +309,39 @@ public class GraphClassInformationDialog extends JDialog
 
 
     protected void closeDialog() {
+        UserSettings.unsubscribe(this);
         setVisible(false);
         dispose();
     }
 
-
+    @Override
     public void valueChanged(ListSelectionEvent e) {
-        if (e.getValueIsAdjusting())
+        if (e.getValueIsAdjusting()) {
             return;
-        if (e.getSource() == classesList);
-            showNode(classesList.getSelectedNode());
+        }
+        if (e.getSource() == classesList) {
+            ;
+        }
+        
+        showNode(classesList.getSelectedNode());
     }
 
 
+    @Override
     public void actionPerformed(ActionEvent event) {
         Object source = event.getSource();
+        
         if (source == okButton) {
             closeDialog();
         } else if (source == classButton) {
-            parent.loader.showDocument("classes/"+
-                classesList.getSelectedNode().getID() +".html");
+            parent.loader.showDocument("classes/"
+                + classesList.getSelectedNode().getID() + ".html");
         } else if (source == inclButton) {
             GraphClass c1 = classesList.getSelectedNode();
             GraphClass c2 = lists.getSelectedNode();
             if (c1 != null && c2 != null) {
-                JDialog dia = InclusionResultDialog.newInstance(parent, c1,c2);
+                JDialog dia = InclusionResultDialog
+                        .newInstance(parent, c1, c2);
                 dia.setVisible(true);
             }
         } else if (source == drawButton) {
@@ -322,6 +353,18 @@ public class GraphClassInformationDialog extends JDialog
             search.setListData(parent, classesList);
             showNode();
         }
+    }
+
+    @Override
+    public void updateOptions() {
+        try {
+            UIManager.setLookAndFeel(UserSettings.getCurrentTheme());
+        } catch (Exception e) {
+            e.printStackTrace();
+        } 
+        
+        SwingUtilities.updateComponentTreeUI(this);
+        pack();
     }
 
 }
@@ -354,14 +397,16 @@ class ProblemsModel extends AbstractTableModel {
     public Object getValueAt(int row, int col) {
         if (row < 0  ||  row >= DataSet.problems.size()  ||
                 col < 0  ||  col > 1 ||
-                gc == null)
+                gc == null) {
             return "???";
+        }
 
         Problem p = DataSet.problems.elementAt(row);
-        if (col == 0)
+        if (col == 0) {
             return p.getName();
-        else if (col == 1)
+        } else if (col == 1) {
             return p.getComplexityString(p.getComplexity(gc));
+        }
 
         return "???";
     }

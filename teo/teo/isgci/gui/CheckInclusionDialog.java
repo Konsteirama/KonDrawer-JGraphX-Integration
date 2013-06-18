@@ -10,25 +10,34 @@
 
 package teo.isgci.gui;
 
-import teo.isgci.db.DataSet;
-import teo.isgci.db.Algo;
-import java.io.IOException;
-import java.awt.GridBagLayout;
-import java.awt.GridBagConstraints;
-import java.awt.Insets;
 import java.awt.Container;
-import java.awt.event.*;
-import javax.swing.*;
-import javax.swing.event.*;
-import java.util.*;
-import java.util.Vector;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.awt.Insets;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+
+import javax.swing.JButton;
+import javax.swing.JDialog;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.ListSelectionModel;
+import javax.swing.SwingUtilities;
+import javax.swing.UIManager;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
+
+import teo.isgci.db.DataSet;
+import teo.isgci.util.Updatable;
+import teo.isgci.util.UserSettings;
 
 /**
  * The dialog the checks for an inclusion between two graphclasses.
  * It contains two lists in single selection mode.
  */
 public class CheckInclusionDialog extends JDialog
-        implements ActionListener, ListSelectionListener {
+        implements ActionListener, ListSelectionListener, Updatable {
     
     protected ISGCIMainFrame parent;
     protected NodeList firstList, secondList;
@@ -77,7 +86,7 @@ public class CheckInclusionDialog extends JDialog
         c.insets = new Insets(5, 5, 5, 5);
         c.weightx = 1.0;
         c.weighty = 1.0;
-        firstList = new NodeList(parent.latex);
+        firstList = new NodeList();
         firstList.setListData(DataSet.getClasses());
         firstList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         JScrollPane scroller = new JScrollPane(firstList);
@@ -109,7 +118,7 @@ public class CheckInclusionDialog extends JDialog
         gridbag.setConstraints(secondSearch, c);
         content.add(secondSearch);
 
-        secondList = new NodeList(parent.latex);
+        secondList = new NodeList();
         secondList.setListData(DataSet.getClasses());
         secondList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         scroller = new JScrollPane(secondList);
@@ -121,13 +130,18 @@ public class CheckInclusionDialog extends JDialog
         content.add(scroller);
         JPanel drawPanel = new JPanel();
         cancelButton = new JButton("Close");
+        cancelButton.setToolTipText("Close this dialogue");
         inclusionCheckButton = new JButton("Find relation");
+        inclusionCheckButton.setToolTipText("Find relation between two "
+                     + "classes; needs two selected classes");
         drawPanel.add(inclusionCheckButton);
         drawPanel.add(cancelButton);
         c.weighty = 0.0;
         gridbag.setConstraints(drawPanel, c);
         content.add(drawPanel);
 
+        UserSettings.subscribeToOptionChanges(this);
+        
         setDefaultCloseOperation(DISPOSE_ON_CLOSE);
         addListeners();
         handleButtons();
@@ -181,6 +195,7 @@ public class CheckInclusionDialog extends JDialog
 
     /** Close the dialog and release resources */
     public void closeDialog() {
+        UserSettings.unsubscribe(this);
         setVisible(false);
         dispose();
     }
@@ -193,6 +208,18 @@ public class CheckInclusionDialog extends JDialog
         InclusionResultDialog.newInstance(parent,
                 firstList.getSelectedNode(), secondList.getSelectedNode()
         ).setVisible(true);
+    }
+
+    @Override
+    public void updateOptions() {
+        try {
+            UIManager.setLookAndFeel(UserSettings.getCurrentTheme());
+        } catch (Exception e) {
+            e.printStackTrace();
+        } 
+        
+        SwingUtilities.updateComponentTreeUI(this);
+        pack();
     }
 
 }
