@@ -13,23 +13,46 @@ package teo.isgci.gui;
 import java.awt.Container;
 import java.awt.Cursor;
 import java.awt.Dimension;
-import java.awt.Font;
-import java.awt.GridBagLayout;
 import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
 import java.awt.Insets;
-import java.awt.event.*;
-import javax.swing.*;
-import javax.swing.event.*;
-import java.util.Vector;
-import java.util.Collection;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Set;
 import java.util.TreeSet;
-import teo.isgci.gc.*;
-import teo.isgci.db.*;
-import teo.isgci.problem.*;
-import teo.isgci.grapht.*;
+import java.util.Vector;
+
+import javax.swing.JButton;
+import javax.swing.JCheckBox;
+import javax.swing.JDialog;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.SwingUtilities;
+import javax.swing.UIManager;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
+
+import org.jgrapht.graph.DefaultEdge;
+import org.jgrapht.graph.SimpleDirectedGraph;
+
+import teo.isgci.db.Algo;
+import teo.isgci.db.DataSet;
+import teo.isgci.gc.GraphClass;
+import teo.isgci.grapht.BFSWalker;
+import teo.isgci.grapht.GAlg;
+import teo.isgci.grapht.GraphWalker;
+import teo.isgci.grapht.Inclusion;
+import teo.isgci.grapht.RevBFSWalker;
+import teo.isgci.problem.Complexity;
+import teo.isgci.problem.Problem;
 import teo.isgci.util.LessLatex;
+import teo.isgci.util.Updatable;
+import teo.isgci.util.UserSettings;
 
 /**
  * Displays three lists of graph classes: Minimal classes for which the given
@@ -37,7 +60,7 @@ import teo.isgci.util.LessLatex;
  * and classes for which the problem is still open.
  */
 public class OpenProblemDialog extends JDialog implements ItemListener,
-        ActionListener, ListSelectionListener {
+        ActionListener, ListSelectionListener, Updatable {
     protected ISGCIMainFrame parent;
     protected JCheckBox fullBoundary;
     protected NodeList npList, openList, pList;
@@ -99,7 +122,7 @@ public class OpenProblemDialog extends JDialog implements ItemListener,
         c.gridwidth = 1;
         c.weightx = 1.0;
         c.weighty = 1.0;
-        npList = new NodeList(ISGCIMainFrame.latex);
+        npList = new NodeList();
         scroller = new JScrollPane(npList);
         scroller.setPreferredSize(listdim);
         lists.add(npList);
@@ -107,7 +130,7 @@ public class OpenProblemDialog extends JDialog implements ItemListener,
         gridbag.setConstraints(scroller, c);
         contents.add(scroller);
 
-        openList = new NodeList(ISGCIMainFrame.latex);
+        openList = new NodeList();
         scroller = new JScrollPane(openList);
         scroller.setPreferredSize(listdim);
         lists.add(openList);
@@ -116,7 +139,7 @@ public class OpenProblemDialog extends JDialog implements ItemListener,
         contents.add(scroller);
 
         c.gridwidth = GridBagConstraints.REMAINDER;
-        pList = new NodeList(ISGCIMainFrame.latex);
+        pList = new NodeList();
         scroller = new JScrollPane(pList);
         scroller.setPreferredSize(listdim);
         lists.add(pList);
@@ -129,9 +152,14 @@ public class OpenProblemDialog extends JDialog implements ItemListener,
 
         JPanel buttonPanel = new JPanel();
         drawButton = new JButton("Draw");
+        drawButton.setToolTipText("Open drawing dialogue");
         drawNewTabButton = new JButton("Draw in New Tab");
+        drawNewTabButton.setToolTipText("Open draw dialogue and draw "
+              + "in new tab");
         showButton = new JButton("Class info");
+        showButton.setToolTipText("Show more details about this graphclass");
         closeButton = new JButton("Close");
+        closeButton.setToolTipText("Close this dialogue");
         buttonPanel.add(drawButton);
         buttonPanel.add(drawNewTabButton);
         buttonPanel.add(showButton);
@@ -149,9 +177,12 @@ public class OpenProblemDialog extends JDialog implements ItemListener,
         closeButton.addActionListener(this);
         pack();
         setSize(700, 300);
+        
+        UserSettings.subscribeToOptionChanges(this);
     }
 
     protected void closeDialog() {
+        UserSettings.unsubscribe(this);
         setVisible(false);
         dispose();
     }
@@ -163,8 +194,9 @@ public class OpenProblemDialog extends JDialog implements ItemListener,
         Vector v = new Vector();
         for (GraphClass gc : DataSet.getClasses()) {
             Complexity c = problem.getComplexity(gc);
-            if (c.isUnknown())
+            if (c.isUnknown()) {
                 v.add(gc);
+            }
         }
 
         openList.setListData(v.iterator());
@@ -201,32 +233,39 @@ public class OpenProblemDialog extends JDialog implements ItemListener,
         TreeSet<GraphClass> p = new TreeSet<GraphClass>(new LessLatex());
 
         for (GraphClass gc : DataSet.getClasses()) {
-            if (npc.contains(gc) || p.contains(gc))
+            if (npc.contains(gc) || p.contains(gc)) {
                 continue;
+            }
 
             Complexity c = problem.getComplexity(gc);
             Set<GraphClass> equs = DataSet.getEquivalentClasses(gc);
 
             notP: if (c.likelyNotP()) {
-                for (GraphClass equ : equs)
+                for (GraphClass equ : equs) {
                     for (GraphClass down : GAlg.outNeighboursOf(
                             DataSet.inclGraph, equ)) {
                         if (problem.getComplexity(down).likelyNotP()
-                                && !equs.contains(down))
+                                && !equs.contains(down)) {
                             break notP;
+                        }
                     }
+                }
+
                 npc.addAll(equs);
             }
 
             inP: if (c.betterOrEqual(Complexity.P)) {
-                for (GraphClass equ : equs)
-                    for (GraphClass up : GAlg.inNeighboursOf(DataSet.inclGraph,
-                            equ)) {
+                for (GraphClass equ : equs) {
+                    for (GraphClass up : GAlg.inNeighboursOf(
+                            DataSet.inclGraph, equ)) {
                         if (problem.getComplexity(up).betterOrEqual(
                                 Complexity.P)
-                                && !equs.contains(up))
+                                && !equs.contains(up)) {
                             break inP;
+                        }
                     }
+                }
+
                 p.addAll(equs);
             }
         }
@@ -235,14 +274,62 @@ public class OpenProblemDialog extends JDialog implements ItemListener,
         pList.setListData(p.iterator());
     }
 
+    @Override
     public void actionPerformed(ActionEvent event) {
         Object source = event.getSource();
         if (source == drawButton) {
-            // TODO jannis
-            //newDrawing(parent.getActiveCanvas());
+            
+            drawButton.setEnabled(false);
+            drawNewTabButton.setEnabled(false);
+            showButton.setEnabled(false);
+            closeButton.setEnabled(false);
+            
+            drawButton.setText("Please wait");
+            
+            // Create runnable to execute later, so swing repaints the ui first
+            Runnable drawGraph = new Runnable() {
+
+                @Override
+                public void run() {
+                    SimpleDirectedGraph<Set<GraphClass>, DefaultEdge> graph 
+                        = Algo.createHierarchySubgraph(
+                                getNodes(lists.getSelectedNode()));
+                    parent.getTabbedPane().drawInActiveTab(
+                            graph,
+                            problem.getName() + " - "
+                                    + lists.getSelectedNode().toString());
+                    closeDialog();
+                }
+            };
+
+            SwingUtilities.invokeLater(drawGraph);
+
         } else if (source == drawNewTabButton) {
-            // TODO jannis
-            //newDrawing(parent.getNewCanvas());
+            
+            drawButton.setEnabled(false);
+            drawNewTabButton.setEnabled(false);
+            showButton.setEnabled(false);
+            closeButton.setEnabled(false);
+            
+            drawNewTabButton.setText("Please wait");
+            
+            // Create runnable to execute later, so swing repaints the ui first
+            Runnable drawGraph = new Runnable() {
+
+                @Override
+                public void run() {
+                    SimpleDirectedGraph<Set<GraphClass>, DefaultEdge> graph 
+                        = Algo.createHierarchySubgraph(
+                                getNodes(lists.getSelectedNode()));
+                    parent.getTabbedPane().drawInNewTab(graph,
+                            problem.getName() + " - "
+                                    + lists.getSelectedNode().toString());
+                    closeDialog();
+                }
+            };
+
+            SwingUtilities.invokeLater(drawGraph);
+            
         } else if (source == showButton) {
             JDialog info = new GraphClassInformationDialog(parent,
                     lists.getSelectedNode());
@@ -255,36 +342,27 @@ public class OpenProblemDialog extends JDialog implements ItemListener,
         }
     }
 
-    /**
-     * Draws the selected Graph on a Canvas.
-     * 
-     * @param canvas
-     *            The canvas to be drawn on.
-     */
-    private void newDrawing(ISGCIGraphCanvas canvas) {
-        Cursor oldcursor = parent.getCursor();
-        setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
-        canvas.drawHierarchy(getNodes(lists.getSelectedNode()));
-        setCursor(oldcursor);
-        closeDialog();
-    }
 
+    @Override
     public void itemStateChanged(ItemEvent event) {
         Object source = event.getSource();
         if (source == fullBoundary) {
-            if (event.getStateChange() == ItemEvent.DESELECTED)
+            if (event.getStateChange() == ItemEvent.DESELECTED) {
                 initListsMinMax();
-            else
+            } else {
                 initListsBoundary();
+            }
         }
     }
 
+    @Override
     public void valueChanged(ListSelectionEvent event) {
         handleButtons();
     }
 
     /**
-     * Enables/disables the buttons depending on whether any items are selected
+     * Enables/disables the buttons depending on whether 
+     * any items are selected.
      */
     public void handleButtons() {
         if (lists.getSelectedItem() == null) {
@@ -305,14 +383,15 @@ public class OpenProblemDialog extends JDialog implements ItemListener,
     protected Collection<GraphClass> getNodes(GraphClass node) {
         Complexity c = problem.getComplexity(node);
         Collection<GraphClass> result = null;
-        if (c.isUnknown())
+        if (c.isUnknown()) {
             result = getNodesOpen(node, problem);
-        else if (c.betterOrEqual(Complexity.P))
+        } else if (c.betterOrEqual(Complexity.P)) {
             result = getNodesP(node, problem);
-        else if (c.likelyNotP())
+        } else if (c.likelyNotP()) {
             result = getNodesNP(node, problem);
-        else
+        } else {
             throw new RuntimeException("Bad node");
+        }
         return result;
     }
 
@@ -324,8 +403,8 @@ public class OpenProblemDialog extends JDialog implements ItemListener,
     private Collection<GraphClass> getNodesOpen(GraphClass node,
             final Problem problem) {
         /*
-         * final ArrayList<GraphClass> result = new ArrayList<GraphClass>(); new
-         * UBFSWalker<GraphClass,Inclusion>( DataSet.inclGraph, node, null,
+         * final ArrayList<GraphClass> result = new ArrayList<GraphClass>(); 
+         * new UBFSWalker<GraphClass,Inclusion>( DataSet.inclGraph, node, null,
          * GraphWalker.InitCode.DYNAMIC) { public void visit(GraphClass v) {
          * result.add(v); Complexity c = problem.getComplexity(v); if
          * (c.isUnknown()) super.visit(v); else finish(v); } }.run();
@@ -350,20 +429,21 @@ public class OpenProblemDialog extends JDialog implements ItemListener,
                 GraphWalker.InitCode.DYNAMIC) {
             public void visit(GraphClass v) {
                 result.add(v);
-                if (problem.getComplexity(v).betterOrEqual(Complexity.P))
+                if (problem.getComplexity(v).betterOrEqual(Complexity.P)) {
                     finish(v);
-                else
+                } else {
                     super.visit(v);
+                }
             }
-        }.run();
+        } .run();
 
         return result;
     }
 
     /**
-     * Fills in a vector with the environment of the given node. The environment
-     * is found by walking over open superclasses until the first non-polynomial
-     * node is reached.
+     * Fills in a vector with the environment of the given node. The 
+     * environment is found by walking over open superclasses until the first 
+     * non-polynomial node is reached.
      */
     private Collection<GraphClass> getNodesP(GraphClass node,
             final Problem problem) {
@@ -373,14 +453,27 @@ public class OpenProblemDialog extends JDialog implements ItemListener,
             public void visit(GraphClass v) {
                 result.add(v);
                 Complexity c = problem.getComplexity(v);
-                if (c.likelyNotP())
+                if (c.likelyNotP()) {
                     finish(v);
-                else
+                } else {
                     super.visit(v);
+                }
             }
         }.run();
 
         return result;
+    }
+
+    @Override
+    public void updateOptions() {
+        try {
+            UIManager.setLookAndFeel(UserSettings.getCurrentTheme());
+        } catch (Exception e) {
+            e.printStackTrace();
+        } 
+        
+        SwingUtilities.updateComponentTreeUI(this);
+        pack();
     }
 
 }

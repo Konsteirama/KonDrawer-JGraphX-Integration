@@ -1,5 +1,6 @@
 /*
- * Replace this line with a (multi-line) description of this file...
+ * The actual implementation of a DrawingLibraryInterface,
+ * which is used to manipulate the canvas etc.
  *
  * $Header$
  *
@@ -8,34 +9,86 @@
  * Email: isgci@graphclasses.org
  */
 
-
 package teo.isgci.drawing;
 
+import java.awt.Color;
+import java.awt.Component;
+import java.awt.Dimension;
+import java.awt.Font;
+import java.awt.Graphics2D;
+import java.awt.Point;
+import java.awt.event.HierarchyBoundsListener;
+import java.awt.event.HierarchyEvent;
 import java.awt.event.MouseEvent;
+import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.OutputStream;
+import java.net.MalformedURLException;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
 
-import com.mxgraph.layout.mxIGraphLayout;
-import com.mxgraph.layout.hierarchical.mxHierarchicalLayout;
+import javax.imageio.ImageIO;
+import javax.swing.SwingConstants;
+import javax.xml.transform.TransformerConfigurationException;
+
+import org.apache.batik.transcoder.TranscoderException;
+import org.apache.batik.transcoder.TranscoderInput;
+import org.apache.batik.transcoder.TranscoderOutput;
+import org.apache.fop.render.ps.EPSTranscoder;
+import org.jgrapht.Graph;
+import org.jgrapht.ext.GraphMLExporter;
+import org.xml.sax.SAXException;
+
+import teo.isgci.gui.LatexLabel;
+
+import com.mxgraph.canvas.mxICanvas;
+import com.mxgraph.canvas.mxSvgCanvas;
 import com.mxgraph.model.mxCell;
 import com.mxgraph.swing.mxGraphComponent;
-
-import org.jgrapht.Graph;
-import org.jgrapht.ListenableGraph;
-import org.jgrapht.graph.DefaultEdge;
-import javax.swing.JComponent;
+import com.mxgraph.util.mxCellRenderer;
+import com.mxgraph.util.mxCellRenderer.CanvasFactory;
+import com.mxgraph.util.mxConstants;
+import com.mxgraph.util.mxDomUtils;
+import com.mxgraph.util.mxUtils;
+import com.mxgraph.util.mxXmlUtils;
+import com.mxgraph.view.mxCellState;
+import com.mxgraph.view.mxGraph;
 
 /**
- * Dumbed down version of the original, WIP interface
- * TODO: replace this with the final one
+ * The actual implementation of a DrawingLibraryInterface,
+ * which is used to manipulate the canvas etc.
+ *
+ * @param <V> Vertices
+ * @param <E> Edges
  */
-public class JGraphXInterface<V, E> implements DrawingLibraryInterface<V, E> {
+class JGraphXInterface<V, E> implements DrawingLibraryInterface<V, E> {
 
+    /** The actual canvas. */
     private mxGraphComponent graphComponent;
-
-    private GraphManipulation graphManipulation;
-
+    
+    /** An interface to manipulate the canvas. */
+    private GraphManipulation<V, E> graphManipulation;
+    
+    /** An simple interface to register 
+     *  an mouse adapter. 
+     */
     private GraphEvent graphEvent;
-
+    
+    /** An adapter, which transforms jgraphx in jgrapht 
+     *  and vice versa.
+     */
     private JGraphXAdapter<V, E> graphAdapter;
+    
+    /** The default font size for a latexlabel. */
+    public static final int DEFAULT_FONT_SIZE = 12;
+    
+    /** The Max-Height-Width for the eps export. */
+    public static final float EPS_MAX_HEIGHT_WIDTH = 16384f;
 
     /**
      * The constructor for JGraphXInterface.
@@ -46,6 +99,8 @@ public class JGraphXInterface<V, E> implements DrawingLibraryInterface<V, E> {
 
         // Convert to JGraphT-Graph
         graphAdapter = createNewAdapter(g);
+
+        applyCustomGraphSettings();
 
         // Create the mxGraphComponent used to draw the graph
         // Also overrides the default behavior of JGraphX panning
@@ -58,27 +113,70 @@ public class JGraphXInterface<V, E> implements DrawingLibraryInterface<V, E> {
                     return false;
                 }
 
-                mxCell cell = (mxCell) getCellAt(event.getX(),
-                        event.getY());
-
-                if (!getBounds().contains(event.getPoint())) {
-                    return false;
-                }
+                mxCell cell = (mxCell) getCellAt(event.getX(), event.getY());
 
                 return cell == null || cell.isEdge();
             }
+
+            @Override
+            public Component[] createComponents(mxCellState state) {
+                if (getGraph().getModel().isVertex(state.getCell())) {
+                    String label = state.getLabel();
+                    
+                    // get rid of these nasty [] around all labels
+                    label = label.replace("[", "");
+                    label = label.replace("]", "");
+
+                    // Creates a new label and sets properties
+                    final LatexLabel labelComponent = new LatexLabel(label);
+                    labelComponent.setHorizontalAlignment(SwingConstants
+                            .CENTER);
+                    labelComponent.setVerticalAlignment(SwingConstants.CENTER);
+                    labelComponent.setBackground(new Color(0, 0, 0, 0));
+
+                    /* A Listener to resize the font in the latexComponent
+                     * when the graphComponent is being zoomed
+                     */ 
+                    labelComponent.addHierarchyBoundsListener(
+                            new HierarchyBoundsListener() {
+                        @Override
+                        public void ancestorResized(HierarchyEvent e) {
+                            double scale = graphComponent.getGraph().
+                                    getView().getScale();
+                            
+                            labelComponent.setFont(new Font(
+                                    "Dialog", Font.BOLD, 
+                                    (int) (DEFAULT_FONT_SIZE * scale))); 
+                        }
+                        
+                        @Override
+                        public void ancestorMoved(HierarchyEvent e) { }
+                    });
+                    
+                    return new Component[]{labelComponent};
+                }
+                return null;
+            };
         };
 
-        graphManipulation = new GraphManipulation(graphComponent, graphAdapter);
+        graphManipulation =
+                new GraphManipulation<V, E>(graphComponent);
         graphEvent = new GraphEvent(graphComponent);
 
         graphComponent.setWheelScrollingEnabled(false);
+        graphComponent.setAutoScroll(false);
+        graphComponent.setCenterZoom(false);
+        graphComponent.setConnectable(false);
+
+        // make background white
+        graphComponent.getViewport().setOpaque(true);
+        graphComponent.getViewport().setBackground(Color.white);
+
         graphEvent.registerMouseAdapter(
-                new InternalMouseAdapter(graphComponent));
+                new InternalMouseAdapter(graphComponent, graphManipulation));
 
         graphManipulation.reapplyHierarchicalLayout();
 
-        applyCustomGraphSettings();
 
     }
 
@@ -109,12 +207,10 @@ public class JGraphXInterface<V, E> implements DrawingLibraryInterface<V, E> {
         };
     }
 
-
     /**
      * Applies some custom settings to the graph.
      */
     private void applyCustomGraphSettings() {
-
         graphAdapter.setKeepEdgesInBackground(true);
         graphAdapter.setAllowDanglingEdges(false);
         graphAdapter.setAllowLoops(false);
@@ -127,15 +223,18 @@ public class JGraphXInterface<V, E> implements DrawingLibraryInterface<V, E> {
         graphAdapter.setVertexLabelsMovable(false);
         graphAdapter.setConnectableEdges(false);
         graphAdapter.setAutoSizeCells(true);
+        graphAdapter.setDropEnabled(false);
+
+        graphAdapter.getStylesheet().getDefaultVertexStyle()
+                .put(mxConstants.STYLE_NOLABEL, "1");
+        graphAdapter.setLabelsVisible(false);
     }
 
     /**
      * Exports the current graph.
-     * 
-     * @param format
-     *            The actual format (.ps, .svg, .graphml)
-     * @param path
-     *            The path where the graph will be exported to
+     *
+     * @param format The actual format (.ps, .svg, .graphml)
+     * @param path   The path where the graph will be exported to
      */
     @Override
     public final void export(final String format, final String path) {
@@ -145,48 +244,190 @@ public class JGraphXInterface<V, E> implements DrawingLibraryInterface<V, E> {
             exportSVG(path);
         } else if (format == "graphml") {
             exportGraphML(path);
+        } else if (format == "jpg") {
+            exportJPG(path);
+        } else if (format == "png") {
+            exportPNG(path);
         }
     }
 
     /**
      * Exports the canvas as an eps under the given path, by converting an
      * existing .svg representation of it.
-     * 
-     * @param path
-     *            The path where the .eps file will be saved to
+     *
+     * @param path The path where the .eps file will be saved to
      */
     private void exportEPS(final String path) {
+        // Creates the .svg file
+        String temp = "temp.svg";
+        exportSVG(temp);
 
+        // Create the transcoder and set some settings
+        EPSTranscoder transcoder = new EPSTranscoder();
+
+        // Add Transcoding hints
+        transcoder.addTranscodingHint(
+                EPSTranscoder.KEY_PIXEL_UNIT_TO_MILLIMETER, 1.0f);
+        transcoder.addTranscodingHint(EPSTranscoder.KEY_MAX_HEIGHT,
+                EPS_MAX_HEIGHT_WIDTH);
+        transcoder.addTranscodingHint(EPSTranscoder.KEY_MAX_WIDTH,
+                EPS_MAX_HEIGHT_WIDTH);
+
+        String svgURI;
+        try {
+            // Create the transcoder input.
+            svgURI = new File(temp).toURI().toURL().toString();
+            TranscoderInput input = new TranscoderInput(svgURI);
+
+            // Create the transcoder output.
+            OutputStream ostream = new FileOutputStream(path);
+            TranscoderOutput output = new TranscoderOutput(ostream);
+
+            // Save the image.
+            transcoder.transcode(input, output);
+
+            // Flush and close the stream.
+            ostream.flush();
+            ostream.close();
+        } catch (MalformedURLException e) {
+            e.printStackTrace();
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (TranscoderException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        // Deletes the temp svg file
+        File file = new File(temp);
+        file.delete();
     }
 
     /**
      * Exports the canvas as an svg under the given path.
-     * 
-     * @param path
-     *            The path where the .svg file will be saved to
+     *
+     * @param path The path where the .svg file will be saved to
      */
     private void exportSVG(final String path) {
- 
+        // Creates a new SVGCanvas and converts internal graph to svg
+        mxSvgCanvas canvas = (mxSvgCanvas) mxCellRenderer.drawCells(
+                (mxGraph) this.graphAdapter, null, 1, null,
+                new CanvasFactory() {
+                    public mxICanvas createCanvas(final int width,
+                                                  final int height) {
+                        mxSvgCanvas canvas = new mxSvgCanvas(mxDomUtils
+                                .createSvgDocument(width, height));
+                        canvas.setEmbedded(true);
+
+                        return canvas;
+                    }
+
+                });
+
+        try {
+            // Saves the svg file under the given path
+            mxUtils.writeFile(mxXmlUtils.getXml(canvas.getDocument()), path);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     /**
      * Exports the canvas as an GraphML under the given path.
-     * 
-     * @param path
-     *            The path where the .graphml file will be saved to
+     *
+     * @param path The path where the .graphml file will be saved to
      */
     private void exportGraphML(final String path) {
-  
+        // Creates a new GraphMLExporter and gets the JGraphT-graph
+        GraphMLExporter<V, E> exporter = new GraphMLExporter<V, E>();
+        Graph<V, E> g = this.graphAdapter.getGraph();
+
+        /*
+         * FileWriter could throw an IOException, GraphMLExporter
+         * TransformerConf.. and SAXException
+         */
+        try {
+            // Creates a new Filewriter and exports the graph under the
+            // given path
+            FileWriter w = new FileWriter(path);
+            exporter.export(w, g);
+            w.close();
+        } catch (IOException e) {
+            System.out.println("Enter a valid path !");
+        } catch (TransformerConfigurationException e) {
+            e.printStackTrace();
+        } catch (SAXException e) {
+            e.printStackTrace();
+        }
+    }
+
+    /**
+     * Exports the canvas as an jpg under the given path.
+     *
+     * @param path The path where the .jpg file will be saved to
+     */
+    private void exportJPG(final String path) {
+        Dimension d = graphComponent.getGraphControl().getSize();
+
+        // For testing purposes, if no Panel exists 
+        if (d.width == 0 || d.height == 0) {
+            d.width = 1;
+            d.height = 1;
+        }
+
+        BufferedImage image = new BufferedImage(d.width, d.height,
+                BufferedImage.TYPE_INT_RGB);
+
+        Graphics2D g = image.createGraphics();
+        graphComponent.getGraphControl().paint(g);
+
+        final File outputfile = new File(path);
+
+        try {
+            ImageIO.write(image, "jpg", outputfile);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    /**
+     * Exports the canvas as an PNG under the given path.
+     *
+     * @param path The path where the .png file will be saved to
+     */
+    private void exportPNG(final String path) {
+        Dimension d = graphComponent.getGraphControl().getSize();
+
+        // For testing purposes, if no Panel exists 
+        if (d.width == 0 || d.height == 0) {
+            d.width = 1;
+            d.height = 1;
+        }
+
+        BufferedImage image = new BufferedImage(d.width, d.height,
+                BufferedImage.TYPE_INT_ARGB);
+
+        Graphics2D g = image.createGraphics();
+        graphComponent.getGraphControl().paint(g);
+
+        final File outputfile = new File(path);
+
+        try {
+            ImageIO.write(image, "png", outputfile);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     /**
      * Returns an Array of all currently implemented export formats.
-     * 
+     *
      * @return An array of String with the formats
      */
     @Override
     public final String[] getAvailableExportFormats() {
-        return new String[] { "ps", "svg", "graphml" };
+        return new String[]{"eps", "svg", "graphml", "jpg", "png"};
     }
 
     @Override
@@ -195,23 +436,107 @@ public class JGraphXInterface<V, E> implements DrawingLibraryInterface<V, E> {
     }
 
     @Override
-    public final GraphManipulationInterface getGraphManipulationInterface() {
+    public final GraphManipulationInterface<V, E>
+    getGraphManipulationInterface() {
         return graphManipulation;
     }
 
     @Override
-    public final JComponent getPanel() {
+    public final mxGraphComponent getPanel() {
         return graphComponent;
     }
 
+    /**
+     * Returns the node located at the specified point.
+     *
+     * @param p Location to look for a node
+     * @return Node located at the given point or null if there is no node
+     */
     @Override
-    public final void setGraph(final Graph<V, E> g) {
+    public V getNodeAt(Point p) {
+        mxCell cell = (mxCell) graphComponent.getCellAt((int) p.getX(),
+                (int) p.getY());
+        if (cell != null && cell.isVertex()) {
+            return graphAdapter.getCellToVertexMap().get(cell);
+        } else {
+            return null;
+        }
+    }
 
-        graphAdapter = new JGraphXAdapter<V, E>(g);
+    /**
+     * Returns the edge located at the specified point.
+     *
+     * @param p Location to look for an edge
+     * @return Edge located at the given point or null if there is no edge
+     */
+    @Override
+    public E getEdgeAt(Point p) {
+        mxCell cell = (mxCell) graphComponent.getCellAt((int) p.getX(),
+                (int) p.getY());
+        if (cell != null && cell.isEdge()) {
+            return graphAdapter.getCellToEdgeMap().get(cell);
+        } else {
+            return null;
+        }      
+    }
+
+    /**
+     * Returns the current graph.
+     *
+     * @return the current graph
+     */
+    @Override
+    public Graph<V, E> getGraph() {
+        return graphAdapter.getGraph();
+    }
+
+    /**
+     * Set a new graph which should be drawn.
+     *
+     * @param g The new graph
+     */
+    @Override
+    public void setGraph(Graph<V, E> g) {
+        graphAdapter = createNewAdapter(g);
         graphComponent.setGraph(graphAdapter);
 
         applyCustomGraphSettings();
 
         graphManipulation.reapplyHierarchicalLayout();
     }
+
+    /**
+     * Returns a list of the selected nodes.
+     *
+     * @return Returns a list of all selected nodes
+     */
+    @Override
+    public List<V> getSelectedNodes() {
+        List<V> list = new ArrayList<V>(graphAdapter.getSelectionCount());
+
+        for (Object cell : graphAdapter.getSelectionCells()) {
+            list.add(graphAdapter.getCellToVertexMap().get(cell));
+        }
+        
+        return list;
+    }
+
+    /**
+     * Sets the selection to the given nodes.
+     * 
+     * @param nodes : the nodes to be selected
+     */
+    @Override
+    public void setSelectedNodes(List<V> nodes) {
+
+        Collection<Object> col = new ArrayList<Object>(nodes.size());
+
+        for (V node : nodes) {
+            col.add(graphAdapter.getVertexToCellMap().get(node));
+        }
+
+        graphAdapter.setSelectionCells(col);
+    }
 }
+
+/* EOF */

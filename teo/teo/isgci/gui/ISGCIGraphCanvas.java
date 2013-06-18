@@ -10,31 +10,26 @@
 
 package teo.isgci.gui;
 
-import java.awt.Component;
 import java.awt.Color;
-import java.awt.Dimension;
-import java.awt.Graphics;
 import java.awt.Point;
-import java.awt.Rectangle;
-import java.awt.event.*;
-import javax.swing.*;
-import java.util.Collection;
-import java.util.Set;
+import java.awt.event.MouseEvent;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
-import org.xml.sax.SAXException;
-import org.jgrapht.VertexFactory;
-import org.jgrapht.graph.SimpleDirectedGraph;
+import java.util.Set;
+
 import org.jgrapht.graph.DefaultEdge;
-import teo.isgci.db.*;
+import org.jgrapht.graph.SimpleDirectedGraph;
+
+import teo.isgci.db.Algo;
+import teo.isgci.db.DataSet;
+import teo.isgci.gc.GraphClass;
+import teo.isgci.grapht.GAlg;
+import teo.isgci.grapht.ISGCIVertexFactory;
+import teo.isgci.grapht.Inclusion;
 import teo.isgci.problem.Complexity;
 import teo.isgci.problem.Problem;
-import teo.isgci.xml.GraphMLWriter;
 import teo.isgci.util.IntFunction;
-import teo.isgci.gc.GraphClass;
-import teo.isgci.grapht.ISGCIVertexFactory;
-import teo.isgci.grapht.GAlg;
-import teo.isgci.grapht.Inclusion;
 
 /**
  * A canvas that can display an inclusion graph.
@@ -55,7 +50,7 @@ public class ISGCIGraphCanvas extends
 
 
     public ISGCIGraphCanvas(ISGCIMainFrame parent) {
-        super(parent, parent.latex, new ISGCIVertexFactory(), null);
+        super(parent, new ISGCIVertexFactory(), null);
         problem = null;
         namingPref = Algo.NamePref.BASIC;
         setWidthFunc(new NodeWidthFunc());
@@ -228,7 +223,7 @@ public class ISGCIGraphCanvas extends
 
         for (GraphView<Set<GraphClass>,DefaultEdge> gv : graphs) {
             if ((p = gv.getNodeCenter(v)) != null) {
-                ((ISGCIMainFrame) parent).centerCanvas(p);
+                //((ISGCIMainFrame) parent).centerCanvas(p);
                 return;
             }
         }
@@ -243,17 +238,17 @@ public class ISGCIGraphCanvas extends
 
         event.consume();
         
-        View v = getViewAt(event.getPoint());
-        if (v == null)
-            return true;
-        if (v instanceof NodeView) {
-            nodePopup.setNode((NodeView) v);
-            nodePopup.show(this, event.getX(), event.getY());
-        }
-        if (v instanceof EdgeView) {
-            edgePopup.setEdge((EdgeView) v);
-            edgePopup.show(this, event.getX(), event.getY());
-        }
+//        View v = getViewAt(event.getPoint());
+//        if (v == null)
+//            return true;
+//        if (v instanceof NodeView) {
+//            nodePopup.setNode((NodeView) v);
+//            nodePopup.show(this, event.getX(), event.getY());
+//        }
+//        if (v instanceof EdgeView) {
+//            edgePopup.setEdge((EdgeView) v);
+//            edgePopup.show(this, event.getX(), event.getY());
+//        }
         return true;
     }
 

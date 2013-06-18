@@ -11,203 +11,190 @@
 package teo.isgci.gui;
 
 import java.awt.BorderLayout;
-import java.awt.Dimension;
-import java.awt.Font;
-import java.awt.Point;
-import java.awt.Rectangle;
-import java.awt.event.*;
-import javax.swing.*;
-import java.io.*;
-import java.util.HashMap;
-import java.util.Map;
-
-import teo.isgci.db.DataSet;
-import teo.isgci.drawing.DrawingLibraryInterface;
-import teo.isgci.drawing.JGraphXAdapter;
-import teo.isgci.problem.*;
-import teo.isgci.gc.ForbiddenClass;
-import teo.isgci.gc.GraphClass;
-
 import java.awt.Color;
-import org.jgrapht.*;
+import java.awt.Point;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
+import java.awt.event.WindowEvent;
+import java.awt.event.WindowListener;
+import java.io.FileOutputStream;
+import java.io.OutputStreamWriter;
+
+import javax.swing.JCheckBoxMenuItem;
+import javax.swing.JDialog;
+import javax.swing.JFrame;
+import javax.swing.JMenu;
+import javax.swing.JMenuBar;
+import javax.swing.JMenuItem;
+import javax.swing.SwingUtilities;
+import javax.swing.UIManager;
+import javax.swing.UnsupportedLookAndFeelException;
+
+import org.jgrapht.Graphs;
 import org.jgrapht.graph.SimpleDirectedGraph;
 
-import com.mxgraph.layout.mxFastOrganicLayout;
-import com.mxgraph.layout.mxIGraphLayout;
-import com.mxgraph.layout.hierarchical.mxHierarchicalLayout;
-import com.mxgraph.swing.mxGraphComponent;
-import com.mxgraph.swing.util.mxMorphing;
-import com.mxgraph.util.mxConstants;
-import com.mxgraph.util.mxEvent;
-import com.mxgraph.util.mxEventObject;
-import com.mxgraph.util.mxEventSource.mxIEventListener;
-import com.mxgraph.view.mxStylesheet;
-
-import teo.isgci.grapht.*;
+import teo.isgci.db.DataSet;
+import teo.isgci.gc.ForbiddenClass;
+import teo.isgci.gc.GraphClass;
+import teo.isgci.grapht.GAlg;
+import teo.isgci.grapht.Inclusion;
+import teo.isgci.problem.Problem;
+import teo.isgci.util.Updatable;
+import teo.isgci.util.UserSettings;
 import teo.isgci.xml.GraphMLWriter;
 
 /*import teo.isgci.gc.GraphClass;
-import java.util.ArrayList;*/
+ import java.util.ArrayList;*/
 
-
-/** The main frame of the application.
+/**
+ * The main frame of the application.
  */
-public class ISGCIMainFrame extends JFrame
-        implements WindowListener, ActionListener {
+public class ISGCIMainFrame extends JFrame 
+            implements WindowListener, Updatable {
 
+    /**
+     * This should change each time the mainframe is changed.
+     */
+    private static final long serialVersionUID = 1L;
+
+    /** The applicationname displayed in the titlebar. */
     public static final String APPLICATIONNAME = "ISGCI";
 
-    public static ISGCIMainFrame tracker; // Needed for MediaTracker (hack)
-    public static LatexGraphics latex;
-    public static Font font;
+    /** The location where new mainframes will be positioned. */
+    private static final Point MAINPOSITION = new Point(20, 20);
 
+    /** The location where new windows will be positioned. */
+    private static final Point DEFAULTPOSITION = new Point(50, 50);
+
+    /** Needed for MediaTracker (hack). */
+    public static ISGCIMainFrame tracker;
+    // public static Font font;
+
+    /** The loader which initialized the mainframe. */
     protected teo.Loader loader;
-
-    // The menu
-    protected JMenuItem miNew, miExport, miExit;
-    protected JMenuItem miNaming, miSearching, miDrawUnproper;
-    protected JMenuItem miSelectGraphClasses, miCheckInclusion;
-    protected JMenuItem miGraphClassInformation, miUserSettings;
-    protected JMenuItem miCut, miCopy, miPaste, miDelete, miSelectAll;
-    protected JMenu miOpenProblem, miColourProblem;
-    protected JMenuItem miSmallgraphs, miHelp, miAbout;
-
-    // This is where the drawing goes.
-    protected JScrollPane drawingPane;
 
     /**
      * The tabbed Pane which handles all tabs and their creation / deletion.
      */
     private ISGCITabbedPane tabbedPane;
+    
+    /** The toolbar which can be set visible by option changes. */
+    private ISGCIToolBar toolbar;
+    
+    /** Indicates whether or not the graph should draw unproper edges. */
+    private JMenuItem miDrawUnproper;
 
+    private JMenuItem miColourProblem;
 
-    /** Creates the frame.
-     * @param locationURL The path/URL to the applet/application.
-     * @param isApplet true iff the program runs as an applet.
+    /**
+     * Creates the frame.
+     * 
+     * Old documentation: * param locationURL The path/URL to the
+     * applet/application. * param isApplet true iff the program runs as an
+     * applet.
+     * 
+     * @param teoloader
+     *            The loader which initializes this mainframe.
      */
-    public ISGCIMainFrame(teo.Loader loader) {
+    public ISGCIMainFrame(teo.Loader teoloader) {
         super(APPLICATIONNAME);
-        
-        
-        
-        loader.register();
-        this.loader = loader;
+
+        teoloader.register();
+        loader = teoloader;
         tracker = this;
 
-        DataSet.init(loader, "data/isgci.xml");
-        ForbiddenClass.initRules(loader, "data/smallgraphs.xml");
-        PSGraphics.init(loader);
-        if (latex == null) {
-            latex = new LatexGraphics();
-            latex.init(loader);
-        }
+        DataSet.init(teoloader, "data/isgci.xml");
+        ForbiddenClass.initRules(teoloader, "data/smallgraphs.xml");
+        PSGraphics.init(teoloader);
+        LatexGraphics.init(teoloader);
 
+        // subscribe to option changes
+        UserSettings.subscribeToOptionChanges(this);
+        
         boolean createMaps = false;
         try {
             createMaps = System.getProperty("org.isgci.mappath") != null;
-        } catch (Exception e) {}
+        } catch (Exception e) {
+            System.err.println(e.toString());
+        }
 
-        if (createMaps) {       // Create maps and terminate
-            createCanvasPanel();
+        if (createMaps) { // Create maps and terminate
             new teo.isgci.util.LandMark(this).createMaps();
             closeWindow();
         }
 
-        /*{
-            int sub = 0, equ = 0, incomp = 0, incompWit = 0, incompWitFin = 0;
-
-            ArrayList<ForbiddenClass> fcs = new ArrayList<ForbiddenClass>();
-            for (GraphClass gc : DataSet.getClasses())
-                if (gc instanceof ForbiddenClass)
-                    fcs.add((ForbiddenClass) gc);
-
-            for (int i = 0; i < fcs.size()-1; i++) {
-                for (int j = i+1; j < fcs.size(); j++) {
-                    boolean sub1 = fcs.get(i).subClassOf(fcs.get(j));
-                    boolean sub2 = fcs.get(j).subClassOf(fcs.get(i));
-                    if (sub1  &&  sub2)
-                        equ++;
-                    else if (!sub1  &&  !sub2) {
-                        StringBuilder why1 = new StringBuilder();
-                        StringBuilder why2 = new StringBuilder();
-                        Boolean not1 = fcs.get(j).notSubClassOf(
-                                fcs.get(i), why1);
-                        Boolean not2 = fcs.get(i).notSubClassOf(
-                                fcs.get(j), why2);
-                        if (not1  &&  not2) {
-                            if (why1.length() > 0  &&  why2.length() > 0) {
-                                if (fcs.get(i).isFinite()  &&
-                                        fcs.get(j).isFinite())
-                                    incompWitFin++;
-                                else
-                                    incompWit++;
-                            } else
-                                incomp++;
-                        }
-                    } else
-                        sub++;
-                }
-            }
-            System.out.println("Total: "+ fcs.size() +
-                    " sub: "+ sub +
-                    " equ: "+ equ +
-                    " incomparable: "+ incomp +
-                    " incomparable with finite witness: "+ incompWitFin +
-                    " incomparable with witness: "+ incompWit);
-        }*/
+        /*
+         * { int sub = 0, equ = 0, incomp = 0, incompWit = 0, incompWitFin = 0;
+         * 
+         * ArrayList<ForbiddenClass> fcs = new ArrayList<ForbiddenClass>(); for
+         * (GraphClass gc : DataSet.getClasses()) if (gc instanceof
+         * ForbiddenClass) fcs.add((ForbiddenClass) gc);
+         * 
+         * for (int i = 0; i < fcs.size()-1; i++) { for (int j = i+1; j <
+         * fcs.size(); j++) { boolean sub1 = fcs.get(i).subClassOf(fcs.get(j));
+         * boolean sub2 = fcs.get(j).subClassOf(fcs.get(i)); if (sub1 && sub2)
+         * equ++; else if (!sub1 && !sub2) { StringBuilder why1 = new
+         * StringBuilder(); StringBuilder why2 = new StringBuilder(); Boolean
+         * not1 = fcs.get(j).notSubClassOf( fcs.get(i), why1); Boolean not2 =
+         * fcs.get(i).notSubClassOf( fcs.get(j), why2); if (not1 && not2) { if
+         * (why1.length() > 0 && why2.length() > 0) { if (fcs.get(i).isFinite()
+         * && fcs.get(j).isFinite()) incompWitFin++; else incompWit++; } else
+         * incomp++; } } else sub++; } } System.out.println("Total: "+
+         * fcs.size() + " sub: "+ sub + " equ: "+ equ + " incomparable: "+
+         * incomp + " incomparable with finite witness: "+ incompWitFin +
+         * " incomparable with witness: "+ incompWit); }
+         */
 
         /*
-        writeGraphML();
-        closeWindow();
-        */
+         * writeGraphML(); closeWindow();
+         */
 
         setJMenuBar(createMenus());
-        
-        // Create and add new toolbar
-        ISGCIToolBar toolbar = new ISGCIToolBar();
-        getContentPane().add(toolbar, BorderLayout.PAGE_START);
-        
+
         // Create and add tabbed interface for canvas
-        // TODO: should not add a canvaspanel on creation; 
-        // instead there should be a startpage of some sort 
-        tabbedPane = new ISGCITabbedPane();
-        
+        tabbedPane = new ISGCITabbedPane(this);
         getContentPane().add(tabbedPane, BorderLayout.CENTER);
+
+        // Create and add new toolbar - has to be after tabbedpane
+        // because toolbar needs to listen to tabbedpane
+        toolbar = new ISGCIToolBar(this);
+        getContentPane().add(toolbar, BorderLayout.PAGE_START);
+
+        setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
+        addWindowListener(this);
         
-        //getContentPane().add("Center", createCanvasPanel());
-        registerListeners();
-        setLocation(20, 20);
+        setLocation(MAINPOSITION);
         pack();
         setVisible(true);
     }
-    
+
     /**
      * Getter for {@link #tabbedPane}.
-     * @return
-     *          Returns {@link #tabbedPane}.
+     * 
+     * @return Returns {@link #tabbedPane}.
      */
     public ISGCITabbedPane getTabbedPane() {
         return tabbedPane;
     }
-    
+
     /**
      * Write the entire database in GraphML to isgcifull.graphml.
      */
     private void writeGraphML() {
         OutputStreamWriter out = null;
 
-        SimpleDirectedGraph<GraphClass, Inclusion> g =
-            new SimpleDirectedGraph<GraphClass, Inclusion>(Inclusion.class);
+        SimpleDirectedGraph<GraphClass, Inclusion> g 
+            = new SimpleDirectedGraph<GraphClass, Inclusion>(Inclusion.class);
         Graphs.addGraph(g, DataSet.inclGraph);
         GAlg.transitiveReductionBruteForce(g);
 
         try {
-            out = new OutputStreamWriter(
-                    new FileOutputStream("isgcifull.graphml"), "UTF-8");
-            GraphMLWriter w = new GraphMLWriter(out,
-                        GraphMLWriter.MODE_PLAIN,
-                        true,
-                        false);
+            out = new OutputStreamWriter(new FileOutputStream(
+                    "isgcifull.graphml"), "UTF-8");
+            GraphMLWriter w = new GraphMLWriter(out, GraphMLWriter.MODE_PLAIN,
+                    true, false);
             w.startDocument();
             for (GraphClass gc : g.vertexSet()) {
                 w.writeNode(gc.getID(), gc.toString(), Color.WHITE);
@@ -223,152 +210,257 @@ public class ISGCIMainFrame extends JFrame
         }
     }
 
-
-    /**
-     * Creates and attaches the necessary eventlisteners.
-     */
-    protected void registerListeners() {
-        setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
-        addWindowListener(this);
-        miNew.addActionListener(this);
-        miExport.addActionListener(this);
-        miExit.addActionListener(this);
-        miNaming.addActionListener(this);
-        miSearching.addActionListener(this);
-        //miDrawUnproper.addItemListener(this); // TODO
-        miSelectGraphClasses.addActionListener(this);
-        miCheckInclusion.addActionListener(this);
-        miGraphClassInformation.addActionListener(this);
-        miUserSettings.addActionListener(this);
-        //miDelete.addActionListener(this);
-        //miSelectAll.addActionListener(this);
-        //miOpenProblem.addActionListener(this);
-        miSmallgraphs.addActionListener(this);
-        miHelp.addActionListener(this);
-        miAbout.addActionListener(this);
-    }
-
-
     /**
      * Creates the menu system.
+     * 
      * @return The created JMenuBar
      * @see JMenuBar
      */
     protected JMenuBar createMenus() {
         JMenuBar mainMenuBar = new JMenuBar();
-        JMenu fileMenu, editMenu, viewMenu,  graphMenu, helpMenu, problemsMenu;
-        JMenuItem menu;
 
-        fileMenu = new JMenu("File");
-        fileMenu.add(miNew = new JMenuItem("New window"));
-        fileMenu.add(miExport = new JMenuItem("Export drawing..."));
-        fileMenu.add(miExit = new JMenuItem("Exit"));
-        mainMenuBar.add(fileMenu);
-
-        /*editMenu = new Menu("Edit");
-        editMenu.add(miDelete = new MenuItem("Delete"));
-        editMenu.add(miSelectAll = new MenuItem("Select all"));
-        mainMenuBar.add(editMenu);*/
-
-        viewMenu = new JMenu("View");
-        viewMenu.add(miSearching = new JMenuItem("Search in drawing..."));
-        viewMenu.add(miNaming = new JMenuItem("Naming preference..."));
-        viewMenu.add(miDrawUnproper =
-                new JCheckBoxMenuItem("Mark unproper inclusions", true));
-        /* menu = new ScaleMenu();
-        menu.setEnabled(false);
-        viewMenu.add(menu); */
-        mainMenuBar.add(viewMenu);
-
-        graphMenu = new JMenu("Graph classes");
-        miGraphClassInformation = new JMenuItem("Browse Database");
-        graphMenu.add(miGraphClassInformation);
-        miCheckInclusion = new JMenuItem("Find Relation...");
-        graphMenu.add(miCheckInclusion);
-        miSelectGraphClasses = new JMenuItem("Draw...");
-        graphMenu.add(miSelectGraphClasses);
-        mainMenuBar.add(graphMenu);
-
-        problemsMenu = new JMenu("Problems");
-        miOpenProblem = new JMenu("Boundary/Open classes");
-        problemsMenu.add(miOpenProblem);
-        for (int i = 0; i < DataSet.problems.size(); i++) {
-            menu = new JMenuItem(
-                    ((Problem) DataSet.problems.elementAt(i)).getName());
-            miOpenProblem.add(menu);
-            menu.addActionListener(this);
-            menu.setActionCommand("miOpenProblem");
-        }
-        miColourProblem = new ProblemsMenu(this, "Colour for problem");
-        problemsMenu.add(miColourProblem);
-        mainMenuBar.add(problemsMenu);
-
-
-        helpMenu = new JMenu("Help");
-        miUserSettings = new JMenuItem("Settings");
-        helpMenu.add(miUserSettings);
-        miSmallgraphs = new JMenuItem("Small graphs");
-        helpMenu.add(miSmallgraphs);
-        miHelp = new JMenuItem("Help");
-        helpMenu.add(miHelp);
-        miAbout = new JMenuItem("About");
-        helpMenu.add(miAbout);
-        //mainMenuBar.add(Box.createHorizontalGlue());
-        mainMenuBar.add(helpMenu);
+        addFileMenu(mainMenuBar);
+        addViewMenu(mainMenuBar);
+        addGraphMenu(mainMenuBar);
+        addProblemsMenu(mainMenuBar);
+        addHelpMenu(mainMenuBar);
 
         return mainMenuBar;
     }
-
-
-    /**
-     * Creates the drawing canvas with scrollbars at the bottom and at the
-     * right.
-     * @return the panel
-     */
-    protected ISGCIGraphCanvas createCanvasPanel() {
-        ISGCIGraphCanvas graphCanvas = new ISGCIGraphCanvas(this);
-        return graphCanvas;
-//        drawingPane = new JScrollPane(graphCanvas,
-//                JScrollPane.VERTICAL_SCROLLBAR_ALWAYS,
-//                JScrollPane.HORIZONTAL_SCROLLBAR_ALWAYS);
-//        
-//        drawingPane.getHorizontalScrollBar().setUnitIncrement(100);
-//        drawingPane.getVerticalScrollBar().setUnitIncrement(100);
-//        
-//        return drawingPane;
-    }
-
-    /**
-     * Center the canvas on the given point.
-     */
-    public void centerCanvas(Point p) {
-        JViewport viewport = drawingPane.getViewport();
-        Dimension port = viewport.getExtentSize();
-        Dimension view = viewport.getViewSize();
-
-        p.x -= port.width/2;
-        if (p.x + port.width > view.width)
-            p.x = view.width - port.width;
-        if (p.x < 0)
-            p.x = 0;
-        p.y -= port.height/2;
-        if (p.y + port.height > view.height)
-            p.y = view.height - port.height;
-        if (p.y < 0)
-            p.y = 0;
-        viewport.setViewPosition(p);
-    }
-
-    public void printPort() {
-        Rectangle view = getViewport();
-        System.err.println("port: "+view);
-    }
-
-    public Rectangle getViewport() {
-        return drawingPane.getViewport().getViewRect();
-    }
-
     
+    /**
+     *  Adds View to the menu.
+     *  @param mainMenuBar The menubar to which the entries are added.
+     */
+    private void addFileMenu(JMenuBar mainMenuBar) {
+
+        JMenuItem miNew = new JMenuItem("New window");
+        miNew.addActionListener(new ActionListener() {
+            
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                new ISGCIMainFrame(loader);
+            }
+        });
+        
+        JMenuItem miExport = new JMenuItem("Export drawing...");
+        miExport.addActionListener(new ActionListener() {
+            
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                openExportDialog();
+            }
+        });
+        
+        JMenuItem miExit = new JMenuItem("Exit");
+        miExit.addActionListener(new ActionListener() {
+            
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                closeWindow();
+            }
+        });
+
+        JMenu fileMenu = new JMenu("File");
+        fileMenu.add(miNew);
+        fileMenu.add(miExport);
+        fileMenu.add(miExit);
+        mainMenuBar.add(fileMenu);
+    }
+    
+    /**
+     *  Adds View to the menu.
+     *  @param mainMenuBar The menubar to which the entries are added.
+     */
+    private void addViewMenu(JMenuBar mainMenuBar) {
+
+        // needed to reference this in actionlistener
+        final ISGCIMainFrame mainframe = this;
+        
+        JMenuItem miSearching = new JMenuItem("Search in drawing...");
+        miSearching.addActionListener(new ActionListener() {
+            
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                openSearchDialog();
+            }
+        });
+        
+        JMenuItem miNaming = new JMenuItem("Naming preference...");
+        miNaming.addActionListener(new ActionListener() {
+            
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                JDialog d = new NamingDialog(mainframe);
+                d.setLocation(DEFAULTPOSITION);
+                d.pack();
+                d.setVisible(true);
+            }
+        });
+        
+        miDrawUnproper = new JCheckBoxMenuItem("Mark unproper inclusions",
+                true);
+        miDrawUnproper.addItemListener(new ItemListener() {
+            
+            @Override
+            public void itemStateChanged(ItemEvent e) {
+                Object object = e.getSource();
+                if (object == miDrawUnproper) {
+                    getTabbedPane().setDrawUnproper(
+                            ((JCheckBoxMenuItem) object).getState(),
+                            getTabbedPane().getSelectedComponent());
+                }
+            }
+        });
+
+        JMenu viewMenu = new JMenu("View");
+        viewMenu.add(miSearching);
+        viewMenu.add(miNaming);
+        viewMenu.add(miDrawUnproper);
+
+        mainMenuBar.add(viewMenu);
+    }
+    
+    /**
+     *  Adds Help to the menu.
+     *  @param mainMenuBar The menubar to which the entries are added.
+     */
+    private void addGraphMenu(JMenuBar mainMenuBar) {
+        // needed to reference this in actionlistener
+        final ISGCIMainFrame mainframe = this;
+        
+        JMenuItem miGraphClassInformation = new JMenuItem("Browse Database");
+        miGraphClassInformation.addActionListener(new ActionListener() {
+            
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                openBrowseDatabaseDialog();
+            }
+        });
+        
+        JMenuItem miCheckInclusion = new JMenuItem("Find Relation...");
+        miCheckInclusion.addActionListener(new ActionListener() {
+            
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                final int width = 700;
+                final int height = 400;
+                
+                JDialog check = new CheckInclusionDialog(mainframe);
+                check.setLocation(DEFAULTPOSITION);
+                check.pack();
+                check.setSize(width, height);
+                check.setVisible(true);
+            }
+        });
+        
+        JMenuItem miSelectGraphClasses = new JMenuItem("Draw...");
+        miSelectGraphClasses.addActionListener(new ActionListener() {
+            
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                openSelectGraphClassesDialog();
+            }
+        });
+
+        JMenu graphMenu = new JMenu("Graph classes");
+        graphMenu.add(miGraphClassInformation);
+        graphMenu.add(miCheckInclusion);
+        graphMenu.add(miSelectGraphClasses);
+        mainMenuBar.add(graphMenu);
+    }
+    
+    /**
+     *  Adds Problems to the menu.
+     *  @param mainMenuBar The menubar to which the entries are added.
+     */
+    private void addProblemsMenu(JMenuBar mainMenuBar) {
+
+        // needed to reference this in actionlistener
+        final ISGCIMainFrame mainframe = this;
+        
+        JMenuItem miOpenProblem = new JMenu("Boundary/Open classes");
+        miColourProblem = new ProblemsMenu(this,
+                "Colour for problem");
+        
+        JMenu problemsMenu = new JMenu("Problems");
+
+        problemsMenu.add(miOpenProblem);
+        for (int i = 0; i < DataSet.problems.size(); i++) {
+            JMenuItem menu = new JMenuItem(
+                    ((Problem) DataSet.problems.elementAt(i)).getName());
+            miOpenProblem.add(menu);
+            menu.addActionListener(new ActionListener() {
+                
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    JDialog open = new OpenProblemDialog(mainframe,
+                            ((JMenuItem) e.getSource()).getText());
+                    open.setLocation(DEFAULTPOSITION);
+                    open.setVisible(true);
+                }
+            });
+        }
+
+        problemsMenu.add(miColourProblem);
+        mainMenuBar.add(problemsMenu);
+    }
+    
+    /**
+     *  Adds Help to the menu.
+     *  @param mainMenuBar The menubar to which the entries are added.
+     */
+    private void addHelpMenu(JMenuBar mainMenuBar) {
+
+        JMenuItem miUserSettings = new JMenuItem("Settings");
+        miUserSettings.addActionListener(new ActionListener() {
+            
+            @Override
+            public void actionPerformed(ActionEvent e) {              
+                openSettingsDialog();
+            }
+        });
+        
+        JMenuItem miSmallgraphs = new JMenuItem("Small graphs");
+        miSmallgraphs.addActionListener(new ActionListener() {
+            
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                loader.showDocument("smallgraphs.html");
+            }
+        });
+        
+        JMenuItem miHelp = new JMenuItem("Help");
+        miHelp.addActionListener(new ActionListener() {
+            
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                loader.showDocument("help.html");
+            }
+        });
+        
+        JMenuItem miAbout = new JMenuItem("About");
+        miAbout.addActionListener(new ActionListener() {
+            
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                openAboutDialog();
+            }
+        });
+        
+
+        JMenu helpMenu = new JMenu("Help");
+
+        helpMenu.add(miUserSettings);
+        helpMenu.add(miSmallgraphs);
+        helpMenu.add(miHelp);
+        helpMenu.add(miAbout);
+
+        // mainMenuBar.add(Box.createHorizontalGlue());
+        mainMenuBar.add(helpMenu);
+    }
+    
+  
     /** Closes the window and possibly terminates the program. */
     public void closeWindow() {
         setVisible(false);
@@ -376,95 +468,141 @@ public class ISGCIMainFrame extends JFrame
         loader.unregister();
     }
 
-    /**
-     * Eventhandler for window events
-     */
+    @Override
     public void windowClosing(WindowEvent e) {
         closeWindow();
     }
 
-    /**
-     * Required to overload (abstract)
-     */
-    public void windowOpened(WindowEvent e) {}
-    public void windowClosed(WindowEvent e) {}
-    public void windowIconified(WindowEvent e) {}
-    public void windowDeiconified(WindowEvent e) {}
-    public void windowDeactivated(WindowEvent e) {}
-    public void windowActivated(WindowEvent e) {}
+    @Override
+    public void windowOpened(WindowEvent e) { }
 
-    /**
-     * Eventhandler for menu selections
-     */
-    public void actionPerformed(ActionEvent event) {
-        Object object = event.getSource();
-
-        if (object == miExit) {
-            closeWindow();
-        } else if (object == miNew) {
-            new ISGCIMainFrame(loader);
-        } else if (object == miExport) {
-            JDialog export = new ExportDialog(this);
-            export.setLocation(50, 50);
-            export.pack();
-            export.setVisible(true);
-        } else if (object == miNaming) {
-            JDialog d = new NamingDialog(this);
-            d.setLocation(50,50);
-            d.pack();
-            d.setVisible(true);
-        } else if (object == miSearching) {
-            JDialog search = new SearchDialog(this);
-            search.setLocation(50,50);
-            search.setVisible(true);
-        } else if (object == miGraphClassInformation) {
-            JDialog info = new GraphClassInformationDialog(this);
-            info.setLocation(50, 50);
-            info.pack();
-            info.setSize(800, 600);
-            info.setVisible(true);
-        } else if (object == miCheckInclusion) {
-            JDialog check = new CheckInclusionDialog(this);
-            check.setLocation(50, 50);
-            check.pack();
-            check.setSize(700, 400);
-            check.setVisible(true);
-        } else if (object == miSelectGraphClasses) {
-            JDialog select = new GraphClassSelectionDialog(this);
-            select.setLocation(50, 50);
-            select.pack();
-            select.setSize(500, 400);
-            select.setVisible(true);
-        } else if (object == miAbout) {
-            JDialog select = new AboutDialog(this);
-            select.setLocation(50, 50);
-            select.setVisible(true);
-        } else if (object == miHelp) {
-            loader.showDocument("help.html");
-        } else if (object == miSmallgraphs) {
-            loader.showDocument("smallgraphs.html");
-        } else if (event.getActionCommand() == "miOpenProblem") {
-            JDialog open=new OpenProblemDialog(this,
-                    ((JMenuItem) event.getSource()).getText());
-            open.setLocation(50, 50);
-            open.setVisible(true);
-        } else if (object == miUserSettings) {
-            ISGCISettingsDialog settingsDialog = new ISGCISettingsDialog();
-            settingsDialog.setSize(500, 400);
-            settingsDialog.setVisible(true);
-        }
+    @Override
+    public void windowClosed(WindowEvent e) {
+        UserSettings.unsubscribe(this);
+        UserSettings.unsubscribe(tabbedPane);
     }
 
-    // TODO jannis
-//    public void itemStateChanged(ItemEvent event) {
-//        Object object = event.getSource();
-//
-//        if (object == miDrawUnproper) {
-//            getActiveCanvas().setDrawUnproper(
-//                    ((JCheckBoxMenuItem) object).getState());
-//        }
-//    }
-}
+    @Override
+    public void windowIconified(WindowEvent e) { }
 
+    @Override
+    public void windowDeiconified(WindowEvent e) { }
+
+    @Override
+    public void windowDeactivated(WindowEvent e) { }
+
+    @Override
+    public void windowActivated(WindowEvent e) { }
+
+    /**
+     * Sets whether the Draw Unproper checkbox is checked.
+     * 
+     * @param state
+     *            True if the checkbox should be checked, false if not.
+     */
+    public void setDrawUnproper(boolean state) {
+        miDrawUnproper.setSelected(state);
+    }
+    
+    /**
+     * Sets the state of the color for problem radiobox.
+     * 
+     * @param problem
+     *            the new problem which is active.
+     */
+    public void setColorProblem(Problem problem) {
+        String name;
+        if (problem == null) {
+            name = "None";
+        } else {
+            name = problem.getName();
+        }
+        ((ProblemsMenu) miColourProblem).setProblem(name);        
+    }
+
+    /**
+     * Opens a new SelectGraphClasses dialog.
+     */
+    public void openSelectGraphClassesDialog() {
+        final int width = 500;
+        final int height = 400;
+        
+        JDialog select = new GraphClassSelectionDialog(this);
+        select.setLocation(DEFAULTPOSITION);
+        select.pack();
+        select.setSize(width, height);
+        select.setVisible(true);
+    }
+
+    /**
+     * Opens a new export dialog.
+     */
+    public void openExportDialog() {
+        JDialog export = new ExportDialog(this);
+        export.setLocation(DEFAULTPOSITION);
+        export.pack();
+        export.setVisible(true);
+    }
+    
+    /**
+     *  Opens the dialog to browse the database.
+     */
+    public void openBrowseDatabaseDialog() {
+        final int width = 800;
+        final int height = 600;
+        
+        JDialog info = new GraphClassInformationDialog(this);
+        info.setLocation(DEFAULTPOSITION);
+        info.pack();
+        info.setSize(width, height);
+        info.setVisible(true);
+    }
+    
+    /**
+     * Opens the settings dialog.
+     */
+    public void openSettingsDialog() {
+        final int width = 650;
+        final int height = 550;
+        
+        SettingsDialog settingsDialog = new SettingsDialog(this);
+        settingsDialog.setSize(width, height);
+        settingsDialog.setVisible(true);
+    }
+    
+    /**
+     * Opens the about dialog.
+     */
+    public void openAboutDialog() {
+        JDialog select = new AboutDialog(this);
+        select.setLocation(DEFAULTPOSITION);
+        select.setVisible(true);
+    }
+    
+    /**
+     * Opens the search in drawing dialog.
+     */
+    public void openSearchDialog() {
+        JDialog search = new SearchDialog(this);
+        search.setLocation(DEFAULTPOSITION);
+        search.setVisible(true);
+    }
+
+    @Override
+    public void updateOptions() {
+        // set UI
+        try {
+            UIManager.setLookAndFeel(UserSettings.getCurrentTheme());
+        } catch (Exception e) {
+            e.printStackTrace();
+        } 
+        
+        SwingUtilities.updateComponentTreeUI(this);
+        pack();
+        
+        // set toolbar visibility
+        toolbar.setVisible(UserSettings.getCurrentToolbarSetting());
+    }
+}
 
 /* EOF */

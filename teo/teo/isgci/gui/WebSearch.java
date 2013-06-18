@@ -11,19 +11,27 @@
 
 package teo.isgci.gui;
 
-import java.io.*;
-import java.net.*;
-import java.util.*;
-//import java.awt.*;
-import java.awt.event.*;
-import javax.swing.*;
-import teo.isgci.db.*;
-import teo.isgci.gui.ISGCIMainFrame;
-import teo.isgci.gui.MessageDialog;
-import teo.isgci.gui.NodeList;
-import teo.isgci.util.BinaryPredicate;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.net.URL;
+import java.net.URLConnection;
+import java.net.URLEncoder;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.Iterator;
+import java.util.List;
+import java.util.NoSuchElementException;
+
+import javax.swing.JFrame;
+import javax.swing.JTextField;
+
+import teo.isgci.db.DataSet;
 import teo.isgci.util.LessLatex;
-import teo.isgci.util.Utility;
+//import java.awt.*;
 
 
 /**

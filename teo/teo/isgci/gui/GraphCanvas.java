@@ -10,23 +10,27 @@
 
 package teo.isgci.gui;
 
-import java.awt.Component;
 import java.awt.Color;
+import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Point;
 import java.awt.Rectangle;
-import java.awt.event.*;
-import javax.swing.*;
-import java.util.Collection;
-import java.util.Set;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
+import java.awt.event.MouseMotionListener;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
-import org.xml.sax.SAXException;
-import org.jgrapht.graph.SimpleDirectedGraph;
+
+import javax.swing.JPanel;
+
 import org.jgrapht.VertexFactory;
-import teo.isgci.xml.GraphMLWriter;
+import org.jgrapht.graph.SimpleDirectedGraph;
+import org.xml.sax.SAXException;
+
 import teo.isgci.util.IntFunction;
+import teo.isgci.xml.GraphMLWriter;
 
 /**
  * A canvas that can display a graph.
@@ -43,7 +47,6 @@ public class GraphCanvas<V,E> extends JPanel
     protected View markedView;
     protected boolean dragInProcess;
     protected boolean drawUnproper;
-    protected LatexGraphics latexgraphics;
     protected VertexFactory<V> vertexFactory;
     protected IntFunction<V> widthFunc;
     
@@ -56,12 +59,10 @@ public class GraphCanvas<V,E> extends JPanel
 
 
     public GraphCanvas(Component parent,
-            LatexGraphics latexgraphics,
             VertexFactory<V> vertexFactory,
             IntFunction<V> widthFunc) {
         super();
         this.parent = parent;
-        this.latexgraphics = latexgraphics;
         this.vertexFactory = vertexFactory;
         this.widthFunc = widthFunc;
         graphs = new ArrayList<GraphView<V,E> >();
@@ -91,7 +92,6 @@ public class GraphCanvas<V,E> extends JPanel
     protected GraphView<V,E> addGraph(SimpleDirectedGraph<V,E> g) {
         GraphView<V,E> gv = new GraphView<V,E>(this, g,
                 vertexFactory, widthFunc);
-        gv.setLatexGraphics(latexgraphics);
         gv.setDrawUnproper(drawUnproper);
         graphs.add(gv);
         return gv;
@@ -176,10 +176,6 @@ public class GraphCanvas<V,E> extends JPanel
     protected void setProperness(EdgeView<V,E> view) {
     }
 
-
-    public LatexGraphics getLatexGraphics() {
-        return latexgraphics;
-    }
 
     public void setWidthFunc(IntFunction<V> widthFunc) {
         this.widthFunc = widthFunc;
@@ -275,7 +271,7 @@ public class GraphCanvas<V,E> extends JPanel
     public void forcePaint(Graphics g) {
         g.setClip(bounds);
         //g.setColor(getForeground());          // Done by ...View.paint
-        g.setFont(latexgraphics.getFont());
+        g.setFont(LatexGraphics.getInstance().getFont());
         dopaint(g);
     }
 

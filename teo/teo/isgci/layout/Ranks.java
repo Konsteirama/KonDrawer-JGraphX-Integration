@@ -17,11 +17,11 @@ import java.util.Arrays;
 import org.jgrapht.graph.SimpleDirectedGraph;
 import org.jgrapht.util.TypeUtil;
 
-import teo.isgci.grapht.GAlg;
 import teo.isgci.grapht.Annotation;
-import teo.isgci.grapht.WalkerInfo;
-import teo.isgci.grapht.GraphWalker;
 import teo.isgci.grapht.BFSWalker;
+import teo.isgci.grapht.GAlg;
+import teo.isgci.grapht.GraphWalker;
+import teo.isgci.grapht.WalkerInfo;
 
 /**
  * Holds the nodes of a graph in Ranks. The nodes are ordered within
