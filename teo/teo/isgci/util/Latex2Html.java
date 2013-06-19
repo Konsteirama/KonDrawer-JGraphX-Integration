@@ -10,22 +10,39 @@
 
 package teo.isgci.util;
 
-public class Latex2Html extends Latex {
+/**
+ * Convert latex to html.
+ */
+public final class Latex2Html extends Latex {
 
     /**
      * Path to the location of the image files. Should end in /.
      */
-    protected String imgpath;
-
+    private static final String IMGPATH = "images/";
 
     /**
-     * Create a new latex->html converter with images at the given location.
+     * The current instance of Latex2Html, needed for singleton pattern.
      */
-    public Latex2Html(String imgpath) {
+    private static final Latex2Html INSTANCE = new Latex2Html();
+    
+    /**
+     * Create a new latex->html converter. Private because of singleton
+     * pattern.
+     */
+    private Latex2Html() {
         super();
-        this.imgpath = imgpath;
     }
 
+    /**
+     * Gets the instance of the Latex2Html converter. Will create a new 
+     * instance if there is none.
+     * 
+     * @return
+     *          The current instance of Latex2Html
+     */
+    public static Latex2Html getInstance() {       
+        return INSTANCE;
+    }
 
     /**
      * Return s as an html string.
@@ -77,7 +94,7 @@ public class Latex2Html extends Latex {
         } else {
             t.append(
                 "<img src=\"");
-            t.append(imgpath);
+            t.append(IMGPATH);
             t.append(g.getImageName());
             t.append("\" alt=\"");
             t.append(g.getName());
