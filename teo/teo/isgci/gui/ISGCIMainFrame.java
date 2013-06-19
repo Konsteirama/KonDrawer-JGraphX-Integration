@@ -312,12 +312,22 @@ public class ISGCIMainFrame extends JFrame
                 }
             }
         });
+        
+        JMenuItem miUserSettings = new JMenuItem("Settings");
+        miUserSettings.addActionListener(new ActionListener() {
+            
+            @Override
+            public void actionPerformed(ActionEvent e) {              
+                openSettingsDialog();
+            }
+        });
 
         JMenu viewMenu = new JMenu("View");
         viewMenu.add(miSearching);
         viewMenu.add(miNaming);
         viewMenu.add(miDrawUnproper);
-
+        viewMenu.add(miUserSettings);
+        
         mainMenuBar.add(viewMenu);
     }
     
@@ -411,15 +421,6 @@ public class ISGCIMainFrame extends JFrame
      *  @param mainMenuBar The menubar to which the entries are added.
      */
     private void addHelpMenu(JMenuBar mainMenuBar) {
-
-        JMenuItem miUserSettings = new JMenuItem("Settings");
-        miUserSettings.addActionListener(new ActionListener() {
-            
-            @Override
-            public void actionPerformed(ActionEvent e) {              
-                openSettingsDialog();
-            }
-        });
         
         JMenuItem miSmallgraphs = new JMenuItem("Small graphs");
         miSmallgraphs.addActionListener(new ActionListener() {
@@ -451,7 +452,6 @@ public class ISGCIMainFrame extends JFrame
 
         JMenu helpMenu = new JMenu("Help");
 
-        helpMenu.add(miUserSettings);
         helpMenu.add(miSmallgraphs);
         helpMenu.add(miHelp);
         helpMenu.add(miAbout);
@@ -562,11 +562,8 @@ public class ISGCIMainFrame extends JFrame
      * Opens the settings dialog.
      */
     public void openSettingsDialog() {
-        final int width = 650;
-        final int height = 550;
-        
         SettingsDialog settingsDialog = new SettingsDialog(this);
-        settingsDialog.setSize(width, height);
+        settingsDialog.setLocation(DEFAULTPOSITION);
         settingsDialog.setVisible(true);
     }
     
