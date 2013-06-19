@@ -335,36 +335,26 @@ public class OpenProblemDialog extends JDialog implements ItemListener,
         }
     }
 
-    /**
-     * Draws the selected Graph on a Canvas.
-     * 
-     * @param canvas
-     *            The canvas to be drawn on.
-     */
-    private void newDrawing(ISGCIGraphCanvas canvas) {
-        Cursor oldcursor = parent.getCursor();
-        setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
-        canvas.drawHierarchy(getNodes(lists.getSelectedNode()));
-        setCursor(oldcursor);
-        closeDialog();
-    }
-
+    @Override
     public void itemStateChanged(ItemEvent event) {
         Object source = event.getSource();
         if (source == fullBoundary) {
-            if (event.getStateChange() == ItemEvent.DESELECTED)
+            if (event.getStateChange() == ItemEvent.DESELECTED) {
                 initListsMinMax();
-            else
+            } else {
                 initListsBoundary();
+            }
         }
     }
 
+    @Override
     public void valueChanged(ListSelectionEvent event) {
         handleButtons();
     }
 
     /**
-     * Enables/disables the buttons depending on whether any items are selected
+     * Enables/disables the buttons depending on 
+     * whether any items are selected.
      */
     public void handleButtons() {
         if (lists.getSelectedItem() == null) {
