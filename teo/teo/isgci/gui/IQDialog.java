@@ -27,8 +27,6 @@ import javax.swing.JDialog;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
-import javax.swing.SwingUtilities;
-import javax.swing.UIManager;
 
 import org.jgrapht.graph.DefaultEdge;
 import org.jgrapht.graph.SimpleDirectedGraph;
@@ -37,8 +35,6 @@ import teo.isgci.db.Algo;
 import teo.isgci.db.DataSet;
 import teo.isgci.gc.GraphClass;
 import teo.isgci.util.LatexGlyph;
-import teo.isgci.util.Updatable;
-import teo.isgci.util.UserSettings;
 
 
 /**
@@ -46,7 +42,7 @@ import teo.isgci.util.UserSettings;
  * selection.
  */
 public class IQDialog extends JDialog
-        implements ActionListener, Updatable {
+        implements ActionListener {
     
     protected ISGCIMainFrame parent;
     protected NodeList classesList;
@@ -151,8 +147,6 @@ public class IQDialog extends JDialog
         classesList.setListData(DataSet.getClasses());
         pack();
         setSize(500, 400);
-        
-        UserSettings.subscribeToOptionChanges(this);
     }
 
 
@@ -162,7 +156,6 @@ public class IQDialog extends JDialog
     }
 
     protected void closeDialog() {
-        UserSettings.unsubscribe(this);
         setVisible(false);
         dispose();
     }
@@ -236,21 +229,9 @@ public class IQDialog extends JDialog
         }*/
 
         return result;
-    }
-
-
-    @Override
-    public void updateOptions() {
-        try {
-            UIManager.setLookAndFeel(UserSettings.getCurrentTheme());
-        } catch (Exception e) {
-            e.printStackTrace();
-        } 
-        
-        SwingUtilities.updateComponentTreeUI(this);
-        pack();
     }    
 }
 
 
 /* EOF */
+

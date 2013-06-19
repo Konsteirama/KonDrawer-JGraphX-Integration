@@ -22,7 +22,6 @@ import javax.swing.JColorChooser;
 import javax.swing.JDialog;
 import javax.swing.JList;
 import javax.swing.JPanel;
-import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
 import javax.swing.border.BevelBorder;
 import javax.swing.event.ChangeEvent;
@@ -31,14 +30,13 @@ import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
 import teo.isgci.problem.Complexity;
-import teo.isgci.util.Updatable;
 import teo.isgci.util.UserSettings;
 
 /**
  * A dialog where the user can change various settings.
  * 
  */
-public class SettingsDialog extends JDialog implements Updatable {
+public class SettingsDialog extends JDialog {
     
     /** TODO marc JAVADOCS. */
     private JButton applyButton;
@@ -77,14 +75,11 @@ public class SettingsDialog extends JDialog implements Updatable {
         // Initialize layout and buttons
         setLayout(new BorderLayout());
         createColorPanel();
-        createBottomPanel();
-        
+        createBottomPanel();       
 
         // window related stuff
         pack();
         setDefaultCloseOperation(DISPOSE_ON_CLOSE);
-        
-        UserSettings.subscribeToOptionChanges(this);
     }
 
     /**
@@ -326,21 +321,8 @@ public class SettingsDialog extends JDialog implements Updatable {
      * Close and dispose the dialogue.
      */
     public void closeDialog() {
-        UserSettings.unsubscribe(this);
         setVisible(false);
         dispose();
-    }
-
-    @Override
-    public void updateOptions() {
-        // Set UI
-        try {
-            UIManager.setLookAndFeel(UserSettings.getCurrentTheme());
-        } catch (Exception e) {
-            e.printStackTrace();
-        } 
-        
-        SwingUtilities.updateComponentTreeUI(this);
     }
 
 }

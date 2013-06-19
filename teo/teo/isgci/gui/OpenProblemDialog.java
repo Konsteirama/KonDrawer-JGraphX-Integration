@@ -33,7 +33,6 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.SwingUtilities;
-import javax.swing.UIManager;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
@@ -51,8 +50,6 @@ import teo.isgci.grapht.RevBFSWalker;
 import teo.isgci.problem.Complexity;
 import teo.isgci.problem.Problem;
 import teo.isgci.util.LessLatex;
-import teo.isgci.util.Updatable;
-import teo.isgci.util.UserSettings;
 
 /**
  * Displays three lists of graph classes: Minimal classes for which the given
@@ -60,7 +57,7 @@ import teo.isgci.util.UserSettings;
  * and classes for which the problem is still open.
  */
 public class OpenProblemDialog extends JDialog implements ItemListener,
-        ActionListener, ListSelectionListener, Updatable {
+        ActionListener, ListSelectionListener {
     protected ISGCIMainFrame parent;
     protected JCheckBox fullBoundary;
     protected NodeList npList, openList, pList;
@@ -177,12 +174,9 @@ public class OpenProblemDialog extends JDialog implements ItemListener,
         closeButton.addActionListener(this);
         pack();
         setSize(700, 300);
-        
-        UserSettings.subscribeToOptionChanges(this);
     }
 
     protected void closeDialog() {
-        UserSettings.unsubscribe(this);
         setVisible(false);
         dispose();
     }
@@ -274,7 +268,6 @@ public class OpenProblemDialog extends JDialog implements ItemListener,
         pList.setListData(p.iterator());
     }
 
-    @Override
     public void actionPerformed(ActionEvent event) {
         Object source = event.getSource();
         if (source == drawButton) {
@@ -342,27 +335,36 @@ public class OpenProblemDialog extends JDialog implements ItemListener,
         }
     }
 
+    /**
+     * Draws the selected Graph on a Canvas.
+     * 
+     * @param canvas
+     *            The canvas to be drawn on.
+     */
+    private void newDrawing(ISGCIGraphCanvas canvas) {
+        Cursor oldcursor = parent.getCursor();
+        setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
+        canvas.drawHierarchy(getNodes(lists.getSelectedNode()));
+        setCursor(oldcursor);
+        closeDialog();
+    }
 
-    @Override
     public void itemStateChanged(ItemEvent event) {
         Object source = event.getSource();
         if (source == fullBoundary) {
-            if (event.getStateChange() == ItemEvent.DESELECTED) {
+            if (event.getStateChange() == ItemEvent.DESELECTED)
                 initListsMinMax();
-            } else {
+            else
                 initListsBoundary();
-            }
         }
     }
 
-    @Override
     public void valueChanged(ListSelectionEvent event) {
         handleButtons();
     }
 
     /**
-     * Enables/disables the buttons depending on whether 
-     * any items are selected.
+     * Enables/disables the buttons depending on whether any items are selected
      */
     public void handleButtons() {
         if (lists.getSelectedItem() == null) {
@@ -383,15 +385,14 @@ public class OpenProblemDialog extends JDialog implements ItemListener,
     protected Collection<GraphClass> getNodes(GraphClass node) {
         Complexity c = problem.getComplexity(node);
         Collection<GraphClass> result = null;
-        if (c.isUnknown()) {
+        if (c.isUnknown())
             result = getNodesOpen(node, problem);
-        } else if (c.betterOrEqual(Complexity.P)) {
+        else if (c.betterOrEqual(Complexity.P))
             result = getNodesP(node, problem);
-        } else if (c.likelyNotP()) {
+        else if (c.likelyNotP())
             result = getNodesNP(node, problem);
-        } else {
+        else
             throw new RuntimeException("Bad node");
-        }
         return result;
     }
 
@@ -403,8 +404,8 @@ public class OpenProblemDialog extends JDialog implements ItemListener,
     private Collection<GraphClass> getNodesOpen(GraphClass node,
             final Problem problem) {
         /*
-         * final ArrayList<GraphClass> result = new ArrayList<GraphClass>(); 
-         * new UBFSWalker<GraphClass,Inclusion>( DataSet.inclGraph, node, null,
+         * final ArrayList<GraphClass> result = new ArrayList<GraphClass>(); new
+         * UBFSWalker<GraphClass,Inclusion>( DataSet.inclGraph, node, null,
          * GraphWalker.InitCode.DYNAMIC) { public void visit(GraphClass v) {
          * result.add(v); Complexity c = problem.getComplexity(v); if
          * (c.isUnknown()) super.visit(v); else finish(v); } }.run();
@@ -429,21 +430,20 @@ public class OpenProblemDialog extends JDialog implements ItemListener,
                 GraphWalker.InitCode.DYNAMIC) {
             public void visit(GraphClass v) {
                 result.add(v);
-                if (problem.getComplexity(v).betterOrEqual(Complexity.P)) {
+                if (problem.getComplexity(v).betterOrEqual(Complexity.P))
                     finish(v);
-                } else {
+                else
                     super.visit(v);
-                }
             }
-        } .run();
+        }.run();
 
         return result;
     }
 
     /**
-     * Fills in a vector with the environment of the given node. The 
-     * environment is found by walking over open superclasses until the first 
-     * non-polynomial node is reached.
+     * Fills in a vector with the environment of the given node. The environment
+     * is found by walking over open superclasses until the first non-polynomial
+     * node is reached.
      */
     private Collection<GraphClass> getNodesP(GraphClass node,
             final Problem problem) {
@@ -453,27 +453,14 @@ public class OpenProblemDialog extends JDialog implements ItemListener,
             public void visit(GraphClass v) {
                 result.add(v);
                 Complexity c = problem.getComplexity(v);
-                if (c.likelyNotP()) {
+                if (c.likelyNotP())
                     finish(v);
-                } else {
+                else
                     super.visit(v);
-                }
             }
         }.run();
 
         return result;
-    }
-
-    @Override
-    public void updateOptions() {
-        try {
-            UIManager.setLookAndFeel(UserSettings.getCurrentTheme());
-        } catch (Exception e) {
-            e.printStackTrace();
-        } 
-        
-        SwingUtilities.updateComponentTreeUI(this);
-        pack();
     }
 
 }

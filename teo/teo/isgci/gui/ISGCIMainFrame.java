@@ -79,10 +79,7 @@ public class ISGCIMainFrame extends JFrame
      * The tabbed Pane which handles all tabs and their creation / deletion.
      */
     private ISGCITabbedPane tabbedPane;
-    
-    /** The toolbar which can be set visible by option changes. */
-    private ISGCIToolBar toolbar;
-    
+
     /** Indicates whether or not the graph should draw unproper edges. */
     private JMenuItem miDrawUnproper;
 
@@ -159,7 +156,7 @@ public class ISGCIMainFrame extends JFrame
 
         // Create and add new toolbar - has to be after tabbedpane
         // because toolbar needs to listen to tabbedpane
-        toolbar = new ISGCIToolBar(this);
+        ISGCIToolBar toolbar = new ISGCIToolBar(this);
         getContentPane().add(toolbar, BorderLayout.PAGE_START);
 
         setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
@@ -477,10 +474,7 @@ public class ISGCIMainFrame extends JFrame
     public void windowOpened(WindowEvent e) { }
 
     @Override
-    public void windowClosed(WindowEvent e) {
-        UserSettings.unsubscribe(this);
-        UserSettings.unsubscribe(tabbedPane);
-    }
+    public void windowClosed(WindowEvent e) { }
 
     @Override
     public void windowIconified(WindowEvent e) { }
@@ -587,7 +581,6 @@ public class ISGCIMainFrame extends JFrame
 
     @Override
     public void updateOptions() {
-        // set UI
         try {
             UIManager.setLookAndFeel(UserSettings.getCurrentTheme());
         } catch (Exception e) {
@@ -596,9 +589,6 @@ public class ISGCIMainFrame extends JFrame
         
         SwingUtilities.updateComponentTreeUI(this);
         pack();
-        
-        // set toolbar visibility
-        toolbar.setVisible(UserSettings.getCurrentToolbarSetting());
     }
 }
 
