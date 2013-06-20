@@ -244,6 +244,7 @@
                 <include name="data/psprolog.txt" />
             </fileset>
             <fileset dir="${data.dir}">
+                <include name="*.png" />
                 <include name="images/*.gif" />
                 <include name="icons/*.gif" />
             </fileset>

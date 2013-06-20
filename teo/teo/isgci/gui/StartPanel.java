@@ -14,26 +14,28 @@ package teo.isgci.gui;
 
 import java.awt.BorderLayout;
 import java.awt.Dimension;
+import java.awt.Graphics;
 import java.awt.GridLayout;
+import java.awt.MouseInfo;
+import java.awt.Point;
+import java.awt.Robot;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.InputEvent;
+import java.awt.image.BufferedImage;
+import java.io.File;
 import java.io.IOException;
 
+import javax.imageio.ImageIO;
+import javax.swing.Box;
+import javax.swing.BoxLayout;
+import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JComponent;
 import javax.swing.JEditorPane;
+import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
-
-import org.jgrapht.Graph;
-import org.jgrapht.graph.DefaultDirectedGraph;
-import org.jgrapht.graph.DefaultEdge;
-
-import teo.isgci.drawing.DrawingLibraryFactory;
-import teo.isgci.drawing.DrawingLibraryInterface;
-import teo.isgci.drawing.GraphManipulationInterface;
-import teo.isgci.problem.Complexity;
-import teo.isgci.util.UserSettings;
 
 /**
  * A ISGCI specific implementation for the startpage of the tabbedpane that is
@@ -54,121 +56,71 @@ class StartPanel extends JPanel {
         = "http://92.51.130.117/news.html";
     
     /**
-     * The drawinglibraryinterface used to draw the isgci graph.
+     * How much time should pass between animationframes.
      */
-    private DrawingLibraryInterface<String, DefaultEdge> drawingLibInterface;
-    
+    private static final int DELAY = 10;
+
+    /**
+     * The parent which contains the startpanel.
+     */
+    private ISGCIMainFrame mainframe;
+
     /**
      * Creates a new StartPanel for ISGCI.
      * 
      * @param parent
-     *          The reference to the window containing this panel.
+     *            The reference to the window containing this panel.
      */
     public StartPanel(final ISGCIMainFrame parent) {
-        // Create a graphcanvas with ISGCI logo
         
-        // space => make nodes bigger
-        String i1 = "   I   "; 
-        String s = "   S   ";
-        String g = "   G   ";
-        String c = "   C   ";
-        String i2 = "   I    "; // needs to be one space bigger, else i1 == i2
-        
-        Graph<String, DefaultEdge> isgci 
-            = new DefaultDirectedGraph<String, DefaultEdge>(DefaultEdge.class);
-        
-        isgci.addVertex(i1);
-        isgci.addVertex(s);
-        isgci.addVertex(g);
-        isgci.addVertex(c);
-        isgci.addVertex(i2);
-        
-        isgci.addEdge(i1, s);
-        isgci.addEdge(s, c);
-        isgci.addEdge(s, g);
-        isgci.addEdge(g, c);
-        isgci.addEdge(c, i2);
-        
-        drawingLibInterface = DrawingLibraryFactory.createNewInterface(isgci);
-        
-        // color nodes differently
-        GraphManipulationInterface<String, DefaultEdge> gmi 
-            = drawingLibInterface.getGraphManipulationInterface();
-        
-        gmi.colorNode(new String[] { i1 }, 
-                UserSettings.getColor(Complexity.NPH));
-        gmi.colorNode(new String[] { s }, 
-                UserSettings.getColor(Complexity.GIC));
-        gmi.colorNode(new String[] { g }, 
-                UserSettings.getColor(Complexity.LINEAR));
-        gmi.colorNode(new String[] { c }, 
-                UserSettings.getColor(Complexity.OPEN));
-        gmi.colorNode(new String[] { i2 }, 
-                UserSettings.getColor(Complexity.P));
-        
-        
-        // create a boxlayout with buttons
-        final int rows = 1;
-        final int cols = 4;
-        JPanel buttonPanel = new JPanel(new GridLayout(rows, cols));
+        mainframe = parent;
         
         // Buttons
-        JButton drawButton = IconButtonFactory.createImageButton(
-                IconButtonFactory.ADD_ICON, "Draw",
-                "Open a dialog to create a new graph drawing");
+        JButton drawButton = createDrawingTaskButton();
         JButton databaseButton = IconButtonFactory.createImageButton(
-                IconButtonFactory.ZOOM_ICON, "Browse",
-                "Open a dialog to browse the graph database");
+                IconButtonFactory.INFORMATION_ICON, 
+                "Look at the boundary of a problem",
+                "TODO");
         JButton settingsButton = IconButtonFactory.createImageButton(
-                IconButtonFactory.PREFERENCES_ICON, "Settings",
-                "Open a dialog to change settings");
+                IconButtonFactory.INFORMATION_ICON, 
+                "Determine common super and subclasses of two classes",
+                "TODO");
         JButton aboutButton = IconButtonFactory.createImageButton(
-                IconButtonFactory.INFORMATION_ICON, "About",
-                "About ISGCI");
+                IconButtonFactory.INFORMATION_ICON, 
+                "Determine the inclusion relation between two classes",
+                "TODO");
         
         // set buttonsize
-        final Dimension buttonSize = new Dimension(100, 50);
+        final Dimension buttonSize = new Dimension(200, 50);
         
         drawButton.setPreferredSize(buttonSize);
         databaseButton.setPreferredSize(buttonSize);
         settingsButton.setPreferredSize(buttonSize);
         aboutButton.setPreferredSize(buttonSize);
         
-        // add actionhandler
-        drawButton.addActionListener(new ActionListener() {    
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                parent.openSelectGraphClassesDialog();
-            }
-        });
+        drawButton.setMinimumSize(buttonSize);
+        databaseButton.setMinimumSize(buttonSize);
+        settingsButton.setMinimumSize(buttonSize);
+        aboutButton.setMinimumSize(buttonSize);
         
-        databaseButton.addActionListener(new ActionListener() {    
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                parent.openBrowseDatabaseDialog();
-            }
-        });
+        // organize buttonlayout
+        final int maxSize = 10000;
         
-        settingsButton.addActionListener(new ActionListener() {    
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                parent.openSettingsDialog();
-            }
-        });
+        JPanel leftPanel = new JPanel();
+        BoxLayout layout = new BoxLayout(leftPanel, BoxLayout.Y_AXIS);
         
-        aboutButton.addActionListener(new ActionListener() {    
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                parent.openAboutDialog();
-            }
-        });
+        leftPanel.setLayout(layout);
         
-        // add to layout
-        buttonPanel.add(drawButton);
-        buttonPanel.add(databaseButton);
-        buttonPanel.add(settingsButton);
-        buttonPanel.add(aboutButton);
-        
+        leftPanel.add(new JLabel(new ImageIcon(
+                getClass().getResource("/logo.png"))));
+        leftPanel.add(drawButton);
+        leftPanel.add(databaseButton);
+        leftPanel.add(settingsButton);
+        leftPanel.add(aboutButton);
+        leftPanel.add(new Box.Filler(new Dimension(0, 0),
+                                     buttonSize,
+                                     new Dimension(maxSize, maxSize)));
+      
         // set news-pane
         final Dimension newsSize = new Dimension(400, 100); 
         
@@ -179,10 +131,138 @@ class StartPanel extends JPanel {
         final int gap = 5;
         setLayout(new BorderLayout(gap, gap));
         
-        add(buttonPanel, BorderLayout.PAGE_START);
-        add(drawingLibInterface.getPanel(), BorderLayout.CENTER);
-        add(newsPane, BorderLayout.LINE_END);
+        add(leftPanel, BorderLayout.LINE_START);
+        add(newsPane, BorderLayout.CENTER);
        
+    }
+    
+    /**
+     * Creates a robot on the currently active screen.
+     *  
+     * @return
+     *          A new robot on the currently active screen.
+     */
+    private Robot getRobot() {
+        Robot robot = null;
+        
+        try {
+            // first, try to create a robot
+            robot = new Robot();
+            
+            // then, try to get a robot on the current screen, which is
+            // more likely to throw an error
+            robot = new Robot(mainframe.getGraphicsConfiguration()
+                                .getDevice());
+        } catch (Exception e) {
+            System.err.println("Failed to initialize robot for moving mouse!");
+        }
+        
+        return robot;
+    }
+    
+    /**
+     * Moves to mouse from the current position to a point by using a slightly
+     * tweaked Bresenham's line algorithm.
+     * 
+     * @param robot
+     *          The robot which is used to move the mouse.
+     * 
+     * @param to
+     *          Where the mousepointer should move to.
+     */
+    private void moveMouseTo(Robot robot, Point to) {        
+        Point start = MouseInfo.getPointerInfo().getLocation();
+        
+        boolean steep = Math.abs(to.y - start.y) > Math.abs(to.x - start.x);
+        if (steep) {
+            int t;
+            
+            // swap(start.x, start.y);
+            t = start.x;
+            start.x = start.y;
+            start.y = t;
+            
+            // swap(to.x, to.y);
+            t = to.x;
+            to.x = to.y;
+            to.y = t;
+        }
+
+        int deltax = Math.abs(to.x - start.x);
+        int deltay = Math.abs(to.y - start.y);
+        int error = deltax / 2;
+        int ystep;
+        int y = start.y;
+
+        if (start.y < to.y) {
+            ystep = 1;
+        } else {
+            ystep = -1;
+        }
+
+        for (int x = start.x; x != to.x;
+                x += Math.signum(to.x - start.x) * 1) {
+
+            if (steep) {
+                robot.mouseMove(y, x);
+            } else {
+                robot.mouseMove(x, y);
+            }
+
+            error = error - deltay;
+
+            if (error < 0) {
+                y = y + ystep;
+                error = error + deltax;
+            }
+
+            // delay animation so it's visible
+            robot.delay(DELAY);
+        }
+    }
+    
+    /**
+     * Creates a button, that - if clicked - will take over the mouse
+     * and guide the user how to do a specific task, in this case:
+     * xyz.
+     * 
+     * @return
+     *          A jbutton that will guide the mouse upon click.
+     */
+    private JButton createDrawingTaskButton() {
+        JButton button = IconButtonFactory.createImageButton(
+                IconButtonFactory.ADD_ICON, "HOW TO: Draw a hierarchy",
+                "Guides you through the process of drawing a hierarchy of "
+                + "super- and/or subclasses of some class(es)."); 
+        
+        button.addActionListener(new ActionListener() {    
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                // create robot on the screen where the parent is active
+                Robot mouseRobot = getRobot();
+                
+                if (mouseRobot == null) {
+                    return;
+                }
+                
+                // Click draw button
+                JComponent endButton = mainframe.getToolbar().getDrawButton();
+                Point endPoint = endButton.getLocationOnScreen();
+                
+                // add size/2 so button isn't clicked in left top corner
+                endPoint.x += endButton.getWidth() / 2;
+                endPoint.y += endButton.getHeight() / 2;
+                
+                moveMouseTo(mouseRobot, endPoint);
+                
+                // click
+                mouseRobot.mousePress(InputEvent.BUTTON1_DOWN_MASK);
+                mouseRobot.mouseRelease(InputEvent.BUTTON1_DOWN_MASK);
+                
+            }
+        });
+        
+        return button;
     }
     
     /**
@@ -192,7 +272,7 @@ class StartPanel extends JPanel {
      */
     private JComponent loadNews() {
         JEditorPane jep = new JEditorPane();
-        jep.setEditable(false);   
+        jep.setEditable(false);
 
         try {
           jep.setPage(NEWSPAGE);
@@ -203,17 +283,7 @@ class StartPanel extends JPanel {
 
         JScrollPane scrollPane = new JScrollPane(jep);
         return scrollPane;
-    }
-    
-    /**
-     * Retrieve the drawinglibraryinterface used to display the ISGCI graph.
-     * @return
-     *          The drawinglibraryinterface used by this class.
-     */
-    public DrawingLibraryInterface getDrawingLibraryInterface() {
-        return drawingLibInterface;
-    }
-    
+    }    
 }
 
 /* EOF */

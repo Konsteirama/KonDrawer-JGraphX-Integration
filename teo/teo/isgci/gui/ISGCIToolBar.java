@@ -42,6 +42,9 @@ public class ISGCIToolBar extends JToolBar {
     /** Redo button, reference here to disable/enable. */
     private JButton redoButton;
 
+    /** Draw button, reference here because it's needed for some animations. */
+    private JButton drawButton;
+    
     /**
      * Creates a toolbar with icons that influence both ISGCI and the currently
      * active drawinglibraryinterface (the active tab). The parent needs an
@@ -59,6 +62,16 @@ public class ISGCIToolBar extends JToolBar {
         mainframe = parent;
     }
 
+    /**
+     * Getter for {@link #drawButton}.
+     * 
+     * @return
+     *          Returns {@link #drawButton}
+     */
+    public JButton getDrawButton() {
+        return drawButton;
+    }
+    
     /**
      * Returns the drawinglibraryinterface.
      * 
@@ -100,11 +113,11 @@ public class ISGCIToolBar extends JToolBar {
     private void addGeneralButtons() {
         // NEW DRAWING
         String newDrawingTooltip = "Open a dialogue to create a new drawing";
-        JButton newdrawingbutton  = IconButtonFactory.createImageButton(
+        drawButton = IconButtonFactory.createImageButton(
                 IconButtonFactory.ADD_ICON, "Draw", newDrawingTooltip);
-        add(newdrawingbutton);
+        add(drawButton);
 
-        newdrawingbutton.addActionListener(new ActionListener() {
+        drawButton.addActionListener(new ActionListener() {
 
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -419,7 +432,7 @@ public class ISGCIToolBar extends JToolBar {
         
         
         // SEARCH
-        String searchTooltip = "Opens a dialog to search for a specific "
+        String searchTooltip = "Opens a dialogue to search for a specific "
                                 + "graphclass in the drawing.";
         JButton searchbutton = IconButtonFactory.createImageButton(
                 IconButtonFactory.SEARCH_ICON, searchTooltip);

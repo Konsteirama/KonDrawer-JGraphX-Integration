@@ -75,6 +75,11 @@ public class ISGCIMainFrame extends JFrame implements WindowListener {
      */
     private ISGCITabbedPane tabbedPane;
 
+    /**
+     * The toolbar, needed to for some startpanel animations.
+     */
+    private ISGCIToolBar toolbar;
+    
     /** Indicates whether or not the graph should draw unproper edges. */
     private JMenuItem miDrawUnproper;
     
@@ -149,7 +154,7 @@ public class ISGCIMainFrame extends JFrame implements WindowListener {
 
         // Create and add new toolbar - has to be after tabbedpane
         // because toolbar needs to listen to tabbedpane
-        ISGCIToolBar toolbar = new ISGCIToolBar(this);
+        toolbar = new ISGCIToolBar(this);
         getContentPane().add(toolbar, BorderLayout.PAGE_START);
 
         setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
@@ -169,6 +174,15 @@ public class ISGCIMainFrame extends JFrame implements WindowListener {
         return tabbedPane;
     }
 
+    /**
+     * Getter for {@link #toolbar}.
+     * 
+     * @return Returns {@link #toolbar}.
+     */
+    public ISGCIToolBar getToolbar() {
+        return toolbar;
+    }
+    
     /**
      * Write the entire database in GraphML to isgcifull.graphml.
      */

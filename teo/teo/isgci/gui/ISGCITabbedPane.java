@@ -348,11 +348,9 @@ public class ISGCITabbedPane extends JTabbedPane implements Updatable {
      */
     public DrawingLibraryInterface getActiveDrawingLibraryInterface() {
         Component panel = getSelectedComponent();
-        if (panel == startpage) {
-            return startpage.getDrawingLibraryInterface();
-        }
         
-        if (!panelToInterfaceMap.containsKey(panel)) {
+        if (!panelToInterfaceMap.containsKey(panel) 
+                || panel instanceof StartPanel) {
             return null;
         }
         
