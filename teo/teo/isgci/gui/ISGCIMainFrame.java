@@ -77,7 +77,8 @@ public class ISGCIMainFrame extends JFrame implements WindowListener {
 
     /** Indicates whether or not the graph should draw unproper edges. */
     private JMenuItem miDrawUnproper;
-
+    
+    /** Shows a list from which a problem can be chosen. */
     private JMenuItem miColourProblem;
 
     /**
