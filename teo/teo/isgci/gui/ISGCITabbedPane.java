@@ -192,6 +192,9 @@ public class ISGCITabbedPane extends JTabbedPane implements Updatable {
         }
     };
 
+    /**
+     * tab component which adds a new tab if clicked.
+     */
     private AddTabComponent addTabComponent;
     
     /**
@@ -263,8 +266,6 @@ public class ISGCITabbedPane extends JTabbedPane implements Updatable {
         if (startpageActive) {
             removeStartpage();
         }        
-        //remove addTabButton
-        remove(indexOfTabComponent(addTabComponent));
         
         
         DrawingLibraryInterface<V, E> drawingInterface = 
@@ -287,13 +288,17 @@ public class ISGCITabbedPane extends JTabbedPane implements Updatable {
         setProperness();
         setProblem(null, panel);
         applyNamingPref(panel);
-        
-        //add the previously removed addTabButton again
-        JPanel addTabTab = new JPanel();
-        addTab("", addTabTab);
-        setSelectedComponent(addTabTab);
-        setTabComponentAt(getSelectedIndex(), addTabComponent);
-        setSelectedIndex(getTabCount() - 2);
+
+        int i = indexOfTabComponent(addTabComponent);
+        // if addTabComponent is active remove it and add it again
+        if (i >= 0) {
+            remove(i);
+            JPanel addTabTab = new JPanel();
+            addTab("", addTabTab);
+            setSelectedComponent(addTabTab);
+            setTabComponentAt(getSelectedIndex(), addTabComponent);
+            setSelectedIndex(getTabCount() - 2);
+        }
     }
     
     /**
