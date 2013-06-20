@@ -15,10 +15,11 @@ import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.Font;
+import java.awt.FontMetrics;
 import java.awt.Graphics2D;
 import java.awt.Point;
-import java.awt.event.HierarchyBoundsListener;
-import java.awt.event.HierarchyEvent;
+import java.awt.event.ComponentAdapter;
+import java.awt.event.ComponentEvent;
 import java.awt.event.MouseEvent;
 import java.awt.image.BufferedImage;
 import java.io.File;
@@ -33,7 +34,6 @@ import java.util.Collection;
 import java.util.List;
 
 import javax.imageio.ImageIO;
-import javax.swing.BorderFactory;
 import javax.swing.SwingConstants;
 import javax.xml.transform.TransformerConfigurationException;
 
@@ -127,36 +127,50 @@ class JGraphXInterface<V, E> implements DrawingLibraryInterface<V, E> {
                     // get rid of these nasty [] around all labels
                     label = label.replace("[", "");
                     label = label.replace("]", "");
-
+                    
                     // Creates a new label and sets properties
                     final LatexLabel labelComponent = new LatexLabel(label);
-                    labelComponent.setHorizontalAlignment(SwingConstants
-                            .CENTER);
+                    
                     labelComponent.setVerticalAlignment(SwingConstants.CENTER);
-                    labelComponent.setBackground(new Color(0, 0, 0, 0));
+                    labelComponent.setHorizontalAlignment(
+                            SwingConstants.CENTER);
 
-                    labelComponent.setBorder(BorderFactory.createLineBorder(
-                            Color.blue));
+                    labelComponent.setBackground(new Color(0, 0, 0, 0));
                     
                     /* A Listener to resize the font in the latexComponent
                      * when the graphComponent is being zoomed
                      */ 
-                    labelComponent.addHierarchyBoundsListener(
-                            new HierarchyBoundsListener() {
-                        @Override
-                        public void ancestorResized(HierarchyEvent e) {
+                    labelComponent.addComponentListener(
+                            new ComponentAdapter() {
+                                
+                        /* Calculates the right font size */        
+                        public void componentResized(ComponentEvent e) {
                             double scale = graphComponent.getGraph().
                                     getView().getScale();
                             
-                            labelComponent.setFont(new Font(
-                                    "Dialog", Font.BOLD, 
-                                    (int) (DEFAULT_FONT_SIZE * scale))); 
-                        }
+                            int fontSize = (int) (DEFAULT_FONT_SIZE * scale);
+                            int windowWidth = labelComponent.getWidth();
+                            int windowHeight = labelComponent.getHeight();
+                            
+                            Font font;
+                            int height, width;
+                            
+                            do {
+                                font = new Font("Dialog", Font.BOLD, 
+                                        fontSize--);
+                                FontMetrics metrics = labelComponent.
+                                        getFontMetrics(font);
+                                
+                                height = metrics.getHeight();
+                                width = metrics.stringWidth(
+                                        labelComponent.getText());
+                                
+                            } while (height > windowHeight || width > windowWidth);
+                            
+                            labelComponent.setFont(font);
+                        }   
                         
-                        @Override
-                        public void ancestorMoved(HierarchyEvent e) { }
                     });
-                    
                     return new Component[]{labelComponent};
                 }
                 return null;
