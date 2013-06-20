@@ -175,11 +175,13 @@ public class AddTabComponent extends JPanel {
             }
 
             final int delta = 6;
-
-            g2.drawLine(delta, delta, getWidth() - delta - 1, getHeight()
-                    - delta - 1);
-            g2.drawLine(getWidth() - delta - 1, delta, delta, getHeight()
-                    - delta - 1);
+            
+            g2.drawLine(delta, getWidth() / 2, 
+                    getHeight() - delta - 1, getWidth() / 2);
+            
+            g2.drawLine(getWidth() / 2, delta, 
+                    getWidth() / 2, getHeight() - delta - 1);
+            
             g2.dispose();
         }
     }
