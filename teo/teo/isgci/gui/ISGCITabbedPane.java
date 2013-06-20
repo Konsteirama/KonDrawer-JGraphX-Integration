@@ -566,7 +566,6 @@ public class ISGCITabbedPane extends JTabbedPane implements Updatable {
             setProblem(getProblem(tab), tab);
         }
         
-        setTabPlacement(UserSettings.getCurrentTabPlacement());
         setNamingPref(UserSettings.getDefaultNamingPref());
     }
 }
