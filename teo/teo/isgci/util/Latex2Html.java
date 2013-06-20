@@ -26,10 +26,26 @@ public final class Latex2Html extends Latex {
     private static final Latex2Html INSTANCE = new Latex2Html();
     
     /**
-     * Indicates whether parser is in "span"/co mode so _6 will not be drawn
-     * with a bar over the character.
+     * Since java can't display CSS overlines, we have to use a special
+     * unicode character to display overlines. This is the character.
      */
-    private static boolean isInSpan;
+    private static final String OVERLINE = "&#x304;";
+    
+    /**
+     * Indicates whether parser is in overline/co mode so _6 will not be drawn
+     * with a bar over the 6.
+     */
+    private static boolean isInOverline;
+    
+    /**
+     * Indicates whether parser is in sub, see {@link #isInOverline}.
+     */
+    private static boolean isInSub;
+    
+    /**
+     * Indicates whether parser is in super, see {@link #isInOverline}.
+     */
+    private static boolean isInSuper;
     
     /**
      * Create a new latex->html converter. Private because of singleton
@@ -59,61 +75,53 @@ public final class Latex2Html extends Latex {
         return state.target.toString();
     }
     
-    /**
-     * Ends the span mode; see {@link #isInSpan}.
-     * @param s
-     *          The state to which the closing tag will be added.
-     */
-    private void endSpan(State s) {
-        if (isInSpan) {
-            ((HtmlState) s).target.append("</span>");
-            isInSpan = false;
-        }
-    }
-
     @Override
     protected State startSuper(State s) {
-        endSpan(s);
+        isInSuper = true;
         ((HtmlState) s).target.append("<sup>");
         return super.startSuper(s);
     }
 
     @Override
     protected void endSuper(State s) {
+        isInSuper = false;
         ((HtmlState) s).target.append("</sup>");
         super.endSuper(s);
     }
 
     @Override
     protected State startSub(State s) {
-        endSpan(s);
+        isInSub = true;
         ((HtmlState) s).target.append("<sub>");
         return super.startSub(s);
     }
 
     @Override
     protected void endSub(State s) {
+        isInSub = false;
         ((HtmlState) s).target.append("</sub>");
         super.endSub(s);
     }
 
     @Override
     protected State startCo(State s) {
-        ((HtmlState) s).target.append("<span style=\"text-decoration: "
-                                      + "overline\">");
-        isInSpan = true;
+        isInOverline = true;
         return super.startCo(s);
     }
 
     @Override
     protected void endCo(State s) {
-        endSpan(s);
+        isInOverline = false;
         super.endCo(s);
     }
 
     @Override
     protected void drawPlainString(State state, String str) {
         ((HtmlState) state).target.append(str);
+        
+        if (isInOverline && !isInSub && !isInSuper) {
+            ((HtmlState) state).target.append(OVERLINE); 
+        }
     }
 
     @Override
