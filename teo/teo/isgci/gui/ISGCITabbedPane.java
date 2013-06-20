@@ -31,6 +31,7 @@ import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
 import org.jgrapht.Graph;
+import org.jgrapht.graph.DefaultDirectedGraph;
 import org.jgrapht.graph.DefaultEdge;
 
 import teo.isgci.db.Algo;
@@ -261,7 +262,10 @@ public class ISGCITabbedPane extends JTabbedPane implements Updatable {
     public <V, E> void drawInNewTab(Graph<V, E> graph, String name) {
         if (startpageActive) {
             removeStartpage();
-        }
+        }        
+        //remove addTabButton
+        remove(indexOfTabComponent(addTabComponent));
+        
         
         DrawingLibraryInterface<V, E> drawingInterface = 
                 DrawingLibraryFactory.createNewInterface(graph);
@@ -283,6 +287,13 @@ public class ISGCITabbedPane extends JTabbedPane implements Updatable {
         setProperness();
         setProblem(null, panel);
         applyNamingPref(panel);
+        
+        //add the previously removed addTabButton again
+        JPanel addTabTab = new JPanel();
+        addTab("", addTabTab);
+        setSelectedComponent(addTabTab);
+        setTabComponentAt(getSelectedIndex(), addTabComponent);
+        setSelectedIndex(getTabCount() - 2);
     }
     
     /**
