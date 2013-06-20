@@ -18,8 +18,8 @@ import java.awt.Font;
 import java.awt.FontMetrics;
 import java.awt.Graphics2D;
 import java.awt.Point;
-import java.awt.event.ComponentAdapter;
-import java.awt.event.ComponentEvent;
+import java.awt.event.HierarchyBoundsListener;
+import java.awt.event.HierarchyEvent;
 import java.awt.event.MouseEvent;
 import java.awt.image.BufferedImage;
 import java.io.File;
@@ -140,11 +140,10 @@ class JGraphXInterface<V, E> implements DrawingLibraryInterface<V, E> {
                     /* A Listener to resize the font in the latexComponent
                      * when the graphComponent is being zoomed
                      */ 
-                    labelComponent.addComponentListener(
-                            new ComponentAdapter() {
-                                
-                        /* Calculates the right font size */        
-                        public void componentResized(ComponentEvent e) {
+                    labelComponent.addHierarchyBoundsListener(new HierarchyBoundsListener() {
+                        
+                        @Override
+                        public void ancestorResized(HierarchyEvent e) {
                             double scale = graphComponent.getGraph().
                                     getView().getScale();
                             
@@ -167,10 +166,13 @@ class JGraphXInterface<V, E> implements DrawingLibraryInterface<V, E> {
                                 
                             } while (height > windowHeight || width > windowWidth);
                             
-                            labelComponent.setFont(font);
-                        }   
+                            labelComponent.setFont(font);                            
+                        }
                         
+                        @Override
+                        public void ancestorMoved(HierarchyEvent e) { }
                     });
+                    
                     return new Component[]{labelComponent};
                 }
                 return null;
