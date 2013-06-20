@@ -33,6 +33,7 @@ import java.util.Collection;
 import java.util.List;
 
 import javax.imageio.ImageIO;
+import javax.swing.BorderFactory;
 import javax.swing.SwingConstants;
 import javax.xml.transform.TransformerConfigurationException;
 
@@ -119,7 +120,7 @@ class JGraphXInterface<V, E> implements DrawingLibraryInterface<V, E> {
             }
 
             @Override
-            public Component[] createComponents(mxCellState state) {
+            public Component[] createComponents(final mxCellState state) {
                 if (getGraph().getModel().isVertex(state.getCell())) {
                     String label = state.getLabel();
                     
@@ -134,6 +135,9 @@ class JGraphXInterface<V, E> implements DrawingLibraryInterface<V, E> {
                     labelComponent.setVerticalAlignment(SwingConstants.CENTER);
                     labelComponent.setBackground(new Color(0, 0, 0, 0));
 
+                    labelComponent.setBorder(BorderFactory.createLineBorder(
+                            Color.blue));
+                    
                     /* A Listener to resize the font in the latexComponent
                      * when the graphComponent is being zoomed
                      */ 
@@ -176,8 +180,6 @@ class JGraphXInterface<V, E> implements DrawingLibraryInterface<V, E> {
                 new InternalMouseAdapter(graphComponent, graphManipulation));
 
         graphManipulation.reapplyHierarchicalLayout();
-
-
     }
 
     /**
