@@ -25,6 +25,7 @@ import java.util.Set;
 
 import javax.swing.JComponent;
 import javax.swing.JDialog;
+import javax.swing.JPanel;
 import javax.swing.JTabbedPane;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
@@ -141,7 +142,16 @@ public class ISGCITabbedPane extends JTabbedPane implements Updatable {
      * On right-click it opens a popup window if the clicked object is a node
      * or a edge.
      */
-    private MouseAdapter mouseAdapter = new MouseAdapter() {        
+    private MouseAdapter mouseAdapter = new MouseAdapter() {  
+        
+        public void mousePressed(MouseEvent e) {            
+            if (getTabComponentAt(getSelectedIndex()) 
+                    instanceof AddTabComponent) {
+                addTabComponent.addTab();
+                e.consume();
+            }            
+        };
+        
         public void mouseClicked(MouseEvent e) {  
             
             Object node = getActiveDrawingLibraryInterface().
@@ -169,7 +179,7 @@ public class ISGCITabbedPane extends JTabbedPane implements Updatable {
                     edgePopup.show(e.getComponent(), e.getX(), e.getY());
                 }
             // Double-click event
-            } else if (e.getClickCount() == 2)  { 
+            } else if (e.getClickCount() == 2 && node != null)  { 
                 JDialog d = new GraphClassInformationDialog(
                         (ISGCIMainFrame) parent
                         , ((Set<GraphClass>) node).iterator().next());
@@ -180,6 +190,8 @@ public class ISGCITabbedPane extends JTabbedPane implements Updatable {
             }
         }
     };
+
+    private AddTabComponent addTabComponent;
     
     /**
      * Creates a new Tabbed pane with a startpage as only active tab.
@@ -189,6 +201,16 @@ public class ISGCITabbedPane extends JTabbedPane implements Updatable {
     public ISGCITabbedPane(ISGCIMainFrame parent) {
         mainframe = parent;
         addStartpage();
+        
+        //Adding the Add-Tab Tab
+        //TODO finding a better name for the Add-Tab tab
+        JPanel addTabTab = new JPanel();
+        addTab("", addTabTab);
+        setSelectedComponent(addTabTab);
+        addTabComponent = new AddTabComponent(this);
+        setTabComponentAt(getSelectedIndex(), addTabComponent);
+        setSelectedComponent(startpage);
+        
         addMouseListener(mouseAdapter);
         addChangeListener(changeListener);
         UserSettings.subscribeToOptionChanges(this);
@@ -284,6 +306,9 @@ public class ISGCITabbedPane extends JTabbedPane implements Updatable {
         if (startpageActive || getSelectedComponent() == null) {
             drawInNewTab(graph, name);
         } else {
+            if (getTabCount() == 1) {
+                addTabComponent.addTab();
+            }
             getActiveDrawingLibraryInterface().setGraph(graph);
             //reapply properness and coloring
             setProperness();
