@@ -88,7 +88,7 @@ class StartPanel extends JPanel {
     public StartPanel(final ISGCIMainFrame parent) {
         
         mainframe = parent;
-              
+        
         // create logo
         JLabel logo = new JLabel(new ImageIcon(
                 getClass().getResource("/logo.png")));
@@ -108,9 +108,14 @@ class StartPanel extends JPanel {
         JButton boundaryButton = createBoundaryTaskButton();
         JButton classButton = createCommonClassesTaskButton();
         JButton inclusionButton = createInclusionRelationTaskButton();
-
-        // organize buttonlayout
         
+        // align icons and text in buttons
+        drawButton.setHorizontalAlignment(SwingConstants.LEFT);
+        boundaryButton.setHorizontalAlignment(SwingConstants.LEFT);
+        classButton.setHorizontalAlignment(SwingConstants.LEFT);
+        inclusionButton.setHorizontalAlignment(SwingConstants.LEFT);
+        
+        // organize buttonlayout
         JPanel buttonPanel = new JPanel();
         BoxLayout buttonlayout 
             = new BoxLayout(buttonPanel, BoxLayout.PAGE_AXIS);
@@ -127,11 +132,12 @@ class StartPanel extends JPanel {
         buttonPanel.add(inclusionButton);
         
         // organize left layout
-        JPanel leftPanel = new JPanel(new BorderLayout());
+        final int gap = 5;
+        JPanel leftPanel = new JPanel(new BorderLayout(gap, gap));
         
         leftPanel.add(logoPanel, BorderLayout.PAGE_START);
         leftPanel.add(buttonPanel, BorderLayout.CENTER);
-      
+
         // set news-pane
         final Dimension newsSize = new Dimension(400, 100); 
         
@@ -139,7 +145,6 @@ class StartPanel extends JPanel {
         newsPane.setPreferredSize(newsSize);
         
         // join everything together
-        final int gap = 5;
         setLayout(new BorderLayout(gap, gap));
         
         add(leftPanel, BorderLayout.LINE_START);
@@ -264,7 +269,7 @@ class StartPanel extends JPanel {
     private JButton createDrawingTaskButton() {
         JButton button = IconButtonFactory.createImageButton(
                 IconButtonFactory.TIP_ICON, 
-                "<html> <br/> Draw a hierarchy of super- <br/>"
+                "<html> <br/> Draw a hierarchy of super-  <br/> "
                 + "and/or subclasses <br/> <br/> </html>",
                 "Guides you through the process of drawing a hierarchy of "
                 + "super- and/or subclasses of some class(es)."); 
@@ -304,8 +309,8 @@ class StartPanel extends JPanel {
     private JButton createBoundaryTaskButton() {
         JButton button = IconButtonFactory.createImageButton(
                 IconButtonFactory.TIP_ICON, 
-                "<html>  <br/> Look at the boundary of a problem"
-                + " <br/>  <br/> </html>",
+                "<html> <br/> Look at the boundary of a   <br/>"
+                + "problem <br/>  <br/> </html>",
                 "Guides you through the process of looking at the "
                 + "boundary of a problem.");
         
@@ -356,7 +361,7 @@ class StartPanel extends JPanel {
     private JButton createCommonClassesTaskButton() {
         JButton button = IconButtonFactory.createImageButton(
                 IconButtonFactory.TIP_ICON, 
-                "<html>  <br/> Determine super- and <br/> "
+                "<html> <br/> Determine super- and        <br/> "
                 + "subclasses of two classes <br/> <br/> </html>",
                 "TODO");
         
@@ -411,11 +416,11 @@ class StartPanel extends JPanel {
     private JButton createInclusionRelationTaskButton() {
         JButton button = IconButtonFactory.createImageButton(
                 IconButtonFactory.TIP_ICON, 
-                "<html>  <br/> Find the inclusion relation <br/> "
+                "<html> <br/> Find the inclusion relation <br/> "
                 + "between two classes <br/>  <br/> </html>",
                 "Guides you through the process of determining the "
                 + "inclusion relation between two classes.");
-        
+
         button.addActionListener(new ActionListener() {
             
             @Override
