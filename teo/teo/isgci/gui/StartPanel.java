@@ -32,9 +32,12 @@ import javax.swing.JButton;
 import javax.swing.JComponent;
 import javax.swing.JEditorPane;
 import javax.swing.JLabel;
+import javax.swing.JMenu;
+import javax.swing.JMenuItem;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.SwingConstants;
+import javax.swing.SwingUtilities;
 import javax.swing.border.BevelBorder;
 
 /**
@@ -58,8 +61,13 @@ class StartPanel extends JPanel {
     /**
      * How much time should pass between animationframes.
      */
-    private static final int DELAY = 10;
+    private static final int DELAY = 4;
 
+    /**
+     * How much time should pass between clicks.
+     */
+    private static final int CLICKDELAY = 600;
+    
     /**
      * The parent which contains the startpanel.
      */
@@ -167,14 +175,28 @@ class StartPanel extends JPanel {
      * @param toComponent
      *          Where the mousepointer should move to.
      */
-    private void moveMouseTo(Robot robot, JComponent toComponent) {        
-        Point start = MouseInfo.getPointerInfo().getLocation();
+    private void moveMouseTo(Robot robot, JComponent toComponent) {
         Point to = toComponent.getLocationOnScreen();
         
         // add size/2 so mousepointer isn't in left top corner of component
         to.x += toComponent.getWidth() / 2;
         to.y += toComponent.getHeight() / 2; 
         
+        moveMouseTo(robot, to);
+    }
+    
+    /**
+     * Moves to mouse from the current position to a point by using a slightly
+     * tweaked Bresenham's line algorithm.
+     * 
+     * @param robot
+     *          The robot which is used to move the mouse.
+     * 
+     * @param to
+     *          Where the mousepointer should move to.
+     */
+    private void moveMouseTo(Robot robot, Point to) {
+        Point start = MouseInfo.getPointerInfo().getLocation();
         
         boolean steep = Math.abs(to.y - start.y) > Math.abs(to.x - start.x);
         if (steep) {
@@ -281,25 +303,39 @@ class StartPanel extends JPanel {
                 "Guides you through the process of looking at the "
                 + "boundary of a problem.");
         
+        button.addActionListener(new ActionListener() {
+            
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                // create robot on the screen where the parent is active
+                final Robot mouseRobot = getRobot();
+                
+                if (mouseRobot == null) {
+                    return;
+                }
+                
+                // Open the problemMenu
+                JMenu problemMenu = mainframe.getProblemsMenu();
+                moveMouseTo(mouseRobot, problemMenu);
+                problemMenu.doClick(1);
+                mouseRobot.delay(CLICKDELAY);
+                
+                // let the ui build the dialog
+                SwingUtilities.invokeLater(new Runnable() {
+                    
+                    @Override
+                    public void run() {
+
+                        // Hover over the open-problem menuitem
+                        JMenuItem problemItem 
+                            = mainframe.getOpenProblemMenuItem();
+                        
+                        moveMouseTo(mouseRobot, problemItem);
+                    }
+                });
+            }
+        });
         
-        
-        return button;
-    }
-    
-    /**
-     * Creates a button, that - if clicked - will take over the mouse
-     * and guide the user how to do a specific task, in this case:
-     * How to determine the inclusion relation between two classes.
-     * 
-     * @return
-     *          A jbutton that will guide the mouse upon click.
-     */
-    private JButton createInclusionRelationTaskButton() {
-        JButton button = IconButtonFactory.createImageButton(
-                IconButtonFactory.TIP_ICON, 
-                "<html>  <br/> Determine the inclusion relation <br/> "
-                + "between two classes <br/>  <br/> </html>",
-                "TODO");
         return button;
     }
     
@@ -317,6 +353,100 @@ class StartPanel extends JPanel {
                 "<html>  <br/> Determine super- and <br/> "
                 + "subclasses of two classes <br/> <br/> </html>",
                 "TODO");
+        
+        button.addActionListener(new ActionListener() {
+            
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                // create robot on the screen where the parent is active
+                final Robot mouseRobot = getRobot();
+                
+                if (mouseRobot == null) {
+                    return;
+                }
+                
+                // Open the problemMenu
+                final JMenu graphMenu = mainframe.getGraphMenu();
+                moveMouseTo(mouseRobot, graphMenu);
+                graphMenu.doClick(1);
+                mouseRobot.delay(CLICKDELAY);
+                
+                // let the ui build the dialog
+                SwingUtilities.invokeLater(new Runnable() {
+                    
+                    @Override
+                    public void run() {
+
+                        // Hover over the open-problem menuitem
+                        JMenuItem inclusionProblem 
+                            = mainframe.getInclusionMenuItem();
+                        
+                        moveMouseTo(mouseRobot, inclusionProblem);
+                        
+                        mouseRobot.delay(CLICKDELAY);
+                        inclusionProblem.doClick(1);
+                    }
+                });
+
+            }
+        });
+        
+        return button;
+    }
+    
+    /**
+     * Creates a button, that - if clicked - will take over the mouse
+     * and guide the user how to do a specific task, in this case:
+     * How to determine the inclusion relation between two classes.
+     * 
+     * @return
+     *          A jbutton that will guide the mouse upon click.
+     */
+    private JButton createInclusionRelationTaskButton() {
+        JButton button = IconButtonFactory.createImageButton(
+                IconButtonFactory.TIP_ICON, 
+                "<html>  <br/> Find the inclusion relation <br/> "
+                + "between two classes <br/>  <br/> </html>",
+                "Guides you through the process of determining the "
+                + "inclusion relation between two classes.");
+        
+        button.addActionListener(new ActionListener() {
+            
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                // create robot on the screen where the parent is active
+                final Robot mouseRobot = getRobot();
+                
+                if (mouseRobot == null) {
+                    return;
+                }
+                
+                // Open the problemMenu
+                final JMenu graphMenu = mainframe.getGraphMenu();
+                moveMouseTo(mouseRobot, graphMenu);
+                graphMenu.doClick(1);
+                mouseRobot.delay(CLICKDELAY);
+                
+                // let the ui build the dialog
+                SwingUtilities.invokeLater(new Runnable() {
+                    
+                    @Override
+                    public void run() {
+
+                        // Hover over the open-problem menuitem
+                        JMenuItem inclusionProblem 
+                            = mainframe.getInclusionMenuItem();
+                        
+                        moveMouseTo(mouseRobot, inclusionProblem);
+                        
+                        mouseRobot.delay(CLICKDELAY);
+                        inclusionProblem.doClick(1);
+                    }
+                });
+
+            }
+        });
+        
         return button;
     }
     

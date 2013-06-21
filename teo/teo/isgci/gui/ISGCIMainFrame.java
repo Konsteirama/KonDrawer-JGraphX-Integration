@@ -83,12 +83,18 @@ public class ISGCIMainFrame extends JFrame implements WindowListener {
     /** Needed so that menubar will not disappear on linux if maximized. */
     private JMenuBar mainMenuBar;
     
+    /** Needed for startpanel animation. */
+    private JMenu problemsMenu, graphMenu;
+    
+    /** Needed for startpanel animation. */
+    private JMenuItem miCheckInclusion, miOpenProblem;
+    
     /** Indicates whether or not the graph should draw unproper edges. */
     private JMenuItem miDrawUnproper;
     
     /** Shows a list from which a problem can be chosen. */
     private JMenuItem miColourProblem;
-
+    
     /**
      * Creates the frame.
      * 
@@ -226,20 +232,19 @@ public class ISGCIMainFrame extends JFrame implements WindowListener {
     protected JMenuBar createMenus() {
         mainMenuBar = new JMenuBar();
 
-        addFileMenu(mainMenuBar);
-        addViewMenu(mainMenuBar);
-        addGraphMenu(mainMenuBar);
-        addProblemsMenu(mainMenuBar);
-        addHelpMenu(mainMenuBar);
+        addFileMenu();
+        addViewMenu();
+        addGraphMenu();
+        addProblemsMenu();
+        addHelpMenu();
 
         return mainMenuBar;
     }
     
     /**
      *  Adds View to the menu.
-     *  @param mainMenuBar The menubar to which the entries are added.
      */
-    private void addFileMenu(JMenuBar mainMenuBar) {
+    private void addFileMenu() {
 
         JMenuItem miNew = new JMenuItem("New window");
         miNew.addActionListener(new ActionListener() {
@@ -277,9 +282,8 @@ public class ISGCIMainFrame extends JFrame implements WindowListener {
     
     /**
      *  Adds View to the menu.
-     *  @param mainMenuBar The menubar to which the entries are added.
      */
-    private void addViewMenu(JMenuBar mainMenuBar) {
+    private void addViewMenu() {
 
         // needed to reference this in actionlistener
         final ISGCIMainFrame mainframe = this;
@@ -340,9 +344,8 @@ public class ISGCIMainFrame extends JFrame implements WindowListener {
     
     /**
      *  Adds Help to the menu.
-     *  @param mainMenuBar The menubar to which the entries are added.
      */
-    private void addGraphMenu(JMenuBar mainMenuBar) {
+    private void addGraphMenu() {
         // needed to reference this in actionlistener
         final ISGCIMainFrame mainframe = this;
         
@@ -355,7 +358,7 @@ public class ISGCIMainFrame extends JFrame implements WindowListener {
             }
         });
         
-        JMenuItem miCheckInclusion = new JMenuItem("Find Relation...");
+        miCheckInclusion = new JMenuItem("Find Relation...");
         miCheckInclusion.addActionListener(new ActionListener() {
             
             @Override
@@ -380,7 +383,7 @@ public class ISGCIMainFrame extends JFrame implements WindowListener {
             }
         });
 
-        JMenu graphMenu = new JMenu("Graph classes");
+        graphMenu = new JMenu("Graph classes");
         graphMenu.add(miGraphClassInformation);
         graphMenu.add(miCheckInclusion);
         graphMenu.add(miSelectGraphClasses);
@@ -389,18 +392,17 @@ public class ISGCIMainFrame extends JFrame implements WindowListener {
     
     /**
      *  Adds Problems to the menu.
-     *  @param mainMenuBar The menubar to which the entries are added.
      */
-    private void addProblemsMenu(JMenuBar mainMenuBar) {
+    private void addProblemsMenu() {
 
         // needed to reference this in actionlistener
         final ISGCIMainFrame mainframe = this;
         
-        JMenuItem miOpenProblem = new JMenu("Boundary/Open classes");
+        miOpenProblem = new JMenu("Boundary/Open classes");
         miColourProblem = new ProblemsMenu(this,
                 "Colour for problem");
         
-        JMenu problemsMenu = new JMenu("Problems");
+        problemsMenu = new JMenu("Problems");
 
         problemsMenu.add(miOpenProblem);
         for (int i = 0; i < DataSet.problems.size(); i++) {
@@ -425,9 +427,8 @@ public class ISGCIMainFrame extends JFrame implements WindowListener {
     
     /**
      *  Adds Help to the menu.
-     *  @param mainMenuBar The menubar to which the entries are added.
      */
-    private void addHelpMenu(JMenuBar mainMenuBar) {
+    private void addHelpMenu() {
         
         JMenuItem miSmallgraphs = new JMenuItem("Small graphs");
         miSmallgraphs.addActionListener(new ActionListener() {
@@ -588,6 +589,42 @@ public class ISGCIMainFrame extends JFrame implements WindowListener {
         JDialog search = new SearchDialog(this);
         search.setLocation(DEFAULTPOSITION);
         search.setVisible(true);
+    }
+    
+    /**
+     * Getter for the menu for the problems.
+     * @return
+     *          The menu for the problems menu.
+     */
+    public JMenu getProblemsMenu() {
+        return problemsMenu;
+    }
+    
+    /**
+     * Getter for the menu for the graph classes.
+     * @return
+     *          The menu for the graph classes menu.
+     */
+    public JMenu getGraphMenu() {
+        return graphMenu;
+    }
+    
+    /**
+     * Getter for the menuitem of search for inclusion.
+     * @return
+     *          The menuitem for inclusions.
+     */
+    public JMenuItem getInclusionMenuItem() {
+        return miCheckInclusion;
+    }
+    
+    /**
+     * Getter for the menu for the open problem menu.
+     * @return
+     *          The menu for the open problem menu.
+     */
+    public JMenuItem getOpenProblemMenuItem() {
+        return miOpenProblem;
     }
 }
 
