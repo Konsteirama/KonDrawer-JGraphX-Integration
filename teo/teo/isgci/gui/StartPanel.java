@@ -272,7 +272,8 @@ class StartPanel extends JPanel {
                 "<html> <br/> Draw a hierarchy of super-  <br/> "
                 + "and/or subclasses <br/> <br/> </html>",
                 "Guides you through the process of drawing a hierarchy of "
-                + "super- and/or subclasses of some class(es)."); 
+                + "super- and/or subclasses of some class(es). Will take over"
+                + "your mouse for a short time!"); 
         
         button.addActionListener(new ActionListener() {    
             @Override
@@ -312,7 +313,8 @@ class StartPanel extends JPanel {
                 "<html> <br/> Look at the boundary of a   <br/>"
                 + "problem <br/>  <br/> </html>",
                 "Guides you through the process of looking at the "
-                + "boundary of a problem.");
+                + "boundary of a problem. Will take over"
+                + "your mouse for a short time!");
         
         button.addActionListener(new ActionListener() {
             
@@ -363,7 +365,9 @@ class StartPanel extends JPanel {
                 IconButtonFactory.TIP_ICON, 
                 "<html> <br/> Determine super- and        <br/> "
                 + "subclasses of two classes <br/> <br/> </html>",
-                "TODO");
+                "Guides you through the process of determining " 
+                + "super- and subclasses of two classes. Will take over"
+                + "your mouse for a short time!");
         
         button.addActionListener(new ActionListener() {
             
@@ -419,7 +423,8 @@ class StartPanel extends JPanel {
                 "<html> <br/> Find the inclusion relation <br/> "
                 + "between two classes <br/>  <br/> </html>",
                 "Guides you through the process of determining the "
-                + "inclusion relation between two classes.");
+                + "inclusion relation between two classes. Will take over"
+                + "your mouse for a short time!");
 
         button.addActionListener(new ActionListener() {
             
