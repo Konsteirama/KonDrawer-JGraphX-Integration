@@ -329,6 +329,7 @@ public class ISGCITabbedPane extends JTabbedPane implements Updatable {
                 = new ISGCITabComponent(this, name);
         
             setTabComponentAt(getSelectedIndex(), closeButton);
+            applyNamingPref(getSelectedComponent());
         }
     }
     
@@ -390,7 +391,12 @@ public class ISGCITabbedPane extends JTabbedPane implements Updatable {
     private void applyNamingPref(Component c) {
         DrawingLibraryInterface graphInterface = panelToInterfaceMap.get(c);
         Graph graph = graphInterface.getGraph();
-        Algo.NamePref namePref = panelToNamingPref.get(c);
+        Algo.NamePref namePref;
+        if (panelToNamingPref.containsKey(c)) {
+            namePref = panelToNamingPref.get(c);
+        } else {
+            namePref = defaultMode;
+        }
         
         graphInterface.getGraphManipulationInterface().beginUpdate();
         for (Object node : graph.vertexSet()) {
