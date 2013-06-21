@@ -274,7 +274,8 @@ public class ISGCIToolBar extends JToolBar {
                 if (zoomLevel == defaultEntry) {
                     return;
                 } else if (zoomLevel == zoomToFit) {
-                    //TODO
+                    graphManipulation.zoomToFit();
+
                     return;
                 } else { // from here on, the text should be "x%"
                     String zoom = zoomLevel.replace("%", "");

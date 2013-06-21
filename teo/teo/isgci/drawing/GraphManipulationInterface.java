@@ -134,6 +134,11 @@ public interface GraphManipulationInterface<V, E> {
      * @param center : the point zoom centers on
      */
     void zoom(boolean zoomIn, Point center);
+    
+    /**
+     * Zooms the panel, so that the whole graph is visible.
+     */
+    void zoomToFit();
 
     /**
      * Highlights a node and if specified its neighbors.

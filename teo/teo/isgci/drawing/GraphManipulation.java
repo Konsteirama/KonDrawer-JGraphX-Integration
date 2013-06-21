@@ -33,6 +33,7 @@ import com.mxgraph.util.mxUndoManager;
 import com.mxgraph.util.mxUndoableEdit;
 import com.mxgraph.util.mxUtils;
 import com.mxgraph.view.mxGraph;
+import com.mxgraph.view.mxGraphView;
 
 /**
  * This class implements the GraphManipulationInterface. It handles
@@ -384,6 +385,16 @@ class GraphManipulation<V, E> implements GraphManipulationInterface<V, E> {
         rect.translate((int)delta.getX(), (int)delta.getY());
 
         graphComponent.getGraphControl().scrollRectToVisible(rect, true);*/
+    }
+    
+    @Override
+    public void zoomToFit() {
+        mxGraphView view = graphComponent.getGraph().getView();
+        
+        int compLen = graphComponent.getWidth();
+        int viewLen = (int) view.getGraphBounds().getWidth();
+        
+        view.setScale((double) compLen / viewLen * view.getScale());
     }
 }
 
