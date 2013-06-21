@@ -47,8 +47,7 @@ public class SearchDialog extends JDialog implements ActionListener {
         this.parent = parent;
         group = new ButtonGroup();
 
-        Algo.NamePref mode = parent.getTabbedPane().getNamingPref(
-                parent.getTabbedPane().getSelectedComponent());
+        Algo.NamePref mode = parent.getTabbedPane().getNamingPref();
 
         Container content = getContentPane();
 
@@ -90,17 +89,21 @@ public class SearchDialog extends JDialog implements ActionListener {
         cancelButton.addActionListener(this);
         setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
 
-        Set setNames = parent.getTabbedPane()
+        if (parent.getTabbedPane()
+                .getActiveDrawingLibraryInterface() != null) {
+            Set setNames = parent.getTabbedPane()
                 .getActiveDrawingLibraryInterface().getGraph().vertexSet();
-        List<GraphClass> listNames = new ArrayList<GraphClass>();
-        for (Object object : setNames) {
-            for (Object name : (Set) object) {
-                listNames.add((GraphClass) name);
+        
+            List<GraphClass> listNames = new ArrayList<GraphClass>();
+            for (Object object : setNames) {
+                for (Object name : (Set) object) {
+                    listNames.add((GraphClass) name);
+                }
             }
-        }
-        if (!listNames.isEmpty()) {
-            Collections.sort(listNames, new LessLatex());
-            classesList.setListData(listNames);
+            if (!listNames.isEmpty()) {
+                Collections.sort(listNames, new LessLatex());
+                classesList.setListData(listNames);
+            }
         }
 
         pack();
@@ -117,7 +120,7 @@ public class SearchDialog extends JDialog implements ActionListener {
         Object source = event.getSource();
         if (source == cancelButton) {
             closeDialog();
-        } else if (source == searchButton) {
+        } else if (source == searchButton && classesList.getSelectedValue() != null) {
             Set<GraphClass> node = null;
             Set setNames = parent.getTabbedPane()
                     .getActiveDrawingLibraryInterface().getGraph().vertexSet();
