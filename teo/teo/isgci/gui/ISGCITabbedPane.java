@@ -239,6 +239,8 @@ public class ISGCITabbedPane extends JTabbedPane implements Updatable {
         
         setTabComponentAt(getSelectedIndex(), closeButton);
       
+        if (addTabComponent != null)
+            addTabComponent.resetTabPosition();
     }
 
     /**
@@ -289,16 +291,7 @@ public class ISGCITabbedPane extends JTabbedPane implements Updatable {
         setProblem(null, panel);
         applyNamingPref(panel);
 
-        int i = indexOfTabComponent(addTabComponent);
-        // if addTabComponent is active remove it and add it again
-        if (i >= 0) {
-            remove(i);
-            JPanel addTabTab = new JPanel();
-            addTab("", addTabTab);
-            setSelectedComponent(addTabTab);
-            setTabComponentAt(getSelectedIndex(), addTabComponent);
-            setSelectedIndex(getTabCount() - 2);
-        }
+        addTabComponent.resetTabPosition();
     }
     
     /**

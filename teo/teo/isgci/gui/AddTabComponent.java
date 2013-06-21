@@ -104,10 +104,16 @@ public class AddTabComponent extends JPanel {
     }
     
     public void addTab(){
-        int i = parent.indexOfTabComponent(AddTabComponent.this);
-        parent.remove(i);
         ((ISGCITabbedPane) parent).drawInNewTab(
                 new DefaultDirectedGraph(DefaultEdge.class), "Empty Tab");
+        resetTabPosition();
+    }
+    
+    public void resetTabPosition(){
+        int i = parent.indexOfTabComponent(AddTabComponent.this);
+        if (i >= 0) {
+            parent.remove(i);
+        }
         JPanel addTabTab = new JPanel();
         parent.addTab("", addTabTab);
         parent.setSelectedComponent(addTabTab);
