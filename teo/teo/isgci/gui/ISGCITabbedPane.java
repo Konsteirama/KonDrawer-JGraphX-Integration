@@ -356,30 +356,6 @@ public class ISGCITabbedPane extends JTabbedPane implements Updatable {
         
         return panelToInterfaceMap.get(panel);
     }
-
-    /**
-     * 
-     * @return 
-     *          The default naming preference of this tabbed pane.
-     */
-    public NamePref getNamingPref() {
-        return defaultMode;
-    }
-
-    /**
-     * Changes the default naming preference of this tabbed pane.
-     * 
-     * @param pref
-     *          The new default naming preference of this tabbed pane.
-     */
-    public void setNamingPref(NamePref pref) {
-        this.defaultMode = pref;
-        if (panelToNamingPref.size() > 0){
-            for (Component tab : panelToNamingPref.keySet()) {
-                setNamingPref(pref, tab);
-            }
-        }
-    }
     
     /**
      * @param c 
@@ -388,9 +364,9 @@ public class ISGCITabbedPane extends JTabbedPane implements Updatable {
      * @return 
      *          The default naming preference of the given Tab.
      */
-    public NamePref getNamingPref(Component c) {
-        if (panelToNamingPref.containsKey(c)) {
-            return panelToNamingPref.get(c);
+    public NamePref getNamingPref() {
+        if (panelToNamingPref.containsKey(getSelectedComponent())) {
+            return panelToNamingPref.get(getSelectedComponent());
         } else {
             return defaultMode;
         }
@@ -404,9 +380,12 @@ public class ISGCITabbedPane extends JTabbedPane implements Updatable {
      * @param c
      *          The Tab for which the naming preference is changed.
      */
-    public void setNamingPref(NamePref pref, Component c) {
-        panelToNamingPref.put((JComponent) c, pref);
-        applyNamingPref(c);
+    public void setNamingPref(NamePref pref) {
+        if (pref != null 
+                && getTabComponentAt(getSelectedIndex()) != addTabComponent) {
+            panelToNamingPref.put((JComponent) getSelectedComponent(), pref);
+            applyNamingPref(getSelectedComponent());
+        }
     }
     
     /**
@@ -419,11 +398,14 @@ public class ISGCITabbedPane extends JTabbedPane implements Updatable {
         DrawingLibraryInterface graphInterface = panelToInterfaceMap.get(c);
         Graph graph = graphInterface.getGraph();
         Algo.NamePref namePref = panelToNamingPref.get(c);
+        
+        graphInterface.getGraphManipulationInterface().beginUpdate();
         for (Object node : graph.vertexSet()) {
             String newName = Algo.getName((Set<GraphClass>) node, namePref);
             graphInterface.getGraphManipulationInterface()
                 .renameNode(node, newName);
         }
+        graphInterface.getGraphManipulationInterface().endUpdate();
     }
 
     /**
@@ -435,8 +417,11 @@ public class ISGCITabbedPane extends JTabbedPane implements Updatable {
      *          the new drawUnproper state of the open tab
      */
     public void setDrawUnproper(boolean state, Component c) {
-        panelToDrawUnproper.put((JComponent) getSelectedComponent(), state);
-        setProperness();
+        if (getTabComponentAt(getSelectedIndex()) != addTabComponent) {
+            panelToDrawUnproper
+                .put((JComponent) getSelectedComponent(), state);
+            setProperness();
+        }
     }
     
     /**
@@ -464,9 +449,9 @@ public class ISGCITabbedPane extends JTabbedPane implements Updatable {
      *          the tab for which the problem is changed.
      */
     public void setProblem(Problem problem, Component c) {
-        if (startpageActive) { return; }
+        if (startpageActive || !panelToInterfaceMap.containsKey(c)) { return; }
         panelToProblem.put((JComponent) c, problem);
-        Graph graph = getActiveDrawingLibraryInterface().getGraph();
+        Graph graph = panelToInterfaceMap.get(c).getGraph();
         HashMap<Color , List<Set<GraphClass>>> colorToNodes = 
                 new HashMap<Color, List<Set<GraphClass>>>();
         // Put all nodes with the same color in a list
@@ -479,10 +464,14 @@ public class ISGCITabbedPane extends JTabbedPane implements Updatable {
             colorToNodes.get(color).add(node);           
         }
         // Color all lists with their color
+        getActiveDrawingLibraryInterface()
+            .getGraphManipulationInterface().beginUpdate();
         for (Color color : colorToNodes.keySet()) {
             getActiveDrawingLibraryInterface().getGraphManipulationInterface()
                 .colorNode(colorToNodes.get(color).toArray(), color);
         }
+        getActiveDrawingLibraryInterface()
+            .getGraphManipulationInterface().endUpdate();
         getSelectedComponent().repaint();
     }
     
@@ -580,7 +569,8 @@ public class ISGCITabbedPane extends JTabbedPane implements Updatable {
             setProblem(getProblem(tab), tab);
         }
         
-        setNamingPref(UserSettings.getDefaultNamingPref());
+        setNamingPref(UserSettings.getNamingPref(
+                (JComponent) getSelectedComponent()));
     }
 }
 

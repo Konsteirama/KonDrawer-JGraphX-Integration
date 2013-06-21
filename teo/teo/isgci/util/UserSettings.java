@@ -16,10 +16,12 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 
+import javax.swing.JComponent;
 import javax.swing.JTabbedPane;
 import javax.swing.UIManager;
 
 import teo.isgci.db.Algo;
+import teo.isgci.db.Algo.NamePref;
 import teo.isgci.problem.Complexity;
 
 /**
@@ -50,7 +52,14 @@ public abstract class UserSettings {
     /**
      * The color of the font of all drawn vertices.
      */
-    private static Color backgroundcolor = getDefaultBackgroundColor();
+    private static Color backgroundcolor = getDefaultBackgroundColor();    
+    
+    /**
+     * Maps the content of the tabs to their corresponding
+     * naming preference.
+     */
+    private static HashMap<JComponent, Algo.NamePref> panelToNamingPref
+        = new HashMap<JComponent, Algo.NamePref>();
     
     // Getter / Setter
     // ------------------------------------------------
@@ -219,17 +228,36 @@ public abstract class UserSettings {
     
     /**
      * Sets the default naming preference.
-     * 
+     *      
+     * @param activeTab
+     *            the currently selected tab
      * @param namepref
      *            the new default naming preference
      */
-    public static void setNamingPref(Algo.NamePref namepref) {
-        if (namepref != null && defaultNamePref != namepref) {
-            defaultNamePref = namepref;
+    public static void setNamingPref(JComponent activeTab,
+                                    Algo.NamePref namepref) {
+        if (namepref != null) {
+            panelToNamingPref.put(activeTab, namepref);
             updateSettings();
         }
     }
 
+    /**
+     * Gets the naming preference for the given tab.
+     * 
+     * @param activeTab
+     *            the currently selected tab
+     * @return 
+     *          the naming preference for activeTab
+     */
+    public static NamePref getNamingPref(JComponent activeTab) {
+        if (panelToNamingPref.get(activeTab) != null) {
+            return panelToNamingPref.get(activeTab);
+        } else {
+            return getDefaultNamingPref();
+        }
+    }
+    
     /**
      * Returns the default naming preference which should be used for new tabs.
      * 

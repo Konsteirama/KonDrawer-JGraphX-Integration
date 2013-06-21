@@ -19,6 +19,7 @@ import java.awt.event.ActionListener;
 
 import javax.swing.ButtonGroup;
 import javax.swing.JButton;
+import javax.swing.JComponent;
 import javax.swing.JDialog;
 import javax.swing.JPanel;
 import javax.swing.JRadioButton;
@@ -38,7 +39,7 @@ public class NamingDialog extends JDialog implements ActionListener {
         this.parent = parent;
         group = new ButtonGroup();
         
-        Algo.NamePref mode = this.parent.getTabbedPane().getNamingPref(parent.getTabbedPane().getSelectedComponent());
+        Algo.NamePref mode = this.parent.getTabbedPane().getNamingPref();
 
         Container contents = getContentPane();
 
@@ -115,11 +116,14 @@ public class NamingDialog extends JDialog implements ActionListener {
             Object c = group.getSelection();
             Algo.NamePref pref = Algo.NamePref.BASIC;
             if (c == basicBox.getModel())
-                UserSettings.setNamingPref(Algo.NamePref.BASIC);
+                UserSettings.setNamingPref((JComponent) parent.getTabbedPane()
+                        .getSelectedComponent(), Algo.NamePref.BASIC);
             else if (c == forbiddenBox.getModel())
-                UserSettings.setNamingPref(Algo.NamePref.FORBIDDEN);
+                UserSettings.setNamingPref((JComponent) parent.getTabbedPane()
+                        .getSelectedComponent(), Algo.NamePref.FORBIDDEN);
             else if (c == derivedBox.getModel())
-                UserSettings.setNamingPref(Algo.NamePref.DERIVED);                
+                UserSettings.setNamingPref((JComponent) parent.getTabbedPane()
+                        .getSelectedComponent(), Algo.NamePref.DERIVED);
             
             closeDialog();
         }
