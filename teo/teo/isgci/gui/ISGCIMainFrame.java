@@ -80,6 +80,9 @@ public class ISGCIMainFrame extends JFrame implements WindowListener {
      */
     private ISGCIToolBar toolbar;
     
+    /** Needed so that menubar will not disappear on linux if maximized. */
+    private JMenuBar mainMenuBar;
+    
     /** Indicates whether or not the graph should draw unproper edges. */
     private JMenuItem miDrawUnproper;
     
@@ -221,7 +224,7 @@ public class ISGCIMainFrame extends JFrame implements WindowListener {
      * @see JMenuBar
      */
     protected JMenuBar createMenus() {
-        JMenuBar mainMenuBar = new JMenuBar();
+        mainMenuBar = new JMenuBar();
 
         addFileMenu(mainMenuBar);
         addViewMenu(mainMenuBar);
