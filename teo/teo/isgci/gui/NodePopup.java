@@ -11,11 +11,10 @@
 package teo.isgci.gui;
 
 import java.awt.Component;
-import java.awt.MouseInfo;
 import java.awt.Point;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.MouseListener;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
@@ -24,11 +23,10 @@ import javax.swing.JMenu;
 import javax.swing.JMenuItem;
 import javax.swing.JPopupMenu;
 
-import org.jgrapht.graph.DefaultEdge;
-
 import teo.isgci.drawing.DrawingLibraryInterface;
 import teo.isgci.drawing.GraphManipulationInterface;
 import teo.isgci.gc.GraphClass;
+import teo.isgci.util.Latex2Html;
 import teo.isgci.util.Utility;
 
 /**
@@ -69,7 +67,8 @@ public class NodePopup extends JPopupMenu implements ActionListener {
             parent.getTabbedPane().getActiveDrawingLibraryInterface().
                 getGraphManipulationInterface().renameNode(node, fullname);
             
-            parent.getTabbedPane().getSelectedComponent().update(parent.getTabbedPane().getSelectedComponent().getGraphics());
+            parent.getTabbedPane().getSelectedComponent().update(parent
+                        .getTabbedPane().getSelectedComponent().getGraphics());
             parent.getTabbedPane().getSelectedComponent().repaint();
         } else if (source == deleteItem) {
             DrawingLibraryInterface drawLib = 
@@ -102,11 +101,19 @@ public class NodePopup extends JPopupMenu implements ActionListener {
         nameItem.removeAll();
         nameItem.setEnabled(node.size() != 1);
         JMenuItem[] mItem = new JMenuItem[node.size()];
+        List<String> newNames = new ArrayList<String>();
         //FIXME sort and render latex properly
         for (GraphClass gc : node) {
-            nameItem.add(mItem[i] = new JMenuItem(
-                    Utility.getShortName(gc.toString())));
-            mItem[i].setActionCommand(CHANGENAME + gc.toString());
+            String oldName = Utility.getShortName(gc.toString());
+            String newName = Latex2Html.getInstance().html(oldName);
+            newNames.add(newName);
+        }
+        for (String name : newNames) {
+            name = name.replace("<sub>", "_");
+            name = name.replace("</sub>", "");
+            mItem[i] = new JMenuItem(name);
+            nameItem.add(mItem[i]);
+            mItem[i].setActionCommand(CHANGENAME + name);
             mItem[i].addActionListener(this);
             i++;
         }
