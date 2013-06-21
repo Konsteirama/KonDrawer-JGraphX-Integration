@@ -16,6 +16,7 @@ import java.awt.Point;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseListener;
+import java.util.List;
 import java.util.Set;
 
 import javax.swing.JDialog;
@@ -71,9 +72,26 @@ public class NodePopup extends JPopupMenu implements ActionListener {
             parent.getTabbedPane().getSelectedComponent().update(parent.getTabbedPane().getSelectedComponent().getGraphics());
             parent.getTabbedPane().getSelectedComponent().repaint();
         } else if (source == deleteItem) {
-            DrawingLibraryInterface drawInterface = parent.getTabbedPane().getActiveDrawingLibraryInterface();
-            GraphManipulationInterface manipulationInterface = drawInterface.getGraphManipulationInterface();
-            manipulationInterface.removeNode(drawInterface.getNodeAt(p));
+            DrawingLibraryInterface drawLib = 
+                    parent.getTabbedPane()
+                        .getActiveDrawingLibraryInterface();
+            
+            if (drawLib == null) {
+                return;
+            }
+            
+            drawLib.getGraphManipulationInterface().beginUpdate();
+            
+            GraphManipulationInterface manipulationInterface =
+                    drawLib.getGraphManipulationInterface();
+            
+            List selectedNodes = drawLib.getSelectedNodes();
+            
+            for (Object node : selectedNodes) {
+                manipulationInterface.removeNode(node);
+            }
+
+            drawLib.getGraphManipulationInterface().endUpdate();
         }
     }
     
