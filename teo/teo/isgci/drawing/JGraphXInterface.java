@@ -12,14 +12,9 @@
 package teo.isgci.drawing;
 
 import java.awt.Color;
-import java.awt.Component;
 import java.awt.Dimension;
-import java.awt.Font;
-import java.awt.FontMetrics;
 import java.awt.Graphics2D;
 import java.awt.Point;
-import java.awt.event.HierarchyBoundsListener;
-import java.awt.event.HierarchyEvent;
 import java.awt.event.MouseEvent;
 import java.awt.image.BufferedImage;
 import java.io.File;
@@ -32,11 +27,12 @@ import java.net.MalformedURLException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.Set;
 
 import javax.imageio.ImageIO;
-import javax.swing.SwingConstants;
 import javax.xml.transform.TransformerConfigurationException;
 
+import com.mxgraph.model.mxICell;
 import org.apache.batik.transcoder.TranscoderException;
 import org.apache.batik.transcoder.TranscoderInput;
 import org.apache.batik.transcoder.TranscoderOutput;
@@ -44,8 +40,6 @@ import org.apache.fop.render.ps.EPSTranscoder;
 import org.jgrapht.Graph;
 import org.jgrapht.ext.GraphMLExporter;
 import org.xml.sax.SAXException;
-
-import teo.isgci.gui.LatexLabel;
 
 import com.mxgraph.canvas.mxICanvas;
 import com.mxgraph.canvas.mxSvgCanvas;
@@ -57,8 +51,9 @@ import com.mxgraph.util.mxConstants;
 import com.mxgraph.util.mxDomUtils;
 import com.mxgraph.util.mxUtils;
 import com.mxgraph.util.mxXmlUtils;
-import com.mxgraph.view.mxCellState;
 import com.mxgraph.view.mxGraph;
+import teo.isgci.gc.GraphClass;
+import teo.isgci.util.Latex2Html;
 
 /**
  * The actual implementation of a DrawingLibraryInterface,
@@ -119,64 +114,6 @@ class JGraphXInterface<V, E> implements DrawingLibraryInterface<V, E> {
                 return cell == null || cell.isEdge();
             }
 
-            @Override
-            public Component[] createComponents(final mxCellState state) {
-                if (getGraph().getModel().isVertex(state.getCell())) {
-                    String label = state.getLabel();
-                    
-                    // get rid of these nasty [] around all labels
-                    label = label.replace("[", "");
-                    label = label.replace("]", "");
-                    
-                    // Creates a new label and sets properties
-                    final LatexLabel labelComponent = new LatexLabel(label);
-                    
-                    labelComponent.setVerticalAlignment(SwingConstants.CENTER);
-                    labelComponent.setHorizontalAlignment(
-                            SwingConstants.CENTER);
-
-                    labelComponent.setBackground(new Color(0, 0, 0, 0));
-                    
-                    /* A Listener to resize the font in the latexComponent
-                     * when the graphComponent is being zoomed
-                     */ 
-                    labelComponent.addHierarchyBoundsListener(new HierarchyBoundsListener() {
-                        
-                        @Override
-                        public void ancestorResized(HierarchyEvent e) {
-                            double scale = graphComponent.getGraph().
-                                    getView().getScale();
-                            
-                            int fontSize = (int) (DEFAULT_FONT_SIZE * scale);
-                            int windowWidth = labelComponent.getWidth();
-                            int windowHeight = labelComponent.getHeight();
-                            
-                            Font font;
-                            int height, width;
-                            
-                            do {
-                                font = new Font("Dialog", Font.BOLD, 
-                                        fontSize--);
-                                FontMetrics metrics = labelComponent.
-                                        getFontMetrics(font);
-                                
-                                height = metrics.getHeight();
-                                width = metrics.stringWidth(
-                                        labelComponent.getText());
-                                
-                            } while (height > windowHeight || width > windowWidth);
-                            
-                            labelComponent.setFont(font);                            
-                        }
-                        
-                        @Override
-                        public void ancestorMoved(HierarchyEvent e) { }
-                    });
-                    
-                    return new Component[]{labelComponent};
-                }
-                return null;
-            };
         };
 
         graphManipulation =
@@ -193,7 +130,8 @@ class JGraphXInterface<V, E> implements DrawingLibraryInterface<V, E> {
         graphComponent.getViewport().setBackground(Color.white);
 
         graphEvent.registerMouseAdapter(
-                new InternalMouseAdapter(graphComponent, graphManipulation));
+                new InternalMouseAdapter<V,E>(graphComponent,
+                        graphManipulation));
 
         graphManipulation.reapplyHierarchicalLayout();
     }
@@ -243,9 +181,10 @@ class JGraphXInterface<V, E> implements DrawingLibraryInterface<V, E> {
         graphAdapter.setAutoSizeCells(true);
         graphAdapter.setDropEnabled(false);
 
-        graphAdapter.getStylesheet().getDefaultVertexStyle()
+        graphAdapter.getStylesheet().getDefaultEdgeStyle()
                 .put(mxConstants.STYLE_NOLABEL, "1");
-        graphAdapter.setLabelsVisible(false);
+
+        graphAdapter.setHtmlLabels(true);
     }
 
     /**
@@ -516,9 +455,10 @@ class JGraphXInterface<V, E> implements DrawingLibraryInterface<V, E> {
     @Override
     public void setGraph(Graph<V, E> g) {
         graphAdapter = createNewAdapter(g);
-        graphComponent.setGraph(graphAdapter);
 
         applyCustomGraphSettings();
+
+        graphComponent.setGraph(graphAdapter);
 
         graphManipulation.reapplyHierarchicalLayout();
     }

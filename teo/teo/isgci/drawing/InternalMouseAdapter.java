@@ -19,17 +19,14 @@ import java.awt.event.MouseWheelEvent;
 /**
  * Internal mouse adapter for double and right click support.
  */
-class InternalMouseAdapter extends MouseAdapter {
+class InternalMouseAdapter<V,E> extends MouseAdapter {
 
     /** The parent object. */
-    private GraphManipulation<?, ?> graphManipulation;
+    private GraphManipulation<V, E> graphManipulation;
     
     /** the actual canvas. */
     private mxGraphComponent graphComponent;
 
-    /** a boolean to handle the panning. */
-    private boolean doPan;
-    
     /**
      * Constructor of the InternalMouseAdapter.
      * 
@@ -37,7 +34,7 @@ class InternalMouseAdapter extends MouseAdapter {
      * @param pGraphManipulation : The Interface to interact with the canvas
      */
     protected InternalMouseAdapter(mxGraphComponent pGraphComponent,
-            GraphManipulation<?, ?> pGraphManipulation) {
+            GraphManipulation<V, E> pGraphManipulation) {
         this.graphComponent = pGraphComponent;
         this.graphManipulation = pGraphManipulation;
     }
@@ -49,8 +46,6 @@ class InternalMouseAdapter extends MouseAdapter {
     @Override
     public void mouseReleased(MouseEvent e) {
         super.mouseReleased(e);
-
-        doPan = false;
     }
 
     @Override

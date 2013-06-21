@@ -146,6 +146,16 @@ public interface GraphManipulationInterface<V, E> {
      * Un-Highlights all nodes that are currently highlighted before.
      */
     void unHiglightAll();
+
+    /**
+     * Call to start a block of updates.
+     */
+    void beginUpdate();
+
+    /**
+     * Call to end and execute a block of updates.
+     */
+    void endUpdate();
 }
 
 /* EOF */

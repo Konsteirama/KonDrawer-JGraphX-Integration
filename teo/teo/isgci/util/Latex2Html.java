@@ -29,7 +29,7 @@ public final class Latex2Html extends Latex {
      * Since java can't display CSS overlines, we have to use a special
      * unicode character to display overlines. This is the character.
      */
-    private static final String OVERLINE = "&#x304;";
+    private static final String OVERLINE = "&#x305;";
     
     /**
      * Indicates whether parser is in overline/co mode so _6 will not be drawn

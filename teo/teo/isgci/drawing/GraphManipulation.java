@@ -32,6 +32,14 @@ import com.mxgraph.util.mxUndoableEdit;
 import com.mxgraph.util.mxUtils;
 import com.mxgraph.view.mxGraph;
 import com.mxgraph.view.mxGraphView;
+import org.jgrapht.Graph;
+import teo.isgci.util.Latex2Html;
+
+import java.awt.Color;
+import java.awt.Point;
+import java.awt.Rectangle;
+import java.util.ArrayList;
+import java.util.HashMap;
 
 /**
  * This class implements the GraphManipulationInterface. It handles
@@ -50,16 +58,16 @@ class GraphManipulation<V, E> implements GraphManipulationInterface<V, E> {
                     .getProperty("edit"));
         }
     };
-    
     /**
      * GraphComponent is the panel the graph is drawn in.
      */
     private mxGraphComponent graphComponent;
+    
     /**
      * Manages the undo-operations on the calling graph.
      */
     private mxUndoManager undoManager;
-
+    
     /**
      * Currently highlighted cells with their previous color.
      */
@@ -159,11 +167,12 @@ class GraphManipulation<V, E> implements GraphManipulationInterface<V, E> {
     public void centerNode(V node) {
         mxGraph graph = graphComponent.getGraph();
 
-        graph.getModel().beginUpdate();
-
-        graphComponent.scrollCellToVisible(getCellFromNode(node), true);
-
-        graph.getModel().endUpdate();
+        beginUpdate();
+        try {
+            graphComponent.scrollCellToVisible(getCellFromNode(node), true);
+        } finally {
+            endUpdate();
+        }
     }
 
     @Override
@@ -171,12 +180,13 @@ class GraphManipulation<V, E> implements GraphManipulationInterface<V, E> {
 
         mxGraph graph = graphComponent.getGraph();
 
-        graph.getModel().beginUpdate();
-
-        graph.setCellStyles(mxConstants.STYLE_FILLCOLOR,
-                mxUtils.hexString(color), getCellsFromNodes(nodes));
-
-        graph.getModel().endUpdate();
+        beginUpdate();
+        try {
+            graph.setCellStyles(mxConstants.STYLE_FILLCOLOR,
+                    mxUtils.hexString(color), getCellsFromNodes(nodes));
+        } finally {
+            endUpdate();
+        }
     }
 
     @Override
@@ -184,37 +194,42 @@ class GraphManipulation<V, E> implements GraphManipulationInterface<V, E> {
 
         mxGraph graph = graphComponent.getGraph();
 
-        graph.getModel().beginUpdate();
-
-        graph.setCellStyles(mxConstants.STYLE_STROKECOLOR,
-                mxUtils.hexString(Color.black), getCellsFromEdges(edges));
-
-        graph.getModel().endUpdate();
+        beginUpdate();
+        try {
+            graph.setCellStyles(mxConstants.STYLE_STROKECOLOR,
+                    mxUtils.hexString(Color.black), getCellsFromEdges(edges));
+        } finally {
+            endUpdate();
+        }
     }
 
     @Override
     public void unmarkEdge(E[] edges) {
         mxGraph graph = graphComponent.getGraph();
 
-        graph.getModel().beginUpdate();
+        beginUpdate();
+        try {
+            graph.setCellStyles(mxConstants.STYLE_STROKECOLOR,
+                    mxUtils.hexString(new Color(100, 130, 185)),
+                    getCellsFromEdges(edges));
 
-        graph.setCellStyles(mxConstants.STYLE_STROKECOLOR,
-                mxUtils.hexString(new Color(100, 130, 185)), 
-                getCellsFromEdges(edges));
-
-        graph.getModel().endUpdate();
+        } finally {
+            endUpdate();
+        }
     }
 
     @Override
     public void reapplyHierarchicalLayout() {
         mxGraph graph = graphComponent.getGraph();
 
-        graph.getModel().beginUpdate();
+        beginUpdate();
+        try {
+            mxHierarchicalLayout layout = new mxHierarchicalLayout(graph);
+            layout.execute(graph.getDefaultParent());
 
-        mxHierarchicalLayout layout = new mxHierarchicalLayout(graph);
-        layout.execute(graph.getDefaultParent());
-
-        graph.getModel().endUpdate();
+        } finally {
+            endUpdate();
+        }
     }
 
     @Override
@@ -231,14 +246,15 @@ class GraphManipulation<V, E> implements GraphManipulationInterface<V, E> {
         // Adds all edges connected to the node
         cells = graph.addAllEdges(cells);
 
-        graph.getModel().beginUpdate();
-
-        // Deletes every cell
-        for (Object object : cells) {
-            graph.getModel().remove(object);
+        beginUpdate();
+        try {
+            // Deletes every cell
+            for (Object object : cells) {
+                graph.getModel().remove(object);
+            }
+        } finally {
+            endUpdate();
         }
-
-        graph.getModel().endUpdate();
     }
 
     @Override
@@ -259,49 +275,72 @@ class GraphManipulation<V, E> implements GraphManipulationInterface<V, E> {
 
                 if (!markedCells.containsKey(source)) {
                     markedCells.put(source, mxUtils.getColor(getGraphAdapter(
-                            ).getCellStyle(source),
+                    ).getCellStyle(source),
                             mxConstants.STYLE_STROKECOLOR));
                     cells.add(source);
                 }
-                
+
                 if (!markedCells.containsKey(target)) {
                     markedCells.put(target, mxUtils.getColor(getGraphAdapter(
-                            ).getCellStyle(target),
+                    ).getCellStyle(target),
                             mxConstants.STYLE_STROKECOLOR));
                     cells.add(target);
                 }
             }
         }
 
-        getGraphAdapter().setCellStyles(mxConstants.STYLE_STROKECOLOR,
-                mxUtils.getHexColorString(
-                        Color.yellow), cells.toArray());
-
+        beginUpdate();
+        try {
+            getGraphAdapter().setCellStyles(mxConstants.STYLE_STROKECOLOR,
+                    mxUtils.getHexColorString(
+                            Color.yellow), cells.toArray());
+        } finally {
+            endUpdate();
+        }
     }
 
     @Override
     public void unHiglightAll() {
         graphComponent.getGraph().getModel().beginUpdate();
 
-        for (mxICell cell : markedCells.keySet()) {
-            getGraphAdapter().setCellStyles(mxConstants.STYLE_STROKECOLOR,
-                    mxUtils.getHexColorString(markedCells.get(cell)),
-                    new Object[]{cell});
+        beginUpdate();
+        try {
+            for (mxICell cell : markedCells.keySet()) {
+                getGraphAdapter().setCellStyles(mxConstants.STYLE_STROKECOLOR,
+                        mxUtils.getHexColorString(markedCells.get(cell)),
+                        new Object[]{cell});
+            }
+        } finally {
+            endUpdate();
         }
-        graphComponent.getGraph().getModel().endUpdate();
+    }
+
+    /**
+     * Call to start a block of updates.
+     */
+    @Override
+    public void beginUpdate() {
+        getGraphAdapter().getModel().beginUpdate();
+    }
+
+    /**
+     * Call to end and execute a block of updates.
+     */
+    @Override
+    public void endUpdate() {
+        getGraphAdapter().getModel().endUpdate();
     }
 
     @Override
     public void renameNode(V node, String newName) {
         mxGraph graph = graphComponent.getGraph();
 
-        String nodeName = newName;
+        newName = Latex2Html.getInstance().html(newName);
 
-        graph.getModel().beginUpdate();
+        mxICell cell = getCellFromNode(node);
 
-        getCellFromNode(node).setValue(newName);
-
-        graph.getModel().endUpdate();
+        graph.getModel().setValue(cell, newName);
+        graph.updateCellSize(cell);
     }
 
     @Override
@@ -309,7 +348,6 @@ class GraphManipulation<V, E> implements GraphManipulationInterface<V, E> {
         Graph<V, E> graphT = getGraphAdapter().getGraph();
 
         JGraphXAdapter<V, E> newGraphAdapter = new JGraphXAdapter<V, E>(graphT);
-        
     }
 
     @Override
@@ -317,12 +355,10 @@ class GraphManipulation<V, E> implements GraphManipulationInterface<V, E> {
         undoManager.undo();
     }
 
-
     @Override
     public void zoomTo(double factor) {
         graphComponent.zoomTo(factor, true);
     }
-
 
     @Override
     public void zoom(boolean zoomIn) {
@@ -334,14 +370,14 @@ class GraphManipulation<V, E> implements GraphManipulationInterface<V, E> {
             graphComponent.zoomOut();
         }
     }
-    
+
     @Override
     public void zoomToFit() {
         mxGraphView view = graphComponent.getGraph().getView();
-        
+
         int compLen = graphComponent.getWidth();
         int viewLen = (int) view.getGraphBounds().getWidth();
-        
+
         view.setScale((double) compLen / viewLen * view.getScale());
     }
 }

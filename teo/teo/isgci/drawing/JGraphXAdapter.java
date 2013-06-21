@@ -157,7 +157,6 @@ public class JGraphXAdapter<V, E> extends mxGraph implements
         return cellToVertexMap;
     }
     
-    
     //~ GraphListener Interface -----------------------------------------------
     
     @Override
@@ -282,7 +281,7 @@ public class JGraphXAdapter<V, E> extends mxGraph implements
             // add edge between mxICells
             mxICell cell = (mxICell) insertEdge(defaultParent, null, 
                     edge, sourceCell, targetCell);
-            
+
             // update cell size so cell isn't "above" graph
             updateCellSize(cell);
 
