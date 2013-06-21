@@ -544,6 +544,11 @@ public class ISGCIMainFrame extends JFrame implements WindowListener {
      * Opens a new export dialog.
      */
     public void openExportDialog() {
+        if (getTabbedPane().getActiveDrawingLibraryInterface() == null) {
+            MessageDialog.error(this,
+                    "The active tab contains no graph to export.");
+            return;
+        }
         JDialog export = new ExportDialog(this);
         export.setLocation(DEFAULTPOSITION);
         export.pack();
