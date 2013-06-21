@@ -13,6 +13,7 @@
 package teo.isgci.gui;
 
 import java.awt.BorderLayout;
+import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.MouseInfo;
 import java.awt.Point;
@@ -33,6 +34,7 @@ import javax.swing.JEditorPane;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
+import javax.swing.SwingConstants;
 import javax.swing.border.BevelBorder;
 
 /**
@@ -78,39 +80,14 @@ class StartPanel extends JPanel {
                 getClass().getResource("/logo.png")));
         
         JPanel logoPanel = new JPanel();
+        logoPanel.setBackground(Color.white);
         logoPanel.setBorder(
                 BorderFactory.createBevelBorder(BevelBorder.RAISED));
         logoPanel.add(logo);
         
         // Logo panel throws nullpointer exceptions if clicked, so
         // consume the events before they reach the panel
-        logoPanel.addMouseListener(new MouseListener() {
-            
-            @Override
-            public void mouseReleased(MouseEvent e) {
-                e.consume();
-            }
-            
-            @Override
-            public void mousePressed(MouseEvent e) {
-                e.consume();
-            }
-            
-            @Override
-            public void mouseExited(MouseEvent e) {
-                e.consume();
-            }
-            
-            @Override
-            public void mouseEntered(MouseEvent e) {
-                e.consume();
-            }
-            
-            @Override
-            public void mouseClicked(MouseEvent e) {
-                e.consume();
-            }
-        });
+        logoPanel.addMouseListener(new MouseEater());
         
         // Buttons
         JButton drawButton = createDrawingTaskButton();
@@ -125,6 +102,11 @@ class StartPanel extends JPanel {
             = new BoxLayout(buttonPanel, BoxLayout.PAGE_AXIS);
         buttonPanel.setLayout(buttonlayout);
         
+        JLabel howtoLabel = new JLabel("<html><h1>HOW TO:</h1></html>");
+        howtoLabel.setHorizontalAlignment(SwingConstants.CENTER);
+        howtoLabel.addMouseListener(new MouseEater());
+        
+        buttonPanel.add(howtoLabel);
         buttonPanel.add(drawButton);
         buttonPanel.add(boundaryButton);
         buttonPanel.add(classButton);
@@ -296,7 +278,11 @@ class StartPanel extends JPanel {
                 IconButtonFactory.TIP_ICON, 
                 "<html>  <br/> Look at the boundary of a problem"
                 + " <br/>  <br/> </html>",
-                "TODO");
+                "Guides you through the process of looking at the "
+                + "boundary of a problem.");
+        
+        
+        
         return button;
     }
     
@@ -352,7 +338,40 @@ class StartPanel extends JPanel {
 
         JScrollPane scrollPane = new JScrollPane(jep);
         return scrollPane;
-    }    
+    }
+    
+    /**
+     * Eats up all mouseevents, so nullpointerexceptions will not be thrown
+     * if a label or image is clicked within the startpanel.
+     *
+     */
+    static class MouseEater implements MouseListener {
+        
+        @Override
+        public void mouseReleased(MouseEvent e) {
+            e.consume();
+        }
+        
+        @Override
+        public void mousePressed(MouseEvent e) {
+            e.consume();
+        }
+        
+        @Override
+        public void mouseExited(MouseEvent e) {
+            e.consume();
+        }
+        
+        @Override
+        public void mouseEntered(MouseEvent e) {
+            e.consume();
+        }
+        
+        @Override
+        public void mouseClicked(MouseEvent e) {
+            e.consume();
+        }
+    }
 }
 
 /* EOF */
