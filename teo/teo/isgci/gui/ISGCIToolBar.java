@@ -357,6 +357,8 @@ public class ISGCIToolBar extends JToolBar {
                 if (drawLib == null) {
                     return;
                 }
+
+                drawLib.getGraphManipulationInterface().beginUpdate();
                 
                 GraphManipulationInterface<V, E> manipulationInterface =
                         drawLib.getGraphManipulationInterface();
@@ -366,6 +368,8 @@ public class ISGCIToolBar extends JToolBar {
                 for (V node : selectedNodes) {
                     manipulationInterface.removeNode(node);
                 }
+                
+                drawLib.getGraphManipulationInterface().endUpdate();                
             }
         });
 
