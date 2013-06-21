@@ -11,9 +11,7 @@
 
 package teo.isgci.gui;
 
-import java.awt.BorderLayout;
 import java.awt.Container;
-import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
@@ -181,6 +179,10 @@ public class GraphClassSelectionDialog extends JDialog implements
             closeDialog();
         } else if (source == newButton) {
             
+            if (classesList.getSelectedValues().length == 0) {
+                return;
+            }
+            
             // Disable all buttons
             newButton.setEnabled(false);
             newTabButton.setEnabled(false);
@@ -193,12 +195,13 @@ public class GraphClassSelectionDialog extends JDialog implements
             Runnable drawGraph = new Runnable() {
 
                 @Override
-                public void run() {
+                public void run() {                   
                     SimpleDirectedGraph<Set<GraphClass>, DefaultEdge> graph 
                     = getGraph();
-                parent.getTabbedPane().drawInActiveTab(graph,
-                        classesList.getSelectedValue().toString());
-                closeDialog();
+                    
+                    parent.getTabbedPane().drawInActiveTab(graph,
+                            classesList.getSelectedValue().toString());
+                    closeDialog();
                 }
 
             };
@@ -209,6 +212,10 @@ public class GraphClassSelectionDialog extends JDialog implements
         } else if (source == search) {
             search.setListData(parent, classesList);
         } else if (source == newTabButton) {
+            
+            if (classesList.getSelectedValues().length == 0) {
+                return;
+            }
             
             // Disable all buttons
             newButton.setEnabled(false);
@@ -224,10 +231,11 @@ public class GraphClassSelectionDialog extends JDialog implements
                 @Override
                 public void run() {
                     SimpleDirectedGraph<Set<GraphClass>, DefaultEdge> graph 
-                    = getGraph();
-                parent.getTabbedPane().drawInNewTab(graph,
-                        classesList.getSelectedValue().toString());
-                closeDialog();
+                        = getGraph();
+                    
+                    parent.getTabbedPane().drawInNewTab(graph,
+                            classesList.getSelectedValue().toString());
+                    closeDialog();
                 }
 
             };
