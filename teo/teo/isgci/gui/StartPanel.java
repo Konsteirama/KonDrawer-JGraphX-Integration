@@ -24,6 +24,7 @@ import java.awt.event.InputEvent;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.io.IOException;
+import java.net.URI;
 
 import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
@@ -57,6 +58,11 @@ class StartPanel extends JPanel {
      */
     private static final String NEWSPAGE 
         = "http://92.51.130.117/news.html";
+    
+    /**
+     * The ISGCI Homepage.
+     */
+    private static final String ISGCIHOME = "www.graphclasses.org";
     
     /**
      * How much time should pass between animationframes.
@@ -476,7 +482,7 @@ class StartPanel extends JPanel {
      *
      */
     static class MouseEater implements MouseListener {
-        
+       
         @Override
         public void mouseReleased(MouseEvent e) {
             e.consume();
@@ -499,6 +505,15 @@ class StartPanel extends JPanel {
         
         @Override
         public void mouseClicked(MouseEvent e) {
+            try {
+                if (e.getSource() instanceof JPanel) {
+                    java.awt.Desktop.getDesktop().browse(new URI(ISGCIHOME));
+                }
+            } catch (Exception err) {
+                System.err.println("Error opening weppage!");
+            }
+            
+            
             e.consume();
         }
     }
