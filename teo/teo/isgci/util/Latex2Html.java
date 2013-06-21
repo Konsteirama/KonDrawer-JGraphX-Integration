@@ -38,16 +38,6 @@ public final class Latex2Html extends Latex {
     private static boolean isInOverline;
     
     /**
-     * Indicates whether parser is in sub, see {@link #isInOverline}.
-     */
-    private static boolean isInSub;
-    
-    /**
-     * Indicates whether parser is in super, see {@link #isInOverline}.
-     */
-    private static boolean isInSuper;
-    
-    /**
      * Create a new latex->html converter. Private because of singleton
      * pattern.
      */
@@ -77,28 +67,24 @@ public final class Latex2Html extends Latex {
     
     @Override
     protected State startSuper(State s) {
-        isInSuper = true;
         ((HtmlState) s).target.append("<sup>");
         return super.startSuper(s);
     }
 
     @Override
     protected void endSuper(State s) {
-        isInSuper = false;
         ((HtmlState) s).target.append("</sup>");
         super.endSuper(s);
     }
 
     @Override
     protected State startSub(State s) {
-        isInSub = true;
         ((HtmlState) s).target.append("<sub>");
         return super.startSub(s);
     }
 
     @Override
     protected void endSub(State s) {
-        isInSub = false;
         ((HtmlState) s).target.append("</sub>");
         super.endSub(s);
     }
@@ -119,7 +105,7 @@ public final class Latex2Html extends Latex {
     protected void drawPlainString(State state, String str) {
         ((HtmlState) state).target.append(str);
         
-        if (isInOverline && !isInSub && !isInSuper) {
+        if (isInOverline) {
             ((HtmlState) state).target.append(OVERLINE); 
         }
     }
