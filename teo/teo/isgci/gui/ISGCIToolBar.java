@@ -94,16 +94,18 @@ public class ISGCIToolBar extends JToolBar {
      * Adds buttons to the toolbar.
      */
     private void addButtons() {
+        final Dimension separatorSize = new Dimension(20, 10);
+        
         addGeneralButtons();
-        addSeparator();
+        addSeparator(separatorSize);
         
         addGraphControlButtons();
-        addSeparator();
+        addSeparator(separatorSize);
         
         addZoomControls();
-        addSeparator();
+        addSeparator(separatorSize);
         
-        addMiscButtons();
+        //addMiscButtons();
     }
 
     /**
@@ -168,48 +170,6 @@ public class ISGCIToolBar extends JToolBar {
 
                     // disable button if no more undos possible
                     // undoButton.setEnabled(graphManipulation.canUndo());
-                }
-            }
-        });
-        
-        // REAPPLYLAYOUT
-        String reapplyTooltip = "Reapply the graph's layout";
-        JButton reapplybutton = IconButtonFactory.createImageButton(
-                IconButtonFactory.REFRESH_ICON, reapplyTooltip);
-
-        add(reapplybutton);
-        
-        reapplybutton.addActionListener(new ActionListener() {
-
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                GraphManipulationInterface<?, ?> graphManipulation = 
-                        getManipulationInterface();
-                
-                if (graphManipulation != null) {
-                    getManipulationInterface();
-                    graphManipulation.reapplyHierarchicalLayout();
-                    
-                }
-            }
-        });
-
-
-        // RESET
-        String resetTooltip = "Reset the graph to its original state";
-        JButton resetbutton = IconButtonFactory.createImageButton(
-                IconButtonFactory.RESET_ICON, resetTooltip);
-        add(resetbutton);
-
-        resetbutton.addActionListener(new ActionListener() {
-
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                GraphManipulationInterface<?, ?> graphManipulation = 
-                        getManipulationInterface();
-                
-                if (graphManipulation != null) {
-                    graphManipulation.resetLayout();
                 }
             }
         });
@@ -403,7 +363,7 @@ public class ISGCIToolBar extends JToolBar {
                 }
             }
         });
-        
+
         // CENTER
         String centerTooltip = "Centers the selected node.";
         JButton centerButton = IconButtonFactory.createImageButton(
@@ -434,8 +394,7 @@ public class ISGCIToolBar extends JToolBar {
                 }
             }
         });
-        
-        
+
         // SEARCH
         String searchTooltip = "Opens a dialogue to search for a specific "
                                 + "graphclass in the drawing.";
@@ -450,7 +409,7 @@ public class ISGCIToolBar extends JToolBar {
                 mainframe.openSearchDialog();
             }
         });
-        
+
         // HOME
         String homeTooltip = "Opens a new tab with the startpage.";
         JButton homebutton = IconButtonFactory.createImageButton(
