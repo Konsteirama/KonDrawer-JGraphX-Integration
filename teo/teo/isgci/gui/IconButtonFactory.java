@@ -59,6 +59,9 @@ public final class IconButtonFactory {
 
     /** Filename for ExportIcon. */
     public static final String EXPORT_ICON = "Export.gif";
+    
+    /** Filename for TipIcon. */
+    public static final String TIP_ICON = "Tip.gif";
 
     /** Filename for RefreshIcon. */
     public static final String REFRESH_ICON = "Refresh.gif";
