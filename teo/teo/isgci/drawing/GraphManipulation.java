@@ -14,8 +14,6 @@
 package teo.isgci.drawing;
 
 import java.awt.Color;
-import java.awt.Point;
-import java.awt.Rectangle;
 import java.util.ArrayList;
 import java.util.HashMap;
 
@@ -145,25 +143,6 @@ class GraphManipulation<V, E> implements GraphManipulationInterface<V, E> {
             cells[i] = getCellFromEdge(edges[i]);
         }
         return cells;
-    }
-
-    /**
-     * Translates a point from graphComponent to graph.
-     *
-     * @param p : the point on the canvas
-     * @return the actual point on graph
-     */
-    private Point getPointOnGraph(Point p) {
-        mxGraph graph = graphComponent.getGraph();
-
-        double s = graph.getView().getScale();
-        Point tr = graph.getView().getTranslate().getPoint();
-
-        double off = graph.getGridSize() / 2;
-        double x = graph.snap(p.getX() / s - tr.getX() - off);
-        double y = graph.snap(p.getY() / s - tr.getY() - off);
-
-        return new Point((int) x, (int) y);
     }
 
     @Override
@@ -354,37 +333,6 @@ class GraphManipulation<V, E> implements GraphManipulationInterface<V, E> {
         } else {
             graphComponent.zoomOut();
         }
-    }
-
-
-    @Override
-    public void zoom(boolean zoomIn, Point center) {
-        Point pointOnCanvas = getPointOnGraph(center);
-
-        zoom(zoomIn);
-
-        Point newPointOnCanvas = getPointOnGraph(center);
-
-        double zoomFactor = zoomIn ? graphComponent.getZoomFactor()
-                : 1 / graphComponent.getZoomFactor();
-
-        Rectangle rect = graphComponent.getGraphControl().getVisibleRect();
-
-        rect.setLocation((int) (rect.getX() * zoomFactor),
-                (int) (rect.getY() * zoomFactor));
-
-        graphComponent.getGraphControl().scrollRectToVisible(rect);
-
-        /*int x = (int)((pointOnCanvas.getX() -
-                newPointOnCanvas.getX()) * zoomFactor);
-        int y = (int)((pointOnCanvas.getY() -
-                newPointOnCanvas.getY()) * zoomFactor);
-        Point delta = new Point(x, y);
-
-        Rectangle rect = graphComponent.getGraphControl().getVisibleRect();
-        rect.translate((int)delta.getX(), (int)delta.getY());
-
-        graphComponent.getGraphControl().scrollRectToVisible(rect, true);*/
     }
     
     @Override

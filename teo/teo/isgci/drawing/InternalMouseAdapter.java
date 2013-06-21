@@ -66,9 +66,9 @@ class InternalMouseAdapter extends MouseAdapter {
     @Override
     public void mouseWheelMoved(MouseWheelEvent e) {
         if (e.getWheelRotation() < 0) {
-            graphManipulation.zoom(true, e.getPoint());
+            graphManipulation.zoom(true);
         } else {
-            graphManipulation.zoom(false, e.getPoint());
+            graphManipulation.zoom(false);
         }
     }
 }

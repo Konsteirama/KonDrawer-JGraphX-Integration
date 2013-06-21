@@ -126,14 +126,6 @@ public interface GraphManipulationInterface<V, E> {
      * @param zoomIn : a boolean to zoom in or out
      */
     void zoom(boolean zoomIn);
-
-    /**
-     * Zooms the panel, centering on the given coordinates.
-     *
-     * @param zoomIn : a boolean to zoom in or out
-     * @param center : the point zoom centers on
-     */
-    void zoom(boolean zoomIn, Point center);
     
     /**
      * Zooms the panel, so that the whole graph is visible.
