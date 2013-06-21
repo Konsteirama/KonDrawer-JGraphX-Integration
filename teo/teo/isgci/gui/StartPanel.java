@@ -14,20 +14,17 @@ package teo.isgci.gui;
 
 import java.awt.BorderLayout;
 import java.awt.Dimension;
-import java.awt.Graphics;
-import java.awt.GridLayout;
 import java.awt.MouseInfo;
 import java.awt.Point;
 import java.awt.Robot;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.InputEvent;
-import java.awt.image.BufferedImage;
-import java.io.File;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
 import java.io.IOException;
 
-import javax.imageio.ImageIO;
-import javax.swing.Box;
+import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
@@ -36,6 +33,7 @@ import javax.swing.JEditorPane;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
+import javax.swing.border.BevelBorder;
 
 /**
  * A ISGCI specific implementation for the startpage of the tabbedpane that is
@@ -74,52 +72,69 @@ class StartPanel extends JPanel {
     public StartPanel(final ISGCIMainFrame parent) {
         
         mainframe = parent;
+              
+        // create logo
+        JLabel logo = new JLabel(new ImageIcon(
+                getClass().getResource("/logo.png")));
+        
+        JPanel logoPanel = new JPanel();
+        logoPanel.setBorder(
+                BorderFactory.createBevelBorder(BevelBorder.RAISED));
+        logoPanel.add(logo);
+        
+        // Logo panel throws nullpointer exceptions if clicked, so
+        // consume the events before they reach the panel
+        logoPanel.addMouseListener(new MouseListener() {
+            
+            @Override
+            public void mouseReleased(MouseEvent e) {
+                e.consume();
+            }
+            
+            @Override
+            public void mousePressed(MouseEvent e) {
+                e.consume();
+            }
+            
+            @Override
+            public void mouseExited(MouseEvent e) {
+                e.consume();
+            }
+            
+            @Override
+            public void mouseEntered(MouseEvent e) {
+                e.consume();
+            }
+            
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                e.consume();
+            }
+        });
         
         // Buttons
         JButton drawButton = createDrawingTaskButton();
-        JButton databaseButton = IconButtonFactory.createImageButton(
-                IconButtonFactory.INFORMATION_ICON, 
-                "Look at the boundary of a problem",
-                "TODO");
-        JButton settingsButton = IconButtonFactory.createImageButton(
-                IconButtonFactory.INFORMATION_ICON, 
-                "Determine common super and subclasses of two classes",
-                "TODO");
-        JButton aboutButton = IconButtonFactory.createImageButton(
-                IconButtonFactory.INFORMATION_ICON, 
-                "Determine the inclusion relation between two classes",
-                "TODO");
-        
-        // set buttonsize
-        final Dimension buttonSize = new Dimension(200, 50);
-        
-        drawButton.setPreferredSize(buttonSize);
-        databaseButton.setPreferredSize(buttonSize);
-        settingsButton.setPreferredSize(buttonSize);
-        aboutButton.setPreferredSize(buttonSize);
-        
-        drawButton.setMinimumSize(buttonSize);
-        databaseButton.setMinimumSize(buttonSize);
-        settingsButton.setMinimumSize(buttonSize);
-        aboutButton.setMinimumSize(buttonSize);
-        
+        JButton boundaryButton = createBoundaryTaskButton();
+        JButton classButton = createCommonClassesTaskButton();
+        JButton inclusionButton = createInclusionRelationTaskButton();
+
         // organize buttonlayout
-        final int maxSize = 10000;
         
-        JPanel leftPanel = new JPanel();
-        BoxLayout layout = new BoxLayout(leftPanel, BoxLayout.Y_AXIS);
+        JPanel buttonPanel = new JPanel();
+        BoxLayout buttonlayout 
+            = new BoxLayout(buttonPanel, BoxLayout.PAGE_AXIS);
+        buttonPanel.setLayout(buttonlayout);
         
-        leftPanel.setLayout(layout);
+        buttonPanel.add(drawButton);
+        buttonPanel.add(boundaryButton);
+        buttonPanel.add(classButton);
+        buttonPanel.add(inclusionButton);
         
-        leftPanel.add(new JLabel(new ImageIcon(
-                getClass().getResource("/logo.png"))));
-        leftPanel.add(drawButton);
-        leftPanel.add(databaseButton);
-        leftPanel.add(settingsButton);
-        leftPanel.add(aboutButton);
-        leftPanel.add(new Box.Filler(new Dimension(0, 0),
-                                     buttonSize,
-                                     new Dimension(maxSize, maxSize)));
+        // organize left layout
+        JPanel leftPanel = new JPanel(new BorderLayout());
+        
+        leftPanel.add(logoPanel, BorderLayout.PAGE_START);
+        leftPanel.add(buttonPanel, BorderLayout.CENTER);
       
         // set news-pane
         final Dimension newsSize = new Dimension(400, 100); 
@@ -167,11 +182,17 @@ class StartPanel extends JPanel {
      * @param robot
      *          The robot which is used to move the mouse.
      * 
-     * @param to
+     * @param toComponent
      *          Where the mousepointer should move to.
      */
-    private void moveMouseTo(Robot robot, Point to) {        
+    private void moveMouseTo(Robot robot, JComponent toComponent) {        
         Point start = MouseInfo.getPointerInfo().getLocation();
+        Point to = toComponent.getLocationOnScreen();
+        
+        // add size/2 so mousepointer isn't in left top corner of component
+        to.x += toComponent.getWidth() / 2;
+        to.y += toComponent.getHeight() / 2; 
+        
         
         boolean steep = Math.abs(to.y - start.y) > Math.abs(to.x - start.x);
         if (steep) {
@@ -200,6 +221,7 @@ class StartPanel extends JPanel {
             ystep = -1;
         }
 
+        // do "animation"
         for (int x = start.x; x != to.x;
                 x += Math.signum(to.x - start.x) * 1) {
 
@@ -224,14 +246,16 @@ class StartPanel extends JPanel {
     /**
      * Creates a button, that - if clicked - will take over the mouse
      * and guide the user how to do a specific task, in this case:
-     * xyz.
+     * How to draw a hierarchy.
      * 
      * @return
      *          A jbutton that will guide the mouse upon click.
      */
     private JButton createDrawingTaskButton() {
         JButton button = IconButtonFactory.createImageButton(
-                IconButtonFactory.ADD_ICON, "HOW TO: Draw a hierarchy",
+                IconButtonFactory.TIP_ICON, 
+                "<html> <br/> Draw a hierarchy of super- <br/>"
+                + "and/or subclasses <br/> <br/> </html>",
                 "Guides you through the process of drawing a hierarchy of "
                 + "super- and/or subclasses of some class(es)."); 
         
@@ -247,13 +271,7 @@ class StartPanel extends JPanel {
                 
                 // Click draw button
                 JComponent endButton = mainframe.getToolbar().getDrawButton();
-                Point endPoint = endButton.getLocationOnScreen();
-                
-                // add size/2 so button isn't clicked in left top corner
-                endPoint.x += endButton.getWidth() / 2;
-                endPoint.y += endButton.getHeight() / 2;
-                
-                moveMouseTo(mouseRobot, endPoint);
+                moveMouseTo(mouseRobot, endButton);
                 
                 // click
                 mouseRobot.mousePress(InputEvent.BUTTON1_DOWN_MASK);
@@ -262,6 +280,57 @@ class StartPanel extends JPanel {
             }
         });
         
+        return button;
+    }
+    
+    /**
+     * Creates a button, that - if clicked - will take over the mouse
+     * and guide the user how to do a specific task, in this case:
+     * How to look at the boundary of a problem.
+     * 
+     * @return
+     *          A jbutton that will guide the mouse upon click.
+     */
+    private JButton createBoundaryTaskButton() {
+        JButton button = IconButtonFactory.createImageButton(
+                IconButtonFactory.TIP_ICON, 
+                "<html>  <br/> Look at the boundary of a problem"
+                + " <br/>  <br/> </html>",
+                "TODO");
+        return button;
+    }
+    
+    /**
+     * Creates a button, that - if clicked - will take over the mouse
+     * and guide the user how to do a specific task, in this case:
+     * How to determine the inclusion relation between two classes.
+     * 
+     * @return
+     *          A jbutton that will guide the mouse upon click.
+     */
+    private JButton createInclusionRelationTaskButton() {
+        JButton button = IconButtonFactory.createImageButton(
+                IconButtonFactory.TIP_ICON, 
+                "<html>  <br/> Determine the inclusion relation <br/> "
+                + "between two classes <br/>  <br/> </html>",
+                "TODO");
+        return button;
+    }
+    
+    /**
+     * Creates a button, that - if clicked - will take over the mouse
+     * and guide the user how to do a specific task, in this case:
+     * How to determine common super- and subclasses of two classes.
+     * 
+     * @return
+     *          A jbutton that will guide the mouse upon click.
+     */
+    private JButton createCommonClassesTaskButton() {
+        JButton button = IconButtonFactory.createImageButton(
+                IconButtonFactory.TIP_ICON, 
+                "<html>  <br/> Determine super- and <br/> "
+                + "subclasses of two classes <br/> <br/> </html>",
+                "TODO");
         return button;
     }
     
