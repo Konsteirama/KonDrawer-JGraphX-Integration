@@ -15,7 +15,6 @@ package teo.isgci.gui;
 
 import java.awt.Color;
 import java.awt.Component;
-import java.awt.Container;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.ArrayList;
@@ -31,7 +30,6 @@ import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
 import org.jgrapht.Graph;
-import org.jgrapht.graph.DefaultDirectedGraph;
 import org.jgrapht.graph.DefaultEdge;
 
 import teo.isgci.db.Algo;
@@ -407,6 +405,11 @@ public class ISGCITabbedPane extends JTabbedPane implements Updatable {
      */
     private void applyNamingPref(Component c) {
         DrawingLibraryInterface graphInterface = panelToInterfaceMap.get(c);
+        
+        if (graphInterface == null) {
+            return;
+        }
+        
         Graph graph = graphInterface.getGraph();
         Algo.NamePref namePref;
         if (panelToNamingPref.containsKey(c)) {

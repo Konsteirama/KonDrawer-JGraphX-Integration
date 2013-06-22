@@ -324,8 +324,8 @@ public class ISGCIMainFrame extends JFrame implements WindowListener {
             }
         });
         
-        JMenuItem miUserSettings = new JMenuItem("Settings");
-        miUserSettings.addActionListener(new ActionListener() {
+        JMenuItem miColorSettings = new JMenuItem("Set colours");
+        miColorSettings.addActionListener(new ActionListener() {
             
             @Override
             public void actionPerformed(ActionEvent e) {              
@@ -337,7 +337,7 @@ public class ISGCIMainFrame extends JFrame implements WindowListener {
         viewMenu.add(miSearching);
         viewMenu.add(miNaming);
         viewMenu.add(miDrawUnproper);
-        viewMenu.add(miUserSettings);
+        viewMenu.add(miColorSettings);
         
         mainMenuBar.add(viewMenu);
     }

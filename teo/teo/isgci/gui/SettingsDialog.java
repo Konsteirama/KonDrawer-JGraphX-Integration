@@ -284,7 +284,9 @@ public class SettingsDialog extends JDialog {
      * Enables the apply button.
      */
     private void enableApplyButton() {
-        applyButton.setEnabled(true);
+        if (applyButton != null) {
+            applyButton.setEnabled(true);
+        }
     }
     
     /**
