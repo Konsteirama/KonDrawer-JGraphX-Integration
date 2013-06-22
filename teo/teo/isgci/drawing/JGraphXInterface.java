@@ -11,7 +11,6 @@
 
 package teo.isgci.drawing;
 
-import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Graphics2D;
 import java.awt.Point;
@@ -27,12 +26,10 @@ import java.net.MalformedURLException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
-import java.util.Set;
 
 import javax.imageio.ImageIO;
 import javax.xml.transform.TransformerConfigurationException;
 
-import com.mxgraph.model.mxICell;
 import org.apache.batik.transcoder.TranscoderException;
 import org.apache.batik.transcoder.TranscoderInput;
 import org.apache.batik.transcoder.TranscoderOutput;
@@ -52,8 +49,6 @@ import com.mxgraph.util.mxDomUtils;
 import com.mxgraph.util.mxUtils;
 import com.mxgraph.util.mxXmlUtils;
 import com.mxgraph.view.mxGraph;
-import teo.isgci.gc.GraphClass;
-import teo.isgci.util.Latex2Html;
 
 /**
  * The actual implementation of a DrawingLibraryInterface,
@@ -310,7 +305,7 @@ class JGraphXInterface<V, E> implements DrawingLibraryInterface<V, E> {
             exporter.export(w, g);
             w.close();
         } catch (IOException e) {
-            System.out.println("Enter a valid path !");
+            e.printStackTrace();
         } catch (TransformerConfigurationException e) {
             e.printStackTrace();
         } catch (SAXException e) {
