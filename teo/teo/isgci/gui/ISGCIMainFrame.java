@@ -87,7 +87,7 @@ public class ISGCIMainFrame extends JFrame implements WindowListener {
     private JMenu problemsMenu, graphMenu;
     
     /** Needed for startpanel animation. */
-    private JMenuItem miCheckInclusion, miOpenProblem;
+    private JMenuItem miCheckInclusion, miOpenProblem, miGraphClassInformation;
     
     /** Indicates whether or not the graph should draw unproper edges. */
     private JMenuItem miDrawUnproper;
@@ -349,7 +349,7 @@ public class ISGCIMainFrame extends JFrame implements WindowListener {
         // needed to reference this in actionlistener
         final ISGCIMainFrame mainframe = this;
         
-        JMenuItem miGraphClassInformation = new JMenuItem("Browse Database");
+        miGraphClassInformation = new JMenuItem("Browse Database");
         miGraphClassInformation.addActionListener(new ActionListener() {
             
             @Override
@@ -630,6 +630,16 @@ public class ISGCIMainFrame extends JFrame implements WindowListener {
      */
     public JMenuItem getOpenProblemMenuItem() {
         return miOpenProblem;
+    }
+    
+    
+    /**
+     * Getter for the menu for the graph class selection menu.
+     * @return
+     *          The menu for the graph class selection menu.
+     */
+    public JMenuItem getGraphClassInformationItem() {
+        return miGraphClassInformation;
     }
 }
 

@@ -393,13 +393,13 @@ class StartPanel extends JPanel {
                     public void run() {
 
                         // Hover over the open-problem menuitem
-                        JMenuItem inclusionProblem 
-                            = mainframe.getInclusionMenuItem();
+                        JMenuItem graphClassSelection 
+                            = mainframe.getGraphClassInformationItem();
                         
-                        moveMouseTo(mouseRobot, inclusionProblem);
+                        moveMouseTo(mouseRobot, graphClassSelection);
                         
                         mouseRobot.delay(CLICKDELAY);
-                        inclusionProblem.doClick(1);
+                        graphClassSelection.doClick(1);
                     }
                 });
 
