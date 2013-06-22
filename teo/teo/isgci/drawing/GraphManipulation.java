@@ -47,6 +47,12 @@ import com.mxgraph.view.mxStylesheet;
  */
 class GraphManipulation<V, E> implements GraphManipulationInterface<V, E> {
 
+    /** Defines the color that should be used for highlighting. */
+    private static final Color HILIGHTCOLOR = new Color(0xFF, 0xAA, 0x00);
+    
+    /** Defines the thickness for highlighting. */
+    private static final String HILIGHTTHICKNESS = "2";
+    
     protected mxIEventListener undoHandler = new mxIEventListener() {
         public void invoke(Object source, mxEventObject evt) {
             undoManager.undoableEditHappened((mxUndoableEdit) evt
@@ -66,7 +72,12 @@ class GraphManipulation<V, E> implements GraphManipulationInterface<V, E> {
     /**
      * Currently highlighted cells with their previous color.
      */
-    private HashMap<mxICell, Color> markedCells;
+    private HashMap<mxICell, Color> markedCellsColor;
+    
+    /**
+     * Currently highlighted cells with their previous thickness.
+     */
+    private HashMap<mxICell, String> markedCellsThickness;
 
     /**
      * Constructor of the class. Creates an instance of the GraphManipulation
@@ -86,8 +97,8 @@ class GraphManipulation<V, E> implements GraphManipulationInterface<V, E> {
         graphComponent.getGraph().getView().
                 addListener(mxEvent.UNDO, undoHandler);
 
-        markedCells = new HashMap<mxICell, Color>();
-
+        markedCellsColor = new HashMap<mxICell, Color>();
+        markedCellsThickness = new HashMap<mxICell, String>();
     }
 
     /**
@@ -286,30 +297,54 @@ class GraphManipulation<V, E> implements GraphManipulationInterface<V, E> {
         mxICell cell = getCellFromNode(node);
         cells.add(cell);
 
-        if (!markedCells.containsKey(cell)) {
-            markedCells.put(cell, mxUtils.getColor(getGraphAdapter()
+        if (!markedCellsColor.containsKey(cell)) {
+            markedCellsThickness.put(cell, 
+                    mxUtils.getString(getGraphAdapter().
+                            getCellStyle(cell), 
+                            mxConstants.STYLE_STROKEWIDTH));
+            
+            markedCellsColor.put(cell, mxUtils.getColor(getGraphAdapter()
                     .getCellStyle(cell), mxConstants.STYLE_STROKECOLOR));
         }
         
         if (hightlightNeighbors) {
             for (int i = 0; i < cell.getEdgeCount(); i++) {
                 mxCell edge = (mxCell) cell.getEdgeAt(i);
-                markedCells.put(edge, mxUtils.getColor(getGraphAdapter()
+                markedCellsColor.put(edge, mxUtils.getColor(getGraphAdapter()
                         .getCellStyle(edge), mxConstants.STYLE_STROKECOLOR));
 
+                markedCellsThickness.put(edge, 
+                        mxUtils.getString(getGraphAdapter().
+                                getCellStyle(edge), 
+                                mxConstants.STYLE_STROKEWIDTH));
+                
+                cells.add(edge);
+                
                 mxICell source = edge.getSource();
                 mxICell target = edge.getTarget();
 
-                if (!markedCells.containsKey(source)) {
-                    markedCells.put(source, mxUtils.getColor(getGraphAdapter(
-                    ).getCellStyle(source),
+                if (!markedCellsColor.containsKey(source)) {
+                    markedCellsThickness.put(source, 
+                            mxUtils.getString(getGraphAdapter().
+                                    getCellStyle(source), 
+                                    mxConstants.STYLE_STROKEWIDTH));
+                    
+                    markedCellsColor.put(source, 
+                            mxUtils.getColor(getGraphAdapter()
+                                    .getCellStyle(source),
                             mxConstants.STYLE_STROKECOLOR));
                     cells.add(source);
                 }
 
-                if (!markedCells.containsKey(target)) {
-                    markedCells.put(target, mxUtils.getColor(getGraphAdapter(
-                    ).getCellStyle(target),
+                if (!markedCellsColor.containsKey(target)) {
+                    
+                    markedCellsThickness.put(target, 
+                            mxUtils.getString(getGraphAdapter().
+                                    getCellStyle(target), 
+                                    mxConstants.STYLE_STROKEWIDTH));
+                    
+                    markedCellsColor.put(target, mxUtils.getColor(
+                            getGraphAdapter().getCellStyle(target),
                             mxConstants.STYLE_STROKECOLOR));
                     cells.add(target);
                 }
@@ -319,8 +354,9 @@ class GraphManipulation<V, E> implements GraphManipulationInterface<V, E> {
         beginUpdate();
         try {
             getGraphAdapter().setCellStyles(mxConstants.STYLE_STROKECOLOR,
-                    mxUtils.getHexColorString(
-                            Color.yellow), cells.toArray());
+                    mxUtils.getHexColorString(HILIGHTCOLOR), cells.toArray());
+            getGraphAdapter().setCellStyles(mxConstants.STYLE_STROKEWIDTH,
+                    HILIGHTTHICKNESS, cells.toArray());
         } finally {
             endUpdate();
         }
@@ -330,14 +366,18 @@ class GraphManipulation<V, E> implements GraphManipulationInterface<V, E> {
     public void unHiglightAll() {
         beginUpdate();
         try {
-            for (mxICell cell : markedCells.keySet()) {
+            for (mxICell cell : markedCellsColor.keySet()) {
+                getGraphAdapter().setCellStyles(mxConstants.STYLE_STROKEWIDTH,
+                        markedCellsThickness.get(cell), new Object[]{cell});
+                
                 getGraphAdapter().setCellStyles(mxConstants.STYLE_STROKECOLOR,
-                        mxUtils.getHexColorString(markedCells.get(cell)),
+                        mxUtils.getHexColorString(markedCellsColor.get(cell)),
                         new Object[]{cell});
             }
         } finally {
             endUpdate();
-            markedCells.clear();
+            markedCellsColor.clear();
+            markedCellsThickness.clear();
         }
     }
 
@@ -373,7 +413,8 @@ class GraphManipulation<V, E> implements GraphManipulationInterface<V, E> {
     public void resetLayout() {
         Graph<V, E> graphT = getGraphAdapter().getGraph();
 
-        JGraphXAdapter<V, E> newGraphAdapter = new JGraphXAdapter<V, E>(graphT);
+        JGraphXAdapter<V, E> newGraphAdapter 
+            = new JGraphXAdapter<V, E>(graphT);
     }
 
     @Override
