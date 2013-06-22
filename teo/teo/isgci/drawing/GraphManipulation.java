@@ -171,14 +171,7 @@ class GraphManipulation<V, E> implements GraphManipulationInterface<V, E> {
 
     @Override
     public void centerNode(V node) {
-        mxGraph graph = graphComponent.getGraph();
-
-        beginUpdate();
-        try {
             graphComponent.scrollCellToVisible(getCellFromNode(node), true);
-        } finally {
-            endUpdate();
-        }
     }
 
     @Override

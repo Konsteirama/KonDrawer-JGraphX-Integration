@@ -28,6 +28,7 @@ import javax.swing.JDialog;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.ListSelectionModel;
+import javax.swing.SwingUtilities;
 
 import teo.isgci.db.Algo;
 import teo.isgci.drawing.DrawingLibraryInterface;
@@ -140,12 +141,31 @@ public class SearchDialog extends JDialog implements ActionListener {
                 return;
             }
             
-            GraphManipulationInterface manipulationInterface
+            final double searchZoomLevel = 2;
+            
+            final GraphManipulationInterface manipulationInterface
                 = drawLib.getGraphManipulationInterface();
             
-            manipulationInterface.centerNode(node);
-            manipulationInterface.unHiglightAll();
-            manipulationInterface.highlightNode(node, false);
+            manipulationInterface.beginUpdate();
+            
+            try {
+                manipulationInterface.zoomTo(searchZoomLevel);
+                manipulationInterface.unHiglightAll();
+                manipulationInterface.highlightNode(node, false);
+                
+            } finally {
+                manipulationInterface.endUpdate();
+            }
+            
+            // Invoke later to prevent centering bug
+            final Set<GraphClass> runnableNode = node; 
+            SwingUtilities.invokeLater(new Runnable() {
+                @Override
+                public void run() {
+                    manipulationInterface.centerNode(runnableNode);
+                }
+            });
+
             
             closeDialog();
         }
