@@ -105,7 +105,7 @@ public class ISGCIToolBar extends JToolBar {
         addZoomControls();
         addSeparator(separatorSize);
         
-        //addMiscButtons();
+        addMiscButtons();
     }
 
     /**

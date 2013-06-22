@@ -120,15 +120,17 @@ public class SearchDialog extends JDialog implements ActionListener {
         Object source = event.getSource();
         if (source == cancelButton) {
             closeDialog();
-        } else if (source == searchButton && classesList.getSelectedValue() != null) {
+        } else if (source == searchButton 
+                && classesList.getSelectedValue() != null) {
             Set<GraphClass> node = null;
             Set setNames = parent.getTabbedPane()
                     .getActiveDrawingLibraryInterface().getGraph().vertexSet();
             List<GraphClass> listNames = new ArrayList<GraphClass>();
             for (Object object : setNames) {
                 Set names = (Set) object;
-                if (names.contains(classesList.getSelectedValue()))
+                if (names.contains(classesList.getSelectedValue())) {
                     node = (Set<GraphClass>) object;
+                }
             }
             
             DrawingLibraryInterface drawLib

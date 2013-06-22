@@ -286,6 +286,11 @@ class GraphManipulation<V, E> implements GraphManipulationInterface<V, E> {
         mxICell cell = getCellFromNode(node);
         cells.add(cell);
 
+        if (!markedCells.containsKey(cell)) {
+            markedCells.put(cell, mxUtils.getColor(getGraphAdapter()
+                    .getCellStyle(cell), mxConstants.STYLE_STROKECOLOR));
+        }
+        
         if (hightlightNeighbors) {
             for (int i = 0; i < cell.getEdgeCount(); i++) {
                 mxCell edge = (mxCell) cell.getEdgeAt(i);
@@ -323,8 +328,6 @@ class GraphManipulation<V, E> implements GraphManipulationInterface<V, E> {
 
     @Override
     public void unHiglightAll() {
-        graphComponent.getGraph().getModel().beginUpdate();
-
         beginUpdate();
         try {
             for (mxICell cell : markedCells.keySet()) {
@@ -334,6 +337,7 @@ class GraphManipulation<V, E> implements GraphManipulationInterface<V, E> {
             }
         } finally {
             endUpdate();
+            markedCells.clear();
         }
     }
 
