@@ -108,7 +108,6 @@ class JGraphXInterface<V, E> implements DrawingLibraryInterface<V, E> {
 
                 return cell == null || cell.isEdge();
             }
-
         };
 
         graphManipulation =
@@ -124,7 +123,7 @@ class JGraphXInterface<V, E> implements DrawingLibraryInterface<V, E> {
         graphComponent.getViewport().setOpaque(true);
 
         graphEvent.registerMouseAdapter(
-                new InternalMouseAdapter<V,E>(graphComponent,
+                new InternalMouseAdapter<V, E>(graphComponent,
                         graphManipulation));
 
         graphManipulation.reapplyHierarchicalLayout();

@@ -146,6 +146,7 @@ public class ISGCITabbedPane extends JTabbedPane implements Updatable {
      */
     private MouseAdapter mouseAdapter = new MouseAdapter() {  
         
+        @Override
         public void mousePressed(MouseEvent e) {            
             if (getTabComponentAt(getSelectedIndex()) 
                     instanceof AddTabComponent) {
@@ -154,6 +155,7 @@ public class ISGCITabbedPane extends JTabbedPane implements Updatable {
             }            
         };
         
+        @Override
         public void mouseClicked(MouseEvent e) {  
             
             Object node = getActiveDrawingLibraryInterface().
@@ -161,30 +163,40 @@ public class ISGCITabbedPane extends JTabbedPane implements Updatable {
             Object edge = getActiveDrawingLibraryInterface().
                     getEdgeAt(e.getPoint());
             
-            Container parent = getParent();
-
-            while (parent != null
-                    && !(parent instanceof ISGCIMainFrame)) {
-                parent = parent.getParent();
-            }    
+            DrawingLibraryInterface drawLib 
+                = getActiveDrawingLibraryInterface();
             
-            // Right-click event
-            if (e.getButton() == MouseEvent.BUTTON3 
-                    && getActiveDrawingLibraryInterface() != null) {
+            // Left-click event
+            if (e.getButton() == MouseEvent.BUTTON1
+                    && drawLib != null) {
                 if (node != null) {
-                    nodePopup = new NodePopup((ISGCIMainFrame) parent);
+                    drawLib.getGraphManipulationInterface().
+                        unHiglightAll();
+                    
+                    drawLib.getGraphManipulationInterface().
+                        highlightNode(node, true);
+                }
+            // Right-click event
+            } else if (e.getButton() == MouseEvent.BUTTON3 
+                    && drawLib != null) {
+                
+                if (node != null) {
+                    nodePopup = new NodePopup(mainframe);
                     nodePopup.setNode((Set<GraphClass>) node);
                     nodePopup.show(e.getComponent(), e.getX(), e.getY());
+                    
                 } else if (edge != null){
-                    edgePopup = new EdgePopup((ISGCIMainFrame) parent);
+                    edgePopup = new EdgePopup(mainframe);
                     edgePopup.setEdge((DefaultEdge) edge);
                     edgePopup.show(e.getComponent(), e.getX(), e.getY());
                 }
+                
             // Double-click event
-            } else if (e.getClickCount() == 2 && node != null)  { 
-                JDialog d = new GraphClassInformationDialog(
-                        (ISGCIMainFrame) parent
-                        , ((Set<GraphClass>) node).iterator().next());
+            } else if (e.getClickCount() == 2 && node != null)  {
+                
+                JDialog d = new GraphClassInformationDialog(mainframe, 
+                        ((Set<GraphClass>) node).iterator().next());
+                
                 d.setLocation(50, 50);
                 d.pack();
                 d.setSize(800, 600);
