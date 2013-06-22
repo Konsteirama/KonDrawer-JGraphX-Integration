@@ -125,9 +125,8 @@ class JGraphXInterface<V, E> implements DrawingLibraryInterface<V, E> {
         graphComponent.setCenterZoom(false);
         graphComponent.setConnectable(false);
 
-        // make background white
+        // enable backgroundcolors
         graphComponent.getViewport().setOpaque(true);
-        graphComponent.getViewport().setBackground(Color.white);
 
         graphEvent.registerMouseAdapter(
                 new InternalMouseAdapter<V,E>(graphComponent,

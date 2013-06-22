@@ -39,6 +39,7 @@ import teo.isgci.db.Algo.NamePref;
 import teo.isgci.db.DataSet;
 import teo.isgci.drawing.DrawingLibraryFactory;
 import teo.isgci.drawing.DrawingLibraryInterface;
+import teo.isgci.drawing.GraphManipulationInterface;
 import teo.isgci.gc.GraphClass;
 import teo.isgci.grapht.GAlg;
 import teo.isgci.grapht.Inclusion;
@@ -239,8 +240,9 @@ public class ISGCITabbedPane extends JTabbedPane implements Updatable {
         
         setTabComponentAt(getSelectedIndex(), closeButton);
       
-        if (addTabComponent != null)
+        if (addTabComponent != null) {
             addTabComponent.resetTabPosition();
+        }
     }
 
     /**
@@ -318,11 +320,14 @@ public class ISGCITabbedPane extends JTabbedPane implements Updatable {
             if (getTabCount() == 1) {
                 addTabComponent.addTab();
             }
+            
             getActiveDrawingLibraryInterface().setGraph(graph);
+            
             //reapply properness and coloring
             setProperness();
             setProblem(getProblem(getSelectedComponent())
                     , getSelectedComponent());
+            
             
             // set title
             ISGCITabComponent closeButton 
@@ -448,11 +453,18 @@ public class ISGCITabbedPane extends JTabbedPane implements Updatable {
      *          the tab for which the problem is changed.
      */
     public void setProblem(Problem problem, Component c) {
-        if (startpageActive || !panelToInterfaceMap.containsKey(c)) { return; }
+        
+        if (startpageActive || !panelToInterfaceMap.containsKey(c)) { 
+            return; 
+        }
+        
         panelToProblem.put((JComponent) c, problem);
         Graph graph = panelToInterfaceMap.get(c).getGraph();
+        
         HashMap<Color , List<Set<GraphClass>>> colorToNodes = 
                 new HashMap<Color, List<Set<GraphClass>>>();
+        
+        
         // Put all nodes with the same color in a list
         for (Object o : graph.vertexSet()) {
             Set<GraphClass> node = (Set<GraphClass>) o;
@@ -462,15 +474,29 @@ public class ISGCITabbedPane extends JTabbedPane implements Updatable {
             }
             colorToNodes.get(color).add(node);           
         }
+        
+        
         // Color all lists with their color
-        getActiveDrawingLibraryInterface()
-            .getGraphManipulationInterface().beginUpdate();
-        for (Color color : colorToNodes.keySet()) {
-            getActiveDrawingLibraryInterface().getGraphManipulationInterface()
-                .colorNode(colorToNodes.get(color).toArray(), color);
-        }
-        getActiveDrawingLibraryInterface()
-            .getGraphManipulationInterface().endUpdate();
+        GraphManipulationInterface gmi 
+        = getActiveDrawingLibraryInterface().getGraphManipulationInterface(); 
+        
+        gmi.beginUpdate();
+        
+        try {
+            
+            for (Color color : colorToNodes.keySet()) {
+                gmi.colorNode(colorToNodes.get(color).toArray(), color);
+            }
+            
+            //set font and backgroundcolor
+            gmi.setFontColor(UserSettings.getCurrentFontColor());
+            gmi.setBackgroundColor(UserSettings.getCurrentBackgroundColor());
+            
+            
+        } finally {
+            gmi.endUpdate();
+        }        
+        
         getSelectedComponent().repaint();
     }
     

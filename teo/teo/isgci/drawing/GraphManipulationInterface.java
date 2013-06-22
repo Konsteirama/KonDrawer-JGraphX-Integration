@@ -55,6 +55,21 @@ public interface GraphManipulationInterface<V, E> {
     void colorNode(V[] node, Color color);
 
     /**
+     * Sets the fontcolor of all nodes to a given color.
+     * 
+     * @param color : a color-parameter
+     */
+    void setFontColor(Color color);
+    
+    /**
+     * Sets the backgroundcolor of the graph to a given color.
+     * 
+     * @param color : a color-parameter
+     */
+    void setBackgroundColor(Color color);
+    
+    
+    /**
      * Marks the edge between two given nodes by adding a small grey arrow and
      * coloring the edge.
      *

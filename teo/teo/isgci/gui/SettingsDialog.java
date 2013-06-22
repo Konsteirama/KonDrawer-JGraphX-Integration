@@ -118,8 +118,10 @@ public class SettingsDialog extends JDialog {
         
         // COLOR LIST
         colorList = new JList(nameToColor.keySet().toArray());
-        colorList.setSelectedIndex(1);
-
+        colorList.setSelectedIndex(0);
+        
+        colorChooser.setColor(nameToColor.get(colorList.getSelectedValue()));
+        
         colorList.addListSelectionListener(new ListSelectionListener() {
 
             /*
@@ -296,8 +298,7 @@ public class SettingsDialog extends JDialog {
         // set font and background color separately because they're
         // not enums
         UserSettings.setCurrentFontColor(nameToColor.get("Font"));
-        UserSettings.setCurrentFontColor(
-                nameToColor.get("Background"));
+        UserSettings.setCurrentBackgroundColor(nameToColor.get("Background"));
         
         // build a new colorscheme and set colors
         HashMap<Complexity, Color> colorScheme 

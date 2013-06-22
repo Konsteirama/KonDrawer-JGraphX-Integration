@@ -19,6 +19,8 @@ import java.util.HashMap;
 
 import org.jgrapht.Graph;
 
+import teo.isgci.util.Latex2Html;
+
 import com.mxgraph.layout.hierarchical.mxHierarchicalLayout;
 import com.mxgraph.model.mxCell;
 import com.mxgraph.model.mxICell;
@@ -32,14 +34,7 @@ import com.mxgraph.util.mxUndoableEdit;
 import com.mxgraph.util.mxUtils;
 import com.mxgraph.view.mxGraph;
 import com.mxgraph.view.mxGraphView;
-import org.jgrapht.Graph;
-import teo.isgci.util.Latex2Html;
-
-import java.awt.Color;
-import java.awt.Point;
-import java.awt.Rectangle;
-import java.util.ArrayList;
-import java.util.HashMap;
+import com.mxgraph.view.mxStylesheet;
 
 /**
  * This class implements the GraphManipulationInterface. It handles
@@ -184,6 +179,33 @@ class GraphManipulation<V, E> implements GraphManipulationInterface<V, E> {
         try {
             graph.setCellStyles(mxConstants.STYLE_FILLCOLOR,
                     mxUtils.hexString(color), getCellsFromNodes(nodes));
+        } finally {
+            endUpdate();
+        }
+    }
+    
+    @Override
+    public void setFontColor(Color color) {
+        
+        mxGraph graph = graphComponent.getGraph();
+        
+        beginUpdate();
+        try {
+            
+            graph.setCellStyles(mxConstants.STYLE_FONTCOLOR, 
+                    mxUtils.hexString(color), 
+                    graph.getChildVertices(graph.getDefaultParent()));
+            
+        } finally {
+            endUpdate();
+        }
+    }
+    
+    @Override
+    public void setBackgroundColor(Color color) {
+        beginUpdate();
+        try {
+            graphComponent.getViewport().setBackground(color);
         } finally {
             endUpdate();
         }
