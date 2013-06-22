@@ -319,6 +319,12 @@ public class JGraphXAdapter<V, E> extends mxGraph implements
     public final Graph<V, E> getGraph() {
         return this.graphT;
     }
+    
+    @Override
+    public String getToolTipForCell(Object cell) {
+        //TODO rework to show actual tooltip
+        return super.getToolTipForCell(cell);
+    }
 }
 
 /* EOF */

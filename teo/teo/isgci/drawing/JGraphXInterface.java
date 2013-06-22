@@ -109,6 +109,7 @@ class JGraphXInterface<V, E> implements DrawingLibraryInterface<V, E> {
                 return cell == null || cell.isEdge();
             }
         };
+        graphComponent.setToolTips(true);
 
         graphManipulation =
                 new GraphManipulation<V, E>(graphComponent);
