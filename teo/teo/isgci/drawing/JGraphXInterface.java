@@ -28,6 +28,7 @@ import java.util.Collection;
 import java.util.List;
 
 import javax.imageio.ImageIO;
+import javax.swing.SwingUtilities;
 import javax.xml.transform.TransformerConfigurationException;
 
 import org.apache.batik.transcoder.TranscoderException;
@@ -127,7 +128,15 @@ class JGraphXInterface<V, E> implements DrawingLibraryInterface<V, E> {
                 new InternalMouseAdapter<V, E>(graphComponent,
                         graphManipulation));
 
-        graphManipulation.reapplyHierarchicalLayout();
+        // let ui build graph
+        SwingUtilities.invokeLater(new Runnable() {
+            @Override
+            public void run() {
+                graphManipulation.reapplyHierarchicalLayout();
+            }
+            
+        });
+
     }
 
     /**

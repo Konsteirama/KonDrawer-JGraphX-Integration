@@ -329,7 +329,7 @@ public class ISGCIToolBar extends JToolBar {
                     manipulationInterface.removeNode(node);
                 }
                 
-                drawLib.getGraphManipulationInterface().endUpdate();                
+                drawLib.getGraphManipulationInterface().endUpdate();
             }
         });
 
