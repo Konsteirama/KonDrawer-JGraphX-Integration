@@ -17,12 +17,9 @@ import java.awt.Point;
 import java.awt.event.MouseEvent;
 import java.awt.image.BufferedImage;
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.io.OutputStream;
-import java.net.MalformedURLException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -31,10 +28,9 @@ import javax.imageio.ImageIO;
 import javax.swing.SwingUtilities;
 import javax.xml.transform.TransformerConfigurationException;
 
-import org.apache.batik.transcoder.TranscoderException;
-import org.apache.batik.transcoder.TranscoderInput;
-import org.apache.batik.transcoder.TranscoderOutput;
-import org.apache.fop.render.ps.EPSTranscoder;
+import net.sf.epsgraphics.ColorMode;
+import net.sf.epsgraphics.EpsGraphics;
+
 import org.jgrapht.Graph;
 import org.jgrapht.ext.GraphMLExporter;
 import org.xml.sax.SAXException;
@@ -218,50 +214,24 @@ class JGraphXInterface<V, E> implements DrawingLibraryInterface<V, E> {
      * @param path The path where the .eps file will be saved to
      */
     private void exportEPS(final String path) {
-        // Creates the .svg file
-        String temp = "temp.svg";
-        exportSVG(temp);
-
-        // Create the transcoder and set some settings
-        EPSTranscoder transcoder = new EPSTranscoder();
-
-        // Add Transcoding hints
-        transcoder.addTranscodingHint(
-                EPSTranscoder.KEY_PIXEL_UNIT_TO_MILLIMETER, 1.0f);
-        transcoder.addTranscodingHint(EPSTranscoder.KEY_MAX_HEIGHT,
-                EPS_MAX_HEIGHT_WIDTH);
-        transcoder.addTranscodingHint(EPSTranscoder.KEY_MAX_WIDTH,
-                EPS_MAX_HEIGHT_WIDTH);
-
-        String svgURI;
+        Dimension d = graphComponent.getGraphControl().getSize();
+        
+        FileOutputStream out;
+        EpsGraphics g;
+        
         try {
-            // Create the transcoder input.
-            svgURI = new File(temp).toURI().toURL().toString();
-            TranscoderInput input = new TranscoderInput(svgURI);
-
-            // Create the transcoder output.
-            OutputStream ostream = new FileOutputStream(path);
-            TranscoderOutput output = new TranscoderOutput(ostream);
-
-            // Save the image.
-            transcoder.transcode(input, output);
-
-            // Flush and close the stream.
-            ostream.flush();
-            ostream.close();
-        } catch (MalformedURLException e) {
-            e.printStackTrace();
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-        } catch (TranscoderException e) {
-            e.printStackTrace();
+            out = new FileOutputStream(new File(path));
+            
+            g = new EpsGraphics("Test", out, 0, 0, (int) d.getWidth(), 
+                    (int) d.getHeight(), ColorMode.COLOR_RGB);
+            
+            graphComponent.getGraphControl().paint(g);
+            
+            g.finalize();
+            g.close();
         } catch (IOException e) {
             e.printStackTrace();
-        }
-
-        // Deletes the temp svg file
-        File file = new File(temp);
-        file.delete();
+        } 
     }
 
     /**

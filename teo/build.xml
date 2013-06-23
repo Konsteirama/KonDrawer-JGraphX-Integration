@@ -78,9 +78,7 @@
         <pathelement location="${jarlib.dir}/mouse.jar" />
         <pathelement location="${jgrapht.jar}" />
         <pathelement location="${jarlib.dir}/jgraphx.jar" />
-        <pathelement location="${jarlib.dir}/batik-all-1.7.jar" />
-        <pathelement location="${jarlib.dir}/pdf-transcoder.jar" />
-        <pathelement location="${jarlib.dir}/xml-apis-ext.jar" />
+        <pathelement location="${jarlib.dir}/epsgraphics.jar" />
     </path>
 
     <path id="run.classpath">
