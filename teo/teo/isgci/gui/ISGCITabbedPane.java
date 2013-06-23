@@ -190,7 +190,10 @@ public class ISGCITabbedPane extends JTabbedPane implements Updatable {
                 }
                 
             // Double-click event
-            } else if (e.getClickCount() == 2 && node != null)  {
+            }
+            
+            if (e.getClickCount() == 2 && node != null 
+                    && e.getButton() == MouseEvent.BUTTON1)  {
                 
                 JDialog d = new GraphClassInformationDialog(mainframe, 
                         ((Set<GraphClass>) node).iterator().next());
