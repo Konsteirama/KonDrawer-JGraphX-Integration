@@ -146,6 +146,7 @@ public class SearchDialog extends JDialog implements ActionListener {
             final GraphManipulationInterface manipulationInterface
                 = drawLib.getGraphManipulationInterface();
             
+            manipulationInterface.beginNotUndoable();
             manipulationInterface.beginUpdate();
             
             try {
@@ -154,6 +155,7 @@ public class SearchDialog extends JDialog implements ActionListener {
                 manipulationInterface.highlightNode(node, false);
                 
             } finally {
+                manipulationInterface.endNotUndoable();
                 manipulationInterface.endUpdate();
             }
             

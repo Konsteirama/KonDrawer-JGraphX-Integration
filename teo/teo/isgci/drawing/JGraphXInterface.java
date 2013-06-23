@@ -87,7 +87,6 @@ class JGraphXInterface<V, E> implements DrawingLibraryInterface<V, E> {
      * @param g JGraphT graph to draw
      */
     public JGraphXInterface(Graph<V, E> g) {
-
         // Convert to JGraphT-Graph
         graphAdapter = createNewAdapter(g);
 
@@ -115,6 +114,9 @@ class JGraphXInterface<V, E> implements DrawingLibraryInterface<V, E> {
 
         graphManipulation =
                 new GraphManipulation<V, E>(graphComponent);
+        
+        graphManipulation.beginNotUndoable();
+        
         graphEvent = new GraphEvent(graphComponent);
 
         graphComponent.setWheelScrollingEnabled(false);
@@ -128,16 +130,8 @@ class JGraphXInterface<V, E> implements DrawingLibraryInterface<V, E> {
         graphEvent.registerMouseAdapter(
                 new InternalMouseAdapter<V, E>(graphComponent,
                         graphManipulation));
-
-        // let ui build graph
-        SwingUtilities.invokeLater(new Runnable() {
-            @Override
-            public void run() {
-                graphManipulation.reapplyHierarchicalLayout();
-            }
-            
-        });
-
+        
+        graphManipulation.endNotUndoable();
     }
 
     /**
@@ -468,8 +462,10 @@ class JGraphXInterface<V, E> implements DrawingLibraryInterface<V, E> {
         graphComponent.setGraph(graphAdapter);
         
         graphManipulation = new GraphManipulation(graphComponent);
-
+        
+        graphManipulation.beginNotUndoable();
         graphManipulation.reapplyHierarchicalLayout();
+        graphManipulation.endNotUndoable();
     }
 
     /**

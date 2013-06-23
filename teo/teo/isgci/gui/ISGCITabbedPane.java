@@ -155,23 +155,22 @@ public class ISGCITabbedPane extends JTabbedPane implements Updatable {
         @Override
         public void mouseClicked(MouseEvent e) {  
             
-            Object node = getActiveDrawingLibraryInterface().
-                    getNodeAt(e.getPoint());
-            Object edge = getActiveDrawingLibraryInterface().
-                    getEdgeAt(e.getPoint());
-            
             DrawingLibraryInterface drawLib 
                 = getActiveDrawingLibraryInterface();
+            GraphManipulationInterface manipulationInterface =
+                    drawLib.getGraphManipulationInterface();
+            
+            Object node = drawLib.getNodeAt(e.getPoint());
+            Object edge = drawLib.getEdgeAt(e.getPoint());
             
             // Left-click event
             if (e.getButton() == MouseEvent.BUTTON1
                     && drawLib != null) {
                 if (node != null) {
-                    drawLib.getGraphManipulationInterface().
-                        unHiglightAll();
-                    
-                    drawLib.getGraphManipulationInterface().
-                        highlightNode(node, true);
+                    manipulationInterface.beginNotUndoable();
+                    manipulationInterface.unHiglightAll();
+                    manipulationInterface.highlightNode(node, true);
+                    manipulationInterface.endNotUndoable();
                 }
             // Right-click event
             } else if (e.getButton() == MouseEvent.BUTTON3 
@@ -287,8 +286,9 @@ public class ISGCITabbedPane extends JTabbedPane implements Updatable {
         DrawingLibraryInterface<V, E> drawingInterface = 
                 DrawingLibraryFactory.createNewInterface(graph);
 
-        final JComponent graphPanel = drawingInterface.getPanel();
+        drawingInterface.getGraphManipulationInterface().beginNotUndoable();
         
+        final JComponent graphPanel = drawingInterface.getPanel();
         final JComponent graphOutline = drawingInterface.getGraphOutline(); 
         
         // layers
@@ -357,6 +357,11 @@ public class ISGCITabbedPane extends JTabbedPane implements Updatable {
         setProblem(null, tabPanel);
         applyNamingPref(tabPanel);
 
+        drawingInterface.getGraphManipulationInterface()
+            .reapplyHierarchicalLayout();
+        
+        drawingInterface.getGraphManipulationInterface().endNotUndoable();
+        
         addTabComponent.resetTabPosition();
         mainframe.closeDialogs();
     }
@@ -386,13 +391,18 @@ public class ISGCITabbedPane extends JTabbedPane implements Updatable {
                 addTabComponent.addTab();
             }
             
-            getActiveDrawingLibraryInterface().setGraph(graph);
+            DrawingLibraryInterface dLib = getActiveDrawingLibraryInterface(); 
+            
+            dLib.setGraph(graph);
+            
+            dLib.getGraphManipulationInterface().beginNotUndoable();
             
             //reapply properness and coloring
             setProperness();
-            setProblem(getProblem(getSelectedComponent())
-                    , getSelectedComponent());
+            setProblem(getProblem(getSelectedComponent()), 
+                    getSelectedComponent());
             
+            dLib.getGraphManipulationInterface().reapplyHierarchicalLayout();
             
             // set title
             ISGCITabComponent closeButton 
@@ -400,6 +410,9 @@ public class ISGCITabbedPane extends JTabbedPane implements Updatable {
         
             setTabComponentAt(getSelectedIndex(), closeButton);
             applyNamingPref(getSelectedComponent());
+            
+            dLib.getGraphManipulationInterface().endNotUndoable();
+            
             mainframe.closeDialogs();
         }
     }
@@ -634,7 +647,7 @@ public class ISGCITabbedPane extends JTabbedPane implements Updatable {
                 unmarkEdges.add(edge);
             }
         }
-        if (markEdges.size() > 0){
+        if (markEdges.size() > 0) {
             getActiveDrawingLibraryInterface().
             getGraphManipulationInterface().markEdge(markEdges.toArray());
         } else if (unmarkEdges.size() > 0) {
@@ -653,11 +666,13 @@ public class ISGCITabbedPane extends JTabbedPane implements Updatable {
      */
     protected Color complexityColor(Set<GraphClass> node) {
         Problem problem = getProblem(getSelectedComponent());
-        if (problem != null){
+        
+        if (problem != null) {
             Complexity complexity = 
                     problem.getComplexity(node.iterator().next());
             return UserSettings.getColor(complexity);
         }
+        
         return UserSettings.getColor(Complexity.UNKNOWN);
     }
 
