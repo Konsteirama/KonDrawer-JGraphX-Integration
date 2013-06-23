@@ -276,20 +276,20 @@ public abstract class UserSettings {
     private static List<Updatable> updatables = new LinkedList<Updatable>();
     
     /**
-     * TODO marc.
+     * Adds an object to the update list. 
      * 
      * @param instance
-     *            TODO marc
+     *            object to be added to the list
      */
     public static void subscribeToOptionChanges(Updatable instance) {
         updatables.add(instance);
     }
 
     /**
-     * TODO marc.
+     * Removes an object from the update list.
      * 
      * @param instance
-     *            TODO marc
+     *            object to be removed from the list
      */
     public static void unsubscribeFromOptionChanges(Updatable instance) {
         updatables.remove(instance);
