@@ -614,8 +614,6 @@ public class ISGCITabbedPane extends JTabbedPane implements Updatable {
         
         setNamingPref(UserSettings.getNamingPref(
                 (JComponent) getSelectedComponent()));
-        
-        setProblem(UserSettings.getProblem(), getSelectedComponent());
     }
 }
 
