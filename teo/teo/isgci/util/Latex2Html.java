@@ -18,7 +18,7 @@ public final class Latex2Html extends Latex {
     /**
      * Path to the location of the image files. Should end in /.
      */
-    private static final String IMGPATH = "images/";
+    private static final String IMGPATH = "/images/";
 
     /**
      * The current instance of Latex2Html, needed for singleton pattern.
@@ -116,10 +116,12 @@ public final class Latex2Html extends Latex {
         if (!g.getHtml().equals("")) {
             t.append(g.getHtml());
         } else {
+            String relativePath 
+             = getClass().getResource(IMGPATH + g.getImageName()).toString();
+            
             t.append(
                 "<img src=\"");
-            t.append(IMGPATH);
-            t.append(g.getImageName());
+            t.append(relativePath);
             t.append("\" alt=\"");
             t.append(g.getName());
             t.append("\"/>");
