@@ -177,6 +177,8 @@ class JGraphXInterface<V, E> implements DrawingLibraryInterface<V, E> {
 
         graphAdapter.getStylesheet().getDefaultEdgeStyle()
                 .put(mxConstants.STYLE_NOLABEL, "1");
+        graphAdapter.getStylesheet().getDefaultVertexStyle()
+                .put(mxConstants.STYLE_STROKECOLOR, "#000000");
 
         graphAdapter.setHtmlLabels(true);
     }
