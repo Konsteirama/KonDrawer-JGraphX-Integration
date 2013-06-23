@@ -23,6 +23,7 @@ import javax.swing.JRadioButtonMenuItem;
 
 import teo.isgci.db.DataSet;
 import teo.isgci.problem.Problem;
+import teo.isgci.util.UserSettings;
 
 public class ProblemsMenu extends JMenu implements ActionListener {
     protected Vector items;
@@ -70,9 +71,7 @@ public class ProblemsMenu extends JMenu implements ActionListener {
     }
 
     public void actionPerformed(ActionEvent event) {
-        parent.getTabbedPane().setProblem(
-                DataSet.getProblem(event.getActionCommand()), 
-                parent.getTabbedPane().getSelectedComponent());
+        UserSettings.setProblem(DataSet.getProblem(event.getActionCommand()));
     }
 }
 

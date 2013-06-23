@@ -23,6 +23,7 @@ import javax.swing.UIManager;
 import teo.isgci.db.Algo;
 import teo.isgci.db.Algo.NamePref;
 import teo.isgci.problem.Complexity;
+import teo.isgci.problem.Problem;
 
 /**
  * Manages all UserSettings with public getter and setter. If a setting 
@@ -61,9 +62,54 @@ public abstract class UserSettings {
     private static HashMap<JComponent, Algo.NamePref> panelToNamingPref
         = new HashMap<JComponent, Algo.NamePref>();
     
+    /**
+     * Maps the tab to their corresponding Problem.
+     */
+    private static HashMap<JComponent, Problem> panelToProblem
+        = new HashMap<JComponent, Problem>();
+
+    /**
+     * The currently active tab
+     */
+    private static JComponent activeTab;
+    
     // Getter / Setter
     // ------------------------------------------------
 
+    /**
+     * Sets the currently active tab.
+     * 
+     * @param tab
+     *          the active tab.
+     */
+    public static void setActiveTab(JComponent tab) {
+        activeTab = tab;
+    }
+    
+    /**
+     * Sets the problem for the currently active tab.
+     * 
+     * @param problem
+     *            the problem for the active tab
+     */
+    public static void setProblem(Problem problem) {
+        if (problem != null) {
+            panelToProblem.put(activeTab, problem);
+            updateSettings();
+        }
+    }
+    
+    /**
+     * Gets the problem for the currently active tab.
+     * 
+     * @return 
+     *          the problem for the tab, or null if no problem is assigned.
+     */
+    public static Problem getProblem() {
+        return panelToProblem.get(activeTab);
+    }
+    
+    
     /**
      * Getter for default font color.
      * 

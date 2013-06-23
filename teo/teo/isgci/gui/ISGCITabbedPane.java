@@ -82,13 +82,7 @@ public class ISGCITabbedPane extends JTabbedPane implements Updatable {
      */
     private HashMap<JComponent, Boolean> panelToDrawUnproper
         = new HashMap<JComponent, Boolean>();
-    
-    /**
-     * Maps the tab to their corresponding Problem.
-     */
-    private HashMap<JComponent, Problem> panelToProblem
-        = new HashMap<JComponent, Problem>();
-    
+
     /**
      * Maps the content of the tabs to their corresponding
      * naming preference.
@@ -134,6 +128,7 @@ public class ISGCITabbedPane extends JTabbedPane implements Updatable {
                         getDrawUnproper(getSelectedComponent()));
                 mainframe.setColorProblem(getProblem(getSelectedComponent()));
             }
+            UserSettings.setActiveTab((JComponent) getSelectedComponent());
         }
     };
     
@@ -472,13 +467,11 @@ public class ISGCITabbedPane extends JTabbedPane implements Updatable {
      * @param c
      *          the tab for which the problem is changed.
      */
-    public void setProblem(Problem problem, Component c) {
+    private void setProblem(Problem problem, Component c) {
         
         if (startpageActive || !panelToInterfaceMap.containsKey(c)) { 
             return; 
-        }
-        
-        panelToProblem.put((JComponent) c, problem);
+        }        
         Graph graph = panelToInterfaceMap.get(c).getGraph();
         
         HashMap<Color , List<Set<GraphClass>>> colorToNodes = 
@@ -531,11 +524,16 @@ public class ISGCITabbedPane extends JTabbedPane implements Updatable {
      *          the problem of the given tab, 
      *          null or "none" if no problem is chosen
      */
-    public Problem getProblem(Component c) {
-        if (panelToProblem.containsKey(c)) {
-            return panelToProblem.get(c);
+    private Problem getProblem(Component c) {
+        try {
+            Component pre = getSelectedComponent();
+            setSelectedComponent(c);
+            Problem retValue = UserSettings.getProblem();
+            setSelectedComponent(pre);
+            return retValue;
+        } catch (Exception e) {
+            return null;
         }
-        return null;
     }
 
     /**
@@ -616,6 +614,8 @@ public class ISGCITabbedPane extends JTabbedPane implements Updatable {
         
         setNamingPref(UserSettings.getNamingPref(
                 (JComponent) getSelectedComponent()));
+        
+        setProblem(UserSettings.getProblem(), getSelectedComponent());
     }
 }
 
