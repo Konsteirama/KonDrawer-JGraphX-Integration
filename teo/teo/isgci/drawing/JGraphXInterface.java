@@ -25,6 +25,7 @@ import java.util.Collection;
 import java.util.List;
 
 import javax.imageio.ImageIO;
+import javax.swing.JScrollBar;
 import javax.swing.SwingUtilities;
 import javax.xml.transform.TransformerConfigurationException;
 
@@ -71,7 +72,7 @@ class JGraphXInterface<V, E> implements DrawingLibraryInterface<V, E> {
      *  and vice versa.
      */
     private JGraphXAdapter<V, E> graphAdapter;
-
+    
     /**
      * The constructor for JGraphXInterface.
      *
@@ -207,25 +208,34 @@ class JGraphXInterface<V, E> implements DrawingLibraryInterface<V, E> {
      * @param path The path where the .eps file will be saved to
      */
     private void exportEPS(final String path) {
-        Dimension d = graphComponent.getGraphControl().getSize();
+        Dimension d = graphComponent.getSize();
         
         FileOutputStream out;
         EpsGraphics g;
         
+        // Gets the Scrollbars
+        JScrollBar hor = graphComponent.getHorizontalScrollBar();
+        JScrollBar vert = graphComponent.getVerticalScrollBar();
+
+        // Calculates the height/width of the scrollbars
+        // to remove them later on
+        int height = hor.getHeight();
+        int width = vert.getWidth();
+        
         try {
             // Creates a new file and the graphics object
             out = new FileOutputStream(new File(path));
-            g = new EpsGraphics("Test", out, 0, 0, (int) d.getWidth(), 
-                    (int) d.getHeight(), ColorMode.COLOR_RGB);
+            g = new EpsGraphics("Test", out, 0, 0, (int) d.getWidth() - width, 
+                    (int) d.getHeight() - height, ColorMode.COLOR_RGB);
             
             // Paints the graphic object
-            graphComponent.getGraphControl().paint(g);
+            graphComponent.paint(g);
             
             g.finalize();
             g.close();
         } catch (IOException e) {
             e.printStackTrace();
-        } 
+        }
     }
 
     /**
@@ -292,21 +302,30 @@ class JGraphXInterface<V, E> implements DrawingLibraryInterface<V, E> {
      * @param path The path where the .jpg file will be saved to
      */
     private void exportJPG(final String path) {
-        Dimension d = graphComponent.getGraphControl().getSize();
-
+        Dimension d = graphComponent.getSize();
+        
         // For testing purposes, if no Panel exists 
         if (d.width == 0 || d.height == 0) {
             d.width = 1;
             d.height = 1;
         }
+        
+        // Gets the Scrollbars
+        JScrollBar hor = graphComponent.getHorizontalScrollBar();
+        JScrollBar vert = graphComponent.getVerticalScrollBar();
 
-        BufferedImage image = new BufferedImage(d.width, d.height,
-                BufferedImage.TYPE_INT_RGB);
+        // Calculates the height/width of the scrollbars
+        // to remove them later on
+        int height = hor.getHeight();
+        int width = vert.getWidth();
+        
+        BufferedImage image = new BufferedImage(d.width - width, 
+                d.height - height, BufferedImage.TYPE_INT_RGB);
 
         Graphics2D g = image.createGraphics();
-        graphComponent.getGraphControl().paint(g);
-
-        final File outputfile = new File(path);
+        graphComponent.paint(g);   
+        
+        File outputfile = new File(path);
 
         try {
             ImageIO.write(image, "jpg", outputfile);
@@ -321,21 +340,30 @@ class JGraphXInterface<V, E> implements DrawingLibraryInterface<V, E> {
      * @param path The path where the .png file will be saved to
      */
     private void exportPNG(final String path) {
-        Dimension d = graphComponent.getGraphControl().getSize();
-
+        Dimension d = graphComponent.getSize();
+        
         // For testing purposes, if no Panel exists 
         if (d.width == 0 || d.height == 0) {
             d.width = 1;
             d.height = 1;
         }
+        
+        // Gets the Scrollbars
+        JScrollBar hor = graphComponent.getHorizontalScrollBar();
+        JScrollBar vert = graphComponent.getVerticalScrollBar();
 
-        BufferedImage image = new BufferedImage(d.width, d.height,
-                BufferedImage.TYPE_INT_ARGB);
+        // Calculates the height/width of the scrollbars
+        // to remove them later on
+        int height = hor.getHeight();
+        int width = vert.getWidth();
+        
+        BufferedImage image = new BufferedImage(d.width - width,
+                d.height - height, BufferedImage.TYPE_INT_ARGB);
 
         Graphics2D g = image.createGraphics();
-        graphComponent.getGraphControl().paint(g);
+        graphComponent.paint(g);
 
-        final File outputfile = new File(path);
+        File outputfile = new File(path);
 
         try {
             ImageIO.write(image, "png", outputfile);
