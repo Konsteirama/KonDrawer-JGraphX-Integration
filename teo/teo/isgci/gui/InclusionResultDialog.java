@@ -80,6 +80,8 @@ public class InclusionResultDialog extends JDialog implements ActionListener {
         constraints.gridwidth = GridBagConstraints.REMAINDER;
         constraints.fill = GridBagConstraints.NONE;
         constraints.anchor = GridBagConstraints.WEST;
+        
+        pack();
     }
 
 
@@ -264,11 +266,14 @@ public class InclusionResultDialog extends JDialog implements ActionListener {
         
         JPanel p = new JPanel();
         refButton = new JButton("View references");
-        refButton.setToolTipText("Opens graphclasses.org website for references");
+        refButton.setToolTipText("Opens graphclasses.org website "
+                                 + "for references");
         drawButton = new JButton("Draw");
-        drawButton.setToolTipText("Draw selected class and subclasses/superclasses; opens a dialogue");
+        drawButton.setToolTipText("Draw selected class and "
+                                + "subclasses/superclasses; opens a dialogue");
         drawNewTabButton = new JButton("Draw in new Tab");
-        drawNewTabButton.setToolTipText("Draw selected class and subclasses/superclasses in a new tab; opens a dialogue");
+        drawNewTabButton.setToolTipText("Draw selected class and "
+                   + "subclasses/superclasses in a new tab; opens a dialogue");
         okButton = new JButton("OK");
         okButton.setToolTipText("Close dialogue");
         p.add(refButton);
@@ -289,6 +294,19 @@ public class InclusionResultDialog extends JDialog implements ActionListener {
         drawButton.addActionListener(this);
         drawNewTabButton.addActionListener(this);
         refButton.addActionListener(this);
+        
+        
+        // set correct size after window is painted
+        SwingUtilities.invokeLater(new Runnable() {
+            @Override
+            public void run() {
+                pack();
+                validate();
+                repaint();
+            }
+        });
+        
+
         setDefaultCloseOperation(DISPOSE_ON_CLOSE);
     }
     
