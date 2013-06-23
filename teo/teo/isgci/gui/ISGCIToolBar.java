@@ -105,7 +105,7 @@ public class ISGCIToolBar extends JToolBar {
         addZoomControls();
         addSeparator(separatorSize);
         
-        addMiscButtons();
+        //addMiscButtons();
     }
 
     /**
@@ -210,8 +210,8 @@ public class ISGCIToolBar extends JToolBar {
         // ZOOM
         final String defaultEntry = "Set Zoom";
         final String zoomToFit = "Zoom to fit";
-        final JComboBox zoomBox = new JComboBox(new String[] { defaultEntry, 
-                "100%", "200%", "300%", zoomToFit });
+        final JComboBox zoomBox = new JComboBox(new String[] { defaultEntry,
+                "50%", "75%", "100%", "150%", "200%", "300%", zoomToFit });
         add(zoomBox);
         
         // make sure zoombox doesn't get bigger
@@ -230,6 +230,11 @@ public class ISGCIToolBar extends JToolBar {
                 
                 GraphManipulationInterface<?, ?> graphManipulation = 
                         getManipulationInterface();
+                
+                
+                if (graphManipulation == null) {
+                    return;
+                }
                 
                 if (zoomLevel == defaultEntry) {
                     return;
