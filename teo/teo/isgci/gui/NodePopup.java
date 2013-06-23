@@ -109,9 +109,7 @@ public class NodePopup extends JPopupMenu implements ActionListener {
             newNames.add(newName);
         }
         for (String name : newNames) {
-            name = name.replace("<sub>", "_");
-            name = name.replace("</sub>", "");
-            mItem[i] = new JMenuItem(name);
+            mItem[i] = new JMenuItem("<html>" + name + "</html>");
             nameItem.add(mItem[i]);
             mItem[i].setActionCommand(CHANGENAME + name);
             mItem[i].addActionListener(this);
