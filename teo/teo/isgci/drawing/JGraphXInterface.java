@@ -466,6 +466,8 @@ class JGraphXInterface<V, E> implements DrawingLibraryInterface<V, E> {
         applyCustomGraphSettings();
 
         graphComponent.setGraph(graphAdapter);
+        
+        graphManipulation = new GraphManipulation(graphComponent);
 
         graphManipulation.reapplyHierarchicalLayout();
     }
