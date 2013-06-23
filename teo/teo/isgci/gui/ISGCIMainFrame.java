@@ -21,6 +21,7 @@ import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
 import java.io.FileOutputStream;
 import java.io.OutputStreamWriter;
+import java.util.Vector;
 
 import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JDialog;
@@ -62,7 +63,7 @@ public class ISGCIMainFrame extends JFrame implements WindowListener {
 
     /** The location where new windows will be positioned. */
     private static final Point DEFAULTPOSITION = new Point(50, 50);
-
+    
     /** Needed for MediaTracker (hack). */
     public static ISGCIMainFrame tracker;
     // public static Font font;
@@ -94,6 +95,9 @@ public class ISGCIMainFrame extends JFrame implements WindowListener {
     
     /** Shows a list from which a problem can be chosen. */
     private JMenuItem miColourProblem;
+    
+    /** Saves jdialogs to close them if they need to be closed from here. */
+    private Vector<JDialog> dialogs = new Vector<JDialog>();
     
     /**
      * Creates the frame.
@@ -302,10 +306,12 @@ public class ISGCIMainFrame extends JFrame implements WindowListener {
             
             @Override
             public void actionPerformed(ActionEvent e) {
-                JDialog d = new NamingDialog(mainframe);
-                d.setLocation(DEFAULTPOSITION);
-                d.pack();
-                d.setVisible(true);
+                JDialog naming = new NamingDialog(mainframe);
+                naming.setLocation(DEFAULTPOSITION);
+                naming.pack();
+                naming.setVisible(true);
+                
+                dialogs.add(naming);
             }
         });
         
@@ -371,6 +377,8 @@ public class ISGCIMainFrame extends JFrame implements WindowListener {
                 check.pack();
                 check.setSize(width, height);
                 check.setVisible(true);
+                
+                dialogs.add(check);
             }
         });
         
@@ -538,6 +546,8 @@ public class ISGCIMainFrame extends JFrame implements WindowListener {
         select.pack();
         select.setSize(width, height);
         select.setVisible(true);
+        
+        dialogs.add(select);
     }
 
     /**
@@ -549,10 +559,13 @@ public class ISGCIMainFrame extends JFrame implements WindowListener {
                     "The active tab contains no graph to export.");
             return;
         }
+        
         JDialog export = new ExportDialog(this);
         export.setLocation(DEFAULTPOSITION);
         export.pack();
         export.setVisible(true);
+        
+        dialogs.add(export);
     }
     
     /**
@@ -567,24 +580,30 @@ public class ISGCIMainFrame extends JFrame implements WindowListener {
         info.pack();
         info.setSize(width, height);
         info.setVisible(true);
+        
+        dialogs.add(info);
     }
     
     /**
      * Opens the settings dialog.
      */
     public void openSettingsDialog() {
-        SettingsDialog settingsDialog = new SettingsDialog(this);
-        settingsDialog.setLocation(DEFAULTPOSITION);
-        settingsDialog.setVisible(true);
+        JDialog settings = new SettingsDialog(this);
+        settings.setLocation(DEFAULTPOSITION);
+        settings.setVisible(true);
+        
+        dialogs.add(settings);
     }
     
     /**
      * Opens the about dialog.
      */
     public void openAboutDialog() {
-        JDialog select = new AboutDialog(this);
-        select.setLocation(DEFAULTPOSITION);
-        select.setVisible(true);
+        JDialog about = new AboutDialog(this);
+        about.setLocation(DEFAULTPOSITION);
+        about.setVisible(true);
+        
+        dialogs.add(about);
     }
     
     /**
@@ -594,6 +613,8 @@ public class ISGCIMainFrame extends JFrame implements WindowListener {
         JDialog search = new SearchDialog(this);
         search.setLocation(DEFAULTPOSITION);
         search.setVisible(true);
+        
+        dialogs.add(search);
     }
     
     /**
@@ -640,6 +661,18 @@ public class ISGCIMainFrame extends JFrame implements WindowListener {
      */
     public JMenuItem getGraphClassInformationItem() {
         return miGraphClassInformation;
+    }
+
+    /**
+     * Closes all dialogs to bring the graphtab to front.
+     */
+    public void closeDialogs() {
+        for (JDialog dialog : dialogs) {           
+            dialog.setVisible(false);
+            dialog.dispose();
+        }
+        
+        dialogs.clear();
     }
 }
 

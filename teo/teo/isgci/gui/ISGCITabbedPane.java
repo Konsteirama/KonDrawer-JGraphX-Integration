@@ -304,6 +304,7 @@ public class ISGCITabbedPane extends JTabbedPane implements Updatable {
         applyNamingPref(panel);
 
         addTabComponent.resetTabPosition();
+        mainframe.closeDialogs();
     }
     
     /**
@@ -345,6 +346,7 @@ public class ISGCITabbedPane extends JTabbedPane implements Updatable {
         
             setTabComponentAt(getSelectedIndex(), closeButton);
             applyNamingPref(getSelectedComponent());
+            mainframe.closeDialogs();
         }
     }
     
