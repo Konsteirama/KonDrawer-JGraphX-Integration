@@ -14,6 +14,7 @@ import org.jgrapht.Graph;
 
 import com.mxgraph.swing.mxGraphComponent;
 
+import javax.swing.JComponent;
 import java.awt.Point;
 import java.util.List;
 
@@ -59,7 +60,7 @@ public interface DrawingLibraryInterface<V, E> {
      * 
      * @return A mxGraphComponent which draws the specified graphs
      */
-    mxGraphComponent getPanel();
+    JComponent getPanel();
 
     /**
      * Returns the node located at the specified point.
@@ -104,7 +105,12 @@ public interface DrawingLibraryInterface<V, E> {
      * @param nodes : the nodes to be set as selected
      */
     void setSelectedNodes(List<V> nodes);
-    
+
+    /**
+     * Gets the minimap component for the current graph
+     * @return
+     */
+    JComponent getGraphOutline();
 }
 
 /* EOF */

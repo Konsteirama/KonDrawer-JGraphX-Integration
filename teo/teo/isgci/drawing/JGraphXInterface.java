@@ -25,12 +25,16 @@ import java.util.Collection;
 import java.util.List;
 
 import javax.imageio.ImageIO;
+import javax.swing.JComponent;
 import javax.swing.JScrollBar;
 import javax.swing.SwingUtilities;
 import javax.xml.transform.TransformerConfigurationException;
 
+import com.mxgraph.model.mxICell;
+import com.mxgraph.swing.mxGraphOutline;
 import net.sf.epsgraphics.ColorMode;
 import net.sf.epsgraphics.EpsGraphics;
+
 
 import org.jgrapht.Graph;
 import org.jgrapht.ext.GraphMLExporter;
@@ -38,7 +42,6 @@ import org.xml.sax.SAXException;
 
 import com.mxgraph.canvas.mxICanvas;
 import com.mxgraph.canvas.mxSvgCanvas;
-import com.mxgraph.model.mxCell;
 import com.mxgraph.swing.mxGraphComponent;
 import com.mxgraph.util.mxCellRenderer;
 import com.mxgraph.util.mxCellRenderer.CanvasFactory;
@@ -59,6 +62,11 @@ class JGraphXInterface<V, E> implements DrawingLibraryInterface<V, E> {
 
     /** The actual canvas. */
     private mxGraphComponent graphComponent;
+
+    /**
+     * The minimap component
+     */
+    private mxGraphOutline graphOutline;
     
     /** An interface to manipulate the canvas. */
     private GraphManipulation<V, E> graphManipulation;
@@ -96,12 +104,14 @@ class JGraphXInterface<V, E> implements DrawingLibraryInterface<V, E> {
                     return false;
                 }
 
-                mxCell cell = (mxCell) getCellAt(event.getX(), event.getY());
+                mxICell cell = (mxICell) getCellAt(event.getX(), event.getY());
 
                 return cell == null || cell.isEdge();
             }
         };
         graphComponent.setToolTips(true);
+
+        graphOutline = new mxGraphOutline(graphComponent);
 
         graphManipulation =
                 new GraphManipulation<V, E>(graphComponent);
@@ -396,7 +406,7 @@ class JGraphXInterface<V, E> implements DrawingLibraryInterface<V, E> {
     }
 
     @Override
-    public final mxGraphComponent getPanel() {
+    public final JComponent getPanel() {
         return graphComponent;
     }
 
@@ -408,7 +418,7 @@ class JGraphXInterface<V, E> implements DrawingLibraryInterface<V, E> {
      */
     @Override
     public V getNodeAt(Point p) {
-        mxCell cell = (mxCell) graphComponent.getCellAt((int) p.getX(),
+        mxICell cell = (mxICell) graphComponent.getCellAt((int) p.getX(),
                 (int) p.getY());
         if (cell != null && cell.isVertex()) {
             return graphAdapter.getCellToVertexMap().get(cell);
@@ -425,7 +435,7 @@ class JGraphXInterface<V, E> implements DrawingLibraryInterface<V, E> {
      */
     @Override
     public E getEdgeAt(Point p) {
-        mxCell cell = (mxCell) graphComponent.getCellAt((int) p.getX(),
+        mxICell cell = (mxICell) graphComponent.getCellAt((int) p.getX(),
                 (int) p.getY());
         if (cell != null && cell.isEdge()) {
             return graphAdapter.getCellToEdgeMap().get(cell);
@@ -491,6 +501,11 @@ class JGraphXInterface<V, E> implements DrawingLibraryInterface<V, E> {
         }
 
         graphAdapter.setSelectionCells(col);
+    }
+
+    public JComponent getGraphOutline()
+    {
+       return graphOutline;
     }
 }
 
