@@ -75,7 +75,7 @@ public class ExportDialog extends JDialog implements ActionListener {
         Box buttonBox = new Box(BoxLayout.X_AXIS);
 
         cardPanel = new JPanel();
-        cardPanel.setBorder(new EmptyBorder(new Insets(5, 10, 5, 10))); 
+        cardPanel.setBorder(new EmptyBorder(new Insets(5, 10, 5, 10)));
 
         cardLayout = new CardLayout(); 
         cardPanel.setLayout(cardLayout);
@@ -94,7 +94,7 @@ public class ExportDialog extends JDialog implements ActionListener {
         buttonPanel.setLayout(new BorderLayout());
         buttonPanel.add(new JSeparator(), BorderLayout.NORTH);
 
-        buttonBox.setBorder(new EmptyBorder(new Insets(5, 10, 5, 10))); 
+        buttonBox.setBorder(new EmptyBorder(new Insets(5, 10, 5, 10)));
         buttonBox.add(backButton);
         buttonBox.add(Box.createHorizontalStrut(10));
         buttonBox.add(nextButton);
@@ -108,8 +108,8 @@ public class ExportDialog extends JDialog implements ActionListener {
         title.setOpaque(true);
         title.setBackground(Color.darkGray);
         title.setForeground(Color.white);
-        title.setBorder(new EmptyBorder(new Insets(10,10,10,10)));
-        cardPanel.setBorder(new EmptyBorder(new Insets(5,40,5,40)));
+        title.setBorder(new EmptyBorder(new Insets(10, 10, 10, 10)));
+        cardPanel.setBorder(new EmptyBorder(new Insets(5, 40, 5, 40)));
         content.add(title, BorderLayout.NORTH);
         content.add(buttonPanel, BorderLayout.SOUTH);
         content.add(cardPanel, BorderLayout.CENTER);
@@ -140,7 +140,7 @@ public class ExportDialog extends JDialog implements ActionListener {
     /**
      * Return the card where the user can select the file format.
      */
-    private Component cardFormat() {        
+    private Component cardFormat() {
         Box box = new Box(BoxLayout.Y_AXIS);
 
         formats = new ButtonGroup();
@@ -159,31 +159,31 @@ public class ExportDialog extends JDialog implements ActionListener {
             // adding description
             if (format.equals("ps") || format.equals("eps")) {
                 box.add(explText(
-                    "A Postscript file can be included immediately in e.g. LaTeX\n"+
-                    "documents, but it cannot easily be edited."));
+              "A Postscript file can be included immediately in e.g. LaTeX\n"
+              + "documents, but it cannot easily be edited."));
             } else if (format.equals("svg")) {
                 box.add(explText(
-                    "An SVG file is suitable for editing the diagram, e.g. with\n"+
-                    "inkscape (http://www.inkscape.org), but cannot be included\n"+
-                    "directly in LaTeX."));                
+           "An SVG file is suitable for editing the diagram, e.g. with\n"
+           + "inkscape (http://www.inkscape.org), but cannot be included\n"
+           + "directly in LaTeX."));                
             } else if (format.equals("graphml")) {
                 box.add(explText(
-                    "A graphml file contains the structure of the graph and is\n"+
-                    "suitable for processing by many graph tools, but does not\n"+
-                    "contain layout information and cannot be included directly\n"+
-                    "in LaTeX. Editing and laying out can be done with e.g. yEd.\n"+
-                    "(http://www.yworks.com)"));                
+           "A graphml file contains the structure of the graph and is\n"
+           + "suitable for processing by many graph tools, but does not\n"
+           + "contain layout information and cannot be included directly\n"
+           + "in LaTeX. Editing and laying out can be done with e.g. yEd.\n"
+           + "(http://www.yworks.com)"));                
             } else if (format.equals("jpg")) {
                 box.add(explText(
-                    "A JPG file is one of the current standard file formats for\n" + 
-                    "images. It can be viewed and processed on nearly any device\n" + 
-                    "or any image-processing application. It is more comprimated\n"+
-                    "than the PNG format."));                
+           "A JPG file is one of the current standard file formats for\n" 
+           + "images. It can be viewed and processed on nearly any device\n" 
+           + "or any image-processing application. It is more comprimated\n"
+           + "than the PNG format."));                
             } else if (format.equals("png")) {
                 box.add(explText(
-                    "A PNG file is one of the current standard file formats for\n" + 
-                    "images. It can be viewed and processed on nearly any device\n" + 
-                    "or any image-processing application. It can be transparent.\n"));
+           "A PNG file is one of the current standard file formats for\n" 
+           + "images. It can be viewed and processed on nearly any device\n" 
+           + "or any image-processing application. It can be transparent.\n"));
             }
         }
 
@@ -222,20 +222,24 @@ public class ExportDialog extends JDialog implements ActionListener {
         dispose();
     }
 
+    @Override
     public void actionPerformed(ActionEvent e) {
         Object source = e.getSource();
-        if (source == cancelButton)
+        if (source == cancelButton) {
             closeDialog();
-        else if (source == nextButton) {
-            if (current == CARD_FORMAT)
+        } else if (source == nextButton) {
+            if (current == CARD_FORMAT) {
                 showCard(CARD_FILE);
+            }
         } else if (source == backButton) {
                 showCard(CARD_FORMAT);
         } else if (e.getActionCommand() == JFileChooser.APPROVE_SELECTION) {
-            if (export())
+            if (export()) {
                 closeDialog();
-        } else if (e.getActionCommand()== JFileChooser.CANCEL_SELECTION)
+            }
+        } else if (e.getActionCommand() == JFileChooser.CANCEL_SELECTION) {
             closeDialog();
+        }
     }
 
     /**
@@ -249,6 +253,7 @@ public class ExportDialog extends JDialog implements ActionListener {
             = parent.getTabbedPane().getActiveDrawingLibraryInterface();
         String chosenFormat = "";
         Enumeration<AbstractButton> buttons = formats.getElements();
+        
         for (int i = 0; i < formats.getButtonCount(); i++) {
             if (buttons.nextElement().getModel()
                     .equals(formats.getSelection())) {
@@ -264,8 +269,8 @@ public class ExportDialog extends JDialog implements ActionListener {
                         , file.getSelectedFile().getPath()  
                         + "." + chosenFormat);
             } else {
-                drawInterface.export(chosenFormat
-                        , file.getSelectedFile().getPath());
+                drawInterface.export(chosenFormat, 
+                        file.getSelectedFile().getPath());
             }
         } catch (Exception e) {
             res = false;
