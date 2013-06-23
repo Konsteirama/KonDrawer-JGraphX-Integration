@@ -97,33 +97,23 @@ public class ISGCITabComponent extends JPanel {
         // make background transparent
         label.setBackground(new Color(0, 0, 0, 0));
         
-        // eat up clicks to prevent nullpointerexceptions
+        // prevent nullpointerexceptions
         label.addMouseListener(new MouseListener() {
             
             @Override
-            public void mouseReleased(MouseEvent e) {
-                e.consume();
-            }
+            public void mouseReleased(MouseEvent e) { }
             
             @Override
-            public void mousePressed(MouseEvent e) {
-                e.consume();
-            }
+            public void mousePressed(MouseEvent e) { }
             
             @Override
-            public void mouseExited(MouseEvent e) {
-                e.consume();
-            }
+            public void mouseExited(MouseEvent e) { }
             
             @Override
-            public void mouseEntered(MouseEvent e) {
-                e.consume();
-            }
+            public void mouseEntered(MouseEvent e) { }
             
             @Override
-            public void mouseClicked(MouseEvent e) {
-                e.consume();
-            }
+            public void mouseClicked(MouseEvent e) { }
         });
         
         add(label);
