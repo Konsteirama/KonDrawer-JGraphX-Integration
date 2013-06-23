@@ -394,6 +394,9 @@ public class ISGCITabbedPane extends JTabbedPane implements Updatable {
                 && getTabComponentAt(getSelectedIndex()) != addTabComponent) {
             panelToNamingPref.put((JComponent) getSelectedComponent(), pref);
             applyNamingPref(getSelectedComponent());
+            
+           getActiveDrawingLibraryInterface().getGraphManipulationInterface().
+               reapplyHierarchicalLayout();
         }
     }
     
