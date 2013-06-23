@@ -200,17 +200,23 @@ public class GraphClassInformationDialog extends JDialog
         classButton.setToolTipText("Show more information about this " 
                      + "graphclass");
         okPanel.add(classButton);
+        
         inclButton = new JButton("Inclusion info");
         inclButton.setToolTipText("Show inclusions of selected "
-         + "graphclasses; needs two classes to be selected");
+         + "graphclasses; needs a class from the lower listbox "
+         + "to be selected!");
+        inclButton.setEnabled(false);
         okPanel.add(inclButton);
+        
         drawButton = new JButton("Draw");
         drawButton.setToolTipText("Draw this graphclass and its "
     + "subclasses/superclasses; opens a dialogue");
         okPanel.add(drawButton);
+        
         okButton = new JButton("Close");
         okButton.setToolTipText("Close this dialogue");
         okPanel.add(okButton);
+        
         c.weighty = 0.0;
         c.insets = new Insets(5, 0, 0, 0);
         c.gridwidth = GridBagConstraints.REMAINDER;
@@ -232,6 +238,9 @@ public class GraphClassInformationDialog extends JDialog
         okButton.addActionListener(this);
         drawButton.addActionListener(this);
         classesList.addListSelectionListener(this);
+        supClassesList.addListSelectionListener(this);
+        subClassesList.addListSelectionListener(this);
+        equClassesList.addListSelectionListener(this);
         supClassesList.addMouseListener(mouseAdapter);
         equClassesList.addMouseListener(mouseAdapter);
         subClassesList.addMouseListener(mouseAdapter);
@@ -312,10 +321,18 @@ public class GraphClassInformationDialog extends JDialog
         if (e.getValueIsAdjusting()) {
             return;
         }
-        if (e.getSource() == classesList) {
-            ;
-        }
+         // subClassesList, supClassesList, equClassesList;
+        if (e.getSource() == subClassesList) {
+            inclButton.setEnabled(true);
+        } else if (e.getSource() == supClassesList) {
+            inclButton.setEnabled(true);
+        } else if (e.getSource() == equClassesList) {
+            inclButton.setEnabled(true);
+        } else if (e.getSource() == classesList
+                && classesList.getSelectedNode() != null) {
             showNode(classesList.getSelectedNode());
+            inclButton.setEnabled(false);
+        }
     }
 
 
