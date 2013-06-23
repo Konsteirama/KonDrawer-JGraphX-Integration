@@ -52,13 +52,20 @@ class GraphManipulation<V, E> implements GraphManipulationInterface<V, E> {
     
     /** Defines the thickness for highlighting. */
     private static final String HILIGHTTHICKNESS = "2";
+
+    private boolean recordUndoableActions = true;
     
     protected mxIEventListener undoHandler = new mxIEventListener() {
         public void invoke(Object source, mxEventObject evt) {
+            if(recordUndoableActions)
+            {
             undoManager.undoableEditHappened((mxUndoableEdit) evt
                     .getProperty("edit"));
+            }
         }
     };
+
+
     /**
      * GraphComponent is the panel the graph is drawn in.
      */
@@ -353,6 +360,22 @@ class GraphManipulation<V, E> implements GraphManipulationInterface<V, E> {
         } finally {
             endUpdate();
         }
+    }
+
+    /**
+     * Starts the recording of actions to the undo history.
+     */
+    @Override
+    public void endNotUndoable() {
+        recordUndoableActions = true;
+    }
+
+    /**
+     * Stops the recording of actions to the undo history.
+     */
+    @Override
+    public void beginNotUndoable() {
+        recordUndoableActions = false;
     }
 
     @Override

@@ -171,6 +171,16 @@ public interface GraphManipulationInterface<V, E> {
      * Call to end and execute a block of updates.
      */
     void endUpdate();
+
+    /**
+     * Stops the recording of actions to the undo history.
+     */
+    void beginNotUndoable();
+
+    /**
+     * Starts the recording of actions to the undo history.
+     */
+    void endNotUndoable();
 }
 
 /* EOF */
