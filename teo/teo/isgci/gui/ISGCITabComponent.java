@@ -96,6 +96,36 @@ public class ISGCITabComponent extends JPanel {
         LatexLabel label = new LatexLabel(name);
         // make background transparent
         label.setBackground(new Color(0, 0, 0, 0));
+        
+        // eat up clicks to prevent nullpointerexceptions
+        label.addMouseListener(new MouseListener() {
+            
+            @Override
+            public void mouseReleased(MouseEvent e) {
+                e.consume();
+            }
+            
+            @Override
+            public void mousePressed(MouseEvent e) {
+                e.consume();
+            }
+            
+            @Override
+            public void mouseExited(MouseEvent e) {
+                e.consume();
+            }
+            
+            @Override
+            public void mouseEntered(MouseEvent e) {
+                e.consume();
+            }
+            
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                e.consume();
+            }
+        });
+        
         add(label);
         
         // add more space between the label and the button
