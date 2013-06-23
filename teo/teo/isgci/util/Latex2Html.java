@@ -31,11 +31,18 @@ public final class Latex2Html extends Latex {
      */
     private static final String OVERLINE = "&#x305;";
     
+    /** Starting tags. */
+    private static final String START_TAGS 
+                        = "<html><div style=\"padding:5px\">";
+    
+    /** Closing tags. */
+    private static final String CLOSING_TAGS = "</div></html>";
+    
     /**
      * Indicates whether parser is in overline/co mode so _6 will not be drawn
      * with a bar over the 6.
      */
-    private static boolean isInOverline;
+    private boolean isInOverline;
     
     /**
      * Create a new latex->html converter. Private because of singleton
@@ -61,7 +68,11 @@ public final class Latex2Html extends Latex {
      */
     public String html(String s) {
         HtmlState state = new HtmlState(s);
+        
+        state.target.append(START_TAGS); 
         drawLatexPart(state, true);
+        state.target.append(CLOSING_TAGS);
+        
         return state.target.toString();
     }
     
@@ -119,15 +130,14 @@ public final class Latex2Html extends Latex {
             String relativePath 
              = getClass().getResource(IMGPATH + g.getImageName()).toString();
             
-            t.append(
-                "<img src=\"");
+            t.append("<img src=\"");
             t.append(relativePath);
             t.append("\" alt=\"");
             t.append(g.getName());
             t.append("\"/>");
         }
     }
-
+    
     protected class HtmlState extends Latex.State {
         protected StringBuffer target;
 
