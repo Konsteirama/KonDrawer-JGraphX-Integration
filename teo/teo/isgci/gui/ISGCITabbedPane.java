@@ -13,8 +13,11 @@
 
 package teo.isgci.gui;
 
+import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
+import java.awt.event.ComponentEvent;
+import java.awt.event.ComponentListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.ArrayList;
@@ -24,6 +27,7 @@ import java.util.Set;
 
 import javax.swing.JComponent;
 import javax.swing.JDialog;
+import javax.swing.JLayeredPane;
 import javax.swing.JPanel;
 import javax.swing.JTabbedPane;
 import javax.swing.event.ChangeEvent;
@@ -283,23 +287,75 @@ public class ISGCITabbedPane extends JTabbedPane implements Updatable {
         DrawingLibraryInterface<V, E> drawingInterface = 
                 DrawingLibraryFactory.createNewInterface(graph);
 
-        JComponent panel = drawingInterface.getPanel();
-        addTab("", panel);
+        final JComponent graphPanel = drawingInterface.getPanel();
+        
+        final JComponent graphOutline = drawingInterface.getGraphOutline(); 
+        
+        // layers
+        JLayeredPane layeredPane = new JLayeredPane();
+        layeredPane.add(graphOutline, new Integer(2));
+        layeredPane.add(graphPanel, new Integer(1));
+        
+        
+        // layeredpane has no layoutmanager and doesn't really work with one
+        final int offset = 20;
+        final double outlineFactor = 0.2;
+        
+        graphPanel.setBounds(0, 0, getWidth(), 
+                getHeight() - this.getTabComponentAt(0).getHeight() - offset);
+        graphOutline.setBounds(0, 0, 0, 0);
+        
+        layeredPane.addComponentListener(new ComponentListener() {
+            
+            @Override
+            public void componentShown(ComponentEvent e) { setSize(e); }
+            
+            @Override
+            public void componentResized(ComponentEvent e) { setSize(e); }
+            
+            @Override
+            public void componentMoved(ComponentEvent e) { setSize(e); }
+            
+            @Override
+            public void componentHidden(ComponentEvent e) { setSize(e); }
+            
+            /** Sets the size. @param e The event */
+            private void setSize(ComponentEvent e) {
+                graphPanel.setBounds(0, 0, e.getComponent().getWidth(), 
+                        e.getComponent().getHeight());
+                
+                int outlineWidth = (int) (outlineFactor 
+                        * e.getComponent().getWidth());
+                
+                int outlineHeight = (int) (outlineFactor 
+                        * e.getComponent().getHeight());
+                
+                graphOutline.setBounds(
+                        e.getComponent().getWidth() - offset - outlineWidth, 
+                        e.getComponent().getHeight() - offset - outlineHeight, 
+                        outlineWidth, outlineHeight);
+            }
+        });
+        
+        JPanel tabPanel = new JPanel(new BorderLayout());
+        tabPanel.add(layeredPane, BorderLayout.CENTER);
+        
+        addTab("", tabPanel);
         ISGCITabComponent tabComponent = new ISGCITabComponent(this, name);
         
         // set tabcomponent as .. tabcomponent
-        setSelectedComponent(panel);
+        setSelectedComponent(tabPanel);
         setTabComponentAt(getSelectedIndex(), tabComponent);
         
         drawingInterface.getGraphEventInterface().
                 registerMouseAdapter(mouseAdapter);
          
-        panelToInterfaceMap.put(panel, drawingInterface);
-        panelToNamingPref.put(panel, defaultMode);
+        panelToInterfaceMap.put(tabPanel, drawingInterface);
+        panelToNamingPref.put(tabPanel, defaultMode);
         
         setProperness();
-        setProblem(null, panel);
-        applyNamingPref(panel);
+        setProblem(null, tabPanel);
+        applyNamingPref(tabPanel);
 
         addTabComponent.resetTabPosition();
         mainframe.closeDialogs();
