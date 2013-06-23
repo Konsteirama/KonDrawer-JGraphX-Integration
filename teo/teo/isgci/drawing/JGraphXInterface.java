@@ -71,12 +71,6 @@ class JGraphXInterface<V, E> implements DrawingLibraryInterface<V, E> {
      *  and vice versa.
      */
     private JGraphXAdapter<V, E> graphAdapter;
-    
-    /** The default font size for a latexlabel. */
-    public static final int DEFAULT_FONT_SIZE = 12;
-    
-    /** The Max-Height-Width for the eps export. */
-    public static final float EPS_MAX_HEIGHT_WIDTH = 16384f;
 
     /**
      * The constructor for JGraphXInterface.
@@ -189,7 +183,7 @@ class JGraphXInterface<V, E> implements DrawingLibraryInterface<V, E> {
     /**
      * Exports the current graph.
      *
-     * @param format The actual format (.ps, .svg, .graphml)
+     * @param format The actual format (.ps, .svg, .graphml, .jpg, .png)
      * @param path   The path where the graph will be exported to
      */
     @Override
@@ -208,8 +202,7 @@ class JGraphXInterface<V, E> implements DrawingLibraryInterface<V, E> {
     }
 
     /**
-     * Exports the canvas as an eps under the given path, by converting an
-     * existing .svg representation of it.
+     * Exports the canvas as an eps under the given path.
      *
      * @param path The path where the .eps file will be saved to
      */
@@ -220,11 +213,12 @@ class JGraphXInterface<V, E> implements DrawingLibraryInterface<V, E> {
         EpsGraphics g;
         
         try {
+            // Creates a new file and the graphics object
             out = new FileOutputStream(new File(path));
-            
             g = new EpsGraphics("Test", out, 0, 0, (int) d.getWidth(), 
                     (int) d.getHeight(), ColorMode.COLOR_RGB);
             
+            // Paints the graphic object
             graphComponent.getGraphControl().paint(g);
             
             g.finalize();
