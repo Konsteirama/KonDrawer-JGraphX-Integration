@@ -104,7 +104,10 @@ public class ISGCITabComponent extends JPanel {
             public void mouseReleased(MouseEvent e) { }
             
             @Override
-            public void mousePressed(MouseEvent e) { }
+            public void mousePressed(MouseEvent e) {
+                int i = parent.indexOfTabComponent(ISGCITabComponent.this);
+                parent.setSelectedIndex(i);
+            }
             
             @Override
             public void mouseExited(MouseEvent e) { }
@@ -142,7 +145,7 @@ public class ISGCITabComponent extends JPanel {
         public TabButton() {
             final int size = 17;
             setPreferredSize(new Dimension(size, size));
-            setToolTipText("close this tab");
+            setToolTipText("Close this tab");
             // Make the button looks the same for all Laf's
             setUI(new BasicButtonUI());
             // Make it transparent
