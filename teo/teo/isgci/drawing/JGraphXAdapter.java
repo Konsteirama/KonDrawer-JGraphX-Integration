@@ -22,7 +22,10 @@ import org.jgrapht.event.GraphVertexChangeEvent;
 import org.jgrapht.graph.DefaultEdge;
 
 import teo.isgci.gc.GraphClass;
+import teo.isgci.problem.Complexity;
+import teo.isgci.problem.Problem;
 import teo.isgci.util.Latex2Html;
+import teo.isgci.util.UserSettings;
 
 import com.mxgraph.model.mxCell;
 import com.mxgraph.model.mxICell;
@@ -331,6 +334,7 @@ public class JGraphXAdapter<V, E> extends mxGraph implements
         String returnValue = "";
         if (cell instanceof mxICell) {
             if (((mxICell) cell).isEdge() && cellToEdgeMap.containsKey(cell)) {
+            // cell is an edge
                 E edge = cellToEdgeMap.get(cell);
                 V source = graphT.getEdgeSource(edge);
                 V target = graphT.getEdgeTarget(edge);
@@ -340,14 +344,23 @@ public class JGraphXAdapter<V, E> extends mxGraph implements
                     returnValue += ((Set) target).iterator().next().toString();
                 }
             } else if (cellToVertexMap.containsKey(cell)) {
+            // cell is a vertex
                 V node = cellToVertexMap.get(cell);
                 if (node instanceof Set) {
                     Set<GraphClass> n = (Set<GraphClass>) node;
                     for (GraphClass graphClass : n) {
                         returnValue += graphClass.toString() + "<br>";
                     }
+                    Problem problem = UserSettings.getProblem();
+                    if (problem != null) {
+                        Complexity complexity = 
+                                problem.getComplexity(n.iterator().next());
+                        returnValue += "<br> <br>" + problem.toString() 
+                                    + ": " + complexity.toString();
+                    }
                 }
             } else {
+            // cell is neither edge nor vertex
                 returnValue += super.getToolTipForCell(cell);
             }
         }
