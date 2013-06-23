@@ -12,13 +12,19 @@ package teo.isgci.drawing;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Set;
 
 import org.jgrapht.Graph;
 import org.jgrapht.ListenableGraph;
 import org.jgrapht.event.GraphEdgeChangeEvent;
 import org.jgrapht.event.GraphListener;
 import org.jgrapht.event.GraphVertexChangeEvent;
+import org.jgrapht.graph.DefaultEdge;
 
+import teo.isgci.gc.GraphClass;
+import teo.isgci.util.Latex2Html;
+
+import com.mxgraph.model.mxCell;
 import com.mxgraph.model.mxICell;
 import com.mxgraph.view.mxGraph;
 /**
@@ -322,8 +328,32 @@ public class JGraphXAdapter<V, E> extends mxGraph implements
     
     @Override
     public String getToolTipForCell(Object cell) {
-        //TODO rework to show actual tooltip
-        return super.getToolTipForCell(cell);
+        String returnValue = "";
+        if (cell instanceof mxICell) {
+            if (((mxICell) cell).isEdge() && cellToEdgeMap.containsKey(cell)) {
+                E edge = cellToEdgeMap.get(cell);
+                V source = graphT.getEdgeSource(edge);
+                V target = graphT.getEdgeTarget(edge);
+                if (source instanceof Set && target instanceof Set) {
+                    returnValue += ((Set) source).iterator().next().toString();
+                    returnValue += "->";
+                    returnValue += ((Set) target).iterator().next().toString();
+                }
+            } else if (cellToVertexMap.containsKey(cell)) {
+                V node = cellToVertexMap.get(cell);
+                if (node instanceof Set) {
+                    Set<GraphClass> n = (Set<GraphClass>) node;
+                    for (GraphClass graphClass : n) {
+                        returnValue += graphClass.toString() + "<br>";
+                    }
+                }
+            } else {
+                returnValue += super.getToolTipForCell(cell);
+            }
+        }
+        return "<html>" + Latex2Html.getInstance()
+                .html(returnValue) + "</html>";
+//        return super.getToolTipForCell(cell);
     }
 }
 
