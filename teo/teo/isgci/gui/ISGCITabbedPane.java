@@ -123,12 +123,12 @@ public class ISGCITabbedPane extends JTabbedPane implements Updatable {
     private ChangeListener changeListener = new ChangeListener() {
         public void stateChanged(ChangeEvent changeEvent) {
 
+            UserSettings.setActiveTab((JComponent) getSelectedComponent());
             if (!startpageActive && getSelectedIndex() >= 0) {
                 mainframe.setDrawUnproper(
                         getDrawUnproper(getSelectedComponent()));
-                mainframe.setColorProblem(getProblem(getSelectedComponent()));
+                mainframe.setColorProblem(UserSettings.getProblem());
             }
-            UserSettings.setActiveTab((JComponent) getSelectedComponent());
         }
     };
     

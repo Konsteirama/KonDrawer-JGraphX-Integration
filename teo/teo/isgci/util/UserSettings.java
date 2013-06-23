@@ -93,10 +93,8 @@ public abstract class UserSettings {
      *            the problem for the active tab
      */
     public static void setProblem(Problem problem) {
-        if (problem != null) {
-            panelToProblem.put(activeTab, problem);
-            updateSettings();
-        }
+        panelToProblem.put(activeTab, problem);
+        updateSettings();
     }
     
     /**
