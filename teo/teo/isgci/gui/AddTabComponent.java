@@ -104,8 +104,7 @@ public class AddTabComponent extends JPanel {
     }
     
     public void addTab(){
-        ((ISGCITabbedPane) parent).drawInNewTab(
-                new DefaultDirectedGraph(DefaultEdge.class), "Empty Tab");
+        ((ISGCITabbedPane) parent).addStartpage();
         resetTabPosition();
     }
     

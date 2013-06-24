@@ -65,16 +65,6 @@ public class ISGCITabbedPane extends JTabbedPane implements Updatable {
     private static final long serialVersionUID = 3L;
 
     /**
-     * Indicates whether the startpage is currently a tab in the tabbedpane.
-     */
-    private boolean startpageActive = false;
-    
-    /**
-     * The startpage that is displayed upon start of the window. 
-     */
-    private StartPanel startpage;
-
-    /**
      * Maps the content of the tabs to their corresponding
      * DrawingLibraryInterface.
      */
@@ -128,7 +118,8 @@ public class ISGCITabbedPane extends JTabbedPane implements Updatable {
         public void stateChanged(ChangeEvent changeEvent) {
 
             UserSettings.setActiveTab((JComponent) getSelectedComponent());
-            if (!startpageActive && getSelectedIndex() >= 0) {
+            if (!(getSelectedComponent() instanceof StartPanel) 
+                    && getSelectedIndex() >= 0) {
                 mainframe.setDrawUnproper(
                         getDrawUnproper(getSelectedComponent()));
                 mainframe.setColorProblem(UserSettings.getProblem());
@@ -151,11 +142,16 @@ public class ISGCITabbedPane extends JTabbedPane implements Updatable {
             }            
         };
         
-        @Override
+        @Override            
         public void mouseClicked(MouseEvent e) {  
             
             DrawingLibraryInterface drawLib 
                 = getActiveDrawingLibraryInterface();
+            // if no drawing library is active do nothing
+            if (drawLib == null) {
+                return;
+            }
+            
             GraphManipulationInterface manipulationInterface =
                     drawLib.getGraphManipulationInterface();
             
@@ -180,7 +176,7 @@ public class ISGCITabbedPane extends JTabbedPane implements Updatable {
                     nodePopup.setNode((Set<GraphClass>) node);
                     nodePopup.show(e.getComponent(), e.getX(), e.getY());
                     
-                } else if (edge != null){
+                } else if (edge != null) {
                     edgePopup = new EdgePopup(mainframe);
                     edgePopup.setEdge((DefaultEdge) edge);
                     edgePopup.show(e.getComponent(), e.getX(), e.getY());
@@ -224,7 +220,7 @@ public class ISGCITabbedPane extends JTabbedPane implements Updatable {
         setSelectedComponent(addTabTab);
         addTabComponent = new AddTabComponent(this);
         setTabComponentAt(getSelectedIndex(), addTabComponent);
-        setSelectedComponent(startpage);
+        setSelectedIndex(0);
         
         addMouseListener(mouseAdapter);
         addChangeListener(changeListener);
@@ -232,17 +228,10 @@ public class ISGCITabbedPane extends JTabbedPane implements Updatable {
     }
 
     /**
-     * Adds a Startpage to the ISGCITabbedPane. Should only be called in the
-     * Constructor.
+     * Adds a Startpage to the ISGCITabbedPane.
      */
     public void addStartpage() {
-        if (startpageActive) {
-            return;
-        }
-        
-        startpageActive = true;
-        
-        startpage = new StartPanel(mainframe);
+        StartPanel startpage = new StartPanel(mainframe);
         addTab("", startpage);
         setSelectedComponent(startpage);
         ISGCITabComponent closeButton 
@@ -258,9 +247,10 @@ public class ISGCITabbedPane extends JTabbedPane implements Updatable {
     /**
      * Removes the startpage from the ISGCITabbedPane.
      */
-    public void removeStartpage() {
-        remove(startpage);
-        startpageActive = false;
+    private void removeStartpage() {
+        if (getSelectedComponent() instanceof StartPanel) {
+            remove(getSelectedComponent());
+        }
     }
     
     /**
@@ -277,7 +267,7 @@ public class ISGCITabbedPane extends JTabbedPane implements Updatable {
      *          The name of the Tab
      */
     public <V, E> void drawInNewTab(Graph<V, E> graph, String name) {
-        if (startpageActive) {
+        if (getSelectedComponent() instanceof StartPanel) {
             removeStartpage();
         }        
         
@@ -383,7 +373,8 @@ public class ISGCITabbedPane extends JTabbedPane implements Updatable {
      *          The name of the Tab
      */
     public <V, E> void drawInActiveTab(Graph<V, E> graph, String name) {
-        if (startpageActive || getSelectedComponent() == null) {
+        if (getSelectedComponent() instanceof StartPanel 
+                || getSelectedComponent() == null) {
             drawInNewTab(graph, name);
         } else {
             if (getTabCount() == 1) {
@@ -537,7 +528,8 @@ public class ISGCITabbedPane extends JTabbedPane implements Updatable {
      */
     private void setProblem(Problem problem, Component c) {
         
-        if (startpageActive || !panelToInterfaceMap.containsKey(c)) { 
+        if (getSelectedComponent() instanceof StartPanel  
+                || !panelToInterfaceMap.containsKey(c)) { 
             return; 
         }        
         Graph graph = panelToInterfaceMap.get(c).getGraph();
@@ -631,7 +623,8 @@ public class ISGCITabbedPane extends JTabbedPane implements Updatable {
      * state.
      */
     private void setProperness() {
-        if (startpageActive || getActiveDrawingLibraryInterface() == null) {
+        if (getSelectedComponent() instanceof StartPanel  
+                || getActiveDrawingLibraryInterface() == null) {
             return; }
         Graph graph = getActiveDrawingLibraryInterface().getGraph();
         List<DefaultEdge> markEdges = new ArrayList<DefaultEdge>();

@@ -168,14 +168,7 @@ public class ISGCITabComponent extends JPanel {
             
             
             if (i != -1) {
-                // if the active tab is the startpage, notify the
-                // isgcitabbedpane about it
-                if (parent.getComponentAt(i) instanceof StartPanel
-                        && parent instanceof ISGCITabbedPane) {
-                    ((ISGCITabbedPane) parent).removeStartpage();
-                } else { // or just remove the tab
-                    parent.remove(i);
-                }
+                parent.remove(i);
             }
         }
 
