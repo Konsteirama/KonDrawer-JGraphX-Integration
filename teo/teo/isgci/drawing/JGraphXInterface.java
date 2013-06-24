@@ -142,6 +142,10 @@ class JGraphXInterface<V, E> implements DrawingLibraryInterface<V, E> {
         
         // change icon to grabbing hand if graph is panning
         new mxPanningHandler(graphComponent) {
+            private List<V> selectedNodes = new ArrayList<V>();
+            private long begin = 0;
+            private final long epsilon = 150;
+
             @Override
             public void mousePressed(MouseEvent e) {
                 try {
@@ -157,6 +161,9 @@ class JGraphXInterface<V, E> implements DrawingLibraryInterface<V, E> {
                 } catch (Exception ex) {
                     System.err.println("Unable to set cursor!");
                 }
+                selectedNodes = getSelectedNodes();
+                begin  = e.getWhen();
+                
                 super.mousePressed(e);
             }
 
@@ -164,8 +171,20 @@ class JGraphXInterface<V, E> implements DrawingLibraryInterface<V, E> {
             public void mouseReleased(MouseEvent e) {
                 graphComponent.getGraphControl().setCursor(
                         Cursor.getDefaultCursor());
+                /* if mouse was pressed longer than 150ms it's probably not a 
+                 * click and is handled as a panning action 
+                 */
+                if ((e.getWhen() - begin) > epsilon) {
+                    setSelectedNodes(selectedNodes);
+                }
+                
                 super.mouseReleased(e);
             }
+            
+//            @Override
+//            public void mouseClicked(MouseEvent e) {
+//                setSelectedNodes(selectedNodes);
+//            }
         };
         
     }
