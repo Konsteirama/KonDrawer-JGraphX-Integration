@@ -18,6 +18,7 @@ import java.awt.Image;
 import java.awt.Point;
 import java.awt.Toolkit;
 import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
 import java.awt.event.MouseWheelEvent;
 import java.awt.event.MouseWheelListener;
 import java.awt.image.BufferedImage;
@@ -186,6 +187,36 @@ class JGraphXInterface<V, E> implements DrawingLibraryInterface<V, E> {
                 }
             }
         });
+        
+        graphOutline.addMouseListener(new MouseListener() {
+            
+            @Override
+            public void mouseReleased(MouseEvent e) { 
+                graphManipulation.setMinimapVisibility(); 
+            }
+            
+            @Override
+            public void mousePressed(MouseEvent e) { 
+                graphManipulation.setMinimapVisibility(); 
+            }
+            
+            @Override
+            public void mouseExited(MouseEvent e) { 
+                graphManipulation.setMinimapVisibility(); 
+            }
+            
+            @Override
+            public void mouseEntered(MouseEvent e) { 
+                graphManipulation.setMinimapVisibility(); 
+            }
+            
+            @Override
+            public void mouseClicked(MouseEvent e) { 
+                graphManipulation.setMinimapVisibility(); 
+            }
+        });
+        
+        graphOutline.setOpaque(false);
     }
     
     /**

@@ -512,7 +512,7 @@ class GraphManipulation<V, E> implements GraphManipulationInterface<V, E> {
     /**
      * Checks if the minimap should be hidden and hides it if necessary.
      */
-    private void setMinimapVisibility() {
+    public void setMinimapVisibility() {
         mxGraphView view = graphComponent.getGraph().getView();
 
         int compLen = graphComponent.getWidth();
