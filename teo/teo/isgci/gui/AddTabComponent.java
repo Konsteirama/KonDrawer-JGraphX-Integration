@@ -82,9 +82,6 @@ public class AddTabComponent extends JPanel {
      * 
      * @param pane
      *          The parent.
-     * @param name
-     *          The name that will be next to the close button, compiled with
-     *          LaTeX.
      */
     public AddTabComponent(final JTabbedPane pane) {
         // unset default FlowLayout' gaps
@@ -102,12 +99,17 @@ public class AddTabComponent extends JPanel {
         // add more space to the top of the component
         setBorder(BorderFactory.createEmptyBorder(2, 0, 0, 0));
     }
-    
+    /**
+     * Adds a new tab with a startPanel in it.
+     */
     public void addTab(){
         ((ISGCITabbedPane) parent).addStartpage();
         resetTabPosition();
     }
     
+    /**
+     * Resets the position of this tab, so it is the last in the list.
+     */
     public void resetTabPosition(){
         int i = parent.indexOfTabComponent(AddTabComponent.this);
         if (i >= 0) {
