@@ -383,9 +383,10 @@ public class ISGCITabbedPane extends JTabbedPane implements Updatable {
         } else if (getSelectedComponent() instanceof StartPanel) {
             remove(getSelectedComponent());
             drawInNewTab(graph, name);
-        } else{
+        } else {
             
-            DrawingLibraryInterface dLib = getActiveDrawingLibraryInterface(); 
+            final DrawingLibraryInterface dLib 
+                = getActiveDrawingLibraryInterface(); 
             
             dLib.setGraph(graph);
             
@@ -396,8 +397,6 @@ public class ISGCITabbedPane extends JTabbedPane implements Updatable {
             setProblem(getProblem(getSelectedComponent()), 
                     getSelectedComponent());
             
-            dLib.getGraphManipulationInterface().reapplyHierarchicalLayout();
-            
             // set title
             ISGCITabComponent closeButton 
                 = new ISGCITabComponent(this, name);
@@ -405,7 +404,18 @@ public class ISGCITabbedPane extends JTabbedPane implements Updatable {
             setTabComponentAt(getSelectedIndex(), closeButton);
             applyNamingPref(getSelectedComponent());
             
-            dLib.getGraphManipulationInterface().endNotUndoable();
+            SwingUtilities.invokeLater(new Runnable() {
+                
+                @Override
+                public void run() {
+                    dLib.getGraphManipulationInterface()
+                            .reapplyHierarchicalLayout();
+
+                    dLib.getGraphManipulationInterface().endNotUndoable();
+
+                }
+            });
+            
             
             mainframe.closeDialogs();
         }
