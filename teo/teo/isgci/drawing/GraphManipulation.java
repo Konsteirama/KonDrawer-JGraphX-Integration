@@ -49,7 +49,7 @@ class GraphManipulation<V, E> implements GraphManipulationInterface<V, E> {
     /**
      * How far the user can zoom in.
      */
-    private static final double MAXZOOMLEVEL = 4;
+    private static final double MAXZOOMLEVEL = 8;
     /**
      * Defines the color that should be used for highlighting.
      */

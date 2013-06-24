@@ -175,7 +175,7 @@ class JGraphXInterface<V, E> implements DrawingLibraryInterface<V, E> {
      */
     private void setGraphOutline() {
 
-        graphOutline = new mxGraphOutline(graphComponent);
+        graphOutline = new ISGCImxGraphOutline(graphComponent);
         graphOutline.addMouseWheelListener(new MouseWheelListener() {
             
             @Override
