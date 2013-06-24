@@ -279,19 +279,36 @@ class StartPanel extends JPanel {
             @Override
             public void actionPerformed(ActionEvent e) {
                 // create robot on the screen where the parent is active
-                Robot mouseRobot = getRobot();
+                final Robot mouseRobot = getRobot();
                 
                 if (mouseRobot == null) {
                     return;
                 }
                 
-                // Click draw button
-                JComponent endButton = mainframe.getToolbar().getDrawButton();
-                moveMouseTo(mouseRobot, endButton);
                 
-                // click
-                mouseRobot.mousePress(InputEvent.BUTTON1_DOWN_MASK);
-                mouseRobot.mouseRelease(InputEvent.BUTTON1_DOWN_MASK);
+                // Open the graphMenu
+                final JMenu graphMenu = mainframe.getGraphMenu();
+                moveMouseTo(mouseRobot, graphMenu);
+                graphMenu.doClick(1);
+                mouseRobot.delay(CLICKDELAY);
+                
+                // let the ui build the dialog
+                SwingUtilities.invokeLater(new Runnable() {
+                    
+                    @Override
+                    public void run() {
+
+                        // Hover over the open-problem menuitem
+                        JMenuItem drawItem = mainframe.getDrawItem();
+                        
+                        moveMouseTo(mouseRobot, drawItem);
+                        
+                        // click
+                        mouseRobot.delay(CLICKDELAY);
+                        drawItem.doClick(1);
+                    }
+                });
+
                 
             }
         });
@@ -380,7 +397,7 @@ class StartPanel extends JPanel {
                     return;
                 }
                 
-                // Open the problemMenu
+                // Open the graphMenu
                 final JMenu graphMenu = mainframe.getGraphMenu();
                 moveMouseTo(mouseRobot, graphMenu);
                 graphMenu.doClick(1);

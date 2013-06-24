@@ -30,6 +30,9 @@ public final class IconButtonFactory {
     /** Filename for InformationIcon. */
     public static final String INFORMATION_ICON = "Information.gif";
     
+    /** Filename for HighlightIcon. */
+    public static final String HIGHLIGHT_ICON = "Highlight.gif";
+    
     /** Filename for NewIcon. */
     public static final String NEW_ICON = "New.gif";
     

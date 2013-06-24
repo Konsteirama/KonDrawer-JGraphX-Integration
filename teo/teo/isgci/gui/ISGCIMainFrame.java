@@ -88,7 +88,8 @@ public class ISGCIMainFrame extends JFrame implements WindowListener {
     private JMenu problemsMenu, graphMenu;
     
     /** Needed for startpanel animation. */
-    private JMenuItem miCheckInclusion, miOpenProblem, miGraphClassInformation;
+    private JMenuItem miCheckInclusion, miOpenProblem, miGraphClassInformation,
+                      miSelectGraphClasses;
     
     /** Indicates whether or not the graph should draw unproper edges. */
     private JMenuItem miDrawUnproper;
@@ -382,7 +383,7 @@ public class ISGCIMainFrame extends JFrame implements WindowListener {
             }
         });
         
-        JMenuItem miSelectGraphClasses = new JMenuItem("Draw...");
+        miSelectGraphClasses = new JMenuItem("Draw...");
         miSelectGraphClasses.addActionListener(new ActionListener() {
             
             @Override
@@ -662,7 +663,16 @@ public class ISGCIMainFrame extends JFrame implements WindowListener {
     public JMenuItem getGraphClassInformationItem() {
         return miGraphClassInformation;
     }
-
+    /**
+     * Getter for the menu for drawing graphs.
+     * @return
+     *          The menu for drawing graphs.
+     */
+    public JMenuItem getDrawItem() {
+        return miSelectGraphClasses;
+    }
+    
+    
     /**
      * Closes all dialogs to bring the graphtab to front.
      */
