@@ -30,6 +30,7 @@ import javax.swing.JDialog;
 import javax.swing.JLayeredPane;
 import javax.swing.JPanel;
 import javax.swing.JTabbedPane;
+import javax.swing.SwingUtilities;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
@@ -268,7 +269,7 @@ public class ISGCITabbedPane extends JTabbedPane implements Updatable {
      */
     public <V, E> void drawInNewTab(Graph<V, E> graph, String name) {       
         
-        DrawingLibraryInterface<V, E> drawingInterface = 
+        final DrawingLibraryInterface<V, E> drawingInterface = 
                 DrawingLibraryFactory.createNewInterface(graph);
 
         drawingInterface.getGraphManipulationInterface().beginNotUndoable();
@@ -342,10 +343,18 @@ public class ISGCITabbedPane extends JTabbedPane implements Updatable {
         setProblem(null, tabPanel);
         applyNamingPref(tabPanel);
 
-        drawingInterface.getGraphManipulationInterface()
-            .reapplyHierarchicalLayout();
-        
-        drawingInterface.getGraphManipulationInterface().endNotUndoable();
+        SwingUtilities.invokeLater(new Runnable() {
+            
+            @Override
+            public void run() {
+                drawingInterface.getGraphManipulationInterface()
+                        .reapplyHierarchicalLayout();
+
+                drawingInterface.getGraphManipulationInterface()
+                        .endNotUndoable();
+
+            }
+        });
         
         addTabComponent.resetTabPosition();
         mainframe.closeDialogs();
