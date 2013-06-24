@@ -180,11 +180,6 @@ class JGraphXInterface<V, E> implements DrawingLibraryInterface<V, E> {
                 
                 super.mouseReleased(e);
             }
-            
-//            @Override
-//            public void mouseClicked(MouseEvent e) {
-//                setSelectedNodes(selectedNodes);
-//            }
         };
         
     }
