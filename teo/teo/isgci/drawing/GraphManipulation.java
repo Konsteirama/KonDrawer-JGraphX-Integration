@@ -34,7 +34,6 @@ import com.mxgraph.util.mxUndoableEdit;
 import com.mxgraph.util.mxUtils;
 import com.mxgraph.view.mxGraph;
 import com.mxgraph.view.mxGraphView;
-import com.mxgraph.view.mxStylesheet;
 
 /**
  * This class implements the GraphManipulationInterface. It handles
@@ -47,18 +46,21 @@ import com.mxgraph.view.mxStylesheet;
  */
 class GraphManipulation<V, E> implements GraphManipulationInterface<V, E> {
 
+    /** How far the user can zoom in. */
+    private static final double MAXZOOMLEVEL = 4;
+    
     /** Defines the color that should be used for highlighting. */
     private static final Color HILIGHTCOLOR = new Color(0xFF, 0xAA, 0x00);
     
     /** Defines the thickness for highlighting. */
     private static final String HILIGHTTHICKNESS = "2";
 
+    /** Defines whether or not the undoHandler should record actions. */
     private boolean recordUndoableActions = true;
     
     protected mxIEventListener undoHandler = new mxIEventListener() {
         public void invoke(Object source, mxEventObject evt) {
-            if(recordUndoableActions)
-            {
+            if (recordUndoableActions) {
             undoManager.undoableEditHappened((mxUndoableEdit) evt
                     .getProperty("edit"));
             }
@@ -439,7 +441,14 @@ class GraphManipulation<V, E> implements GraphManipulationInterface<V, E> {
     }
 
     @Override
+    public double getZoomLevel() {
+        return graphComponent.getGraph().getView().getScale();
+    }
+    
+    @Override
     public void zoomTo(double factor) {
+        factor = Math.min(MAXZOOMLEVEL, factor);
+        
         graphComponent.zoomTo(factor, true);
     }
 
@@ -448,7 +457,9 @@ class GraphManipulation<V, E> implements GraphManipulationInterface<V, E> {
         graphComponent.setCenterZoom(true);
 
         if (zoomIn) {
-            graphComponent.zoomIn();
+            if (getZoomLevel() < MAXZOOMLEVEL) {
+                graphComponent.zoomIn();
+            }
         } else {
             graphComponent.zoomOut();
         }

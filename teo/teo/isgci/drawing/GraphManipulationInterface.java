@@ -124,6 +124,14 @@ public interface GraphManipulationInterface<V, E> {
     void undo();
     
     /**
+     * Returns the current zoomlevel of the graph. 1.0 stands for 100% zoom.
+     * 
+     * @return
+     *          Value indicating the current zoomlevel.
+     */
+    double getZoomLevel();
+    
+    /**
      * Zooms the panel to the given factor. It will magnify the graph, if the
      * graph is too big for the panel only a section of the whole graph will be
      * shown. This method zooms to the center of the panel.

@@ -19,7 +19,7 @@ import com.mxgraph.swing.mxGraphComponent;
  * Internal mouse adapter for double and right click support.
  */
 class InternalMouseAdapter<V,E> extends MouseAdapter {
-
+    
     /** The parent object. */
     private GraphManipulation<V, E> graphManipulation;
     
