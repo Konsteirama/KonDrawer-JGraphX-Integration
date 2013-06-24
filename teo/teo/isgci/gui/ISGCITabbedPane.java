@@ -148,7 +148,6 @@ public class ISGCITabbedPane extends JTabbedPane implements Updatable {
             if (getTabComponentAt(getSelectedIndex()) 
                     instanceof AddTabComponent) {
                 addTabComponent.addTab();
-                e.consume();
             }            
         };
         

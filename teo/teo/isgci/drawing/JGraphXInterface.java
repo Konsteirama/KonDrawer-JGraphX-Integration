@@ -543,6 +543,7 @@ class JGraphXInterface<V, E> implements DrawingLibraryInterface<V, E> {
         graphManipulation.beginNotUndoable();
         graphManipulation.reapplyHierarchicalLayout();
         graphManipulation.endNotUndoable();
+        graphOutline.setGraphComponent(graphComponent);
     }
 
     /**
