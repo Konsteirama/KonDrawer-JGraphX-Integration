@@ -165,7 +165,7 @@ public class ISGCITabbedPane extends JTabbedPane implements Updatable {
                 if (node != null) {
                     manipulationInterface.beginNotUndoable();
                     manipulationInterface.unHiglightAll();
-                    manipulationInterface.highlightNode(node, true);
+                    manipulationInterface.highlightNode(node, 1);
                     manipulationInterface.endNotUndoable();
                 }
             // Right-click event

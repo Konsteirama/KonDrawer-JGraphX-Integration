@@ -144,7 +144,7 @@ public class ISGCIToolBar extends JToolBar {
                 if (selectedNodes.size() == 1) {
                     manipulationInterface.centerNode(selectedNodes.get(0));
                     manipulationInterface.highlightNode(
-                            selectedNodes.get(0), false);
+                            selectedNodes.get(0), 0);
                 }
             }
         });
@@ -175,7 +175,7 @@ public class ISGCIToolBar extends JToolBar {
                 manipulationInterface.unHiglightAll();
                 
                 for (V node : selectedNodes) {
-                    manipulationInterface.highlightNode(node, true);
+                    manipulationInterface.highlightNode(node, 4);
                 }
             }
         });

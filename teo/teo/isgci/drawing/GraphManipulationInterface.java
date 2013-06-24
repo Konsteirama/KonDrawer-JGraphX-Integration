@@ -160,10 +160,9 @@ public interface GraphManipulationInterface<V, E> {
      * 
      * @param node : The node to be highlighted
      * 
-     * @param hightlightNeighbors if checked, neighbors will be highlighted 
-     * as well
+     * @param depth : How "deep" the neighbours should be highlighted.
      */
-    void highlightNode(V node, boolean hightlightNeighbors);
+    void highlightNode(V node, int depth);
 
     /**
      * Un-Highlights all nodes that are currently highlighted before.
