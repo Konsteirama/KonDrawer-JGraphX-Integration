@@ -236,26 +236,24 @@ public class ISGCIToolBar extends JToolBar {
      */
     private void addZoomControls() {
         
-        // ZOOM IN
-        String zoomInTooltip = "Zoom In";
-        JButton zoominbutton = IconButtonFactory.createImageButton(
-                IconButtonFactory.ZOOM_IN_ICON, zoomInTooltip);
+        // ZOOM OUT
+        String zoomOutTooltip = "Zoom Out";
+        JButton zoomoutbutton  = IconButtonFactory.createImageButton(
+                IconButtonFactory.ZOOM_OUT_ICON, zoomOutTooltip);
+        add(zoomoutbutton);
 
-        add(zoominbutton);
-        
-        zoominbutton.addActionListener(new ActionListener() {
-
+        zoomoutbutton.addActionListener(new ActionListener() {
+            
             @Override
             public void actionPerformed(ActionEvent e) {
                 GraphManipulationInterface<?, ?> graphManipulation = 
                         getManipulationInterface();
                 
                 if (graphManipulation != null) {
-                    graphManipulation.zoom(true);
+                    graphManipulation.zoom(false);
                 }
             }
         });
-
 
         // ZOOM
         final String defaultEntry = "Set Zoom";
@@ -306,13 +304,14 @@ public class ISGCIToolBar extends JToolBar {
         });
         
         
-        // ZOOM OUT
-        String zoomOutTooltip = "Zoom Out";
-        JButton zoomoutbutton  = IconButtonFactory.createImageButton(
-                IconButtonFactory.ZOOM_OUT_ICON, zoomOutTooltip);
-        add(zoomoutbutton);
+        // ZOOM IN
+        String zoomInTooltip = "Zoom In";
+        JButton zoominbutton = IconButtonFactory.createImageButton(
+                IconButtonFactory.ZOOM_IN_ICON, zoomInTooltip);
 
-        zoomoutbutton.addActionListener(new ActionListener() {
+        add(zoominbutton);
+        
+        zoominbutton.addActionListener(new ActionListener() {
 
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -320,10 +319,11 @@ public class ISGCIToolBar extends JToolBar {
                         getManipulationInterface();
                 
                 if (graphManipulation != null) {
-                    graphManipulation.zoom(false);
+                    graphManipulation.zoom(true);
                 }
             }
         });
+
     }
     
     /**
