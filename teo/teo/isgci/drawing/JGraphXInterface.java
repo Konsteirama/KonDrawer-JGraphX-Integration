@@ -11,15 +11,19 @@
 
 package teo.isgci.drawing;
 
+import java.awt.Cursor;
 import java.awt.Dimension;
 import java.awt.Graphics2D;
+import java.awt.Image;
 import java.awt.Point;
+import java.awt.Toolkit;
 import java.awt.event.MouseEvent;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -27,14 +31,10 @@ import java.util.List;
 import javax.imageio.ImageIO;
 import javax.swing.JComponent;
 import javax.swing.JScrollBar;
-import javax.swing.SwingUtilities;
 import javax.xml.transform.TransformerConfigurationException;
 
-import com.mxgraph.model.mxICell;
-import com.mxgraph.swing.mxGraphOutline;
 import net.sf.epsgraphics.ColorMode;
 import net.sf.epsgraphics.EpsGraphics;
-
 
 import org.jgrapht.Graph;
 import org.jgrapht.ext.GraphMLExporter;
@@ -42,7 +42,10 @@ import org.xml.sax.SAXException;
 
 import com.mxgraph.canvas.mxICanvas;
 import com.mxgraph.canvas.mxSvgCanvas;
+import com.mxgraph.model.mxICell;
 import com.mxgraph.swing.mxGraphComponent;
+import com.mxgraph.swing.mxGraphOutline;
+import com.mxgraph.swing.handler.mxPanningHandler;
 import com.mxgraph.util.mxCellRenderer;
 import com.mxgraph.util.mxCellRenderer.CanvasFactory;
 import com.mxgraph.util.mxConstants;
@@ -64,7 +67,7 @@ class JGraphXInterface<V, E> implements DrawingLibraryInterface<V, E> {
     private mxGraphComponent graphComponent;
 
     /**
-     * The minimap component
+     * The minimap component.
      */
     private mxGraphOutline graphOutline;
     
@@ -89,7 +92,7 @@ class JGraphXInterface<V, E> implements DrawingLibraryInterface<V, E> {
     public JGraphXInterface(Graph<V, E> g) {
         // Convert to JGraphT-Graph
         graphAdapter = createNewAdapter(g);
-
+        
         applyCustomGraphSettings();
 
         // Create the mxGraphComponent used to draw the graph
@@ -97,14 +100,14 @@ class JGraphXInterface<V, E> implements DrawingLibraryInterface<V, E> {
         // implementation so the users are not required to hold down shift
         // and ctrl
         graphComponent = new mxGraphComponent(graphAdapter) {
+            
             @Override
             public boolean isPanningEvent(MouseEvent event) {
                 if (event == null) {
                     return false;
-                }
+                } 
 
                 mxICell cell = (mxICell) getCellAt(event.getX(), event.getY());
-
                 return cell == null || cell.isEdge();
             }
         };
@@ -132,6 +135,36 @@ class JGraphXInterface<V, E> implements DrawingLibraryInterface<V, E> {
                         graphManipulation));
         
         graphManipulation.endNotUndoable();
+
+        
+        // change icon to grabbing hand if graph is panning
+        new mxPanningHandler(graphComponent) {
+            @Override
+            public void mousePressed(MouseEvent e) {
+                try {
+                    Toolkit toolkit = Toolkit.getDefaultToolkit();
+                    URL url = getClass().getResource("/icons/Grabbing.gif");
+
+                    Image image = toolkit.getImage(url);
+                    Cursor c = toolkit.createCustomCursor(image, new Point(
+                            graphComponent.getX(), graphComponent.getY()),
+                            "img");
+
+                    graphComponent.getGraphControl().setCursor(c);
+                } catch (Exception ex) {
+                    System.err.println("Unable to set cursor!");
+                }
+                super.mousePressed(e);
+            }
+
+            @Override
+            public void mouseReleased(MouseEvent e) {
+                graphComponent.getGraphControl().setCursor(
+                        Cursor.getDefaultCursor());
+                super.mouseReleased(e);
+            }
+        };
+        
     }
 
     /**
