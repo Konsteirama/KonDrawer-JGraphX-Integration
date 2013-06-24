@@ -67,7 +67,6 @@ class GraphManipulation<V, E> implements GraphManipulationInterface<V, E> {
         }
     };
 
-
     /**
      * GraphComponent is the panel the graph is drawn in.
      */

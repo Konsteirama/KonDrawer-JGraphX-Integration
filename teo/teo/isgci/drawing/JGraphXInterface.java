@@ -18,6 +18,8 @@ import java.awt.Image;
 import java.awt.Point;
 import java.awt.Toolkit;
 import java.awt.event.MouseEvent;
+import java.awt.event.MouseWheelEvent;
+import java.awt.event.MouseWheelListener;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.FileOutputStream;
@@ -114,9 +116,19 @@ class JGraphXInterface<V, E> implements DrawingLibraryInterface<V, E> {
         graphComponent.setToolTips(true);
 
         graphOutline = new mxGraphOutline(graphComponent);
+        graphOutline.addMouseWheelListener(new MouseWheelListener() {
+            
+            @Override
+            public void mouseWheelMoved(MouseWheelEvent e) {
+                if (e.getWheelRotation() < 0) {
+                    graphManipulation.zoom(true);
+                } else {
+                    graphManipulation.zoom(false);
+                }
+            }
+        });
 
-        graphManipulation =
-                new GraphManipulation<V, E>(graphComponent);
+        graphManipulation = new GraphManipulation<V, E>(graphComponent);
         
         graphManipulation.beginNotUndoable();
         
