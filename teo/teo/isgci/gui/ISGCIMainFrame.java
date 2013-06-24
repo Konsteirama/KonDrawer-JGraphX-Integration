@@ -683,6 +683,8 @@ public class ISGCIMainFrame extends JFrame implements WindowListener {
         }
         
         dialogs.clear();
+        
+        toFront();
     }
 }
 
