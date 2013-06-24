@@ -266,11 +266,7 @@ public class ISGCITabbedPane extends JTabbedPane implements Updatable {
      * @param name
      *          The name of the Tab
      */
-    public <V, E> void drawInNewTab(Graph<V, E> graph, String name) {
-        if (getSelectedComponent() instanceof StartPanel) {
-            removeStartpage();
-        }        
-        
+    public <V, E> void drawInNewTab(Graph<V, E> graph, String name) {       
         
         DrawingLibraryInterface<V, E> drawingInterface = 
                 DrawingLibraryFactory.createNewInterface(graph);
