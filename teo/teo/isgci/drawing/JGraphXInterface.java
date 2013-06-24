@@ -299,28 +299,19 @@ class JGraphXInterface<V, E> implements DrawingLibraryInterface<V, E> {
      * @param path The path where the .eps file will be saved to
      */
     private void exportEPS(final String path) {
-        Dimension d = graphComponent.getSize();
+        Dimension d = graphComponent.getGraphControl().getSize();
         
         FileOutputStream out;
         EpsGraphics g;
         
-        // Gets the Scrollbars
-        JScrollBar hor = graphComponent.getHorizontalScrollBar();
-        JScrollBar vert = graphComponent.getVerticalScrollBar();
-
-        // Calculates the height/width of the scrollbars
-        // to remove them later on
-        int height = hor.getHeight();
-        int width = vert.getWidth();
-        
         try {
             // Creates a new file and the graphics object
             out = new FileOutputStream(new File(path));
-            g = new EpsGraphics("Test", out, 0, 0, (int) d.getWidth() - width, 
-                    (int) d.getHeight() - height, ColorMode.COLOR_RGB);
+            g = new EpsGraphics("", out, 0, 0, (int) d.getWidth(), 
+                    (int) d.getHeight(), ColorMode.COLOR_RGB);
             
             // Paints the graphic object
-            graphComponent.paint(g);
+            graphComponent.getGraphControl().paint(g);
             
             g.finalize();
             g.close();
