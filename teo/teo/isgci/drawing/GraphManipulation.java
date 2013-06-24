@@ -464,6 +464,10 @@ class GraphManipulation<V, E> implements GraphManipulationInterface<V, E> {
             endUpdate();
             markedCellsColor.clear();
             markedCellsThickness.clear();
+            //FIXME graphOutline should take changes without being deactivated
+            //and reactivated
+            graphOutline.setVisible(false);
+            setMinimapVisibility();
         }
     }
 
