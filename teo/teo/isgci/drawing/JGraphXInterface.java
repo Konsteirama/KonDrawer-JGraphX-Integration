@@ -115,20 +115,10 @@ class JGraphXInterface<V, E> implements DrawingLibraryInterface<V, E> {
         };
         graphComponent.setToolTips(true);
 
-        graphOutline = new mxGraphOutline(graphComponent);
-        graphOutline.addMouseWheelListener(new MouseWheelListener() {
-            
-            @Override
-            public void mouseWheelMoved(MouseWheelEvent e) {
-                if (e.getWheelRotation() < 0) {
-                    graphManipulation.zoom(true);
-                } else {
-                    graphManipulation.zoom(false);
-                }
-            }
-        });
-
-        graphManipulation = new GraphManipulation<V, E>(graphComponent);
+        setGraphOutline();
+        
+        graphManipulation 
+            = new GraphManipulation<V, E>(graphComponent, graphOutline);
         
         graphManipulation.beginNotUndoable();
         
@@ -179,6 +169,25 @@ class JGraphXInterface<V, E> implements DrawingLibraryInterface<V, E> {
         
     }
 
+    /**
+     * Adds the graphoutline component and adds custom settings to it. 
+     */
+    private void setGraphOutline() {
+
+        graphOutline = new mxGraphOutline(graphComponent);
+        graphOutline.addMouseWheelListener(new MouseWheelListener() {
+            
+            @Override
+            public void mouseWheelMoved(MouseWheelEvent e) {
+                if (e.getWheelRotation() < 0) {
+                    graphManipulation.zoom(true);
+                } else {
+                    graphManipulation.zoom(false);
+                }
+            }
+        });
+    }
+    
     /**
      * Creates a new JGraphXAdapter form the given Graph with edge selection
      * and movement disabled.
@@ -506,7 +515,8 @@ class JGraphXInterface<V, E> implements DrawingLibraryInterface<V, E> {
 
         graphComponent.setGraph(graphAdapter);
         
-        graphManipulation = new GraphManipulation(graphComponent);
+        graphManipulation 
+            = new GraphManipulation(graphComponent, graphOutline);
         
         graphManipulation.beginNotUndoable();
         graphManipulation.reapplyHierarchicalLayout();

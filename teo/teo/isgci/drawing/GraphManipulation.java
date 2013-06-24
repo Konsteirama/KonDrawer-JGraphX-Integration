@@ -14,6 +14,8 @@
 package teo.isgci.drawing;
 
 import java.awt.Color;
+import java.awt.event.ComponentEvent;
+import java.awt.event.ComponentListener;
 import java.util.ArrayList;
 import java.util.HashMap;
 
@@ -25,6 +27,7 @@ import com.mxgraph.layout.hierarchical.mxHierarchicalLayout;
 import com.mxgraph.model.mxCell;
 import com.mxgraph.model.mxICell;
 import com.mxgraph.swing.mxGraphComponent;
+import com.mxgraph.swing.mxGraphOutline;
 import com.mxgraph.util.mxConstants;
 import com.mxgraph.util.mxEvent;
 import com.mxgraph.util.mxEventObject;
@@ -73,6 +76,11 @@ class GraphManipulation<V, E> implements GraphManipulationInterface<V, E> {
     private mxGraphComponent graphComponent;
     
     /**
+     * The corresponding minimap, which can be hidden depending on zoom.
+     */
+    private mxGraphOutline graphOutline;
+    
+    /**
      * Manages the undo-operations on the calling graph.
      */
     private mxUndoManager undoManager;
@@ -92,18 +100,40 @@ class GraphManipulation<V, E> implements GraphManipulationInterface<V, E> {
      * class that operates on a given graphComponent.
      *
      * @param pGraphComponent : a JGRaphX graphComponent, shown on the panel
+     * @param pGraphOutline : the corresponding graphoutline
      */
-    public GraphManipulation(mxGraphComponent pGraphComponent) {
-        this.graphComponent = pGraphComponent;
-
+    public GraphManipulation(mxGraphComponent pGraphComponent,
+            mxGraphOutline pGraphOutline) {
+        graphComponent = pGraphComponent;
+        graphOutline = pGraphOutline;
+        
         // initiation of undoManager variable
-        this.undoManager = new mxUndoManager();
+        undoManager = new mxUndoManager();
 
-        //notify undoManager about edits
+        // notify undoManager about edits
         graphComponent.getGraph().getModel().
                 addListener(mxEvent.UNDO, undoHandler);
         graphComponent.getGraph().getView().
                 addListener(mxEvent.UNDO, undoHandler);
+        
+        // notify this component about size changes, to check if the minimap
+        // has to be displayed/hidden
+        graphComponent.addComponentListener(new ComponentListener() {
+            
+            @Override
+            public void componentShown(ComponentEvent e) { }
+            
+            @Override
+            public void componentResized(ComponentEvent e) {
+                setMinimapVisibility();
+            }
+            
+            @Override
+            public void componentMoved(ComponentEvent e) { }
+            
+            @Override
+            public void componentHidden(ComponentEvent e) { }
+        });
 
         markedCellsColor = new HashMap<mxICell, Color>();
         markedCellsThickness = new HashMap<mxICell, String>();
@@ -449,6 +479,8 @@ class GraphManipulation<V, E> implements GraphManipulationInterface<V, E> {
         factor = Math.min(MAXZOOMLEVEL, factor);
         
         graphComponent.zoomTo(factor, true);
+        
+        setMinimapVisibility();
     }
 
     @Override
@@ -462,6 +494,8 @@ class GraphManipulation<V, E> implements GraphManipulationInterface<V, E> {
         } else {
             graphComponent.zoomOut();
         }
+        
+        setMinimapVisibility();
     }
 
     @Override
@@ -472,6 +506,25 @@ class GraphManipulation<V, E> implements GraphManipulationInterface<V, E> {
         int viewLen = (int) view.getGraphBounds().getWidth();
 
         view.setScale((double) compLen / viewLen * view.getScale());
+        setMinimapVisibility();
+    }
+    
+    /**
+     * Checks if the minimap should be hidden and hides it if necessary.
+     */
+    private void setMinimapVisibility() {
+        mxGraphView view = graphComponent.getGraph().getView();
+
+        int compLen = graphComponent.getWidth();
+        int viewLen = (int) view.getGraphBounds().getWidth();
+
+        double scale = ((double) compLen / viewLen * view.getScale());
+        
+        if (getZoomLevel() > scale) {
+            graphOutline.setVisible(true);
+        } else {
+            graphOutline.setVisible(false);
+        }
     }
 }
 
