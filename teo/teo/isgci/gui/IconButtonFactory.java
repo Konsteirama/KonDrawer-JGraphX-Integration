@@ -68,9 +68,6 @@ public final class IconButtonFactory {
 
     /** Filename for RefreshIcon. */
     public static final String REFRESH_ICON = "Refresh.gif";
-    
-    /** Filename for ResetIcon. */
-    public static final String RESET_ICON = "Reset.gif";
 
     /** Filename for HomeIcon. */
     public static final String HOME_ICON = "Home.gif";
