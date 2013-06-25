@@ -348,8 +348,8 @@ class JGraphXInterface<V, E> implements DrawingLibraryInterface<V, E> {
                 new CanvasFactory() {
                     public mxICanvas createCanvas(final int width,
                                                   final int height) {
-                        AltMxSvgCanvas canvas = new AltMxSvgCanvas(mxDomUtils
-                                .createSvgDocument(width, height));
+                        CustomMxSvgCanvas canvas = new CustomMxSvgCanvas(
+                                mxDomUtils.createSvgDocument(width, height));
                         canvas.setEmbedded(true);
 
                         return canvas;
@@ -369,21 +369,21 @@ class JGraphXInterface<V, E> implements DrawingLibraryInterface<V, E> {
      * An alternate mxSvgCanvas, which removes all html
      * and latex based symbols.
      */
-    private class AltMxSvgCanvas extends mxSvgCanvas {
+    private class CustomMxSvgCanvas extends mxSvgCanvas {
 
         /** 
          * The default constructor.
          * 
          * @param createSvgDocument : the default document
          */
-        public AltMxSvgCanvas(Document createSvgDocument) {
+        public CustomMxSvgCanvas(Document createSvgDocument) {
             super(createSvgDocument);
         }
 
         @Override
         public Object drawLabel(String arg0, mxCellState arg1, boolean arg2) {
             // Strip html
-            arg0 = arg0.replaceAll("\\<[^>]*>", "");
+            arg0 = arg0.replaceAll("\\<html[^>]*>", "");
             // Strip latex
             arg0 = arg0.replaceAll("\\&[^;]*;", "");
             
