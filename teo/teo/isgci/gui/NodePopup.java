@@ -66,14 +66,23 @@ public class NodePopup extends JPopupMenu implements ActionListener {
             String fullname = event.getActionCommand().substring(
                     CHANGENAME.length());
             
+            GraphManipulationInterface graphManipulation
+                = parent.getTabbedPane().getActiveDrawingLibraryInterface().
+                        getGraphManipulationInterface();
             
-            parent.getTabbedPane().getActiveDrawingLibraryInterface().
-                getGraphManipulationInterface().renameNode(node, fullname);
+            graphManipulation.beginUpdate();
             
-            
-            parent.getTabbedPane().getSelectedComponent().update(parent
-                        .getTabbedPane().getSelectedComponent().getGraphics());
-            parent.getTabbedPane().getSelectedComponent().repaint();
+            try {
+                graphManipulation.renameNode(node, fullname);
+
+                parent.getTabbedPane()
+                        .getSelectedComponent()
+                        .update(parent.getTabbedPane().getSelectedComponent()
+                                .getGraphics());
+                parent.getTabbedPane().getSelectedComponent().repaint();
+            } finally {
+                graphManipulation.endUpdate();
+            }
         } else if (source == deleteItem) {
             DrawingLibraryInterface drawLib = 
                     parent.getTabbedPane()
