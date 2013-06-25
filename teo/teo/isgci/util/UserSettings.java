@@ -17,8 +17,6 @@ import java.util.LinkedList;
 import java.util.List;
 
 import javax.swing.JComponent;
-import javax.swing.JTabbedPane;
-import javax.swing.UIManager;
 
 import teo.isgci.db.Algo;
 import teo.isgci.db.Algo.NamePref;
@@ -48,12 +46,22 @@ public abstract class UserSettings {
     /**
      * The color of the font of all drawn vertices.
      */
-    private static Color fontcolor = getDefaultFontColor();
+    private static Color fontColor = getDefaultFontColor();
     
     /**
      * The color of the font of all drawn vertices.
      */
-    private static Color backgroundcolor = getDefaultBackgroundColor();    
+    private static Color backgroundColor = getDefaultBackgroundColor();    
+    
+    /**
+     * The standard color for highlighting neighbour and edges.
+     */
+    private static Color highlightColor = getDefaultHighlightColor();
+    
+    /**
+     * The standard color for marking the selected nodes.
+     */
+    private static Color selectionColor = getDefaultSelectionColor();
     
     /**
      * Maps the content of the tabs to their corresponding
@@ -69,7 +77,7 @@ public abstract class UserSettings {
         = new HashMap<JComponent, Problem>();
 
     /**
-     * The currently active tab
+     * The currently active tab.
      */
     private static JComponent activeTab;
     
@@ -107,6 +115,67 @@ public abstract class UserSettings {
         return panelToProblem.get(activeTab);
     }
     
+    /**
+     * Getter for default selection color.
+     * 
+     * @return
+     *          The default selection color.
+     */
+    public static Color getDefaultSelectionColor() {
+        return Color.black;
+    }
+    
+    /**
+     * Setter for {@link #selectionColor}.
+     * 
+     * @param color
+     *          The selection color.
+     */
+    public static void setCurrentSelectionColor(Color color) {
+        selectionColor = color;
+    }
+    
+    /**
+     * Getter for {@link #selectionColor}.
+     * 
+     * @return
+     *          The current selection color.
+     */
+    public static Color getCurrentSelectionColor() {
+        return selectionColor;
+    }
+    
+    
+    /**
+     * Getter for default highlight color.
+     * 
+     * @return
+     *          The default highlight color.
+     */
+    public static Color getDefaultHighlightColor() {
+        return Color.orange;
+    }
+    
+    /**
+     * Setter for {@link #highlightColor}.
+     * 
+     * @param color
+     *          The highlight color.
+     */
+    public static void setCurrentHighlightColor(Color color) {
+        highlightColor = color;
+    }
+    
+    /**
+     * Getter for {@link #highlightColor}.
+     * 
+     * @return
+     *          The current highlight color.
+     */
+    public static Color getCurrentHighlightColor() {
+        return highlightColor;
+    }
+    
     
     /**
      * Getter for default font color.
@@ -119,23 +188,23 @@ public abstract class UserSettings {
     }
     
     /**
-     * Setter for {@link #fontcolor}.
+     * Setter for {@link #fontColor}.
      * 
      * @param color
      *          The font color.
      */
     public static void setCurrentFontColor(Color color) {
-        fontcolor = color;
+        fontColor = color;
     }
     
     /**
-     * Getter for {@link #fontcolor}.
+     * Getter for {@link #fontColor}.
      * 
      * @return
      *          The current font color.
      */
     public static Color getCurrentFontColor() {
-        return fontcolor;
+        return fontColor;
     }
     
     /**
@@ -149,23 +218,23 @@ public abstract class UserSettings {
     }
     
     /**
-     * Setter for {@link #backgroundcolor}.
+     * Setter for {@link #backgroundColor}.
      * 
      * @param color
      *          The background color.
      */
     public static void setCurrentBackgroundColor(Color color) {
-        backgroundcolor = color;
+        backgroundColor = color;
     }
     
     /**
-     * Getter for {@link #backgroundcolor}.
+     * Getter for {@link #backgroundColor}.
      * 
      * @return
      *          The current font color.
      */
     public static Color getCurrentBackgroundColor() {
-        return backgroundcolor;
+        return backgroundColor;
     }
 
     /**
@@ -273,12 +342,12 @@ public abstract class UserSettings {
     /**
      * Sets the default naming preference.
      *      
-     * @param activeTab
+     * @param tab
      *            the currently selected tab
      * @param namepref
      *            the new default naming preference
      */
-    public static void setNamingPref(JComponent activeTab,
+    public static void setNamingPref(JComponent tab,
                                     Algo.NamePref namepref) {
         if (namepref != null) {
             panelToNamingPref.put(activeTab, namepref);
@@ -289,12 +358,12 @@ public abstract class UserSettings {
     /**
      * Gets the naming preference for the given tab.
      * 
-     * @param activeTab
+     * @param tab
      *            the currently selected tab
      * @return 
      *          the naming preference for activeTab
      */
-    public static NamePref getNamingPref(JComponent activeTab) {
+    public static NamePref getNamingPref(JComponent tab) {
         if (panelToNamingPref.get(activeTab) != null) {
             return panelToNamingPref.get(activeTab);
         } else {

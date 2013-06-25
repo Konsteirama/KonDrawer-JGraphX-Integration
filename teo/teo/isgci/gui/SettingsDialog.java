@@ -15,7 +15,9 @@ import java.awt.Color;
 import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.Vector;
 
 import javax.swing.JButton;
 import javax.swing.JColorChooser;
@@ -36,13 +38,30 @@ import teo.isgci.util.UserSettings;
  * 
  */
 public class SettingsDialog extends JDialog {
-
+    
     /**
-     * A button to safe changes. Only enabled if there are any changes. 
+     * Separator for colorlist.
+     */
+    private static final String SEPARATOR = "-----------";
+    
+    /** Fontname. */
+    private static final String FONT = "Font";
+    
+    /** Backgroundname. */
+    private static final String BACKGROUND = "Background";
+    
+    /** Highlightname. */
+    private static final String HIGHLIGHT = "Highlight";
+    
+    /** Selectionname. */
+    private static final String SELECTION = "Selection";
+    
+    /**
+     * A button to save changes. Only enabled if there are any changes. 
      * Does not close the dialogue.
      */
     private JButton applyButton;
-
+    
     /**
      * A list with all possible options for which the colours can be changed.
      */
@@ -72,10 +91,12 @@ public class SettingsDialog extends JDialog {
         // initialize colors
         nameToColor = new HashMap<String, Color>();
 
-        nameToColor
-                .put("Background", UserSettings.getCurrentBackgroundColor());
-        nameToColor.put("Font", UserSettings.getCurrentFontColor());
-
+        nameToColor.put(FONT, UserSettings.getCurrentFontColor());
+        nameToColor.put(BACKGROUND, UserSettings.getCurrentBackgroundColor());
+        nameToColor.put(HIGHLIGHT, UserSettings.getCurrentHighlightColor());
+        nameToColor.put(SELECTION, UserSettings.getCurrentSelectionColor());
+        nameToColor.put(SEPARATOR, Color.gray);
+        
         for (Complexity c : Complexity.values()) {
             nameToColor.put(c.getComplexityString(), UserSettings.getColor(c));
         }
@@ -125,7 +146,7 @@ public class SettingsDialog extends JDialog {
                 });
 
         // COLOR LIST
-        colorList = new JList(nameToColor.keySet().toArray());
+        colorList = new JList(getColorNames());
         colorList.setSelectedIndex(0);
 
         colorChooser.setColor(nameToColor.get(colorList.getSelectedValue()));
@@ -141,6 +162,12 @@ public class SettingsDialog extends JDialog {
             public void valueChanged(ListSelectionEvent e) {
                 String name = (String) colorList.getSelectedValue();
 
+                if (name.equals(SEPARATOR)) {
+                    colorChooser.setEnabled(false);
+                } else {
+                    colorChooser.setEnabled(true);
+                }
+                
                 disableApply = true;
                 colorChooser.setColor(nameToColor.get(name));
                 disableApply = false;
@@ -168,10 +195,14 @@ public class SettingsDialog extends JDialog {
                 }
 
                 // special colors
-                nameToColor.put("Font", UserSettings.getDefaultFontColor());
-                nameToColor.put("Background",
+                nameToColor.put(FONT, UserSettings.getDefaultFontColor());
+                nameToColor.put(BACKGROUND,
                         UserSettings.getDefaultBackgroundColor());
-
+                nameToColor.put(HIGHLIGHT, 
+                        UserSettings.getDefaultHighlightColor());
+                nameToColor.put(SELECTION, 
+                        UserSettings.getDefaultSelectionColor());
+                
                 String name = (String) colorList.getSelectedValue();
                 colorChooser.setColor(nameToColor.get(name));
 
@@ -200,9 +231,13 @@ public class SettingsDialog extends JDialog {
                 }
 
                 // special colors
-                nameToColor.put("Font", UserSettings.getDefaultFontColor());
-                nameToColor.put("Background",
+                nameToColor.put(FONT, UserSettings.getDefaultFontColor());
+                nameToColor.put(BACKGROUND,
                         UserSettings.getDefaultBackgroundColor());
+                nameToColor.put(HIGHLIGHT, 
+                        UserSettings.getDefaultHighlightColor());
+                nameToColor.put(SELECTION, 
+                        UserSettings.getDefaultSelectionColor());
 
                 String name = (String) colorList.getSelectedValue();
                 colorChooser.setColor(nameToColor.get(name));
@@ -310,8 +345,10 @@ public class SettingsDialog extends JDialog {
 
         // set font and background color separately because they're
         // not enums
-        UserSettings.setCurrentFontColor(nameToColor.get("Font"));
-        UserSettings.setCurrentBackgroundColor(nameToColor.get("Background"));
+        UserSettings.setCurrentFontColor(nameToColor.get(FONT));
+        UserSettings.setCurrentBackgroundColor(nameToColor.get(BACKGROUND));
+        UserSettings.setCurrentHighlightColor(nameToColor.get(HIGHLIGHT));
+        UserSettings.setCurrentSelectionColor(nameToColor.get(SELECTION));
 
         // build a new colorscheme and set colors
         HashMap<Complexity, Color> colorScheme 
@@ -338,6 +375,32 @@ public class SettingsDialog extends JDialog {
         dispose();
     }
 
+    /**
+     * Creates a ordered list of all available colors.
+     * 
+     * @return
+     *          An array containing all available colors in order.
+     */
+    private Object[] getColorNames() {        
+        Vector<String> names = new Vector<String>();
+        
+        // add special colors
+        names.add(FONT);
+        names.add(BACKGROUND);
+        names.add(HIGHLIGHT);
+        names.add(SELECTION);
+        names.add(SEPARATOR);
+        
+        // add sorted complexities
+        Complexity[] complexities = Complexity.values();
+        Arrays.sort(complexities);
+        
+        for (Complexity c : complexities) {
+            names.add(c.getComplexityString());
+        }
+        
+        return names.toArray();
+    }
 }
 
 /* EOF */
