@@ -15,6 +15,7 @@ import java.awt.Point;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Set;
 
@@ -64,8 +65,11 @@ public class NodePopup extends JPopupMenu implements ActionListener {
         } else if (event.getActionCommand().startsWith(CHANGENAME)) {
             String fullname = event.getActionCommand().substring(
                     CHANGENAME.length());
+            
+            
             parent.getTabbedPane().getActiveDrawingLibraryInterface().
                 getGraphManipulationInterface().renameNode(node, fullname);
+            
             
             parent.getTabbedPane().getSelectedComponent().update(parent
                         .getTabbedPane().getSelectedComponent().getGraphics());
@@ -101,15 +105,22 @@ public class NodePopup extends JPopupMenu implements ActionListener {
         nameItem.removeAll();
         nameItem.setEnabled(node.size() != 1);
         JMenuItem[] mItem = new JMenuItem[node.size()];
-        List<String> newNames = new ArrayList<String>();
+        //List<String> newNames = new ArrayList<String>();
+        HashMap<String, String> shortToLong = new HashMap<String, String>();
+        
+        
         //FIXME sort and render latex properly
         for (GraphClass gc : node) {
+            String longName = Latex2Html.getInstance().html(gc.toString());
             String oldName = Utility.getShortName(gc.toString());
-            String newName = Latex2Html.getInstance().html(oldName);
-            newNames.add(newName);
+            String shortHtmlName = Latex2Html.getInstance().html(oldName);
+            
+            shortToLong.put(longName, shortHtmlName);
         }
-        for (String name : newNames) {
-            mItem[i] = new JMenuItem("<html>" + name + "</html>");
+        
+        for (String name : shortToLong.keySet()) {
+            mItem[i] = new JMenuItem("<html>" + shortToLong.get(name) 
+                    + "</html>");
             nameItem.add(mItem[i]);
             mItem[i].setActionCommand(CHANGENAME + name);
             mItem[i].addActionListener(this);
