@@ -380,7 +380,7 @@ class StartPanel extends JPanel {
     private JButton createCommonClassesTaskButton() {
         JButton button = IconButtonFactory.createImageButton(
                 IconButtonFactory.TIP_ICON, 
-                "<html> <br/> Determine super- and        <br/> "
+                "<html> <br/> Determine common super- and <br/> "
                 + "subclasses of two classes <br/> <br/> </html>",
                 "Guides you through the process of determining " 
                 + "super- and subclasses of two classes. Will take over "
@@ -397,7 +397,7 @@ class StartPanel extends JPanel {
                     return;
                 }
                 
-                // Open the graphMenu
+                // Open the problemMenu
                 final JMenu graphMenu = mainframe.getGraphMenu();
                 moveMouseTo(mouseRobot, graphMenu);
                 graphMenu.doClick(1);
@@ -410,13 +410,13 @@ class StartPanel extends JPanel {
                     public void run() {
 
                         // Hover over the open-problem menuitem
-                        JMenuItem graphClassSelection 
-                            = mainframe.getGraphClassInformationItem();
+                        JMenuItem inclusionProblem 
+                            = mainframe.getInclusionMenuItem();
                         
-                        moveMouseTo(mouseRobot, graphClassSelection);
+                        moveMouseTo(mouseRobot, inclusionProblem);
                         
                         mouseRobot.delay(CLICKDELAY);
-                        graphClassSelection.doClick(1);
+                        inclusionProblem.doClick(1);
                     }
                 });
 
