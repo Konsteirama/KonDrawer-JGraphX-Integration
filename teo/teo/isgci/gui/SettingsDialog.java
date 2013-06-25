@@ -38,8 +38,8 @@ import teo.isgci.util.UserSettings;
 public class SettingsDialog extends JDialog {
 
     /**
-     * A button to safe changes. Only enabled if there are any changes. Does not
-     * close the dialogue.
+     * A button to safe changes. Only enabled if there are any changes. 
+     * Does not close the dialogue.
      */
     private JButton applyButton;
 
@@ -48,6 +48,9 @@ public class SettingsDialog extends JDialog {
      */
     private JList colorList;
 
+    /** Disables enabling the apply button during "internal" changes. */
+    private boolean disableApply;
+    
     /** Maps a name to a specific color, includes all complexities. */
     private HashMap<String, Color> nameToColor;
 
@@ -64,7 +67,7 @@ public class SettingsDialog extends JDialog {
      *            The mainframe from which the dialog is created.
      */
     public SettingsDialog(ISGCIMainFrame parent) {
-        super(parent, "Settings", true);
+        super(parent, "Coloursettings", true);
 
         // initialize colors
         nameToColor = new HashMap<String, Color>();
@@ -116,7 +119,7 @@ public class SettingsDialog extends JDialog {
                         if (newColor != nameToColor.get(name)) {
                             nameToColor.put(name, newColor);
                         }
-
+                        
                         enableApplyButton();
                     }
                 });
@@ -138,7 +141,9 @@ public class SettingsDialog extends JDialog {
             public void valueChanged(ListSelectionEvent e) {
                 String name = (String) colorList.getSelectedValue();
 
+                disableApply = true;
                 colorChooser.setColor(nameToColor.get(name));
+                disableApply = false;
             }
         });
 
@@ -150,6 +155,8 @@ public class SettingsDialog extends JDialog {
 
             @Override
             public void actionPerformed(ActionEvent e) {
+                enableApplyButton();
+                
                 // Set default color scheme.
                 HashMap<Complexity, Color> colorscheme = UserSettings
                         .getDefaultColorScheme();
@@ -181,7 +188,8 @@ public class SettingsDialog extends JDialog {
 
             @Override
             public void actionPerformed(ActionEvent e) {
-
+                enableApplyButton();
+                
                 HashMap<Complexity, Color> colorscheme = UserSettings
                         .getDefaultColorBlindColorScheme();
 
@@ -287,7 +295,7 @@ public class SettingsDialog extends JDialog {
      * Enables the apply button.
      */
     private void enableApplyButton() {
-        if (applyButton != null) {
+        if (applyButton != null && !disableApply) {
             applyButton.setEnabled(true);
         }
     }
@@ -306,7 +314,8 @@ public class SettingsDialog extends JDialog {
         UserSettings.setCurrentBackgroundColor(nameToColor.get("Background"));
 
         // build a new colorscheme and set colors
-        HashMap<Complexity, Color> colorScheme = new HashMap<Complexity, Color>();
+        HashMap<Complexity, Color> colorScheme 
+            = new HashMap<Complexity, Color>();
 
         for (String name : nameToColor.keySet()) {
             Complexity c = Complexity.getComplexity(name);

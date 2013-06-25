@@ -331,7 +331,7 @@ public class ISGCIMainFrame extends JFrame implements WindowListener {
             }
         });
         
-        JMenuItem miColorSettings = new JMenuItem("Set colours");
+        JMenuItem miColorSettings = new JMenuItem("Set colours...");
         miColorSettings.addActionListener(new ActionListener() {
             
             @Override
