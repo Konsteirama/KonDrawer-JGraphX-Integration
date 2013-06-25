@@ -299,15 +299,15 @@ class JGraphXInterface<V, E> implements DrawingLibraryInterface<V, E> {
      */
     @Override
     public final void export(final String format, final String path) {
-        if (format == "eps") {
+        if (format.equals("eps")) {
             exportEPS(path);
-        } else if (format == "svg") {
+        } else if (format.equals("svg")) {
             exportSVG(path);
-        } else if (format == "graphml") {
+        } else if (format.equals("graphml")) {
             exportGraphML(path);
-        } else if (format == "jpg") {
+        } else if (format.equals("jpg")) {
             exportJPG(path);
-        } else if (format == "png") {
+        } else if (format.equals("png")) {
             exportPNG(path);
         }
     }
