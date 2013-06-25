@@ -285,6 +285,9 @@ class JGraphXInterface<V, E> implements DrawingLibraryInterface<V, E> {
         graphAdapter.getStylesheet().getDefaultVertexStyle()
                 .put(mxConstants.STYLE_STROKECOLOR, "#000000");
 
+        graphAdapter.getStylesheet().getDefaultVertexStyle()
+        .put(mxConstants.STYLE_ROUNDED, "true");
+        
         graphAdapter.setHtmlLabels(true);
     }
 
