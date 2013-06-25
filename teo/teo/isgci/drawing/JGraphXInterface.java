@@ -383,7 +383,7 @@ class JGraphXInterface<V, E> implements DrawingLibraryInterface<V, E> {
         @Override
         public Object drawLabel(String arg0, mxCellState arg1, boolean arg2) {
             // Strip html
-            arg0 = arg0.replaceAll("\\<html[^>]*>", "");
+            arg0 = arg0.replaceAll("\\<[^>]*>", "");
             // Strip latex
             arg0 = arg0.replaceAll("\\&[^;]*;", "");
             
