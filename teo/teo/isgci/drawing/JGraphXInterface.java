@@ -41,6 +41,7 @@ import net.sf.epsgraphics.EpsGraphics;
 
 import org.jgrapht.Graph;
 import org.jgrapht.ext.GraphMLExporter;
+import org.w3c.dom.Document;
 import org.xml.sax.SAXException;
 
 import com.mxgraph.canvas.mxICanvas;
@@ -55,6 +56,7 @@ import com.mxgraph.util.mxConstants;
 import com.mxgraph.util.mxDomUtils;
 import com.mxgraph.util.mxUtils;
 import com.mxgraph.util.mxXmlUtils;
+import com.mxgraph.view.mxCellState;
 import com.mxgraph.view.mxGraph;
 
 /**
@@ -346,7 +348,7 @@ class JGraphXInterface<V, E> implements DrawingLibraryInterface<V, E> {
                 new CanvasFactory() {
                     public mxICanvas createCanvas(final int width,
                                                   final int height) {
-                        mxSvgCanvas canvas = new mxSvgCanvas(mxDomUtils
+                        AltMxSvgCanvas canvas = new AltMxSvgCanvas(mxDomUtils
                                 .createSvgDocument(width, height));
                         canvas.setEmbedded(true);
 
@@ -361,6 +363,32 @@ class JGraphXInterface<V, E> implements DrawingLibraryInterface<V, E> {
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+    
+    /**
+     * An alternate mxSvgCanvas, which removes all html
+     * and latex based symbols.
+     */
+    private class AltMxSvgCanvas extends mxSvgCanvas {
+
+        /** 
+         * The default constructor.
+         * 
+         * @param createSvgDocument : the default document
+         */
+        public AltMxSvgCanvas(Document createSvgDocument) {
+            super(createSvgDocument);
+        }
+
+        @Override
+        public Object drawLabel(String arg0, mxCellState arg1, boolean arg2) {
+            // Strip html
+            arg0 = arg0.replaceAll("\\<[^>]*>", "");
+            // Strip latex
+            arg0 = arg0.replaceAll("\\&[^;]*;", "");
+            
+            return super.drawLabel(arg0, arg1, arg2);
+        }  
     }
 
     /**
