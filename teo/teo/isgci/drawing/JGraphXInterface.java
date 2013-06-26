@@ -48,13 +48,18 @@ import com.mxgraph.canvas.mxSvgCanvas;
 import com.mxgraph.model.mxICell;
 import com.mxgraph.swing.mxGraphComponent;
 import com.mxgraph.swing.mxGraphOutline;
+import com.mxgraph.swing.handler.mxCellHandler;
 import com.mxgraph.swing.handler.mxPanningHandler;
 import com.mxgraph.util.mxCellRenderer;
 import com.mxgraph.util.mxCellRenderer.CanvasFactory;
 import com.mxgraph.util.mxConstants;
 import com.mxgraph.util.mxDomUtils;
+import com.mxgraph.util.mxEvent;
+import com.mxgraph.util.mxEventObject;
+import com.mxgraph.util.mxEventSource.mxIEventListener;
 import com.mxgraph.util.mxUtils;
 import com.mxgraph.util.mxXmlUtils;
+import com.mxgraph.view.mxCellState;
 import com.mxgraph.view.mxGraph;
 
 /**
@@ -113,13 +118,19 @@ class JGraphXInterface<V, E> implements DrawingLibraryInterface<V, E> {
                 mxICell cell = (mxICell) getCellAt(event.getX(), event.getY());
                 return cell == null || cell.isEdge();
             }
+            
+            @Override
+            public mxCellHandler createHandler(mxCellState state) {
+                // disable dashed lines around selection
+                return null;
+            }
+            
         };
         graphComponent.setToolTips(true);
 
         setGraphOutline();
         
-        graphManipulation 
-            = new GraphManipulation<V, E>(graphComponent, graphOutline);
+        graphManipulation = new GraphManipulation<V, E>(this);
         
         graphManipulation.beginNotUndoable();
         
@@ -181,6 +192,16 @@ class JGraphXInterface<V, E> implements DrawingLibraryInterface<V, E> {
             }
         };
         
+        
+        // listen for cellselection
+        graphAdapter.getSelectionModel().addListener(mxEvent.CHANGE, 
+                new mxIEventListener() {
+                    
+                    @Override
+                    public void invoke(Object sender, mxEventObject evt) {
+                        graphManipulation.updateSelectedCells();
+                    }
+                });
     }
 
     /**
@@ -275,23 +296,22 @@ class JGraphXInterface<V, E> implements DrawingLibraryInterface<V, E> {
         graphAdapter.setAutoSizeCells(true);
         graphAdapter.setDropEnabled(false);
 
+        // disable edge labels
         graphAdapter.getStylesheet().getDefaultEdgeStyle()
                 .put(mxConstants.STYLE_NOLABEL, "1");
+        
+        // set black outline around nodes
         graphAdapter.getStylesheet().getDefaultVertexStyle()
                 .put(mxConstants.STYLE_STROKECOLOR, "#000000");
 
+        // rounded edges
         graphAdapter.getStylesheet().getDefaultVertexStyle()
-        .put(mxConstants.STYLE_ROUNDED, "true");
+                .put(mxConstants.STYLE_ROUNDED, "true");
         
         graphAdapter.setHtmlLabels(true);
     }
 
-    /**
-     * Exports the current graph.
-     *
-     * @param format The actual format (.ps, .svg, .graphml, .jpg, .png)
-     * @param path   The path where the graph will be exported to
-     */
+
     @Override
     public final void export(final String format, final String path) {
         if (format.equals("eps")) {
@@ -468,11 +488,6 @@ class JGraphXInterface<V, E> implements DrawingLibraryInterface<V, E> {
         }
     }
 
-    /**
-     * Returns an Array of all currently implemented export formats.
-     *
-     * @return An array of String with the formats
-     */
     @Override
     public final String[] getAvailableExportFormats() {
         return new String[]{"eps", "svg", "graphml", "jpg", "png"};
@@ -494,12 +509,6 @@ class JGraphXInterface<V, E> implements DrawingLibraryInterface<V, E> {
         return graphComponent;
     }
 
-    /**
-     * Returns the node located at the specified point.
-     *
-     * @param p Location to look for a node
-     * @return Node located at the given point or null if there is no node
-     */
     @Override
     public V getNodeAt(Point p) {
         mxICell cell = (mxICell) graphComponent.getCellAt((int) p.getX(),
@@ -511,12 +520,6 @@ class JGraphXInterface<V, E> implements DrawingLibraryInterface<V, E> {
         }
     }
 
-    /**
-     * Returns the edge located at the specified point.
-     *
-     * @param p Location to look for an edge
-     * @return Edge located at the given point or null if there is no edge
-     */
     @Override
     public E getEdgeAt(Point p) {
         mxICell cell = (mxICell) graphComponent.getCellAt((int) p.getX(),
@@ -528,21 +531,11 @@ class JGraphXInterface<V, E> implements DrawingLibraryInterface<V, E> {
         }      
     }
 
-    /**
-     * Returns the current graph.
-     *
-     * @return the current graph
-     */
     @Override
     public Graph<V, E> getGraph() {
         return graphAdapter.getGraph();
     }
 
-    /**
-     * Set a new graph which should be drawn.
-     *
-     * @param g The new graph
-     */
     @Override
     public void setGraph(Graph<V, E> g) {
         graphAdapter = createNewAdapter(g);
@@ -551,8 +544,7 @@ class JGraphXInterface<V, E> implements DrawingLibraryInterface<V, E> {
 
         graphComponent.setGraph(graphAdapter);
         
-        graphManipulation 
-            = new GraphManipulation(graphComponent, graphOutline);
+        graphManipulation = new GraphManipulation(this);
         
         graphManipulation.beginNotUndoable();
         graphManipulation.reapplyHierarchicalLayout();
@@ -560,11 +552,6 @@ class JGraphXInterface<V, E> implements DrawingLibraryInterface<V, E> {
         graphOutline.setGraphComponent(graphComponent);
     }
 
-    /**
-     * Returns a list of the selected nodes.
-     *
-     * @return Returns a list of all selected nodes
-     */
     @Override
     public List<V> getSelectedNodes() {
         List<V> list = new ArrayList<V>(graphAdapter.getSelectionCount());
@@ -576,14 +563,10 @@ class JGraphXInterface<V, E> implements DrawingLibraryInterface<V, E> {
         return list;
     }
 
-    /**
-     * Sets the selection to the given nodes.
-     * 
-     * @param nodes : the nodes to be selected
-     */
     @Override
     public void setSelectedNodes(List<V> nodes) {
-
+        graphComponent.getGraph().clearSelection();
+        
         Collection<Object> col = new ArrayList<Object>(nodes.size());
 
         for (V node : nodes) {
@@ -593,9 +576,19 @@ class JGraphXInterface<V, E> implements DrawingLibraryInterface<V, E> {
         graphAdapter.setSelectionCells(col);
     }
 
-    public JComponent getGraphOutline()
-    {
+    @Override
+    public JComponent getGraphOutline() {
        return graphOutline;
+    }
+    
+    /**
+     * Returns the current mxGraphComponent.
+     * 
+     * @return
+     *          The current mxGraphComponent
+     */
+    public mxGraphComponent getGraphComponent() {
+        return graphComponent;
     }
 }
 

@@ -107,8 +107,9 @@ public interface DrawingLibraryInterface<V, E> {
     void setSelectedNodes(List<V> nodes);
 
     /**
-     * Gets the minimap component for the current graph
+     * Gets the minimap component for the current graph.
      * @return
+     *          A minimap component
      */
     JComponent getGraphOutline();
 }

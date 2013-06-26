@@ -165,15 +165,6 @@ public interface GraphManipulationInterface<V, E> {
      * Zooms the panel, so that the whole graph is visible.
      */
     void zoomToFit();
-
-    /**
-     * Selects the specified nodes (for interaction). All other nodes will be
-     * deselected.
-     * 
-     * @param nodes
-     *          The nodes which will be selected.
-     */    
-    void selectNodes(V[] nodes);
     
     /**
      * Highlights the parents of a node. If used multiple times on the same
