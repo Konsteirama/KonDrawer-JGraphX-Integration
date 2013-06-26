@@ -207,7 +207,7 @@ public class ISGCITabbedPane extends JTabbedPane implements Updatable {
         
         //Adding the Add-Tab Tab
         //TODO finding a better name for the Add-Tab tab
-        JPanel addTabTab = new JPanel();
+        StartPanel addTabTab = new StartPanel(mainframe);
         addTab("", addTabTab);
         setSelectedComponent(addTabTab);
         addTabComponent = new AddTabComponent(this);

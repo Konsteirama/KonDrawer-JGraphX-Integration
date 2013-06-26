@@ -170,6 +170,10 @@ public class ISGCITabComponent extends JPanel {
             if (i != -1) {
                 parent.remove(i);
             }
+            
+            if (parent.getTabCount() > 1) {
+                parent.setSelectedIndex(parent.getTabCount() - 2);
+            }
         }
 
         // we don't want to update UI for this button

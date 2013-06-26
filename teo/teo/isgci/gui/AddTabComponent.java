@@ -44,6 +44,7 @@ package teo.isgci.gui;
 import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Component;
+import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.Graphics;
@@ -76,7 +77,10 @@ public class AddTabComponent extends JPanel {
     
     /** Parent. */
     private final JTabbedPane parent;
-
+    
+    /** mainframe */
+    private final ISGCIMainFrame mainframe;
+    
     /** 
      * Creates a new tabbedcomponent with close button and name.
      * 
@@ -91,6 +95,11 @@ public class AddTabComponent extends JPanel {
         }
         this.parent = pane;
         setOpaque(false);
+        Container mframe = parent;
+        while (mframe != null && !(mframe instanceof ISGCIMainFrame)) {
+            mframe = mframe.getParent();
+        }
+        mainframe = (ISGCIMainFrame) mframe;
         
         // tab button
         JButton button = new TabButton();
@@ -115,7 +124,7 @@ public class AddTabComponent extends JPanel {
         if (i >= 0) {
             parent.remove(i);
         }
-        JPanel addTabTab = new JPanel();
+        StartPanel addTabTab = new StartPanel(mainframe);
         parent.addTab("", addTabTab);
         parent.setSelectedComponent(addTabTab);
         parent.setTabComponentAt(parent.getSelectedIndex(), this);
