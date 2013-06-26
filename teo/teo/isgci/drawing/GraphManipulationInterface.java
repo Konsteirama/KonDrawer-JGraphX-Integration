@@ -68,6 +68,19 @@ public interface GraphManipulationInterface<V, E> {
      */
     void setBackgroundColor(Color color);
     
+    /**
+     * Sets the highlightcolor of the graph to a given color.
+     * 
+     * @param color : a color-parameter
+     */
+    void setHighlightColor(Color color);
+    
+    /**
+     * Sets the selectioncolor of the graph to a given color.
+     * 
+     * @param color : a color-parameter
+     */
+    void setSelectionColor(Color color);
     
     /**
      * Marks the edge between two given nodes by adding a small grey arrow and
@@ -96,13 +109,17 @@ public interface GraphManipulationInterface<V, E> {
     void redo();
 
     /**
-     * Removes the given node from the graph. Removal only effects the
-     * JGraphX-graph.
+     * Removes the given node from the graph.
      *
-     * @param node : a JGraphX-graph node object
+     * @param node : The node which will be deleted.
      */
     void removeNode(V node);
 
+    /**
+     * Removes all selected and highlighted nodes from the graph.
+     */
+    void removeHighlightedNodes();
+    
     /**
      * Alters the attribute name of a given node by replacing it by a given new
      * name. Renaming only effects the JGraphX-graph.
@@ -156,14 +173,30 @@ public interface GraphManipulationInterface<V, E> {
     void zoomToFit();
 
     /**
-     * Highlights a node and if specified its neighbors.
+     * Selects the specified nodes (for interaction). All other nodes will be
+     * deselected.
      * 
-     * @param node : The node to be highlighted
+     * @param nodes
+     *          The nodes which will be selected.
+     */    
+    void selectNodes(V[] nodes);
+    
+    /**
+     * Highlights the parents of a node. If used multiple times on the same
+     * nodes (without calling {@link #unHiglightAll()}) the depth is increased.
      * 
-     * @param depth : How "deep" the neighbours should be highlighted.
+     * @param roots : The nodes where to begin with highlighting
      */
-    void highlightNode(V node, int depth);
+    void highlightParents(V[] roots);
 
+    /**
+     * Highlights the parents of a node. If used multiple times on the same
+     * nodes (without calling {@link #unHiglightAll()}) the depth is increased.
+     * 
+     * @param roots : The nodes where to begin with highlighting
+     */
+    void highlightChildren(V[] roots);
+    
     /**
      * Un-Highlights all nodes that are currently highlighted before.
      */

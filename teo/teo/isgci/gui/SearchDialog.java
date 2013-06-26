@@ -155,7 +155,7 @@ public class SearchDialog extends JDialog implements ActionListener {
                 }
                 
                 manipulationInterface.unHiglightAll();
-                manipulationInterface.highlightNode(node, 0);
+                manipulationInterface.selectNodes(new Object[] { node });
                 
             } finally {
                 manipulationInterface.endNotUndoable();

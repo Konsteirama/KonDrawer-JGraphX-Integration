@@ -108,7 +108,8 @@ public class ISGCIToolBar extends JToolBar {
     private <V, E> void addGraphControlButtons() {
         
       // DELETE
-      String deleteTooltip = "Discard the selected nodes and their edges.";
+      String deleteTooltip = "Deletes all selected and highlighted"
+                          + " nodes and their edges.";
       JButton deletebutton = IconButtonFactory.createImageButton(
               IconButtonFactory.DELETE_ICON, deleteTooltip);
       add(deletebutton);
@@ -135,6 +136,8 @@ public class ISGCIToolBar extends JToolBar {
               for (V node : selectedNodes) {
                   manipulationInterface.removeNode(node);
               }
+              
+              manipulationInterface.removeHighlightedNodes();
               
               drawLib.getGraphManipulationInterface().endUpdate();
           }
@@ -165,8 +168,6 @@ public class ISGCIToolBar extends JToolBar {
                 
                 if (selectedNodes.size() == 1) {
                     manipulationInterface.centerNode(selectedNodes.get(0));
-                    manipulationInterface.highlightNode(
-                            selectedNodes.get(0), 0);
                 }
             }
         });
@@ -176,7 +177,8 @@ public class ISGCIToolBar extends JToolBar {
                 "Highlights the parent-nodes of the selected nodes."
                 + " Clicking multiple times will increase the depth.";
         JButton highlightParentButton = IconButtonFactory.createImageButton(
-                IconButtonFactory.HIGHLIGHT_ICON, highlightParentTooltip);
+                IconButtonFactory.HIGHLIGHTPARENT_ICON, 
+                highlightParentTooltip);
         add(highlightParentButton);
         
         highlightParentButton.addActionListener(new ActionListener() {
@@ -196,11 +198,8 @@ public class ISGCIToolBar extends JToolBar {
                 
                 List<V> selectedNodes = drawLib.getSelectedNodes();
                 
-                manipulationInterface.unHiglightAll();
                 
-                for (V node : selectedNodes) {
-                    manipulationInterface.highlightNode(node, 4);
-                }
+                
             }
         });
         
@@ -209,7 +208,8 @@ public class ISGCIToolBar extends JToolBar {
                 "Highlights the child-nodes of the selected nodes."
                 + " Clicking multiple times will increase the depth.";
         JButton highlightChildButton = IconButtonFactory.createImageButton(
-                IconButtonFactory.HIGHLIGHT_ICON, highlightChildTooltip);
+                IconButtonFactory.HIGHLIGHTCHILD_ICON, 
+                highlightChildTooltip);
         add(highlightChildButton);
         
         highlightChildButton.addActionListener(new ActionListener() {
@@ -229,11 +229,6 @@ public class ISGCIToolBar extends JToolBar {
                 
                 List<V> selectedNodes = drawLib.getSelectedNodes();
                 
-                manipulationInterface.unHiglightAll();
-                
-                for (V node : selectedNodes) {
-                    manipulationInterface.highlightNode(node, 4);
-                }
             }
         });
     }

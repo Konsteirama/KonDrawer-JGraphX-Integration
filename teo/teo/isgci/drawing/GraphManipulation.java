@@ -50,20 +50,21 @@ class GraphManipulation<V, E> implements GraphManipulationInterface<V, E> {
     /**
      * How far the user can zoom in.
      */
-    private static final double MAXZOOMLEVEL = 8;
-    /**
-     * Defines the color that should be used for highlighting.
-     */
-    private static final Color[] HIGHLIGHTCOLORS = new Color[]{
-        new Color(0xFF, 0xAA, 0x00),
-        new Color(0x00, 0xFF, 0x00),
-        new Color(0x44, 0x44, 0xFF),
-        new Color(0xFF, 0x00, 0x00)};
+    private static final double MAXZOOMLEVEL = 8; 
+    
     /**
      * Defines the thickness for highlighting.
      */
-    private static final String HIGHLIGHTTHICKNESS = "2";
-    protected mxIEventListener undoHandler = new mxIEventListener() {
+    private static final String HIGHLIGHTTHICKNESS = "4";
+    
+    /**
+     * Defines the color that should be used for highlighting.
+     */
+    private Color highlightColor;
+    
+    
+    /** Handles undo events in jgraphx. */
+    private mxIEventListener undoHandler = new mxIEventListener() {
         public void invoke(Object source, mxEventObject evt) {
             if (recordUndoableActions) {
                 undoManager.undoableEditHappened((mxUndoableEdit) evt
@@ -331,7 +332,7 @@ class GraphManipulation<V, E> implements GraphManipulationInterface<V, E> {
         setMinimapVisibility();
     }
 
-    @Override
+
     public void highlightNode(V node, int depth) {
         if (depth < 0) {
             return;
@@ -354,7 +355,7 @@ class GraphManipulation<V, E> implements GraphManipulationInterface<V, E> {
 
         if (depth == 0) {
             getGraphAdapter().setCellStyles(mxConstants.STYLE_STROKECOLOR,
-                    mxUtils.getHexColorString(HIGHLIGHTCOLORS[0]),
+                    mxUtils.getHexColorString(highlightColor),
                     cells.toArray());
             getGraphAdapter().setCellStyles(mxConstants.STYLE_STROKEWIDTH,
                     HIGHLIGHTTHICKNESS, cells.toArray());
@@ -430,8 +431,7 @@ class GraphManipulation<V, E> implements GraphManipulationInterface<V, E> {
 
                     getGraphAdapter().setCellStyles(
                             mxConstants.STYLE_STROKECOLOR,
-                            mxUtils.getHexColorString(
-                                 HIGHLIGHTCOLORS[i % HIGHLIGHTCOLORS.length]),
+                            mxUtils.getHexColorString(highlightColor),
                             cells.toArray());
                     getGraphAdapter().setCellStyles(
                             mxConstants.STYLE_STROKEWIDTH, HIGHLIGHTTHICKNESS,
@@ -527,7 +527,8 @@ class GraphManipulation<V, E> implements GraphManipulationInterface<V, E> {
     public void resetLayout() {
         Graph<V, E> graphT = getGraphAdapter().getGraph();
 
-        JGraphXAdapter<V, E> newGraphAdapter = new JGraphXAdapter<V, E>(graphT);
+        JGraphXAdapter<V, E> newGraphAdapter 
+            = new JGraphXAdapter<V, E>(graphT);
         setMinimapVisibility();
     }
 
@@ -594,6 +595,42 @@ class GraphManipulation<V, E> implements GraphManipulationInterface<V, E> {
         } else {
             graphOutline.setVisible(false);
         }
+    }
+
+    @Override
+    public void removeHighlightedNodes() {
+        // TODO Auto-generated method stub
+        
+    }
+
+    @Override
+    public void highlightParents(V[] roots) {
+        // TODO Auto-generated method stub
+        
+    }
+
+    @Override
+    public void highlightChildren(V[] roots) {
+        // TODO Auto-generated method stub
+        
+    }
+
+    @Override
+    public void setHighlightColor(Color color) {
+        // TODO Auto-generated method stub
+        
+    }
+
+    @Override
+    public void setSelectionColor(Color color) {
+        // TODO Auto-generated method stub
+        
+    }
+
+    @Override
+    public void selectNodes(V[] nodes) {
+        // TODO Auto-generated method stub
+        
     }
 }
 

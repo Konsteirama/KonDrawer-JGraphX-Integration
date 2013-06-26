@@ -159,17 +159,8 @@ public class ISGCITabbedPane extends JTabbedPane implements Updatable {
             Object node = drawLib.getNodeAt(e.getPoint());
             Object edge = drawLib.getEdgeAt(e.getPoint());
             
-            // Left-click event
-            if (e.getButton() == MouseEvent.BUTTON1
-                    && drawLib != null) {
-                if (node != null) {
-                    manipulationInterface.beginNotUndoable();
-                    manipulationInterface.unHiglightAll();
-                    manipulationInterface.highlightNode(node, 1);
-                    manipulationInterface.endNotUndoable();
-                }
             // Right-click event
-            } else if (e.getButton() == MouseEvent.BUTTON3 
+            if (e.getButton() == MouseEvent.BUTTON3 
                     && drawLib != null) {
                 
                 if (node != null) {

@@ -41,7 +41,6 @@ import net.sf.epsgraphics.EpsGraphics;
 
 import org.jgrapht.Graph;
 import org.jgrapht.ext.GraphMLExporter;
-import org.w3c.dom.Document;
 import org.xml.sax.SAXException;
 
 import com.mxgraph.canvas.mxICanvas;
@@ -56,7 +55,6 @@ import com.mxgraph.util.mxConstants;
 import com.mxgraph.util.mxDomUtils;
 import com.mxgraph.util.mxUtils;
 import com.mxgraph.util.mxXmlUtils;
-import com.mxgraph.view.mxCellState;
 import com.mxgraph.view.mxGraph;
 
 /**
@@ -174,8 +172,7 @@ class JGraphXInterface<V, E> implements DrawingLibraryInterface<V, E> {
                 graphComponent.getGraphControl().setCursor(
                         Cursor.getDefaultCursor());
                 /* if mouse was pressed longer than 150ms it's probably not a 
-                 * click and is handled as a panning action 
-                 */
+                 * click and is handled as a panning action */
                 if ((e.getWhen() - begin) > epsilon) {
                     setSelectedNodes(selectedNodes);
                 }
@@ -231,8 +228,6 @@ class JGraphXInterface<V, E> implements DrawingLibraryInterface<V, E> {
                 graphManipulation.setMinimapVisibility(); 
             }
         });
-        
-        graphOutline.setOpaque(false);
     }
     
     /**
