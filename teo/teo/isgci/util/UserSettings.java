@@ -63,6 +63,9 @@ public abstract class UserSettings {
      */
     private static Color selectionColor = getDefaultSelectionColor();
     
+    /** The colorblind color for highlighting. */
+    public static final Color BLINDHIGHTLIGHTCOLOR = new Color(168, 221, 181);
+    
     /**
      * Maps the content of the tabs to their corresponding
      * naming preference.
@@ -175,7 +178,6 @@ public abstract class UserSettings {
     public static Color getCurrentHighlightColor() {
         return highlightColor;
     }
-    
     
     /**
      * Getter for default font color.

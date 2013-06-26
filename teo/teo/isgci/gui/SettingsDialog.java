@@ -234,8 +234,7 @@ public class SettingsDialog extends JDialog {
                 nameToColor.put(FONT, UserSettings.getDefaultFontColor());
                 nameToColor.put(BACKGROUND,
                         UserSettings.getDefaultBackgroundColor());
-                nameToColor.put(HIGHLIGHT, 
-                        UserSettings.getDefaultHighlightColor());
+                nameToColor.put(HIGHLIGHT, UserSettings.BLINDHIGHTLIGHTCOLOR);
                 nameToColor.put(SELECTION, 
                         UserSettings.getDefaultSelectionColor());
 
