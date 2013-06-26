@@ -168,11 +168,11 @@ public class ISGCITabComponent extends JPanel {
             
             
             if (i != -1) {
-                parent.remove(i);
-            }
-            
-            if (parent.getTabCount() > 1) {
-                parent.setSelectedIndex(parent.getTabCount() - 2);
+                parent.remove(i);                
+                if (parent.getTabCount() > 1 
+                        && i == parent.getTabCount() - 1) {
+                    parent.setSelectedIndex(parent.getTabCount() - 2);
+                }
             }
         }
 
