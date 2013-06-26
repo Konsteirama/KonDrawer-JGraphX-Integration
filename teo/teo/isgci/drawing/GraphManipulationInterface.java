@@ -130,12 +130,6 @@ public interface GraphManipulationInterface<V, E> {
     void renameNode(V node, String newName);
 
     /**
-     * Resets the layout of the JGrapgX-graph on the panel to the original
-     * JGraphT-graph.
-     */
-    void resetLayout();
-
-    /**
      * Undoes a previously performed action on the graph.
      */
     void undo();
