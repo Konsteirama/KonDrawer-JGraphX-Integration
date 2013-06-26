@@ -566,9 +566,11 @@ public class ISGCITabbedPane extends JTabbedPane implements Updatable {
                 gmi.colorNode(colorToNodes.get(color).toArray(), color);
             }
             
-            //set font and backgroundcolor
+            //set special colors
             gmi.setFontColor(UserSettings.getCurrentFontColor());
             gmi.setBackgroundColor(UserSettings.getCurrentBackgroundColor());
+            gmi.setHighlightColor(UserSettings.getCurrentHighlightColor());
+            gmi.setSelectionColor(UserSettings.getCurrentSelectionColor());
             
             
         } finally {

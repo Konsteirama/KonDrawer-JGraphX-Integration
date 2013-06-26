@@ -655,9 +655,19 @@ class GraphManipulation<V, E> implements GraphManipulationInterface<V, E> {
     }
 
     @Override
-    public void setHighlightColor(Color color) {
+    public void setHighlightColor(Color color) {        
         highlightColor = color;
-        // TODO
+        
+        for (mxICell cell : highlightedCellsColor.keySet()) {
+            
+            // ignore selected cells
+            if (cellsToHDepth.containsKey(cell)) {
+                continue;
+            }
+            
+            getGraphAdapter().setCellStyles(mxConstants.STYLE_STROKECOLOR,
+                    mxUtils.getHexColorString(color), new Object[] {cell});
+        }
     }
 
     @Override
