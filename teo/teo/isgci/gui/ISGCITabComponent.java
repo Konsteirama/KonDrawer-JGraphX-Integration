@@ -61,6 +61,8 @@ import javax.swing.JPanel;
 import javax.swing.JTabbedPane;
 import javax.swing.plaf.basic.BasicButtonUI;
 
+import teo.isgci.util.Utility;
+
 /**
  * Component to be used as tabComponent. Contains a JLabel to show the text and
  * a JButton to close the tab it belongs to.
@@ -93,7 +95,7 @@ public class ISGCITabComponent extends JPanel {
         setOpaque(false);
 
         // transform titles of JTabbedPane to their LaTeX text
-        LatexLabel label = new LatexLabel(name);
+        LatexLabel label = new LatexLabel(Utility.getShortName(name));
         // make background transparent
         label.setBackground(new Color(0, 0, 0, 0));
         
