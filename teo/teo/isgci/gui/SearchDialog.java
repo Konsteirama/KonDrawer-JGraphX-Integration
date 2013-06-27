@@ -154,7 +154,7 @@ public class SearchDialog extends JDialog implements ActionListener {
                     manipulationInterface.zoomTo(searchZoomLevel);
                 }
                 
-                manipulationInterface.unHiglightAll();
+                manipulationInterface.unHighlightAll();
                 
                 List selectedNodes = new ArrayList();
                 selectedNodes.add(node);

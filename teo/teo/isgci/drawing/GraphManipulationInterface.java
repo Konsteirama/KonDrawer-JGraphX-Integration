@@ -121,6 +121,14 @@ public interface GraphManipulationInterface<V, E> {
     void removeHighlightedNodes();
     
     /**
+    * unHighlights a selected node and all its highlighted parents and 
+    * children as well as vertices. 
+    * @param node
+    *          The node that should be unhighlighted
+    */
+    void unHighlightNode(V node);
+    
+    /**
      * Alters the attribute name of a given node by replacing it by a given new
      * name. Renaming only effects the JGraphX-graph.
      *
@@ -185,7 +193,7 @@ public interface GraphManipulationInterface<V, E> {
     /**
      * Un-Highlights all nodes that are currently highlighted before.
      */
-    void unHiglightAll();
+    void unHighlightAll();
 
     /**
      * Call to start a block of updates.

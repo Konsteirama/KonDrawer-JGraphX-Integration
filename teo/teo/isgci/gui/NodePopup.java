@@ -92,18 +92,11 @@ public class NodePopup extends JPopupMenu implements ActionListener {
                 return;
             }
             
-            drawLib.getGraphManipulationInterface().beginUpdate();
-            
             GraphManipulationInterface manipulationInterface =
                     drawLib.getGraphManipulationInterface();
-            
-            List selectedNodes = drawLib.getSelectedNodes();
-            
-            for (Object node : selectedNodes) {
-                manipulationInterface.removeNode(node);
-            }
 
-            drawLib.getGraphManipulationInterface().endUpdate();
+            manipulationInterface.unHighlightNode(node);
+            manipulationInterface.removeNode(node);
         }
     }
     

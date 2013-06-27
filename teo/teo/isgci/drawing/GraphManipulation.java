@@ -27,7 +27,6 @@ import teo.isgci.util.Latex2Html;
 import teo.isgci.util.UserSettings;
 
 import com.mxgraph.layout.hierarchical.mxHierarchicalLayout;
-import com.mxgraph.model.mxCell;
 import com.mxgraph.model.mxICell;
 import com.mxgraph.swing.mxGraphComponent;
 import com.mxgraph.util.mxConstants;
@@ -75,7 +74,7 @@ class GraphManipulation<V, E> implements GraphManipulationInterface<V, E> {
      * Defines the color that should be used for selection.
      */
     private Color selectionColor;
-    
+
     /** Handles undo events in jgraphx. */
     private mxIEventListener undoHandler = new mxIEventListener() {
         public void invoke(Object source, mxEventObject evt) {
@@ -352,13 +351,12 @@ class GraphManipulation<V, E> implements GraphManipulationInterface<V, E> {
         mxGraph graph = drawLib.getGraphComponent().getGraph();
 
         Object[] cells = new Object[]{getCellFromNode(node)};
-
+        
         // Adds all edges connected to the node
         cells = graph.addAllEdges(cells);
-
+        
         beginUpdate();
         try {
-            //unHighlightNode(getCellFromNode(node));
             // Deletes every cell
             for (Object object : cells) {
                 graph.getModel().remove(object);
@@ -387,7 +385,8 @@ class GraphManipulation<V, E> implements GraphManipulationInterface<V, E> {
     }
 
     @Override
-    public void unHiglightAll() {
+    public void unHighlightAll() {
+        beginNotUndoable();
         beginUpdate();
         try {
             for (mxICell cell : highlightedCellsColor.keySet()) {
@@ -396,6 +395,7 @@ class GraphManipulation<V, E> implements GraphManipulationInterface<V, E> {
                 if (selectedCells.contains(cell)) {
                     continue;
                 }
+                
                 
                 getGraphAdapter().setCellStyles(mxConstants.STYLE_STROKECOLOR,
                         mxUtils.getHexColorString(
@@ -406,11 +406,23 @@ class GraphManipulation<V, E> implements GraphManipulationInterface<V, E> {
                         highlightedCellsThickness.get(cell), 
                         new Object[]{cell});
                 
-                highlightedCellsColor.remove(cell);
-                highlightedCellsThickness.remove(cell);
+            }
+            
+            // second iteration is needed so we don't delete from the keyset
+            // while deleting from it - same reason why we use .toArray here
+            for (Object obj : highlightedCellsColor.keySet().toArray()) {
+                
+                // ignore cells that are selected
+                if (selectedCells.contains(obj)) {
+                    continue;
+                }
+                
+                highlightedCellsColor.remove(obj);
+                highlightedCellsThickness.remove(obj);
             }
         } finally {
             endUpdate();
+            endNotUndoable();
             
             /*
              * graphOutline sometimes won't take changes from this method, to
@@ -421,6 +433,72 @@ class GraphManipulation<V, E> implements GraphManipulationInterface<V, E> {
             drawLib.getGraphOutline().setVisible(false);
             setMinimapVisibility();
         }
+    }
+
+    @Override
+    public void unHighlightNode(V tnode) {
+        mxICell node = getCellFromNode(tnode);
+        
+        if (!highlightedCellsColor.containsKey(node)) {
+            return;
+        }
+        
+        beginNotUndoable();
+        
+        getGraphAdapter().setCellStyles(mxConstants.STYLE_STROKECOLOR,
+                mxUtils.getHexColorString(
+                        highlightedCellsColor.get(node)),
+                new Object[]{node});
+    
+        getGraphAdapter().setCellStyles(mxConstants.STYLE_STROKEWIDTH,
+                highlightedCellsThickness.get(node), 
+                new Object[]{node});
+        
+        highlightedCellsColor.remove(node);
+        highlightedCellsThickness.remove(node);
+        
+        endNotUndoable();
+        
+        Graph<V, E> graph = drawLib.getGraph();
+        Set<E> edges = graph.edgesOf(
+                getGraphAdapter().getCellToVertexMap().get(node));
+        
+        for (E edge : edges) {
+            V parent = graph.getEdgeSource(edge);
+            V child = graph.getEdgeTarget(edge);
+            mxICell mxParent = getCellFromNode(parent);
+            mxICell mxChild = getCellFromNode(child);
+            mxICell mxEdge = getCellFromEdge(edge);
+            
+            // unhighlight edge if necessary
+            if (highlightedCellsColor.containsKey(mxEdge)) {
+                beginNotUndoable();
+                
+                getGraphAdapter().setCellStyles(mxConstants.STYLE_STROKECOLOR,
+                        mxUtils.getHexColorString(
+                                highlightedCellsColor.get(mxEdge)),
+                        new Object[]{mxEdge});
+    
+                getGraphAdapter().setCellStyles(mxConstants.STYLE_STROKEWIDTH,
+                        highlightedCellsThickness.get(mxEdge), 
+                        new Object[]{mxEdge});
+                
+                highlightedCellsColor.remove(mxEdge);
+                highlightedCellsThickness.remove(mxEdge);
+                
+                endNotUndoable();
+            }
+            
+            // stop if node is selected, else recursively unhighlight nodes
+            if (!selectedCells.contains(mxParent)) {
+                unHighlightNode(parent);
+            }
+            
+            if (!selectedCells.contains(mxChild)) {
+                unHighlightNode(child);
+            }
+         }
+        
     }
 
     /**
@@ -533,18 +611,31 @@ class GraphManipulation<V, E> implements GraphManipulationInterface<V, E> {
 
     @Override
     public void removeHighlightedNodes() {
-        beginUpdate();
+        // get a copy of the list before removing everything
+        List<mxICell> cells 
+            = new ArrayList<mxICell>(highlightedCellsColor.keySet().size());
+            
+        for (mxICell cell : highlightedCellsColor.keySet()) {
+            cells.add(cell);
+        }
         
+        // unhighlighting everything (thats why we need the copy) 
+        beginNotUndoable();
+        unHighlightAll();
+        endNotUndoable();
+        
+        // deselect all nodes
+        drawLib.setSelectedNodes(new ArrayList<V>());
+        
+        
+        beginUpdate();
         try {
             HashMap<mxICell, V> cellToVertex 
                 = getGraphAdapter().getCellToVertexMap();
             
-            for (mxICell cell : highlightedCellsColor.keySet()) {
-                if (cellToVertex.containsKey(cell)) {
-                    removeNode(cellToVertex.get(cell));
-                }
+            for (mxICell cell : cells) {
+                removeNode(cellToVertex.get(cell));
             }
-            
             
         } finally {
             endUpdate();
@@ -555,82 +646,99 @@ class GraphManipulation<V, E> implements GraphManipulationInterface<V, E> {
     @Override
     public void highlightParents(List<V> roots) {
         beginNotUndoable();
-        Graph<V, E> graph = drawLib.getGraph(); 
+        Graph<V, E> graph = drawLib.getGraph();
+
+        // don't visit a node twice
+        List<V> visitedNodes = new ArrayList<V>();
 
         for (V root : roots) {
             Set<E> edges = graph.edgesOf(root);
-            
+
             for (E edge : edges) {
                 V parent = graph.getEdgeSource(edge);
                 mxICell mxParent = getCellFromNode(parent);
-                
+
                 // edge was pointing to child
                 if (parent == root) {
                     continue;
                 }
-                
+
                 // highlight node
-                highlightCell(getCellFromEdge(edge), 
-                        highlightColor, HIGHLIGHTTHICKNESS);
-                
+                highlightCell(getCellFromEdge(edge), highlightColor,
+                        HIGHLIGHTTHICKNESS);
+
                 // node already selected -> only mark the edge and continue
                 if (selectedCells.contains(mxParent)) {
                     continue;
                 }
-                
-                if (highlightedCellsColor.containsKey(mxParent) 
-                   && !selectedCells.contains(mxParent)) {
+
+                // cell already highlighted: recursively highlight if it's
+                // not a selection and if the node wasn't already visited
+                // during this loop
+                if (highlightedCellsColor.containsKey(mxParent)
+                        && !selectedCells.contains(mxParent)
+                        && !visitedNodes.contains(parent)) {
+                    // got to use a list
                     List<V> parentList = new ArrayList<V>();
                     parentList.add(parent);
                     highlightParents(parentList);
                 } else {
-                    highlightCell(mxParent, 
-                            highlightColor, HIGHLIGHTTHICKNESS);
+                    visitedNodes.add(parent);
+                    highlightCell(mxParent, highlightColor, 
+                            HIGHLIGHTTHICKNESS);
                 }
-             }
-            
+            }
+
         }
-        
+
         endNotUndoable();
     }
 
     @Override
     public void highlightChildren(List<V> roots) {
         beginNotUndoable();
-        Graph<V, E> graph = drawLib.getGraph(); 
+        Graph<V, E> graph = drawLib.getGraph();
+
+        // don't visit a node twice
+        List<V> visitedNodes = new ArrayList<V>();
 
         for (V root : roots) {
             Set<E> edges = graph.edgesOf(root);
-            
+
             for (E edge : edges) {
                 V child = graph.getEdgeTarget(edge);
-                 mxICell mxChild = getCellFromNode(child);
-                
-                 // edge was pointing to parent
-                 if (child == root) {
-                     continue;
-                 }
-                 
-                 // highlight node
-                 highlightCell(getCellFromEdge(edge), 
-                         highlightColor, HIGHLIGHTTHICKNESS);
-                 
-                 // node already selected -> only mark the edge and continue
-                 if (selectedCells.contains(mxChild)) {
-                     continue;
-                 }
-               
-                if (highlightedCellsColor.containsKey(mxChild) 
-                   && !selectedCells.contains(mxChild)) {
+                mxICell mxChild = getCellFromNode(child);
+
+                // edge was pointing to parent
+                if (child == root) {
+                    continue;
+                }
+
+                // highlight node
+                highlightCell(getCellFromEdge(edge), highlightColor,
+                        HIGHLIGHTTHICKNESS);
+
+                // node already selected -> only mark the edge and continue
+                if (selectedCells.contains(mxChild)) {
+                    continue;
+                }
+
+                // cell already highlighted: recursively highlight if it's
+                // not a selection and if the node wasn't already visited
+                // during this loop
+                if (highlightedCellsColor.containsKey(mxChild)
+                        && !selectedCells.contains(mxChild)
+                        && !visitedNodes.contains(child)) {                    
+                    // got to use a list
                     List<V> childList = new ArrayList<V>();
                     childList.add(child);
                     highlightChildren(childList);
                 } else {
-                    highlightCell(mxChild, 
-                            highlightColor, HIGHLIGHTTHICKNESS);
+                    highlightCell(mxChild, highlightColor, HIGHLIGHTTHICKNESS);
+                    visitedNodes.add(child);
                 }
-             }
-            
+            }
+
         }
         endNotUndoable();
     }
@@ -664,27 +772,37 @@ class GraphManipulation<V, E> implements GraphManipulationInterface<V, E> {
     /**
      * Updates all selected cells and adds a border around them.
      */
-    public void updateSelectedCells() {       
-        // unmark all previous cells
-        for (mxICell cell : selectedCells) {
-            unHighlightNode(cell);
-        }
-        
-        selectedCells.clear();
-        
-        // build a list of all newly selected cells
-        Object[] cells 
+    public void updateSelectedCells() {
+        // build difference between old cells and new cells
+        Object[] newCells
             = drawLib.getGraphComponent().getGraph().getSelectionCells();
-        
-        // convert to list
+
+        // convert new cells to list     
         List<mxICell> currentCells 
-            = new ArrayList<mxICell>(cells.length);
+            = new ArrayList<mxICell>(newCells.length);
             
-        for (Object obj : cells) {
+        for (Object obj : newCells) {
             if (obj instanceof mxICell) {
                currentCells.add((mxICell) obj); 
             }
         }
+        
+        // build difference and unhighlight all that are not in new cells
+        for (mxICell cell : selectedCells) {
+            if (!currentCells.contains(cell)) {
+                unHighlightNode(getGraphAdapter()
+                        .getCellToVertexMap().get(cell));
+            }
+        }
+        
+        selectedCells.clear();
+       
+        // if there are no selected cells, simply unhighlight everything
+        if (newCells.length == 0) {
+            unHighlightAll();
+            return;
+        }
+        
         
         // select all cells
         for (mxICell cell : currentCells) { 
@@ -694,142 +812,6 @@ class GraphManipulation<V, E> implements GraphManipulationInterface<V, E> {
         
     }
     
-
-    /**
-     * Highlights a node's parents or children as specified with child.
-     * @param startCell where to start
-     * @param child whether the algorithm should go down or upwards
-     */
-    private void highlightNode(mxICell startCell, boolean child) {
-        ArrayList<mxICell> cells = new ArrayList<mxICell>();
-        ArrayList<mxICell> neighborCells = new ArrayList<mxICell>();
-
-        cells.add(startCell);
-
-        if (!highlightedCellsColor.containsKey(startCell)) {
-            highlightedCellsThickness.put(startCell,
-                    mxUtils.getString(getGraphAdapter()
-                    .getCellStyle(startCell), mxConstants.STYLE_STROKEWIDTH));
-
-            highlightedCellsColor.put(startCell, mxUtils.getColor(
-                    getGraphAdapter()
-                    .getCellStyle(startCell),
-                    mxConstants.STYLE_STROKECOLOR));
-        }
-
-
-        beginUpdate();
-        try {
-            for (int i = 0; i < 0; i++) {
-
-                for (mxICell cell : cells) {
-                    if (cell.isEdge()) {
-                        continue;
-                    }
-                    for (int j = 0; j < cell.getEdgeCount(); j++) {
-                        mxCell edge = (mxCell) cell.getEdgeAt(j);
-
-                        if (highlightedCellsColor.containsKey(edge)) {
-                            continue;
-                        }
-
-                        highlightedCellsColor.put(edge, mxUtils.getColor(
-                                getGraphAdapter().getCellStyle(edge),
-                                mxConstants.STYLE_STROKECOLOR));
-
-                        highlightedCellsThickness.put(edge, mxUtils.getString(
-                                getGraphAdapter().getCellStyle(edge),
-                                mxConstants.STYLE_STROKEWIDTH));
-
-                        neighborCells.add(edge);
-
-                        mxICell source = edge.getSource();
-                        mxICell target = edge.getTarget();
-
-                        if (!highlightedCellsColor.containsKey(source)) {
-                            highlightedCellsThickness.put(source, mxUtils
-                                    .getString(
-                                            getGraphAdapter().getCellStyle(
-                                                    source),
-                                            mxConstants.STYLE_STROKEWIDTH));
-
-                            highlightedCellsColor.put(source, mxUtils
-                                    .getColor(
-                                            getGraphAdapter().getCellStyle(
-                                                    source),
-                                            mxConstants.STYLE_STROKECOLOR));
-                            neighborCells.add(source);
-                        }
-
-                        if (!highlightedCellsColor.containsKey(target)) {
-
-                            highlightedCellsThickness.put(target, mxUtils
-                                    .getString(
-                                            getGraphAdapter().getCellStyle(
-                                                    target),
-                                            mxConstants.STYLE_STROKEWIDTH));
-
-                            highlightedCellsColor.put(target, mxUtils
-                                    .getColor(
-                                            getGraphAdapter().getCellStyle(
-                                                    target),
-                                            mxConstants.STYLE_STROKECOLOR));
-                            neighborCells.add(target);
-                        }
-                    }
-                }
-
-                if (i > 0) {
-                    cells.clear();
-                }
-
-                cells.addAll(neighborCells);
-
-                getGraphAdapter().setCellStyles(mxConstants.STYLE_STROKECOLOR,
-                        mxUtils.getHexColorString(highlightColor),
-                        cells.toArray());
-                getGraphAdapter().setCellStyles(mxConstants.STYLE_STROKEWIDTH,
-                        HIGHLIGHTTHICKNESS, cells.toArray());
-
-                if (i == 0) {
-                    cells.remove(startCell);
-                }
-
-                neighborCells.clear();
-            }
-        } finally {
-            endUpdate();
-        }
-
-    }
-    
-    /**
-     * unHighlights a selected node and all its highlighted parents and 
-     * children. 
-     * @param node
-     *          The node that should be unhighlighted
-     */
-    private void unHighlightNode(mxICell node) {
-        if (!highlightedCellsColor.containsKey(node)) {
-            return;
-        }
-        
-        beginNotUndoable();
-        
-        getGraphAdapter().setCellStyles(mxConstants.STYLE_STROKECOLOR,
-                mxUtils.getHexColorString(
-                        highlightedCellsColor.get(node)),
-                new Object[]{node});
-
-        getGraphAdapter().setCellStyles(mxConstants.STYLE_STROKEWIDTH,
-                highlightedCellsThickness.get(node), 
-                new Object[]{node});
-        
-        endNotUndoable();
-        
-        highlightedCellsColor.remove(node);
-        highlightedCellsThickness.remove(node);
-    }
     
     /**
      * Highlights a cell with the given color and thickness.
@@ -841,14 +823,18 @@ class GraphManipulation<V, E> implements GraphManipulationInterface<V, E> {
      *          How thick the border should be
      */
     private void highlightCell(mxICell cell, Color color, String thickness) {
-        // save old values
-        highlightedCellsThickness.put(cell,
-                mxUtils.getString(getGraphAdapter().getCellStyle(cell), 
-                        mxConstants.STYLE_STROKEWIDTH));
+        // don't overwrite original values
+        if (!highlightedCellsColor.containsKey(cell)) {
 
-        highlightedCellsColor.put(cell, mxUtils.getColor(
-                getGraphAdapter().getCellStyle(cell), 
-                mxConstants.STYLE_STROKECOLOR));
+            // save old values
+            highlightedCellsThickness.put(cell, mxUtils.getString(
+                    getGraphAdapter().getCellStyle(cell),
+                    mxConstants.STYLE_STROKEWIDTH));
+
+            highlightedCellsColor.put(cell, mxUtils.getColor(getGraphAdapter()
+                    .getCellStyle(cell), mxConstants.STYLE_STROKECOLOR));
+        }
+        
         
         // apply new values
         getGraphAdapter().setCellStyles(mxConstants.STYLE_STROKECOLOR,

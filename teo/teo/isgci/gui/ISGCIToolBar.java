@@ -126,20 +126,10 @@ public class ISGCIToolBar extends JToolBar {
                   return;
               }
 
-              drawLib.getGraphManipulationInterface().beginUpdate();
-              
               GraphManipulationInterface<V, E> manipulationInterface =
                       drawLib.getGraphManipulationInterface();
-              
-              List<V> selectedNodes = drawLib.getSelectedNodes();
-              
-              for (V node : selectedNodes) {
-                  manipulationInterface.removeNode(node);
-              }
-              
+
               manipulationInterface.removeHighlightedNodes();
-              
-              drawLib.getGraphManipulationInterface().endUpdate();
           }
       });
         

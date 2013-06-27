@@ -172,8 +172,19 @@ class JGraphXInterface<V, E> implements DrawingLibraryInterface<V, E> {
                 } catch (Exception ex) {
                     System.err.println("Unable to set cursor!");
                 }
+                
                 selectedNodes = getSelectedNodes();
                 begin  = e.getWhen();
+                
+                // set black border around cells
+                graphManipulation.beginNotUndoable();
+                graphManipulation.beginUpdate();
+                try {
+                    graphManipulation.updateSelectedCells();
+                } finally {
+                    graphManipulation.endUpdate();
+                    graphManipulation.endNotUndoable();
+                }
                 
                 super.mousePressed(e);
             }
@@ -186,27 +197,21 @@ class JGraphXInterface<V, E> implements DrawingLibraryInterface<V, E> {
                  * click and is handled as a panning action */
                 if ((e.getWhen() - begin) > epsilon) {
                     setSelectedNodes(selectedNodes);
+                    
+                    // update black border around cells
+                    graphManipulation.beginNotUndoable();
+                    graphManipulation.beginUpdate();
+                    try {
+                        graphManipulation.updateSelectedCells();
+                    } finally {
+                        graphManipulation.endUpdate();
+                        graphManipulation.endNotUndoable();
+                    }
                 }
                 
                 super.mouseReleased(e);
             }
         };
-        
-        
-        // listen for cellselection
-        graphAdapter.getSelectionModel().addListener(mxEvent.CHANGE, 
-                new mxIEventListener() {
-                    
-                    @Override
-                    public void invoke(Object sender, mxEventObject evt) {
-                        graphManipulation.beginNotUndoable();
-                        try {
-                            graphManipulation.updateSelectedCells();
-                        } finally {
-                            graphManipulation.endNotUndoable();
-                        }
-                    }
-                });
     }
 
     /**
@@ -314,6 +319,17 @@ class JGraphXInterface<V, E> implements DrawingLibraryInterface<V, E> {
                 .put(mxConstants.STYLE_ROUNDED, "true");
         
         graphAdapter.setHtmlLabels(true);
+        
+        
+//        // listen for cellselection
+//        graphAdapter.getSelectionModel().addListener(mxEvent.CHANGE, 
+//                new mxIEventListener() {
+//                    
+//                    @Override
+//                    public void invoke(Object sender, mxEventObject evt) {
+//
+//                    }
+//                });
     }
 
 
@@ -579,6 +595,7 @@ class JGraphXInterface<V, E> implements DrawingLibraryInterface<V, E> {
         }
 
         graphAdapter.setSelectionCells(col);
+        graphManipulation.updateSelectedCells();
     }
 
     @Override
