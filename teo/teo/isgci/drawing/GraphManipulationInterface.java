@@ -12,7 +12,6 @@
 package teo.isgci.drawing;
 
 import java.awt.Color;
-import java.awt.Point;
 import java.util.List;
 
 /**

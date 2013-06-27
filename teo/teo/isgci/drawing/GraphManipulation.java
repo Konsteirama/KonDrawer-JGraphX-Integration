@@ -492,10 +492,23 @@ class GraphManipulation<V, E> implements GraphManipulationInterface<V, E> {
     public void zoomToFit() {
         mxGraphView view = drawLib.getGraphComponent().getGraph().getView();
 
-        int compLen = drawLib.getGraphComponent().getWidth();
-        int viewLen = (int) view.getGraphBounds().getWidth();
+        // Get the component and view heights/widths
+        int compWidth = drawLib.getGraphComponent().getWidth();
+        int viewWidth = (int) view.getGraphBounds().getWidth();
+        int compHeight = drawLib.getGraphComponent().getHeight();
+        int viewHeight = (int) view.getGraphBounds().getHeight();
 
-        view.setScale((double) compLen / viewLen * view.getScale());
+        double relWidth = (double) compWidth / viewWidth;
+        double relHeight = (double) compHeight / viewHeight;
+
+        // If the relative Width is greater than the rel. height
+        // set the scale to fit the width and vice versa
+        if (relWidth <= relHeight) {
+            view.setScale(relWidth * view.getScale());
+        } else {
+            view.setScale(relHeight * view.getScale()); 
+        }
+
         setMinimapVisibility();
     }
 
