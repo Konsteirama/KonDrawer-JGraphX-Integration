@@ -358,7 +358,7 @@ class GraphManipulation<V, E> implements GraphManipulationInterface<V, E> {
 
         beginUpdate();
         try {
-            unHighlightNode(getCellFromNode(node));
+            //unHighlightNode(getCellFromNode(node));
             // Deletes every cell
             for (Object object : cells) {
                 graph.getModel().remove(object);
@@ -520,28 +520,28 @@ class GraphManipulation<V, E> implements GraphManipulationInterface<V, E> {
 
     @Override
     public void removeHighlightedNodes() {
-        for (mxICell cell : highlightedCellsColor.keySet()) {
-            mxGraph graph = drawLib.getGraphComponent().getGraph();
-
-            // Adds all edges connected to the node
-            Object[] cells = graph.addAllEdges(new Object[] { cell });
-
-            beginUpdate();
-            try {
-                // Deletes every cell
-                for (Object object : cells) {
-                    graph.getModel().remove(object);
+        beginUpdate();
+        
+        try {
+            HashMap<mxICell, V> cellToVertex 
+                = getGraphAdapter().getCellToVertexMap();
+            
+            for (mxICell cell : highlightedCellsColor.keySet()) {
+                if (cellToVertex.containsKey(cell)) {
+                    removeNode(cellToVertex.get(cell));
                 }
-            } finally {
-                endUpdate();
             }
-
-            setMinimapVisibility();
+            
+            
+        } finally {
+            endUpdate();
         }
+        
     }
 
     @Override
     public void highlightParents(List<V> roots) {
+        beginNotUndoable();
         Graph<V, E> graph = drawLib.getGraph(); 
 
         for (V root : roots) {
@@ -577,10 +577,13 @@ class GraphManipulation<V, E> implements GraphManipulationInterface<V, E> {
              }
             
         }
+        
+        endNotUndoable();
     }
 
     @Override
     public void highlightChildren(List<V> roots) {
+        beginNotUndoable();
         Graph<V, E> graph = drawLib.getGraph(); 
 
         for (V root : roots) {
@@ -616,6 +619,7 @@ class GraphManipulation<V, E> implements GraphManipulationInterface<V, E> {
              }
             
         }
+        endNotUndoable();
     }
 
     @Override
@@ -808,10 +812,10 @@ class GraphManipulation<V, E> implements GraphManipulationInterface<V, E> {
                 highlightedCellsThickness.get(node), 
                 new Object[]{node});
         
+        endNotUndoable();
+        
         highlightedCellsColor.remove(node);
         highlightedCellsThickness.remove(node);
-        
-        endNotUndoable();
     }
     
     /**
