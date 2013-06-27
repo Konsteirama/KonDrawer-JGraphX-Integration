@@ -199,7 +199,12 @@ class JGraphXInterface<V, E> implements DrawingLibraryInterface<V, E> {
                     
                     @Override
                     public void invoke(Object sender, mxEventObject evt) {
-                        graphManipulation.updateSelectedCells();
+                        graphManipulation.beginNotUndoable();
+                        try {
+                            graphManipulation.updateSelectedCells();
+                        } finally {
+                            graphManipulation.endNotUndoable();
+                        }
                     }
                 });
     }
