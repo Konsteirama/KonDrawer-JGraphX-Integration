@@ -611,6 +611,12 @@ public class ISGCIMainFrame extends JFrame implements WindowListener {
      * Opens the search in drawing dialog.
      */
     public void openSearchDialog() {
+        if (getTabbedPane().getActiveDrawingLibraryInterface() == null) {
+            MessageDialog.error(this,
+                    "The active tab contains no graph to search in.");
+            return;
+        }
+        
         JDialog search = new SearchDialog(this);
         search.setLocation(DEFAULTPOSITION);
         search.setVisible(true);
