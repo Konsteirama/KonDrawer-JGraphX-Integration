@@ -84,6 +84,15 @@ public class JGraphXAdapter<V, E> extends mxGraph implements
      */
     private HashMap<mxICell, E> cellToEdgeMap = new HashMap<mxICell, E>();
 
+    /**
+     * CSS Style for Tooltips.
+     */
+    private final String style = "<head><style type=\"text/css\">" 
+                                + " div.firstname{}"
+                                + " div.name{margin-top: 5px;}" 
+                                + " div.problem{margin-top:15px}"
+                                + "</style></head>";
+
     
     
     
@@ -348,15 +357,24 @@ public class JGraphXAdapter<V, E> extends mxGraph implements
                 V node = cellToVertexMap.get(cell);
                 if (node instanceof Set) {
                     Set<GraphClass> n = (Set<GraphClass>) node;
+                    boolean firstName = true;
                     for (GraphClass graphClass : n) {
-                        returnValue += graphClass.toString() + "<br>";
+                        if (!firstName) {
+                            returnValue += "<div class=\"name\">" 
+                                        + graphClass.toString() + "</div>";
+                        } else {
+                            returnValue += "<div class=\"firstname\">" 
+                                        + graphClass.toString() + "</div>";
+                            firstName = false;
+                        }
                     }
                     Problem problem = UserSettings.getProblem();
                     if (problem != null) {
                         Complexity complexity = 
                                 problem.getComplexity(n.iterator().next());
-                        returnValue += "<br> <br>" + problem.toString() 
-                                    + ": " + complexity.toString();
+                        returnValue += "<div class=\"problem\">" 
+                                    + problem.toString() 
+                                    + ": " + complexity.toString() + "</div>";
                     }
                 }
             } else {
@@ -364,9 +382,9 @@ public class JGraphXAdapter<V, E> extends mxGraph implements
                 returnValue += super.getToolTipForCell(cell);
             }
         }
-        return "<html>" + Latex2Html.getInstance()
-                .html(returnValue) + "</html>";
-//        return super.getToolTipForCell(cell);
+        return "<html>" + style + "<body>" 
+                + Latex2Html.getInstance().html(returnValue) 
+                + "</body></html>";
     }
 }
 
