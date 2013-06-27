@@ -19,6 +19,9 @@ import java.awt.event.ComponentListener;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Set;
+
+import org.jgrapht.Graph;
 
 import teo.isgci.util.Latex2Html;
 import teo.isgci.util.UserSettings;
@@ -298,7 +301,7 @@ class GraphManipulation<V, E> implements GraphManipulationInterface<V, E> {
         try {
             graph.setCellStyles(mxConstants.STYLE_STROKECOLOR,
                     mxUtils.hexString(Color.black), getCellsFromEdges(edges));
-            graph.setCellStyles(mxConstants.STYLE_STARTARROW , 
+            graph.setCellStyles(mxConstants.STYLE_STARTARROW, 
                     mxConstants.ARROW_CLASSIC, getCellsFromEdges(edges));     
         } finally {
             endUpdate();
@@ -314,7 +317,6 @@ class GraphManipulation<V, E> implements GraphManipulationInterface<V, E> {
             graph.setCellStyles(mxConstants.STYLE_STROKECOLOR,
                     mxUtils.hexString(EDGECOLOR),
                     getCellsFromEdges(edges));
-
         } finally {
             endUpdate();
         }
@@ -354,6 +356,7 @@ class GraphManipulation<V, E> implements GraphManipulationInterface<V, E> {
 
         beginUpdate();
         try {
+            unHighlightNode(getCellFromNode(node));
             // Deletes every cell
             for (Object object : cells) {
                 graph.getModel().remove(object);
@@ -536,19 +539,85 @@ class GraphManipulation<V, E> implements GraphManipulationInterface<V, E> {
     }
 
     @Override
-    public void highlightParents(V[] roots) {
-        // TODO Auto-generated method stub
-        
+    public void highlightParents(List<V> roots) {
+        Graph<V, E> graph = drawLib.getGraph(); 
+
+        for (V root : roots) {
+            Set<E> edges = graph.edgesOf(root);
+            
+            for (E edge : edges) {
+                V parent = graph.getEdgeSource(edge);
+                mxICell mxParent = getCellFromNode(parent);
+                
+                // edge was pointing to child
+                if (parent == root) {
+                    continue;
+                }
+                
+                // highlight node
+                highlightCell(getCellFromEdge(edge), 
+                        highlightColor, HIGHLIGHTTHICKNESS);
+                
+                // node already selected -> only mark the edge and continue
+                if (selectedCells.contains(mxParent)) {
+                    continue;
+                }
+                
+                if (highlightedCellsColor.containsKey(mxParent) 
+                   && !selectedCells.contains(mxParent)) {
+                    List<V> parentList = new ArrayList<V>();
+                    parentList.add(parent);
+                    highlightParents(parentList);
+                } else {
+                    highlightCell(mxParent, 
+                            highlightColor, HIGHLIGHTTHICKNESS);
+                }
+             }
+            
+        }
     }
 
     @Override
-    public void highlightChildren(V[] roots) {
-        // TODO Auto-generated method stub
-        
+    public void highlightChildren(List<V> roots) {
+        Graph<V, E> graph = drawLib.getGraph(); 
+
+        for (V root : roots) {
+            Set<E> edges = graph.edgesOf(root);
+            
+            for (E edge : edges) {
+                V child = graph.getEdgeTarget(edge);
+                 mxICell mxChild = getCellFromNode(child);
+                
+                 // edge was pointing to parent
+                 if (child == root) {
+                     continue;
+                 }
+                 
+                 // highlight node
+                 highlightCell(getCellFromEdge(edge), 
+                         highlightColor, HIGHLIGHTTHICKNESS);
+                 
+                 // node already selected -> only mark the edge and continue
+                 if (selectedCells.contains(mxChild)) {
+                     continue;
+                 }
+               
+                if (highlightedCellsColor.containsKey(mxChild) 
+                   && !selectedCells.contains(mxChild)) {
+                    List<V> childList = new ArrayList<V>();
+                    childList.add(child);
+                    highlightChildren(childList);
+                } else {
+                    highlightCell(mxChild, 
+                            highlightColor, HIGHLIGHTTHICKNESS);
+                }
+             }
+            
+        }
     }
 
     @Override
-    public void setHighlightColor(Color color) {        
+    public void setHighlightColor(Color color) {
         highlightColor = color;
         
         for (mxICell cell : highlightedCellsColor.keySet()) {
@@ -599,25 +668,9 @@ class GraphManipulation<V, E> implements GraphManipulationInterface<V, E> {
         }
         
         // select all cells
-        for (mxICell cell : currentCells) {
-            
+        for (mxICell cell : currentCells) { 
             selectedCells.add(cell);
-            
-            // save old values
-            highlightedCellsThickness.put(cell,
-                    mxUtils.getString(getGraphAdapter().getCellStyle(cell), 
-                            mxConstants.STYLE_STROKEWIDTH));
-
-            highlightedCellsColor.put(cell, mxUtils.getColor(
-                    getGraphAdapter().getCellStyle(cell), 
-                    mxConstants.STYLE_STROKECOLOR));
-            
-            // apply new values
-            getGraphAdapter().setCellStyles(mxConstants.STYLE_STROKECOLOR,
-                    mxUtils.getHexColorString(selectionColor),
-                    new Object[] {cell});
-            getGraphAdapter().setCellStyles(mxConstants.STYLE_STROKEWIDTH,
-                    HIGHLIGHTTHICKNESS, new Object[] {cell});
+            highlightCell(cell, selectionColor, HIGHLIGHTTHICKNESS);
         }
         
     }
@@ -626,14 +679,9 @@ class GraphManipulation<V, E> implements GraphManipulationInterface<V, E> {
     /**
      * Highlights a node's parents or children as specified with child.
      * @param startCell where to start
-     * @param depth how deep to go
      * @param child whether the algorithm should go down or upwards
      */
-    private void highlightNode(mxICell startCell, int depth, boolean child) {
-        if (depth < 0) {
-            return;
-        }
-        
+    private void highlightNode(mxICell startCell, boolean child) {
         ArrayList<mxICell> cells = new ArrayList<mxICell>();
         ArrayList<mxICell> neighborCells = new ArrayList<mxICell>();
 
@@ -646,113 +694,109 @@ class GraphManipulation<V, E> implements GraphManipulationInterface<V, E> {
 
             highlightedCellsColor.put(startCell, mxUtils.getColor(
                     getGraphAdapter()
-                    .getCellStyle(startCell), 
+                    .getCellStyle(startCell),
                     mxConstants.STYLE_STROKECOLOR));
         }
 
-        if (depth == 0) {
-            getGraphAdapter().setCellStyles(mxConstants.STYLE_STROKECOLOR,
-                    mxUtils.getHexColorString(highlightColor),
-                    cells.toArray());
-            getGraphAdapter().setCellStyles(mxConstants.STYLE_STROKEWIDTH,
-                    HIGHLIGHTTHICKNESS, cells.toArray());
 
-        } else {
+        beginUpdate();
+        try {
+            for (int i = 0; i < 0; i++) {
 
-            beginUpdate();
-            try {
-                for (int i = 0; i < depth; i++) {
+                for (mxICell cell : cells) {
+                    if (cell.isEdge()) {
+                        continue;
+                    }
+                    for (int j = 0; j < cell.getEdgeCount(); j++) {
+                        mxCell edge = (mxCell) cell.getEdgeAt(j);
 
-                    for (mxICell cell : cells) {
-                        if (cell.isEdge()) {
+                        if (highlightedCellsColor.containsKey(edge)) {
                             continue;
                         }
-                        for (int j = 0; j < cell.getEdgeCount(); j++) {
-                            mxCell edge = (mxCell) cell.getEdgeAt(j);
 
-                            if (highlightedCellsColor.containsKey(edge)) {
-                                continue;
-                            }
+                        highlightedCellsColor.put(edge, mxUtils.getColor(
+                                getGraphAdapter().getCellStyle(edge),
+                                mxConstants.STYLE_STROKECOLOR));
 
-                            highlightedCellsColor.put(edge, mxUtils.getColor(
-                                    getGraphAdapter().getCellStyle(edge),
-                                    mxConstants.STYLE_STROKECOLOR));
+                        highlightedCellsThickness.put(edge, mxUtils.getString(
+                                getGraphAdapter().getCellStyle(edge),
+                                mxConstants.STYLE_STROKEWIDTH));
 
-                            highlightedCellsThickness.put(edge, 
-                                    mxUtils.getString(
-                                    getGraphAdapter().getCellStyle(edge),
-                                    mxConstants.STYLE_STROKEWIDTH));
+                        neighborCells.add(edge);
 
-                            neighborCells.add(edge);
+                        mxICell source = edge.getSource();
+                        mxICell target = edge.getTarget();
 
-                            mxICell source = edge.getSource();
-                            mxICell target = edge.getTarget();
+                        if (!highlightedCellsColor.containsKey(source)) {
+                            highlightedCellsThickness.put(source, mxUtils
+                                    .getString(
+                                            getGraphAdapter().getCellStyle(
+                                                    source),
+                                            mxConstants.STYLE_STROKEWIDTH));
 
-                            if (!highlightedCellsColor.containsKey(source)) {
-                                highlightedCellsThickness
-                                        .put(source, mxUtils.getString(
-                                                getGraphAdapter()
-                                                        .getCellStyle(source),
-                                               mxConstants.STYLE_STROKEWIDTH));
+                            highlightedCellsColor.put(source, mxUtils
+                                    .getColor(
+                                            getGraphAdapter().getCellStyle(
+                                                    source),
+                                            mxConstants.STYLE_STROKECOLOR));
+                            neighborCells.add(source);
+                        }
 
-                                highlightedCellsColor
-                                        .put(source, mxUtils.getColor(
-                                                getGraphAdapter()
-                                                        .getCellStyle(source),
-                                               mxConstants.STYLE_STROKECOLOR));
-                                neighborCells.add(source);
-                            }
+                        if (!highlightedCellsColor.containsKey(target)) {
 
-                            if (!highlightedCellsColor.containsKey(target)) {
+                            highlightedCellsThickness.put(target, mxUtils
+                                    .getString(
+                                            getGraphAdapter().getCellStyle(
+                                                    target),
+                                            mxConstants.STYLE_STROKEWIDTH));
 
-                                highlightedCellsThickness
-                                        .put(target, mxUtils.getString(
-                                                getGraphAdapter()
-                                                        .getCellStyle(target),
-                                               mxConstants.STYLE_STROKEWIDTH));
-
-                                highlightedCellsColor
-                                        .put(target, mxUtils.getColor(
-                                                getGraphAdapter()
-                                                        .getCellStyle(target),
-                                              mxConstants.STYLE_STROKECOLOR));
-                                neighborCells.add(target);
-                            }
+                            highlightedCellsColor.put(target, mxUtils
+                                    .getColor(
+                                            getGraphAdapter().getCellStyle(
+                                                    target),
+                                            mxConstants.STYLE_STROKECOLOR));
+                            neighborCells.add(target);
                         }
                     }
-
-                    if (i > 0) {
-                        cells.clear();
-                    }
-
-                    cells.addAll(neighborCells);
-
-                    getGraphAdapter().setCellStyles(
-                            mxConstants.STYLE_STROKECOLOR,
-                            mxUtils.getHexColorString(highlightColor),
-                            cells.toArray());
-                    getGraphAdapter().setCellStyles(
-                            mxConstants.STYLE_STROKEWIDTH, HIGHLIGHTTHICKNESS,
-                            cells.toArray());
-
-                    if (i == 0) {
-                        cells.remove(startCell);
-                    }
-
-                    neighborCells.clear();
                 }
-            } finally {
-                endUpdate();
+
+                if (i > 0) {
+                    cells.clear();
+                }
+
+                cells.addAll(neighborCells);
+
+                getGraphAdapter().setCellStyles(mxConstants.STYLE_STROKECOLOR,
+                        mxUtils.getHexColorString(highlightColor),
+                        cells.toArray());
+                getGraphAdapter().setCellStyles(mxConstants.STYLE_STROKEWIDTH,
+                        HIGHLIGHTTHICKNESS, cells.toArray());
+
+                if (i == 0) {
+                    cells.remove(startCell);
+                }
+
+                neighborCells.clear();
             }
+        } finally {
+            endUpdate();
         }
+
     }
     
     /**
      * unHighlights a selected node and all its highlighted parents and 
      * children. 
      * @param node
+     *          The node that should be unhighlighted
      */
     private void unHighlightNode(mxICell node) {
+        if (!highlightedCellsColor.containsKey(node)) {
+            return;
+        }
+        
+        beginNotUndoable();
+        
         getGraphAdapter().setCellStyles(mxConstants.STYLE_STROKECOLOR,
                 mxUtils.getHexColorString(
                         highlightedCellsColor.get(node)),
@@ -764,8 +808,36 @@ class GraphManipulation<V, E> implements GraphManipulationInterface<V, E> {
         
         highlightedCellsColor.remove(node);
         highlightedCellsThickness.remove(node);
+        
+        endNotUndoable();
     }
     
+    /**
+     * Highlights a cell with the given color and thickness.
+     * @param cell
+     *          The cell to highlight.
+     * @param color
+     *          The color in which the node should be highlighted
+     * @param thickness
+     *          How thick the border should be
+     */
+    private void highlightCell(mxICell cell, Color color, String thickness) {
+        // save old values
+        highlightedCellsThickness.put(cell,
+                mxUtils.getString(getGraphAdapter().getCellStyle(cell), 
+                        mxConstants.STYLE_STROKEWIDTH));
+
+        highlightedCellsColor.put(cell, mxUtils.getColor(
+                getGraphAdapter().getCellStyle(cell), 
+                mxConstants.STYLE_STROKECOLOR));
+        
+        // apply new values
+        getGraphAdapter().setCellStyles(mxConstants.STYLE_STROKECOLOR,
+                mxUtils.getHexColorString(color),
+                new Object[] {cell});
+        getGraphAdapter().setCellStyles(mxConstants.STYLE_STROKEWIDTH,
+                thickness, new Object[] {cell});
+    }
 }
 
 /* EOF */

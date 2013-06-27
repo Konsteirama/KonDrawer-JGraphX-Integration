@@ -13,6 +13,7 @@ package teo.isgci.drawing;
 
 import java.awt.Color;
 import java.awt.Point;
+import java.util.List;
 
 /**
  * This class is an interface, that handels the mani-
@@ -172,7 +173,7 @@ public interface GraphManipulationInterface<V, E> {
      * 
      * @param roots : The nodes where to begin with highlighting
      */
-    void highlightParents(V[] roots);
+    void highlightParents(List<V> roots);
 
     /**
      * Highlights the parents of a node. If used multiple times on the same
@@ -180,7 +181,7 @@ public interface GraphManipulationInterface<V, E> {
      * 
      * @param roots : The nodes where to begin with highlighting
      */
-    void highlightChildren(V[] roots);
+    void highlightChildren(List<V> roots);
     
     /**
      * Un-Highlights all nodes that are currently highlighted before.

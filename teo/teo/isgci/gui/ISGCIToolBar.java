@@ -197,9 +197,7 @@ public class ISGCIToolBar extends JToolBar {
                         drawLib.getGraphManipulationInterface();
                 
                 List<V> selectedNodes = drawLib.getSelectedNodes();
-                
-                
-                
+                manipulationInterface.highlightParents(selectedNodes);
             }
         });
         
@@ -216,9 +214,8 @@ public class ISGCIToolBar extends JToolBar {
             
             @Override
             public void actionPerformed(ActionEvent e) {
-                DrawingLibraryInterface<V, E> drawLib = 
-                        mainframe.getTabbedPane()
-                            .getActiveDrawingLibraryInterface();
+                DrawingLibraryInterface<V, E> drawLib 
+                = mainframe.getTabbedPane().getActiveDrawingLibraryInterface();
                 
                 if (drawLib == null) {
                     return;
@@ -228,7 +225,7 @@ public class ISGCIToolBar extends JToolBar {
                         drawLib.getGraphManipulationInterface();
                 
                 List<V> selectedNodes = drawLib.getSelectedNodes();
-                
+                manipulationInterface.highlightChildren(selectedNodes);
             }
         });
     }
