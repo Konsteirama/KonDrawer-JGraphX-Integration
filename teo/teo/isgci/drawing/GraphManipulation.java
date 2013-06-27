@@ -61,6 +61,11 @@ class GraphManipulation<V, E> implements GraphManipulationInterface<V, E> {
     private static final Color EDGECOLOR = new Color(100, 130, 185);
     
     /**
+     * Defines the color with which improper edges are marked.
+     */
+    private static final Color MARKEDCOLOR = Color.black;
+    
+    /**
      * Defines the color that should be used for highlighting.
      */
     private Color highlightColor; 
@@ -293,15 +298,24 @@ class GraphManipulation<V, E> implements GraphManipulationInterface<V, E> {
 
     @Override
     public void markEdge(E[] edges) {
-
         mxGraph graph = drawLib.getGraphComponent().getGraph();
-
+        mxICell[] cells = getCellsFromEdges(edges);
+        
         beginUpdate();
         try {
-            graph.setCellStyles(mxConstants.STYLE_STROKECOLOR,
-                    mxUtils.hexString(Color.black), getCellsFromEdges(edges));
-            graph.setCellStyles(mxConstants.STYLE_STARTARROW, 
-                    mxConstants.ARROW_CLASSIC, getCellsFromEdges(edges));     
+            for (mxICell edge : cells) {
+                graph.setCellStyles(mxConstants.STYLE_STARTARROW,
+                        mxConstants.ARROW_CLASSIC, new Object[] { edge });
+                
+                // update original values of highlighted cells
+                if (highlightedCellsColor.containsKey(edge)) {
+                    highlightedCellsColor.put(edge, MARKEDCOLOR);
+                } else { // or update cell directly
+                    graph.setCellStyles(mxConstants.STYLE_STROKECOLOR,
+                            mxUtils.hexString(MARKEDCOLOR),
+                            new Object[] { edge });
+                }
+            }
         } finally {
             endUpdate();
         }
@@ -310,14 +324,25 @@ class GraphManipulation<V, E> implements GraphManipulationInterface<V, E> {
     @Override
     public void unmarkEdge(E[] edges) {
         mxGraph graph = drawLib.getGraphComponent().getGraph();
-
+        mxICell[] cells = getCellsFromEdges(edges);
+        
+        
         beginUpdate();
         try {
-            graph.setCellStyles(mxConstants.STYLE_STROKECOLOR,
-                    mxUtils.hexString(EDGECOLOR),
-                    getCellsFromEdges(edges));
-            graph.setCellStyles(mxConstants.STYLE_STARTARROW,
-                    "", getCellsFromEdges(edges));
+            for (mxICell edge : cells) {
+                
+                graph.setCellStyles(mxConstants.STYLE_STARTARROW, "",
+                        new Object[] { edge });
+                
+                // update original values of highlighted cells and 
+                if (highlightedCellsColor.containsKey(edge)) {
+                    highlightedCellsColor.put(edge, EDGECOLOR);
+                } else { // or update cell directly
+                    graph.setCellStyles(mxConstants.STYLE_STROKECOLOR,
+                            mxUtils.hexString(EDGECOLOR),
+                            new Object[] { edge });
+                }
+            }
         } finally {
             endUpdate();
         }
