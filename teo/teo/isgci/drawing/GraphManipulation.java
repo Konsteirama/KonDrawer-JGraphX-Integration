@@ -56,11 +56,6 @@ class GraphManipulation<V, E> implements GraphManipulationInterface<V, E> {
     private static final double MAXZOOMLEVEL = 8; 
     
     /**
-     * Defines the thickness for highlighting.
-     */
-    private static final String HIGHLIGHTTHICKNESS = "4";
-    
-    /**
      * Defines the original edge color.
      */
     private static final Color EDGECOLOR = new Color(100, 130, 185);
@@ -74,6 +69,11 @@ class GraphManipulation<V, E> implements GraphManipulationInterface<V, E> {
      * Defines the color that should be used for selection.
      */
     private Color selectionColor;
+    
+    /**
+     * Defines the thickness for highlighting.
+     */
+    private  String cellThickness = "4";
 
     /** Handles undo events in jgraphx. */
     private mxIEventListener undoHandler = new mxIEventListener() {
@@ -152,7 +152,7 @@ class GraphManipulation<V, E> implements GraphManipulationInterface<V, E> {
 
             @Override
             public void componentResized(ComponentEvent e) {
-                setMinimapVisibility();
+                applyZoomSettings();
             }
 
             @Override
@@ -336,14 +336,14 @@ class GraphManipulation<V, E> implements GraphManipulationInterface<V, E> {
             endUpdate();
         }
 
-        setMinimapVisibility();
+        applyZoomSettings();
     }
 
     @Override
     public void redo() {
         undoManager.redo();
 
-        setMinimapVisibility();
+        applyZoomSettings();
     }
 
     @Override
@@ -365,7 +365,7 @@ class GraphManipulation<V, E> implements GraphManipulationInterface<V, E> {
             endUpdate();
         }
 
-        setMinimapVisibility();
+        applyZoomSettings();
     }
 
     /**
@@ -431,7 +431,7 @@ class GraphManipulation<V, E> implements GraphManipulationInterface<V, E> {
              * FIXME graphOutline should react properly to this method
              */
             drawLib.getGraphOutline().setVisible(false);
-            setMinimapVisibility();
+            applyZoomSettings();
         }
     }
 
@@ -528,13 +528,13 @@ class GraphManipulation<V, E> implements GraphManipulationInterface<V, E> {
         graph.getModel().setValue(cell, newName);
         graph.updateCellSize(cell);
 
-        setMinimapVisibility();
+        applyZoomSettings();
     }
 
     @Override
     public void undo() {
         undoManager.undo();
-        setMinimapVisibility();
+        applyZoomSettings();
     }
 
     @Override
@@ -548,7 +548,7 @@ class GraphManipulation<V, E> implements GraphManipulationInterface<V, E> {
 
         drawLib.getGraphComponent().zoomTo(factor, true);
 
-        setMinimapVisibility();
+        applyZoomSettings();
     }
 
     @Override
@@ -563,7 +563,7 @@ class GraphManipulation<V, E> implements GraphManipulationInterface<V, E> {
             drawLib.getGraphComponent().zoomOut();
         }
 
-        setMinimapVisibility();
+        applyZoomSettings();
     }
 
     @Override
@@ -587,14 +587,15 @@ class GraphManipulation<V, E> implements GraphManipulationInterface<V, E> {
             view.setScale(relHeight * view.getScale()); 
         }
 
-        setMinimapVisibility();
+        applyZoomSettings();
     }
 
     /**
      * Checks if the minimap should be hidden and hides it if necessary.
+     * Sets the thickness according to zoom-level
      */
-
-    public void setMinimapVisibility() {
+    public void applyZoomSettings() {
+        // check minimap visibility
         mxGraphView view = drawLib.getGraphComponent().getGraph().getView();
 
         int compLen = drawLib.getGraphComponent().getWidth();
@@ -606,6 +607,15 @@ class GraphManipulation<V, E> implements GraphManipulationInterface<V, E> {
             drawLib.getGraphOutline().setVisible(true);
         } else {
             drawLib.getGraphOutline().setVisible(false);
+        }
+        
+        // set thickness based on zoom
+        if (getZoomLevel() < 0.4) {
+            setThickness("12");
+        } else if (getZoomLevel() < 0.7) {
+            setThickness("8");
+        } else {
+            setThickness("4");
         }
     }
 
@@ -664,8 +674,7 @@ class GraphManipulation<V, E> implements GraphManipulationInterface<V, E> {
                 }
 
                 // highlight node
-                highlightCell(getCellFromEdge(edge), highlightColor,
-                        HIGHLIGHTTHICKNESS);
+                highlightCell(getCellFromEdge(edge), highlightColor);
 
                 // node already selected -> only mark the edge and continue
                 if (selectedCells.contains(mxParent)) {
@@ -684,8 +693,7 @@ class GraphManipulation<V, E> implements GraphManipulationInterface<V, E> {
                     highlightParents(parentList);
                 } else {
                     visitedNodes.add(parent);
-                    highlightCell(mxParent, highlightColor, 
-                            HIGHLIGHTTHICKNESS);
+                    highlightCell(mxParent, highlightColor);
                 }
             }
 
@@ -715,8 +723,7 @@ class GraphManipulation<V, E> implements GraphManipulationInterface<V, E> {
                 }
 
                 // highlight node
-                highlightCell(getCellFromEdge(edge), highlightColor,
-                        HIGHLIGHTTHICKNESS);
+                highlightCell(getCellFromEdge(edge), highlightColor);
 
                 // node already selected -> only mark the edge and continue
                 if (selectedCells.contains(mxChild)) {
@@ -734,7 +741,7 @@ class GraphManipulation<V, E> implements GraphManipulationInterface<V, E> {
                     childList.add(child);
                     highlightChildren(childList);
                 } else {
-                    highlightCell(mxChild, highlightColor, HIGHLIGHTTHICKNESS);
+                    highlightCell(mxChild, highlightColor);
                     visitedNodes.add(child);
                 }
             }
@@ -807,7 +814,7 @@ class GraphManipulation<V, E> implements GraphManipulationInterface<V, E> {
         // select all cells
         for (mxICell cell : currentCells) { 
             selectedCells.add(cell);
-            highlightCell(cell, selectionColor, HIGHLIGHTTHICKNESS);
+            highlightCell(cell, selectionColor);
         }
         
     }
@@ -819,10 +826,8 @@ class GraphManipulation<V, E> implements GraphManipulationInterface<V, E> {
      *          The cell to highlight.
      * @param color
      *          The color in which the node should be highlighted
-     * @param thickness
-     *          How thick the border should be
      */
-    private void highlightCell(mxICell cell, Color color, String thickness) {
+    private void highlightCell(mxICell cell, Color color) {
         // don't overwrite original values
         if (!highlightedCellsColor.containsKey(cell)) {
 
@@ -841,7 +846,25 @@ class GraphManipulation<V, E> implements GraphManipulationInterface<V, E> {
                 mxUtils.getHexColorString(color),
                 new Object[] {cell});
         getGraphAdapter().setCellStyles(mxConstants.STYLE_STROKEWIDTH,
-                thickness, new Object[] {cell});
+                cellThickness, new Object[] {cell});
+    }
+    
+    /**
+     * Sets the thickness of highlighting and selection.
+     * @param value The thickness that should be applied.
+     */
+    private void setThickness(String value) {
+        // nothing to do
+        if (cellThickness.equals(value)) {
+            return;
+        }
+        
+        cellThickness = value;
+        
+        for (mxICell cell : highlightedCellsThickness.keySet()) {
+            getGraphAdapter().setCellStyles(mxConstants.STYLE_STROKEWIDTH,
+                    value, new Object[] {cell});
+        }
     }
 }
 
