@@ -358,6 +358,7 @@ public class GraphClassInformationDialog extends JDialog
                 new GraphClassSelectionDialog(parent);
             draw.select(classesList.getSelectedNode());
             draw.setVisible(true);
+            closeDialog();
         } else if (source == search) {
             search.setListData(parent, classesList);
             showNode();

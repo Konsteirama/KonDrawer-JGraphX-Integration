@@ -623,6 +623,7 @@ public class InclusionResultDialog extends JDialog implements ActionListener {
                     refButton.setEnabled(true);
                     
                     drawButton.setText(text);
+                    closeDialog();
                 }
             };
 
@@ -656,6 +657,7 @@ public class InclusionResultDialog extends JDialog implements ActionListener {
                     refButton.setEnabled(true);
                     
                     drawNewTabButton.setText(text);
+                    closeDialog();
                 }
             };
 
