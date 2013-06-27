@@ -166,7 +166,7 @@ public class ISGCIToolBar extends JToolBar {
                 
                 List<V> selectedNodes = drawLib.getSelectedNodes();
                 
-                if (selectedNodes.size() == 1) {
+                if (selectedNodes.size() >= 1) {
                     manipulationInterface.centerNode(selectedNodes.get(0));
                 }
             }
