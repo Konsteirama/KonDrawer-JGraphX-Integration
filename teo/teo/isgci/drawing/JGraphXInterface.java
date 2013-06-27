@@ -236,27 +236,27 @@ class JGraphXInterface<V, E> implements DrawingLibraryInterface<V, E> {
             
             @Override
             public void mouseReleased(MouseEvent e) { 
-                graphManipulation.setMinimapVisibility(); 
+                graphManipulation.applyZoomSettings(); 
             }
             
             @Override
             public void mousePressed(MouseEvent e) { 
-                graphManipulation.setMinimapVisibility(); 
+                graphManipulation.applyZoomSettings(); 
             }
             
             @Override
             public void mouseExited(MouseEvent e) { 
-                graphManipulation.setMinimapVisibility(); 
+                graphManipulation.applyZoomSettings(); 
             }
             
             @Override
             public void mouseEntered(MouseEvent e) { 
-                graphManipulation.setMinimapVisibility(); 
+                graphManipulation.applyZoomSettings(); 
             }
             
             @Override
             public void mouseClicked(MouseEvent e) { 
-                graphManipulation.setMinimapVisibility(); 
+                graphManipulation.applyZoomSettings(); 
             }
         });
     }
