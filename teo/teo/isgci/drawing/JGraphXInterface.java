@@ -11,18 +11,12 @@
 
 package teo.isgci.drawing;
 
-import java.awt.Color;
-import java.awt.Component;
 import java.awt.Cursor;
 import java.awt.Dimension;
-import java.awt.Font;
-import java.awt.FontMetrics;
 import java.awt.Graphics2D;
 import java.awt.Image;
 import java.awt.Point;
 import java.awt.Toolkit;
-import java.awt.event.HierarchyBoundsListener;
-import java.awt.event.HierarchyEvent;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseWheelEvent;
@@ -40,7 +34,6 @@ import java.util.List;
 import javax.imageio.ImageIO;
 import javax.swing.JComponent;
 import javax.swing.JScrollBar;
-import javax.swing.SwingConstants;
 import javax.xml.transform.TransformerConfigurationException;
 
 import net.sf.epsgraphics.ColorMode;
@@ -49,8 +42,6 @@ import net.sf.epsgraphics.EpsGraphics;
 import org.jgrapht.Graph;
 import org.jgrapht.ext.GraphMLExporter;
 import org.xml.sax.SAXException;
-
-import teo.isgci.gui.LatexLabel;
 
 import com.mxgraph.canvas.mxICanvas;
 import com.mxgraph.canvas.mxSvgCanvas;
@@ -127,66 +118,6 @@ class JGraphXInterface<V, E> implements DrawingLibraryInterface<V, E> {
                 mxICell cell = (mxICell) getCellAt(event.getX(), event.getY());
                 return cell == null || cell.isEdge();
             }
-            
-            @Override
-            public Component[] createComponents(final mxCellState state) {
-                if (getGraph().getModel().isVertex(state.getCell())) {
-                    String label = state.getLabel();
-                    
-                    // get rid of these nasty [] around all labels
-                    label = label.replace("[", "");
-                    label = label.replace("]", "");
-                    
-                    // Creates a new label and sets properties
-                    final LatexLabel labelComponent = new LatexLabel(label);
-                    
-                    labelComponent.setVerticalAlignment(SwingConstants.CENTER);
-                    labelComponent.setHorizontalAlignment(
-                            SwingConstants.CENTER);
-
-                    labelComponent.setBackground(new Color(0, 0, 0, 0));
-                    
-                    /* A Listener to resize the font in the latexComponent
-                     * when the graphComponent is being zoomed
-                     */ 
-                    labelComponent.addHierarchyBoundsListener(new HierarchyBoundsListener() {
-                        
-                        @Override
-                        public void ancestorResized(HierarchyEvent e) {
-                            double scale = graphComponent.getGraph().
-                                    getView().getScale();
-                            
-                            int fontSize = (int) (12 * scale);
-                            int windowWidth = labelComponent.getWidth();
-                            int windowHeight = labelComponent.getHeight();
-                            
-                            Font font;
-                            int height, width;
-                            
-                            do {
-                                font = new Font("Dialog", Font.BOLD, 
-                                        fontSize);
-                                FontMetrics metrics = labelComponent.
-                                        getFontMetrics(font);
-                                
-                                height = metrics.getHeight();
-                                width = metrics.stringWidth(
-                                        labelComponent.getText());
-                                
-                            } while (height > windowHeight || width > windowWidth);
-                            
-                            labelComponent.setFont(font);                            
-                        }
-                        
-                        @Override
-                        public void ancestorMoved(HierarchyEvent e) { }
-                    });
-                    
-                    return new Component[]{labelComponent};
-                }
-                return null;
-            };
-
             
             @Override
             public mxCellHandler createHandler(mxCellState state) {
