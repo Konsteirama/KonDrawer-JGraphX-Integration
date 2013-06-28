@@ -36,6 +36,7 @@ import javax.swing.JComponent;
 import javax.swing.JScrollBar;
 import javax.xml.transform.TransformerConfigurationException;
 
+import com.mxgraph.canvas.mxGraphics2DCanvas;
 import net.sf.epsgraphics.ColorMode;
 import net.sf.epsgraphics.EpsGraphics;
 
@@ -94,6 +95,13 @@ class JGraphXInterface<V, E> implements DrawingLibraryInterface<V, E> {
      *
      * @param g JGraphT graph to draw
      */
+
+    static
+    {
+        mxUtils.setDefaultTextRenderer(lightweightLatexLabel.getSharedInstance());
+        mxGraphics2DCanvas.putTextShape(mxGraphics2DCanvas.TEXT_SHAPE_DEFAULT, new mxDefaultLatexShape());
+    }
+
     public JGraphXInterface(Graph<V, E> g) {
         // Convert to JGraphT-Graph
         graphAdapter = createNewAdapter(g);
@@ -298,27 +306,20 @@ class JGraphXInterface<V, E> implements DrawingLibraryInterface<V, E> {
         // disable edge labels
         graphAdapter.getStylesheet().getDefaultEdgeStyle()
                 .put(mxConstants.STYLE_NOLABEL, "1");
+
+        graphAdapter.getStylesheet().getDefaultVertexStyle().
+                put(mxConstants.STYLE_ALIGN, mxConstants.ALIGN_CENTER);
         
         // set black outline around nodes
         graphAdapter.getStylesheet().getDefaultVertexStyle()
                 .put(mxConstants.STYLE_STROKECOLOR, "#000000");
 
+        graphAdapter.getStylesheet().getDefaultVertexStyle()
+                .put(mxConstants.STYLE_SPACING, "5");
+
         // rounded edges
         graphAdapter.getStylesheet().getDefaultVertexStyle()
                 .put(mxConstants.STYLE_ROUNDED, "true");
-        
-        graphAdapter.setHtmlLabels(true);
-        
-        
-//        // listen for cellselection
-//        graphAdapter.getSelectionModel().addListener(mxEvent.CHANGE, 
-//                new mxIEventListener() {
-//                    
-//                    @Override
-//                    public void invoke(Object sender, mxEventObject evt) {
-//
-//                    }
-//                });
     }
 
 

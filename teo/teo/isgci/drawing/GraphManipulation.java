@@ -89,6 +89,26 @@ class GraphManipulation<V, E> implements GraphManipulationInterface<V, E> {
             }
         }
     };
+
+    private ComponentListener zoomListener = new ComponentListener() {
+
+        @Override
+        public void componentShown(ComponentEvent e) {
+        }
+
+        @Override
+        public void componentResized(ComponentEvent e) {
+            applyZoomSettings();
+        }
+
+        @Override
+        public void componentMoved(ComponentEvent e) {
+        }
+
+        @Override
+        public void componentHidden(ComponentEvent e) {
+        }
+    };
     
     /**
      * Defines whether or not the undoHandler should record actions.
@@ -161,29 +181,23 @@ class GraphManipulation<V, E> implements GraphManipulationInterface<V, E> {
 
         // notify this component about size changes, to check if the minimap
         // has to be displayed/hidden
-        graphComponent.addComponentListener(new ComponentListener() {
-
-            @Override
-            public void componentShown(ComponentEvent e) {
-            }
-
-            @Override
-            public void componentResized(ComponentEvent e) {
-                applyZoomSettings();
-            }
-
-            @Override
-            public void componentMoved(ComponentEvent e) {
-            }
-
-            @Override
-            public void componentHidden(ComponentEvent e) {
-            }
-        });
+        graphComponent.addComponentListener(zoomListener);
 
         highlightedCellsColor = new HashMap<mxICell, Color>();
         highlightedCellsThickness = new HashMap<mxICell, String>();
         selectedCells = new ArrayList<mxICell>();
+    }
+
+    /**
+     * Unregisters all eventlisteners
+     */
+    public void unregisterEventListener(){
+        drawLib.getGraphComponent().getGraph().getModel().removeListener(
+                undoHandler, mxEvent.UNDO);
+        drawLib.getGraphComponent().getGraph().getView().removeListener(
+                undoHandler, mxEvent.UNDO);
+
+        drawLib.getGraphComponent().removeComponentListener(zoomListener);
     }
 
     /**
@@ -470,7 +484,7 @@ class GraphManipulation<V, E> implements GraphManipulationInterface<V, E> {
     public void renameNode(V node, String newName) {
         mxGraph graph = drawLib.getGraphComponent().getGraph();
 
-        newName = Latex2Html.getInstance().html(newName);
+        //newName = Latex2Html.getInstance().html(newName);
 
         mxICell cell = getCellFromNode(node);
 
