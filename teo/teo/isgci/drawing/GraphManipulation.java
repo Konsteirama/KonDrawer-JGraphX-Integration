@@ -632,11 +632,25 @@ class GraphManipulation<V, E> implements GraphManipulationInterface<V, E> {
     public void applyZoomSettings() {
         // check minimap visibility
         mxGraphView view = drawLib.getGraphComponent().getGraph().getView();
+        
+        // Get the component and view heights/widths
+        int compWidth = drawLib.getGraphComponent().getWidth();
+        int viewWidth = (int) view.getGraphBounds().getWidth();
+        int compHeight = drawLib.getGraphComponent().getHeight();
+        int viewHeight = (int) view.getGraphBounds().getHeight();
 
-        int compLen = drawLib.getGraphComponent().getWidth();
-        int viewLen = (int) view.getGraphBounds().getWidth();
+        double relWidth = (double) compWidth / viewWidth;
+        double relHeight = (double) compHeight / viewHeight;
 
-        double scale = ((double) compLen / viewLen * view.getScale());
+        double scale;
+        
+        // If the relative Width is greater than the rel. height
+        // set the scale to fit the width and vice versa
+        if (relWidth <= relHeight) {
+            scale = relWidth * view.getScale();
+        } else {
+            scale = relHeight * view.getScale(); 
+        }
 
         if (getZoomLevel() > scale) {
             drawLib.getGraphOutline().setVisible(true);
