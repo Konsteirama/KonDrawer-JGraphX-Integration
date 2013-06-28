@@ -113,7 +113,7 @@ public class NodePopup extends JPopupMenu implements ActionListener {
         
         //FIXME sort and render latex properly
         for (GraphClass gc : node) {
-            String longName = Latex2Html.getInstance().html(gc.toString());
+            String longName = gc.toString();
             String oldName = Utility.getShortName(gc.toString());
             String shortHtmlName = Latex2Html.getInstance().html(oldName);
             
