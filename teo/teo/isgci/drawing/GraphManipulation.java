@@ -83,7 +83,7 @@ class GraphManipulation<V, E> implements GraphManipulationInterface<V, E> {
     /** Handles undo events in jgraphx. */
     private mxIEventListener undoHandler = new mxIEventListener() {
         public void invoke(Object source, mxEventObject evt) {
-            if (recordUndoableActions) {
+            if (recordUndoableActions == 0) {
                 undoManager.undoableEditHappened((mxUndoableEdit) evt
                         .getProperty("edit"));
             }
@@ -93,7 +93,7 @@ class GraphManipulation<V, E> implements GraphManipulationInterface<V, E> {
     /**
      * Defines whether or not the undoHandler should record actions.
      */
-    private boolean recordUndoableActions = true;
+    private int recordUndoableActions;
     
     /**
      * The parent interface from which this object was created.
@@ -398,7 +398,7 @@ class GraphManipulation<V, E> implements GraphManipulationInterface<V, E> {
      */
     @Override
     public void endNotUndoable() {
-        recordUndoableActions = true;
+        recordUndoableActions--;
     }
 
     /**
@@ -406,7 +406,7 @@ class GraphManipulation<V, E> implements GraphManipulationInterface<V, E> {
      */
     @Override
     public void beginNotUndoable() {
-        recordUndoableActions = false;
+        recordUndoableActions++;
     }
 
     @Override
@@ -468,8 +468,6 @@ class GraphManipulation<V, E> implements GraphManipulationInterface<V, E> {
             return;
         }
         
-        beginNotUndoable();
-        
         getGraphAdapter().setCellStyles(mxConstants.STYLE_STROKECOLOR,
                 mxUtils.getHexColorString(
                         highlightedCellsColor.get(node)),
@@ -481,8 +479,6 @@ class GraphManipulation<V, E> implements GraphManipulationInterface<V, E> {
         
         highlightedCellsColor.remove(node);
         highlightedCellsThickness.remove(node);
-        
-        endNotUndoable();
         
         Graph<V, E> graph = drawLib.getGraph();
         Set<E> edges = graph.edgesOf(
@@ -497,8 +493,6 @@ class GraphManipulation<V, E> implements GraphManipulationInterface<V, E> {
             
             // unhighlight edge if necessary
             if (highlightedCellsColor.containsKey(mxEdge)) {
-                beginNotUndoable();
-                
                 getGraphAdapter().setCellStyles(mxConstants.STYLE_STROKECOLOR,
                         mxUtils.getHexColorString(
                                 highlightedCellsColor.get(mxEdge)),
@@ -511,7 +505,6 @@ class GraphManipulation<V, E> implements GraphManipulationInterface<V, E> {
                 highlightedCellsColor.remove(mxEdge);
                 highlightedCellsThickness.remove(mxEdge);
                 
-                endNotUndoable();
             }
             
             // stop if node is selected, else recursively unhighlight nodes
@@ -805,6 +798,9 @@ class GraphManipulation<V, E> implements GraphManipulationInterface<V, E> {
      * Updates all selected cells and adds a border around them.
      */
     public void updateSelectedCells() {
+        beginNotUndoable();
+        beginUpdate();
+        
         // build difference between old cells and new cells
         Object[] newCells
             = drawLib.getGraphComponent().getGraph().getSelectionCells();
@@ -832,16 +828,16 @@ class GraphManipulation<V, E> implements GraphManipulationInterface<V, E> {
         // if there are no selected cells, simply unhighlight everything
         if (newCells.length == 0) {
             unHighlightAll();
-            return;
+        } else {
+            // select all cells
+            for (mxICell cell : currentCells) {
+                selectedCells.add(cell);
+                highlightCell(cell, selectionColor);
+            }
         }
         
-        
-        // select all cells
-        for (mxICell cell : currentCells) { 
-            selectedCells.add(cell);
-            highlightCell(cell, selectionColor);
-        }
-        
+        endUpdate();
+        endNotUndoable();
     }
     
     

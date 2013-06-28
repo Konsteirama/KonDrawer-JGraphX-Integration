@@ -170,18 +170,19 @@ class JGraphXInterface<V, E> implements DrawingLibraryInterface<V, E> {
                     System.err.println("Unable to set cursor!");
                 }
                 
+                mxICell cell = (mxICell) graphComponent.getCellAt(
+                        (int) e.getPoint().getX(),
+                        (int) e.getPoint().getY());
+                if (cell != null && cell.isEdge()) {
+                    return;
+                }
+                
+                
                 selectedNodes = getSelectedNodes();
                 begin  = e.getWhen();
                 
                 // set black border around cells
-                graphManipulation.beginNotUndoable();
-                graphManipulation.beginUpdate();
-                try {
-                    graphManipulation.updateSelectedCells();
-                } finally {
-                    graphManipulation.endUpdate();
-                    graphManipulation.endNotUndoable();
-                }
+                graphManipulation.updateSelectedCells();
                 
                 super.mousePressed(e);
             }
@@ -194,18 +195,9 @@ class JGraphXInterface<V, E> implements DrawingLibraryInterface<V, E> {
                  * click and is handled as a panning action */
                 if ((e.getWhen() - begin) > epsilon) {
                     setSelectedNodes(selectedNodes);
-                    
-                    // update black border around cells
-                    graphManipulation.beginNotUndoable();
-                    graphManipulation.beginUpdate();
-                    try {
-                        graphManipulation.updateSelectedCells();
-                    } finally {
-                        graphManipulation.endUpdate();
-                        graphManipulation.endNotUndoable();
-                    }
                 }
                 
+                graphManipulation.updateSelectedCells();
                 super.mouseReleased(e);
             }
         };
