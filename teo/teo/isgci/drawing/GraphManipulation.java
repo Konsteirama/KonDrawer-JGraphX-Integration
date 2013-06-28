@@ -534,6 +534,15 @@ class GraphManipulation<V, E> implements GraphManipulationInterface<V, E> {
             }
          }
         
+        /*
+         * graphOutline sometimes won't take changes from this method, to
+         * ensure that it properly shows all changes it's visibility is 
+         * turned off and on again.
+         * FIXME graphOutline should react properly to this method
+         */
+        drawLib.getGraphOutline().setVisible(false);
+        applyZoomSettings();
+        
     }
 
     /**
@@ -747,8 +756,16 @@ class GraphManipulation<V, E> implements GraphManipulationInterface<V, E> {
             }
 
         }
-
         endNotUndoable();
+        
+        /*
+         * graphOutline sometimes won't take changes from this method, to
+         * ensure that it properly shows all changes it's visibility is 
+         * turned off and on again.
+         * FIXME graphOutline should react properly to this method
+         */
+        drawLib.getGraphOutline().setVisible(false);
+        applyZoomSettings();
     }
 
     @Override
@@ -797,6 +814,15 @@ class GraphManipulation<V, E> implements GraphManipulationInterface<V, E> {
 
         }
         endNotUndoable();
+        
+        /*
+         * graphOutline sometimes won't take changes from this method, to
+         * ensure that it properly shows all changes it's visibility is 
+         * turned off and on again.
+         * FIXME graphOutline should react properly to this method
+         */
+        drawLib.getGraphOutline().setVisible(false);
+        applyZoomSettings();
     }
 
     @Override
