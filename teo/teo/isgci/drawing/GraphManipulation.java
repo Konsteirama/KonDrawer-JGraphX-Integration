@@ -667,6 +667,7 @@ class GraphManipulation<V, E> implements GraphManipulationInterface<V, E> {
             drawLib.getGraphOutline().setVisible(false);
         }
         
+        beginNotUndoable();
         // set thickness based on zoom
         if (getZoomLevel() < 0.4) {
             setThickness("12");
@@ -675,6 +676,7 @@ class GraphManipulation<V, E> implements GraphManipulationInterface<V, E> {
         } else {
             setThickness("4");
         }
+        endNotUndoable();
     }
 
     @Override
