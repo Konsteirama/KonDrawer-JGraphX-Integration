@@ -257,6 +257,10 @@ public class GraphClassInformationDialog extends JDialog
      * Show the information about the given class.
      */
     private void showNode(GraphClass target) {
+        if (target == null) {
+            return;
+        }
+        
         classesList.setSelectedValue(target, true);
         updateLists(target);
         updateComplexity(target);
