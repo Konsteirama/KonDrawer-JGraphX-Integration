@@ -616,14 +616,10 @@ public class InclusionResultDialog extends JDialog implements ActionListener {
                     parent.getTabbedPane().drawInActiveTab(graph,
                             upper.toString() + "-" + lower.toString());
                     
-                    // restore buttons
-                    okButton.setEnabled(true);
-                    drawButton.setEnabled(true);
-                    drawNewTabButton.setEnabled(true);
-                    refButton.setEnabled(true);
                     
                     drawButton.setText(text);
                     closeDialog();
+                    parent.closeDialogs();
                 }
             };
 
@@ -658,6 +654,7 @@ public class InclusionResultDialog extends JDialog implements ActionListener {
                     
                     drawNewTabButton.setText(text);
                     closeDialog();
+                    parent.closeDialogs();
                 }
             };
 
