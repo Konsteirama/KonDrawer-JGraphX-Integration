@@ -11,6 +11,7 @@
 package teo.isgci.drawing;
 
 import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.awt.event.MouseWheelEvent;
 
 import com.mxgraph.swing.mxGraphComponent;
@@ -45,6 +46,12 @@ class InternalMouseAdapter<V,E> extends MouseAdapter {
         } else {
             graphManipulation.zoom(false);
         }
+    }
+    
+    @Override
+    public void mouseReleased(MouseEvent e) {
+        graphManipulation.updateSelectedCells();
+        super.mouseReleased(e);
     }
 }
 
