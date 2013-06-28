@@ -560,6 +560,7 @@ public class ISGCITabbedPane extends JTabbedPane implements Updatable {
         GraphManipulationInterface gmi 
         = getActiveDrawingLibraryInterface().getGraphManipulationInterface(); 
         
+        gmi.beginNotUndoable();
         gmi.beginUpdate();
         
         try {
@@ -577,7 +578,8 @@ public class ISGCITabbedPane extends JTabbedPane implements Updatable {
             
         } finally {
             gmi.endUpdate();
-        }        
+            gmi.endNotUndoable();
+        }
         
         getSelectedComponent().repaint();
     }
