@@ -273,7 +273,12 @@ public class GraphClassInformationDialog extends JDialog
         GraphClass node = null;
         if (classesList.getElementCount() > 0) {
             node = (GraphClass) classesList.getModel().getElementAt(0);
+        } else {
+            classesList.setSelectedValue(null, true);
+            updateLists(null);
+            updateComplexity(null);
         }
+        
         showNode(node);
         repaint();
     }
