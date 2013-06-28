@@ -468,17 +468,26 @@ class GraphManipulation<V, E> implements GraphManipulationInterface<V, E> {
             return;
         }
         
-        getGraphAdapter().setCellStyles(mxConstants.STYLE_STROKECOLOR,
-                mxUtils.getHexColorString(
-                        highlightedCellsColor.get(node)),
-                new Object[]{node});
-    
-        getGraphAdapter().setCellStyles(mxConstants.STYLE_STROKEWIDTH,
-                highlightedCellsThickness.get(node), 
-                new Object[]{node});
+        beginNotUndoable();
+        beginUpdate();
         
-        highlightedCellsColor.remove(node);
-        highlightedCellsThickness.remove(node);
+        try {
+            getGraphAdapter().setCellStyles(
+                            mxConstants.STYLE_STROKECOLOR,
+                            mxUtils.getHexColorString(highlightedCellsColor
+                                    .get(node)), new Object[] { node });
+
+            getGraphAdapter().setCellStyles(mxConstants.STYLE_STROKEWIDTH,
+                            highlightedCellsThickness.get(node),
+                            new Object[] { node });
+
+            highlightedCellsColor.remove(node);
+            highlightedCellsThickness.remove(node);
+        } finally {
+            endUpdate();
+            endNotUndoable();
+        }
+        
         
         Graph<V, E> graph = drawLib.getGraph();
         Set<E> edges = graph.edgesOf(
@@ -493,17 +502,25 @@ class GraphManipulation<V, E> implements GraphManipulationInterface<V, E> {
             
             // unhighlight edge if necessary
             if (highlightedCellsColor.containsKey(mxEdge)) {
-                getGraphAdapter().setCellStyles(mxConstants.STYLE_STROKECOLOR,
-                        mxUtils.getHexColorString(
-                                highlightedCellsColor.get(mxEdge)),
-                        new Object[]{mxEdge});
-    
-                getGraphAdapter().setCellStyles(mxConstants.STYLE_STROKEWIDTH,
-                        highlightedCellsThickness.get(mxEdge), 
-                        new Object[]{mxEdge});
-                
-                highlightedCellsColor.remove(mxEdge);
-                highlightedCellsThickness.remove(mxEdge);
+                beginNotUndoable();
+                beginUpdate();
+                try {
+                    getGraphAdapter().setCellStyles(
+                            mxConstants.STYLE_STROKECOLOR,
+                            mxUtils.getHexColorString(highlightedCellsColor
+                                    .get(mxEdge)), new Object[] { mxEdge });
+
+                    getGraphAdapter().setCellStyles(
+                            mxConstants.STYLE_STROKEWIDTH,
+                            highlightedCellsThickness.get(mxEdge),
+                            new Object[] { mxEdge });
+
+                    highlightedCellsColor.remove(mxEdge);
+                    highlightedCellsThickness.remove(mxEdge);
+                } finally {
+                    endUpdate();
+                    endNotUndoable();
+                }
                 
             }
             
