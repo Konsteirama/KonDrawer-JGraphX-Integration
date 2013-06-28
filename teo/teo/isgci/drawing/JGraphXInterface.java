@@ -29,6 +29,7 @@ import java.io.IOException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
 
 import javax.imageio.ImageIO;
@@ -603,6 +604,23 @@ class JGraphXInterface<V, E> implements DrawingLibraryInterface<V, E> {
      */
     public mxGraphComponent getGraphComponent() {
         return graphComponent;
+    }
+
+    @Override
+    public List<V> getVisibleNodes() {
+        Object[] cells 
+            = graphAdapter.getChildVertices(graphAdapter.getDefaultParent());
+        
+        HashMap<mxICell, V> cellToVertex = graphAdapter.getCellToVertexMap();
+        List<V> visibleNodes = new ArrayList<V>(cellToVertex.size());
+        
+        for (Object cell : cells) {
+            if (cell instanceof mxICell) {
+                visibleNodes.add(cellToVertex.get(cell));
+            }
+        }
+        
+        return visibleNodes;
     }
 }
 

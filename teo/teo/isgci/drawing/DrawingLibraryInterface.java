@@ -79,6 +79,13 @@ public interface DrawingLibraryInterface<V, E> {
     E getEdgeAt(Point p);
 
     /**
+     * Returns all currently visible nodes without the deleted nodes.
+     * 
+     * @return a list with all currently visible nodes.
+     */
+    List<V> getVisibleNodes();
+    
+    /**
      * Sets a new graph which should be drawn.
      * 
      * @param g The new graph

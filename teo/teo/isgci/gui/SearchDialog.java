@@ -92,8 +92,8 @@ public class SearchDialog extends JDialog implements ActionListener {
 
         if (parent.getTabbedPane()
                 .getActiveDrawingLibraryInterface() != null) {
-            Set setNames = parent.getTabbedPane()
-                .getActiveDrawingLibraryInterface().getGraph().vertexSet();
+            List setNames = parent.getTabbedPane()
+                    .getActiveDrawingLibraryInterface().getVisibleNodes();
         
             List<GraphClass> listNames = new ArrayList<GraphClass>();
             for (Object object : setNames) {
