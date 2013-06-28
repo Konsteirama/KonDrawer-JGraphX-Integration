@@ -630,51 +630,6 @@ class GraphManipulation<V, E> implements GraphManipulationInterface<V, E> {
         }
         endNotUndoable();
         
-//        beginNotUndoable();
-//        Graph<V, E> graph = drawLib.getGraph();
-//
-//        // don't visit a node twice
-//        List<V> visitedNodes = new ArrayList<V>();
-//
-//        for (V root : roots) {
-//            Set<E> edges = graph.edgesOf(root);
-//
-//            for (E edge : edges) {
-//                V parent = graph.getEdgeSource(edge);
-//                mxICell mxParent = getCellFromNode(parent);
-//
-//                // edge was pointing to child
-//                if (parent == root) {
-//                    continue;
-//                }
-//
-//                // highlight node
-//                highlightCell(getCellFromEdge(edge), highlightColor);
-//
-//                // node already selected -> only mark the edge and continue
-//                if (selectedCells.contains(mxParent)) {
-//                    continue;
-//                }
-//
-//                // cell already highlighted: recursively highlight if it's
-//                // not a selection and if the node wasn't already visited
-//                // during this loop
-//                if (highlightedCellsColor.containsKey(mxParent)
-//                        && !selectedCells.contains(mxParent)
-//                        && !visitedNodes.contains(parent)) {
-//                    // got to use a list
-//                    List<V> parentList = new ArrayList<V>();
-//                    parentList.add(parent);
-//                    highlightParents(parentList);
-//                } else {
-//                    visitedNodes.add(parent);
-//                    highlightCell(mxParent, highlightColor);
-//                }
-//            }
-//
-//        }
-//        endNotUndoable();
-        
         /*
          * graphOutline sometimes won't take changes from this method, to
          * ensure that it properly shows all changes it's visibility is 
