@@ -295,6 +295,7 @@ class JGraphXInterface<V, E> implements DrawingLibraryInterface<V, E> {
         graphAdapter.setKeepEdgesInBackground(true);
         graphAdapter.setAllowDanglingEdges(false);
         graphAdapter.setAllowLoops(false);
+        graphAdapter.setAllowNegativeCoordinates(false);
         graphAdapter.setCellsDeletable(false);
         graphAdapter.setCellsDisconnectable(false);
         graphAdapter.setCellsBendable(false);
