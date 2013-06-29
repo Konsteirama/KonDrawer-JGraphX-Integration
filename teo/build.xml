@@ -68,7 +68,8 @@
     <property name="search.cgi.out" location="${web.dir}/search.cgi" />
     <property name="refs.xml.in" location="${data.dir}/refs.xml" />
     <property name="isgci.jar" location="${web.dir}/ISGCI.jar" />
-
+    <property name="web.lib.dir" location="${web.dir}/lib" />
+    
     <!-- classpaths -->
     <property name="jarlib.dir" location="../lib" />
     <property name="jgrapht.jar" location="${jarlib.dir}/jgrapht.jar" />
@@ -83,7 +84,6 @@
 
     <path id="run.classpath">
         <path refid="compile.classpath" />
-        <pathelement location="${jarlib.dir}/saxon.jar" />
         <pathelement location="${build.classes.dir}" />
     </path>
 
@@ -213,13 +213,26 @@
     <target name="jar" depends="compile"
             description="Create a jar file containing the ISGCI application">
 
+        <delete dir="${web.lib.dir}" />
+        <mkdir dir="${web.lib.dir}"/>
+        <copy todir="${web.lib.dir}">
+            <fileset dir="${jarlib.dir}" includes="**" 
+                excludes="ant-contrib.jar" />
+        </copy>
+        
+        <manifestclasspath property="mf.classpath" jarfile="${isgci.jar}">
+            <classpath>
+                <fileset dir="${web.lib.dir}" includes="*.jar" />
+            </classpath>
+        </manifestclasspath>
+        
         <delete file="${isgci.jar}" />
         <jar destfile="${isgci.jar}" index="false">
-            <zipgroupfileset includes="*.jar" dir="${jarlib.dir}"/>
+            <!-- <zipgroupfileset includes="*.jar" dir="${jarlib.dir}"/> -->
             <!-- otherwise Class-Path doesn't work -->
             <manifest>
                 <attribute name="Main-Class" value="teo.Loader" />
-                <!--<attribute name="Class-Path" value="jgrapht.jar" /> -->
+                <attribute name="Class-Path" value="${mf.classpath}" />
             </manifest>
             <fileset dir="${build.classes.dir}">
                 <include name="teo/**" />
@@ -251,15 +264,15 @@
                  jar="${isgci.jar}"
                  keystore="${data.dir}/keystore"
                  storepass="graphclasses.org" />
-        <signjar alias="isgci"
-                 jar="${jgrapht.jar}"
-                 signedjar="${web.dir}/jgrapht.jar"
+        
+        <!--<signjar alias="isgci"
                  keystore="${data.dir}/keystore"
-                 storepass="graphclasses.org" />
-        <!-- <signjar alias="isgci"
-     jar="${isgci.jar}"
-     keystore="${data.dir}/keystore"
-     storepass="isgciteo"/> -->
+                 storepass="graphclasses.org">
+            <path>
+              <fileset dir="${web.lib.dir}" includes="*.jar" />
+            </path>
+        </signjar> -->
+        
     </target>
 
 
@@ -702,7 +715,8 @@
     <target name="run" description="Run isgci" depends="jar">
 
         <java jar="${isgci.jar}" fork="true">
-            <arg value="file://${web.dir}/" />
+            <!--<arg value="file://${web.dir}/" />-->
+            <arg value="http://www.graphclasses.org/" />
         </java>
     </target>
 
