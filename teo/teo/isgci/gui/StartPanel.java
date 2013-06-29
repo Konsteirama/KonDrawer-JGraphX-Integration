@@ -285,27 +285,32 @@ class StartPanel extends JPanel {
                     return;
                 }
                 
-                
-                // Open the graphMenu
-                final JMenu graphMenu = mainframe.getGraphMenu();
-                moveMouseTo(mouseRobot, graphMenu);
-                graphMenu.doClick(1);
-                mouseRobot.delay(CLICKDELAY);
-                
+                try {
+                    // Open the graphMenu
+                    final JMenu graphMenu = mainframe.getGraphMenu();
+                    moveMouseTo(mouseRobot, graphMenu);
+                    graphMenu.doClick(1);
+                    mouseRobot.delay(CLICKDELAY);
+                } catch (Exception ex) {
+                    // ignoring exception
+                }
                 // let the ui build the dialog
                 SwingUtilities.invokeLater(new Runnable() {
                     
                     @Override
                     public void run() {
+                        try {
+                            // Hover over the open-problem menuitem
+                            JMenuItem drawItem = mainframe.getDrawItem();
 
-                        // Hover over the open-problem menuitem
-                        JMenuItem drawItem = mainframe.getDrawItem();
-                        
-                        moveMouseTo(mouseRobot, drawItem);
-                        
-                        // click
-                        mouseRobot.delay(CLICKDELAY);
-                        drawItem.doClick(1);
+                            moveMouseTo(mouseRobot, drawItem);
+
+                            // click
+                            mouseRobot.delay(CLICKDELAY);
+                            drawItem.doClick(1);
+                        } catch (Exception e) {
+                            // ignoring exception
+                        }
                     }
                 });
 
@@ -343,24 +348,29 @@ class StartPanel extends JPanel {
                 if (mouseRobot == null) {
                     return;
                 }
-                
-                // Open the problemMenu
-                JMenu problemMenu = mainframe.getProblemsMenu();
-                moveMouseTo(mouseRobot, problemMenu);
-                problemMenu.doClick(1);
-                mouseRobot.delay(CLICKDELAY);
-                
+                try {
+                    // Open the problemMenu
+                    JMenu problemMenu = mainframe.getProblemsMenu();
+                    moveMouseTo(mouseRobot, problemMenu);
+                    problemMenu.doClick(1);
+                    mouseRobot.delay(CLICKDELAY);
+                } catch (Exception ex) {
+                    // ignoring exception
+                }
                 // let the ui build the dialog
                 SwingUtilities.invokeLater(new Runnable() {
                     
                     @Override
                     public void run() {
+                        try {
+                            // Hover over the open-problem menuitem
+                            JMenuItem problemItem = mainframe
+                                    .getOpenProblemMenuItem();
 
-                        // Hover over the open-problem menuitem
-                        JMenuItem problemItem 
-                            = mainframe.getOpenProblemMenuItem();
-                        
-                        moveMouseTo(mouseRobot, problemItem);
+                            moveMouseTo(mouseRobot, problemItem);
+                        } catch (Exception ex) {
+                            // ignoring exception
+                        }
                     }
                 });
             }
@@ -397,26 +407,33 @@ class StartPanel extends JPanel {
                     return;
                 }
                 
-                // Open the problemMenu
-                final JMenu graphMenu = mainframe.getGraphMenu();
-                moveMouseTo(mouseRobot, graphMenu);
-                graphMenu.doClick(1);
-                mouseRobot.delay(CLICKDELAY);
+                try {
+                    // Open the problemMenu
+                    final JMenu graphMenu = mainframe.getGraphMenu();
+                    moveMouseTo(mouseRobot, graphMenu);
+                    graphMenu.doClick(1);
+                    mouseRobot.delay(CLICKDELAY);
+                } catch (Exception ex) {
+                    // ignoring exception
+                }
                 
                 // let the ui build the dialog
                 SwingUtilities.invokeLater(new Runnable() {
                     
                     @Override
                     public void run() {
+                        try {
+                            // Hover over the open-problem menuitem
+                            JMenuItem inclusionProblem = mainframe
+                                    .getInclusionMenuItem();
 
-                        // Hover over the open-problem menuitem
-                        JMenuItem inclusionProblem 
-                            = mainframe.getInclusionMenuItem();
-                        
-                        moveMouseTo(mouseRobot, inclusionProblem);
-                        
-                        mouseRobot.delay(CLICKDELAY);
-                        inclusionProblem.doClick(1);
+                            moveMouseTo(mouseRobot, inclusionProblem);
+
+                            mouseRobot.delay(CLICKDELAY);
+                            inclusionProblem.doClick(1);
+                        } catch (Exception ex) {
+                            // ignoring exception
+                        }
                     }
                 });
 
@@ -454,26 +471,33 @@ class StartPanel extends JPanel {
                     return;
                 }
                 
-                // Open the problemMenu
-                final JMenu graphMenu = mainframe.getGraphMenu();
-                moveMouseTo(mouseRobot, graphMenu);
-                graphMenu.doClick(1);
-                mouseRobot.delay(CLICKDELAY);
+                try {
+                    // Open the problemMenu
+                    final JMenu graphMenu = mainframe.getGraphMenu();
+                    moveMouseTo(mouseRobot, graphMenu);
+                    graphMenu.doClick(1);
+                    mouseRobot.delay(CLICKDELAY);
+                } catch (Exception ex) {
+                    // ignoring exception
+                }
                 
                 // let the ui build the dialog
                 SwingUtilities.invokeLater(new Runnable() {
                     
                     @Override
                     public void run() {
+                        try {
+                            // Hover over the open-problem menuitem
+                            JMenuItem inclusionProblem = mainframe
+                                    .getInclusionMenuItem();
 
-                        // Hover over the open-problem menuitem
-                        JMenuItem inclusionProblem 
-                            = mainframe.getInclusionMenuItem();
-                        
-                        moveMouseTo(mouseRobot, inclusionProblem);
-                        
-                        mouseRobot.delay(CLICKDELAY);
-                        inclusionProblem.doClick(1);
+                            moveMouseTo(mouseRobot, inclusionProblem);
+
+                            mouseRobot.delay(CLICKDELAY);
+                            inclusionProblem.doClick(1);
+                        } catch (Exception ex) {
+                            // ignoring exception
+                        }
                     }
                 });
 
@@ -493,11 +517,11 @@ class StartPanel extends JPanel {
         jep.setEditable(false);
 
         try {
-          jep.setPage(NEWSPAGE);
+            jep.setPage(NEWSPAGE);
         } catch (IOException e) {
-          jep.setContentType("text/html");
-          jep.setText("<html>Could not load webpage</html>");
-        } 
+            jep.setContentType("text/html");
+            jep.setText("<html>Could not load webpage</html>");
+        }
 
         JScrollPane scrollPane = new JScrollPane(jep);
         return scrollPane;
