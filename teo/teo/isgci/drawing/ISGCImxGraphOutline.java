@@ -84,9 +84,9 @@ class ISGCImxGraphOutline extends mxGraphOutline {
                         - finderBounds.getWidth() / 2) / scale);
                 int dy = (int) ((e.getY() - translate.y 
                         - finderBounds.getHeight() / 2) / scale);
-
-                // Keeps current location as start for delta movement
-                // of the scrollbars
+                
+                // Moves scrollbars to the right position.
+                
                 graphComponent.getHorizontalScrollBar().setValue(dx);
                 graphComponent.getVerticalScrollBar().setValue(dy);
             }
