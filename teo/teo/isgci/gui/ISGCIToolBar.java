@@ -11,14 +11,17 @@
 
 package teo.isgci.gui;
 
-import teo.isgci.drawing.DrawingLibraryInterface;
-import teo.isgci.drawing.GraphManipulationInterface;
-
-import javax.swing.*;
-import java.awt.*;
+import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.List;
+
+import javax.swing.JButton;
+import javax.swing.JComboBox;
+import javax.swing.JToolBar;
+
+import teo.isgci.drawing.DrawingLibraryInterface;
+import teo.isgci.drawing.GraphManipulationInterface;
 
 /**
  * ISGCI-specific implementation of the JToolBar that modifies the application
@@ -205,7 +208,7 @@ public class ISGCIToolBar extends JToolBar {
             @Override
             public void actionPerformed(ActionEvent e) {
                 DrawingLibraryInterface<V, E> drawLib
-                        = mainframe.getTabbedPane().getActiveDrawingLibraryInterface();
+                = mainframe.getTabbedPane().getActiveDrawingLibraryInterface();
 
                 if (drawLib == null) {
                     return;

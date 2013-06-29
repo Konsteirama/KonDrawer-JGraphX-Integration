@@ -10,20 +10,31 @@
 
 package teo.isgci.gui;
 
-import teo.isgci.db.Algo;
-import teo.isgci.drawing.DrawingLibraryInterface;
-import teo.isgci.drawing.GraphManipulationInterface;
-import teo.isgci.gc.GraphClass;
-import teo.isgci.util.LessLatex;
-
-import javax.swing.*;
-import java.awt.*;
+import java.awt.Container;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Set;
+
+import javax.swing.ButtonGroup;
+import javax.swing.JButton;
+import javax.swing.JCheckBox;
+import javax.swing.JDialog;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.ListSelectionModel;
+import javax.swing.SwingUtilities;
+
+import teo.isgci.db.Algo;
+import teo.isgci.drawing.DrawingLibraryInterface;
+import teo.isgci.drawing.GraphManipulationInterface;
+import teo.isgci.gc.GraphClass;
+import teo.isgci.util.LessLatex;
 
 public class SearchDialog extends JDialog implements ActionListener {
     protected ISGCIMainFrame parent;
@@ -124,7 +135,7 @@ public class SearchDialog extends JDialog implements ActionListener {
             }
 
             DrawingLibraryInterface drawLib
-                    = parent.getTabbedPane().getActiveDrawingLibraryInterface();
+                  = parent.getTabbedPane().getActiveDrawingLibraryInterface();
 
             if (drawLib == null) {
                 return;
