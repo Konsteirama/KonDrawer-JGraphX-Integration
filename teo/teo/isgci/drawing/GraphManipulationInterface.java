@@ -11,7 +11,7 @@
 
 package teo.isgci.drawing;
 
-import java.awt.Color;
+import java.awt.*;
 import java.util.List;
 
 /**
@@ -22,7 +22,7 @@ import java.util.List;
  * @param <E> : edges of the graph
  */
 public interface GraphManipulationInterface<V, E> {
-    
+
     /**
      * Returns a boolean denoting whether the calling graph is able to perform
      * a redo-operation.
@@ -42,46 +42,53 @@ public interface GraphManipulationInterface<V, E> {
     /**
      * Centers the view of the panel on the selected node.
      *
-     * @param node : a node of the graph
+     * @param node : node of the graph
      */
     void centerNode(V node);
 
     /**
+     * Centers the view of the panel on the selected nodes.
+     *
+     * @param nodes : nodes of the graph
+     */
+    void centerNodes(V[] nodes);
+
+    /**
      * Colors a given node in a given color.
      *
-     * @param node : an array of nodes of the graph
+     * @param node  : an array of nodes of the graph
      * @param color : a color-parameter
      */
     void colorNode(V[] node, Color color);
 
     /**
      * Sets the fontcolor of all nodes to a given color.
-     * 
+     *
      * @param color : a color-parameter
      */
     void setFontColor(Color color);
-    
+
     /**
      * Sets the backgroundcolor of the graph to a given color.
-     * 
+     *
      * @param color : a color-parameter
      */
     void setBackgroundColor(Color color);
-    
+
     /**
      * Sets the highlightcolor of the graph to a given color.
-     * 
+     *
      * @param color : a color-parameter
      */
     void setHighlightColor(Color color);
-    
+
     /**
      * Sets the selectioncolor of the graph to a given color.
-     * 
+     *
      * @param color : a color-parameter
      */
     void setSelectionColor(Color color);
-    
+
     /**
      * Marks the edge between two given nodes by adding a small grey arrow and
      * coloring the edge.
@@ -89,7 +96,7 @@ public interface GraphManipulationInterface<V, E> {
      * @param edges : an array of edges of the graph
      */
     void markEdge(E[] edges);
-    
+
     /**
      * Unmarks the edge between two given nodes by removing
      * the small grey arrow and uncoloring the edge.
@@ -119,15 +126,15 @@ public interface GraphManipulationInterface<V, E> {
      * Removes all selected and highlighted nodes from the graph.
      */
     void removeHighlightedNodes();
-    
+
     /**
-    * unHighlights a selected node and all its highlighted parents and 
-    * children as well as vertices. 
-    * @param node
-    *          The node that should be unhighlighted
-    */
+     * unHighlights a selected node and all its highlighted parents and
+     * children as well as vertices.
+     *
+     * @param node The node that should be unhighlighted
+     */
     void unHighlightNode(V node);
-    
+
     /**
      * Alters the attribute name of a given node by replacing it by a given new
      * name. Renaming only effects the JGraphX-graph.
@@ -141,15 +148,14 @@ public interface GraphManipulationInterface<V, E> {
      * Undoes a previously performed action on the graph.
      */
     void undo();
-    
+
     /**
      * Returns the current zoomlevel of the graph. 1.0 stands for 100% zoom.
-     * 
-     * @return
-     *          Value indicating the current zoomlevel.
+     *
+     * @return Value indicating the current zoomlevel.
      */
     double getZoomLevel();
-    
+
     /**
      * Zooms the panel to the given factor. It will magnify the graph, if the
      * graph is too big for the panel only a section of the whole graph will be
@@ -168,16 +174,16 @@ public interface GraphManipulationInterface<V, E> {
      * @param zoomIn : a boolean to zoom in or out
      */
     void zoom(boolean zoomIn);
-    
+
     /**
      * Zooms the panel, so that the whole graph is visible.
      */
     void zoomToFit();
-    
+
     /**
      * Highlights the parents of a node. If used multiple times on the same
      * nodes (without calling {@link #unHiglightAll()}) the depth is increased.
-     * 
+     *
      * @param roots : The nodes where to begin with highlighting
      */
     void highlightParents(List<V> roots);
@@ -185,11 +191,11 @@ public interface GraphManipulationInterface<V, E> {
     /**
      * Highlights the parents of a node. If used multiple times on the same
      * nodes (without calling {@link #unHiglightAll()}) the depth is increased.
-     * 
+     *
      * @param roots : The nodes where to begin with highlighting
      */
     void highlightChildren(List<V> roots);
-    
+
     /**
      * Un-Highlights all nodes that are currently highlighted before.
      */

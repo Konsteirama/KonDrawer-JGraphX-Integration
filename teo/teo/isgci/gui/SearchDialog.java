@@ -10,31 +10,20 @@
 
 package teo.isgci.gui;
 
-import java.awt.Container;
-import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
-import java.awt.Insets;
+import teo.isgci.db.Algo;
+import teo.isgci.drawing.DrawingLibraryInterface;
+import teo.isgci.drawing.GraphManipulationInterface;
+import teo.isgci.gc.GraphClass;
+import teo.isgci.util.LessLatex;
+
+import javax.swing.*;
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Set;
-
-import javax.swing.ButtonGroup;
-import javax.swing.JButton;
-import javax.swing.JCheckBox;
-import javax.swing.JDialog;
-import javax.swing.JPanel;
-import javax.swing.JScrollPane;
-import javax.swing.ListSelectionModel;
-import javax.swing.SwingUtilities;
-
-import teo.isgci.db.Algo;
-import teo.isgci.drawing.DrawingLibraryInterface;
-import teo.isgci.drawing.GraphManipulationInterface;
-import teo.isgci.gc.GraphClass;
-import teo.isgci.util.LessLatex;
 
 public class SearchDialog extends JDialog implements ActionListener {
     protected ISGCIMainFrame parent;
@@ -77,7 +66,7 @@ public class SearchDialog extends JDialog implements ActionListener {
         JPanel p = new JPanel();
         searchButton = new JButton("Search");
         searchButton.setToolTipText("Search in database; "
-                           + "needs connection to internet");
+                + "needs connection to internet");
         cancelButton = new JButton("Cancel");
         cancelButton.setToolTipText("Close this dialogue");
         p.add(searchButton);
@@ -92,9 +81,9 @@ public class SearchDialog extends JDialog implements ActionListener {
 
         if (parent.getTabbedPane()
                 .getActiveDrawingLibraryInterface() != null) {
-            List setNames = parent.getTabbedPane()
-                    .getActiveDrawingLibraryInterface().getVisibleNodes();
-        
+            Set setNames = parent.getTabbedPane()
+                    .getActiveDrawingLibraryInterface().getGraph().vertexSet();
+
             List<GraphClass> listNames = new ArrayList<GraphClass>();
             for (Object object : setNames) {
                 for (Object name : (Set) object) {
@@ -121,7 +110,7 @@ public class SearchDialog extends JDialog implements ActionListener {
         Object source = event.getSource();
         if (source == cancelButton) {
             closeDialog();
-        } else if (source == searchButton 
+        } else if (source == searchButton
                 && classesList.getSelectedValue() != null) {
             Set<GraphClass> node = null;
             Set setNames = parent.getTabbedPane()
@@ -133,40 +122,40 @@ public class SearchDialog extends JDialog implements ActionListener {
                     node = (Set<GraphClass>) object;
                 }
             }
-            
+
             DrawingLibraryInterface drawLib
-                = parent.getTabbedPane().getActiveDrawingLibraryInterface(); 
-            
+                    = parent.getTabbedPane().getActiveDrawingLibraryInterface();
+
             if (drawLib == null) {
                 return;
             }
-            
+
             final double searchZoomLevel = 2;
-            
+
             final GraphManipulationInterface manipulationInterface
-                = drawLib.getGraphManipulationInterface();
-            
+                    = drawLib.getGraphManipulationInterface();
+
             manipulationInterface.beginNotUndoable();
             manipulationInterface.beginUpdate();
-            
+
             try {
                 if (searchZoomLevel > manipulationInterface.getZoomLevel()) {
                     manipulationInterface.zoomTo(searchZoomLevel);
                 }
-                
+
                 manipulationInterface.unHighlightAll();
-                
+
                 List selectedNodes = new ArrayList();
                 selectedNodes.add(node);
                 drawLib.setSelectedNodes(selectedNodes);
-                
+
             } finally {
                 manipulationInterface.endNotUndoable();
                 manipulationInterface.endUpdate();
             }
-            
+
             // Invoke later to prevent centering bug
-            final Set<GraphClass> runnableNode = node; 
+            final Set<GraphClass> runnableNode = node;
             SwingUtilities.invokeLater(new Runnable() {
                 @Override
                 public void run() {
@@ -174,7 +163,7 @@ public class SearchDialog extends JDialog implements ActionListener {
                 }
             });
 
-            
+
             closeDialog();
         }
     }

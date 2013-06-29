@@ -2,10 +2,13 @@ package teo.isgci.drawing;
 
 import com.mxgraph.util.mxConstants;
 import teo.isgci.gui.LatexLabel;
-import javax.swing.SwingConstants;
-import java.awt.Font;
-import java.awt.Rectangle;
 
+import javax.swing.*;
+import java.awt.*;
+
+/**
+ * A lightweight latex label
+ */
 public class lightweightLatexLabel extends LatexLabel {
 
     /**
@@ -16,153 +19,120 @@ public class lightweightLatexLabel extends LatexLabel {
     /**
      * Initializes the shared instance.
      */
-    static
-    {
-        try
-        {
+    static {
+        try {
             sharedInstance = new lightweightLatexLabel();
-        }
-        catch (Exception e)
-        {
+        } catch (Exception e) {
             // ignore
         }
     }
 
     /**
      *
-     */
-    public static lightweightLatexLabel getSharedInstance()
-    {
-        return sharedInstance;
-    }
-
-    /**
-     *
      *
      */
-    public lightweightLatexLabel()
-    {
+    public lightweightLatexLabel() {
         setFont(new Font(mxConstants.DEFAULT_FONTFAMILY, 0,
                 mxConstants.DEFAULT_FONTSIZE));
         setVerticalAlignment(SwingConstants.TOP);
     }
 
     /**
-     * Overridden for performance reasons.
      *
      */
-    public void validate()
-    {
+    public static lightweightLatexLabel getSharedInstance() {
+        return sharedInstance;
     }
 
     /**
      * Overridden for performance reasons.
-     *
      */
-    public void revalidate()
-    {
+    public void validate() {
     }
 
     /**
      * Overridden for performance reasons.
-     *
      */
-    public void repaint(long tm, int x, int y, int width, int height)
-    {
+    public void revalidate() {
     }
 
     /**
      * Overridden for performance reasons.
-     *
      */
-    public void repaint(Rectangle r)
-    {
+    public void repaint(long tm, int x, int y, int width, int height) {
     }
 
     /**
      * Overridden for performance reasons.
-     *
+     */
+    public void repaint(Rectangle r) {
+    }
+
+    /**
+     * Overridden for performance reasons.
      */
     protected void firePropertyChange(String propertyName, Object oldValue,
-                                      Object newValue)
-    {
+                                      Object newValue) {
         // Strings get interned...
-        if (propertyName == "text" || propertyName == "font")
-        {
+        if (propertyName == "text" || propertyName == "font") {
             super.firePropertyChange(propertyName, oldValue, newValue);
         }
     }
 
     /**
      * Overridden for performance reasons.
-     *
      */
     public void firePropertyChange(String propertyName, byte oldValue,
-                                   byte newValue)
-    {
+                                   byte newValue) {
     }
 
     /**
      * Overridden for performance reasons.
-     *
      */
     public void firePropertyChange(String propertyName, char oldValue,
-                                   char newValue)
-    {
+                                   char newValue) {
     }
 
     /**
      * Overridden for performance reasons.
-     *
      */
     public void firePropertyChange(String propertyName, short oldValue,
-                                   short newValue)
-    {
+                                   short newValue) {
     }
 
     /**
      * Overridden for performance reasons.
-     *
      */
     public void firePropertyChange(String propertyName, int oldValue,
-                                   int newValue)
-    {
+                                   int newValue) {
     }
 
     /**
      * Overridden for performance reasons.
-     *
      */
     public void firePropertyChange(String propertyName, long oldValue,
-                                   long newValue)
-    {
+                                   long newValue) {
     }
 
     /**
      * Overridden for performance reasons.
-     *
      */
     public void firePropertyChange(String propertyName, float oldValue,
-                                   float newValue)
-    {
+                                   float newValue) {
     }
 
     /**
      * Overridden for performance reasons.
-     *
      */
     public void firePropertyChange(String propertyName, double oldValue,
-                                   double newValue)
-    {
+                                   double newValue) {
     }
 
     /**
      * Overridden for performance reasons.
-     *
      */
     public void firePropertyChange(String propertyName, boolean oldValue,
-                                   boolean newValue)
-    {
+                                   boolean newValue) {
     }
 
 }
