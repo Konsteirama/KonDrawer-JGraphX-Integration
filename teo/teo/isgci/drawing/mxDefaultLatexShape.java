@@ -78,8 +78,6 @@ public class mxDefaultLatexShape implements mxITextShape {
             }
             int dx = 0;
 
-            double dy = 0;
-
             int sw = lightweightLatexLabel.getSharedInstance()
                     .getLatexWidth(g, text);
 
@@ -94,7 +92,7 @@ public class mxDefaultLatexShape implements mxITextShape {
             }
 
             lightweightLatexLabel.getSharedInstance().drawLatexString(g,
-                    text, 10, 10);
+                    text, x + dx, y);
         }
     }
 
