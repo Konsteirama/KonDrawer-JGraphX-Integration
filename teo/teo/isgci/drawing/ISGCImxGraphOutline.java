@@ -80,15 +80,13 @@ class ISGCImxGraphOutline extends mxGraphOutline {
                     && (finderBounds.contains(e.getPoint()) || zoomGesture)) {
                 start = e.getPoint();
             } else { 
-                System.out.println("vsdf");                    
                 int dx = (int) ((e.getX() - translate.x 
                         - finderBounds.getWidth() / 2) / scale);
                 int dy = (int) ((e.getY() - translate.y 
                         - finderBounds.getHeight() / 2) / scale);
 
                 // Keeps current location as start for delta movement
-                // of the scrollbarsq
-
+                // of the scrollbars
                 graphComponent.getHorizontalScrollBar().setValue(dx);
                 graphComponent.getVerticalScrollBar().setValue(dy);
             }
