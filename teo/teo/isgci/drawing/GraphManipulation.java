@@ -407,6 +407,9 @@ class GraphManipulation<V, E> implements GraphManipulationInterface<V, E> {
         beginUpdate();
         try {
             mxHierarchicalLayout layout = new mxHierarchicalLayout(graph);
+            layout.setFineTuning(true);
+            layout.setInterHierarchySpacing(150);
+            layout.setInterRankCellSpacing(100);
             layout.execute(graph.getDefaultParent());
 
         } finally {
