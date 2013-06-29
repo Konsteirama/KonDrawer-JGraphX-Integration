@@ -433,11 +433,9 @@ public class ISGCITabbedPane extends JTabbedPane implements Updatable {
     }
     
     /**
-     * @param c 
-     *          The tab for which the naming preference is wanted.
      * 
      * @return 
-     *          The default naming preference of the given Tab.
+     *          The default naming preference of the active Tab.
      */
     public NamePref getNamingPref() {
         if (panelToNamingPref.containsKey(getSelectedComponent())) {
@@ -448,22 +446,25 @@ public class ISGCITabbedPane extends JTabbedPane implements Updatable {
     }
 
     /**
-     * Changes the naming preferences of target tab.
+     * Changes the naming preferences of the active tab.
      * 
      * @param pref
-     *          The new default naming preference of this tab.
-     * @param c
-     *          The Tab for which the naming preference is changed.
+     *          The new default naming preference of the active tab.
      */
     public void setNamingPref(NamePref pref) {
-        if (pref != null 
-                && getTabComponentAt(getSelectedIndex()) != addTabComponent) {
-            panelToNamingPref.put((JComponent) getSelectedComponent(), pref);
-            applyNamingPref(getSelectedComponent());
+        if (!(getSelectedComponent() instanceof StartPanel) 
+                && !(getComponentAt(getSelectedIndex()) 
+                        instanceof AddTabComponent)) {
+            if (pref != null && getTabComponentAt(
+                    getSelectedIndex()) != addTabComponent) {
+                panelToNamingPref.put(
+                        (JComponent) getSelectedComponent(), pref);
+                applyNamingPref(getSelectedComponent());
+            }
+            
+            getActiveDrawingLibraryInterface().getGraphManipulationInterface()
+                           .reapplyHierarchicalLayout();
         }
-        
-        getActiveDrawingLibraryInterface().getGraphManipulationInterface()
-                       .reapplyHierarchicalLayout();
     }
     
     /**
