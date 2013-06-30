@@ -11,12 +11,28 @@
 
 package teo.isgci.drawing;
 
-import java.awt.Cursor;
-import java.awt.Dimension;
-import java.awt.Graphics2D;
-import java.awt.Image;
-import java.awt.Point;
-import java.awt.Toolkit;
+import com.mxgraph.canvas.mxGraphics2DCanvas;
+import com.mxgraph.canvas.mxICanvas;
+import com.mxgraph.canvas.mxSvgCanvas;
+import com.mxgraph.model.mxICell;
+import com.mxgraph.swing.handler.mxCellHandler;
+import com.mxgraph.swing.handler.mxPanningHandler;
+import com.mxgraph.swing.mxGraphComponent;
+import com.mxgraph.swing.mxGraphOutline;
+import com.mxgraph.util.*;
+import com.mxgraph.util.mxCellRenderer.CanvasFactory;
+import com.mxgraph.view.mxCellState;
+import com.mxgraph.view.mxGraph;
+import net.sf.epsgraphics.ColorMode;
+import net.sf.epsgraphics.EpsGraphics;
+import org.jgrapht.Graph;
+import org.jgrapht.ext.GraphMLExporter;
+import org.xml.sax.SAXException;
+
+import javax.imageio.ImageIO;
+import javax.swing.*;
+import javax.xml.transform.TransformerConfigurationException;
+import java.awt.*;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseWheelEvent;
@@ -32,35 +48,6 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 
-import javax.imageio.ImageIO;
-import javax.swing.JComponent;
-import javax.swing.JScrollBar;
-import javax.xml.transform.TransformerConfigurationException;
-
-import com.mxgraph.canvas.mxGraphics2DCanvas;
-import net.sf.epsgraphics.ColorMode;
-import net.sf.epsgraphics.EpsGraphics;
-
-import org.jgrapht.Graph;
-import org.jgrapht.ext.GraphMLExporter;
-import org.xml.sax.SAXException;
-
-import com.mxgraph.canvas.mxICanvas;
-import com.mxgraph.canvas.mxSvgCanvas;
-import com.mxgraph.model.mxICell;
-import com.mxgraph.swing.mxGraphComponent;
-import com.mxgraph.swing.mxGraphOutline;
-import com.mxgraph.swing.handler.mxCellHandler;
-import com.mxgraph.swing.handler.mxPanningHandler;
-import com.mxgraph.util.mxCellRenderer;
-import com.mxgraph.util.mxCellRenderer.CanvasFactory;
-import com.mxgraph.util.mxConstants;
-import com.mxgraph.util.mxDomUtils;
-import com.mxgraph.util.mxUtils;
-import com.mxgraph.util.mxXmlUtils;
-import com.mxgraph.view.mxCellState;
-import com.mxgraph.view.mxGraph;
-
 /**
  * The actual implementation of a DrawingLibraryInterface,
  * which is used to manipulate the canvas etc.
@@ -70,45 +57,50 @@ import com.mxgraph.view.mxGraph;
  */
 class JGraphXInterface<V, E> implements DrawingLibraryInterface<V, E> {
 
-    /** The actual canvas. */
+    /**
+     * The actual canvas.
+     */
     private mxGraphComponent graphComponent;
 
     /**
      * The minimap component.
      */
     private mxGraphOutline graphOutline;
-    
-    /** An interface to manipulate the canvas. */
+
+    /**
+     * An interface to manipulate the canvas.
+     */
     private GraphManipulation<V, E> graphManipulation;
-    
-    /** An simple interface to register 
-     *  an mouse adapter. 
+
+    /**
+     * An simple interface to register
+     * an mouse adapter.
      */
     private GraphEvent graphEvent;
-    
-    /** An adapter, which transforms jgraphx in jgrapht 
-     *  and vice versa.
+
+    /**
+     * An adapter, which transforms jgraphx in jgrapht
+     * and vice versa.
      */
     private JGraphXAdapter<V, E> graphAdapter;
-    
+
     /**
      * The constructor for JGraphXInterface.
      *
      * @param g JGraphT graph to draw
      */
 
-    static
-    {
+    static {
         mxUtils.setDefaultTextRenderer(
                 lightweightLatexLabel.getSharedInstance());
-        mxGraphics2DCanvas.putTextShape(mxGraphics2DCanvas.TEXT_SHAPE_DEFAULT, 
+        mxGraphics2DCanvas.putTextShape(mxGraphics2DCanvas.TEXT_SHAPE_DEFAULT,
                 new mxDefaultLatexShape());
     }
 
     public JGraphXInterface(Graph<V, E> g) {
         // Convert to JGraphT-Graph
         graphAdapter = createNewAdapter(g);
-        
+
         applyCustomGraphSettings();
 
         // Create the mxGraphComponent used to draw the graph
@@ -116,32 +108,32 @@ class JGraphXInterface<V, E> implements DrawingLibraryInterface<V, E> {
         // implementation so the users are not required to hold down shift
         // and ctrl
         graphComponent = new mxGraphComponent(graphAdapter) {
-            
+
             @Override
             public boolean isPanningEvent(MouseEvent event) {
                 if (event == null) {
                     return false;
-                } 
+                }
 
                 mxICell cell = (mxICell) getCellAt(event.getX(), event.getY());
                 return cell == null || cell.isEdge();
             }
-            
+
             @Override
             public mxCellHandler createHandler(mxCellState state) {
                 // disable dashed lines around selection
                 return null;
             }
-            
+
         };
         graphComponent.setToolTips(true);
 
         setGraphOutline();
-        
+
         graphManipulation = new GraphManipulation<V, E>(this);
-        
+
         graphManipulation.beginNotUndoable();
-        
+
         graphEvent = new GraphEvent(graphComponent);
 
         graphComponent.setWheelScrollingEnabled(false);
@@ -155,10 +147,10 @@ class JGraphXInterface<V, E> implements DrawingLibraryInterface<V, E> {
         graphEvent.registerMouseAdapter(
                 new InternalMouseAdapter<V, E>(graphComponent,
                         graphManipulation));
-        
+
         graphManipulation.endNotUndoable();
 
-        
+
         // change icon to grabbing hand if graph is panning
         new mxPanningHandler(graphComponent) {
             private List<V> selectedNodes = new ArrayList<V>();
@@ -180,21 +172,21 @@ class JGraphXInterface<V, E> implements DrawingLibraryInterface<V, E> {
                 } catch (Exception ex) {
                     System.err.println("Unable to set cursor!");
                 }
-                
+
                 mxICell cell = (mxICell) graphComponent.getCellAt(
                         (int) e.getPoint().getX(),
                         (int) e.getPoint().getY());
                 if (cell != null && cell.isEdge()) {
                     return;
                 }
-                
-                
+
+
                 selectedNodes = getSelectedNodes();
-                begin  = e.getWhen();
-                
+                begin = e.getWhen();
+
                 // set black border around cells
                 graphManipulation.updateSelectedCells();
-                
+
                 super.mousePressed(e);
             }
 
@@ -207,7 +199,7 @@ class JGraphXInterface<V, E> implements DrawingLibraryInterface<V, E> {
                 if ((e.getWhen() - begin) > epsilon) {
                     setSelectedNodes(selectedNodes);
                 }
-                
+
                 graphManipulation.updateSelectedCells();
                 super.mouseReleased(e);
             }
@@ -215,13 +207,13 @@ class JGraphXInterface<V, E> implements DrawingLibraryInterface<V, E> {
     }
 
     /**
-     * Adds the graphoutline component and adds custom settings to it. 
+     * Adds the graphoutline component and adds custom settings to it.
      */
     private void setGraphOutline() {
 
         graphOutline = new ISGCImxGraphOutline(graphComponent);
         graphOutline.addMouseWheelListener(new MouseWheelListener() {
-            
+
             @Override
             public void mouseWheelMoved(MouseWheelEvent e) {
                 if (e.getWheelRotation() < 0) {
@@ -231,36 +223,36 @@ class JGraphXInterface<V, E> implements DrawingLibraryInterface<V, E> {
                 }
             }
         });
-        
+
         graphOutline.addMouseListener(new MouseListener() {
-            
+
             @Override
-            public void mouseReleased(MouseEvent e) { 
-                graphManipulation.applyZoomSettings(); 
+            public void mouseReleased(MouseEvent e) {
+                graphManipulation.applyZoomSettings();
             }
-            
+
             @Override
-            public void mousePressed(MouseEvent e) { 
-                graphManipulation.applyZoomSettings(); 
+            public void mousePressed(MouseEvent e) {
+                graphManipulation.applyZoomSettings();
             }
-            
+
             @Override
-            public void mouseExited(MouseEvent e) { 
-                graphManipulation.applyZoomSettings(); 
+            public void mouseExited(MouseEvent e) {
+                graphManipulation.applyZoomSettings();
             }
-            
+
             @Override
-            public void mouseEntered(MouseEvent e) { 
-                graphManipulation.applyZoomSettings(); 
+            public void mouseEntered(MouseEvent e) {
+                graphManipulation.applyZoomSettings();
             }
-            
+
             @Override
-            public void mouseClicked(MouseEvent e) { 
-                graphManipulation.applyZoomSettings(); 
+            public void mouseClicked(MouseEvent e) {
+                graphManipulation.applyZoomSettings();
             }
         });
     }
-    
+
     /**
      * Creates a new JGraphXAdapter form the given Graph with edge selection
      * and movement disabled.
@@ -313,13 +305,15 @@ class JGraphXInterface<V, E> implements DrawingLibraryInterface<V, E> {
 
         graphAdapter.getStylesheet().getDefaultVertexStyle().
                 put(mxConstants.STYLE_ALIGN, mxConstants.ALIGN_CENTER);
-        
+
         // set black outline around nodes
         graphAdapter.getStylesheet().getDefaultVertexStyle()
                 .put(mxConstants.STYLE_STROKECOLOR, "#000000");
 
         graphAdapter.getStylesheet().getDefaultVertexStyle()
-                .put(mxConstants.STYLE_SPACING, "5");
+                .put(mxConstants.STYLE_SPACING_LEFT, "5");
+        graphAdapter.getStylesheet().getDefaultVertexStyle()
+                .put(mxConstants.STYLE_SPACING_RIGHT, "5");
 
         // rounded edges
         graphAdapter.getStylesheet().getDefaultVertexStyle()
@@ -349,19 +343,19 @@ class JGraphXInterface<V, E> implements DrawingLibraryInterface<V, E> {
      */
     private void exportEPS(final String path) {
         Dimension d = graphComponent.getGraphControl().getSize();
-        
+
         FileOutputStream out;
         EpsGraphics g;
-        
+
         try {
             // Creates a new file and the graphics object
             out = new FileOutputStream(new File(path));
-            g = new EpsGraphics("", out, 0, 0, (int) d.getWidth(), 
+            g = new EpsGraphics("", out, 0, 0, (int) d.getWidth(),
                     (int) d.getHeight(), ColorMode.COLOR_RGB);
-            
+
             // Paints the graphic object
             graphComponent.getGraphControl().paint(g);
-            
+
             g.finalize();
             g.close();
         } catch (IOException e) {
@@ -434,13 +428,13 @@ class JGraphXInterface<V, E> implements DrawingLibraryInterface<V, E> {
      */
     private void exportJPG(final String path) {
         Dimension d = graphComponent.getSize();
-        
+
         // For testing purposes, if no Panel exists 
         if (d.width == 0 || d.height == 0) {
             d.width = 1;
             d.height = 1;
         }
-        
+
         // Gets the Scrollbars
         JScrollBar hor = graphComponent.getHorizontalScrollBar();
         JScrollBar vert = graphComponent.getVerticalScrollBar();
@@ -449,13 +443,13 @@ class JGraphXInterface<V, E> implements DrawingLibraryInterface<V, E> {
         // to remove them later on
         int height = hor.getHeight();
         int width = vert.getWidth();
-        
-        BufferedImage image = new BufferedImage(d.width - width, 
+
+        BufferedImage image = new BufferedImage(d.width - width,
                 d.height - height, BufferedImage.TYPE_INT_RGB);
 
         Graphics2D g = image.createGraphics();
-        graphComponent.paint(g);   
-        
+        graphComponent.paint(g);
+
         File outputfile = new File(path);
 
         try {
@@ -472,13 +466,13 @@ class JGraphXInterface<V, E> implements DrawingLibraryInterface<V, E> {
      */
     private void exportPNG(final String path) {
         Dimension d = graphComponent.getSize();
-        
+
         // For testing purposes, if no Panel exists 
         if (d.width == 0 || d.height == 0) {
             d.width = 1;
             d.height = 1;
         }
-        
+
         // Gets the Scrollbars
         JScrollBar hor = graphComponent.getHorizontalScrollBar();
         JScrollBar vert = graphComponent.getVerticalScrollBar();
@@ -487,7 +481,7 @@ class JGraphXInterface<V, E> implements DrawingLibraryInterface<V, E> {
         // to remove them later on
         int height = hor.getHeight();
         int width = vert.getWidth();
-        
+
         BufferedImage image = new BufferedImage(d.width - width,
                 d.height - height, BufferedImage.TYPE_INT_ARGB);
 
@@ -543,7 +537,7 @@ class JGraphXInterface<V, E> implements DrawingLibraryInterface<V, E> {
             return graphAdapter.getCellToEdgeMap().get(cell);
         } else {
             return null;
-        }      
+        }
     }
 
     @Override
@@ -558,9 +552,9 @@ class JGraphXInterface<V, E> implements DrawingLibraryInterface<V, E> {
         applyCustomGraphSettings();
 
         graphComponent.setGraph(graphAdapter);
-        
+
         graphManipulation = new GraphManipulation(this);
-        
+
         graphManipulation.beginNotUndoable();
         graphManipulation.reapplyHierarchicalLayout();
         graphManipulation.endNotUndoable();
@@ -574,14 +568,14 @@ class JGraphXInterface<V, E> implements DrawingLibraryInterface<V, E> {
         for (Object cell : graphAdapter.getSelectionCells()) {
             list.add(graphAdapter.getCellToVertexMap().get(cell));
         }
-        
+
         return list;
     }
 
     @Override
     public void setSelectedNodes(List<V> nodes) {
         graphComponent.getGraph().clearSelection();
-        
+
         Collection<Object> col = new ArrayList<Object>(nodes.size());
 
         for (V node : nodes) {
@@ -594,14 +588,13 @@ class JGraphXInterface<V, E> implements DrawingLibraryInterface<V, E> {
 
     @Override
     public JComponent getGraphOutline() {
-       return graphOutline;
+        return graphOutline;
     }
-    
+
     /**
      * Returns the current mxGraphComponent.
-     * 
-     * @return
-     *          The current mxGraphComponent
+     *
+     * @return The current mxGraphComponent
      */
     public mxGraphComponent getGraphComponent() {
         return graphComponent;
@@ -609,18 +602,18 @@ class JGraphXInterface<V, E> implements DrawingLibraryInterface<V, E> {
 
     @Override
     public List<V> getVisibleNodes() {
-        Object[] cells 
-            = graphAdapter.getChildVertices(graphAdapter.getDefaultParent());
-        
+        Object[] cells
+                = graphAdapter.getChildVertices(graphAdapter.getDefaultParent());
+
         HashMap<mxICell, V> cellToVertex = graphAdapter.getCellToVertexMap();
         List<V> visibleNodes = new ArrayList<V>(cellToVertex.size());
-        
+
         for (Object cell : cells) {
             if (cell instanceof mxICell) {
                 visibleNodes.add(cellToVertex.get(cell));
             }
         }
-        
+
         return visibleNodes;
     }
 }
