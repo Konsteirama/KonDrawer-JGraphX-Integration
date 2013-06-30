@@ -345,6 +345,8 @@ public class ISGCIToolBar extends JToolBar {
             }
         });
 
+        // Very small separator
+        addSeparator(new Dimension(1, 1));
 
         // ZOOM IN
         String zoomInTooltip = "Zoom In";
