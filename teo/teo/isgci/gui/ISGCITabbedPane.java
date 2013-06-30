@@ -46,6 +46,7 @@ import teo.isgci.drawing.GraphManipulationInterface;
 import teo.isgci.gc.GraphClass;
 import teo.isgci.grapht.GAlg;
 import teo.isgci.grapht.Inclusion;
+import teo.isgci.gui.ISGCITabComponent.Mode;
 import teo.isgci.problem.Complexity;
 import teo.isgci.problem.Problem;
 import teo.isgci.util.Updatable;
@@ -227,7 +228,7 @@ public class ISGCITabbedPane extends JTabbedPane implements Updatable {
         addTab("", startpage);
         setSelectedComponent(startpage);
         ISGCITabComponent closeButton 
-            = new ISGCITabComponent(this, "Welcome to ISGCI");
+            = new ISGCITabComponent(this, "Welcome to ISGCI", null);
         
         setTabComponentAt(getSelectedIndex(), closeButton);
       
@@ -256,9 +257,11 @@ public class ISGCITabbedPane extends JTabbedPane implements Updatable {
      *          The graph that will be drawn and interacted with within 
      *          this tab.
      * @param name
-     *          The name of the Tab
+     *          The name of the Tab 
+     * @param m
+     *          The chosen mode (with subclasses or superclasses or both)
      */
-    public <V, E> void drawInNewTab(Graph<V, E> graph, String name) {       
+    public <V, E> void drawInNewTab(Graph<V, E> graph, String name, Mode m) {
         
         final DrawingLibraryInterface<V, E> drawingInterface = 
                 DrawingLibraryFactory.createNewInterface(graph);
@@ -318,7 +321,7 @@ public class ISGCITabbedPane extends JTabbedPane implements Updatable {
         tabPanel.add(layeredPane, BorderLayout.CENTER);
         
         addTab("", tabPanel);
-        ISGCITabComponent tabComponent = new ISGCITabComponent(this, name);
+        ISGCITabComponent tabComponent = new ISGCITabComponent(this, name, m);
         
         // set tabcomponent as .. tabcomponent
         setSelectedComponent(tabPanel);
@@ -367,15 +370,19 @@ public class ISGCITabbedPane extends JTabbedPane implements Updatable {
      *          
      * @param name
      *          The name of the Tab
+     *          
+     * @param m
+     *          The chosen mode (with subclasses or superclasses or both).
+     *          Null if no mode was chosen.
      */
-    public <V, E> void drawInActiveTab(Graph<V, E> graph, String name) {
+    public <V, E> void drawInActiveTab(Graph<V, E> graph, String name, Mode m) {
         if (getSelectedComponent() == null || getTabCount() == 1 
                 || getTabComponentAt(getSelectedIndex()) 
                 instanceof AddTabComponent) {
-            drawInNewTab(graph, name);
+            drawInNewTab(graph, name, m);
         } else if (getSelectedComponent() instanceof StartPanel) {
             remove(getSelectedComponent());
-            drawInNewTab(graph, name);
+            drawInNewTab(graph, name, m);
         } else {
             
             final DrawingLibraryInterface dLib 
@@ -392,7 +399,7 @@ public class ISGCITabbedPane extends JTabbedPane implements Updatable {
             
             // set title
             ISGCITabComponent closeButton 
-                = new ISGCITabComponent(this, name);
+                = new ISGCITabComponent(this, name, m);
         
             setTabComponentAt(getSelectedIndex(), closeButton);
             applyNamingPref(getSelectedComponent());

@@ -614,7 +614,7 @@ public class InclusionResultDialog extends JDialog implements ActionListener {
                         = Algo.createHierarchySubgraph(
                                 Algo.nodesBetween(upper, lower));
                     parent.getTabbedPane().drawInActiveTab(graph,
-                            upper.toString() + "-" + lower.toString());
+                            upper.toString() + "-" + lower.toString(), null);
                     
                     
                     drawButton.setText(text);
@@ -644,7 +644,7 @@ public class InclusionResultDialog extends JDialog implements ActionListener {
                         = Algo.createHierarchySubgraph(
                                 Algo.nodesBetween(upper, lower));
                     parent.getTabbedPane().drawInNewTab(graph,
-                            upper.toString() + "-" + lower.toString());
+                            upper.toString() + "-" + lower.toString(), null);
                     
                     // restore buttons
                     okButton.setEnabled(true);

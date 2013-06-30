@@ -177,7 +177,7 @@ public class IQDialog extends JDialog
             setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
             SimpleDirectedGraph<Set<GraphClass>, DefaultEdge> graph =
                     Algo.createHierarchySubgraph(getNodes());
-            parent.getTabbedPane().drawInActiveTab(graph, "");
+            parent.getTabbedPane().drawInActiveTab(graph, "", null);
             
 //            for (Object o : classesList.getSelectedValues()) {
 //                GraphClass gc = (GraphClass) o;

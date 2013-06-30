@@ -42,6 +42,7 @@ import teo.isgci.grapht.GAlg;
 import teo.isgci.grapht.GraphWalker;
 import teo.isgci.grapht.Inclusion;
 import teo.isgci.grapht.RevBFSWalker;
+import teo.isgci.gui.ISGCITabComponent.Mode;
 
 /**
  * Display a list of graphclasses and change the drawing according to the
@@ -173,6 +174,7 @@ public class GraphClassSelectionDialog extends JDialog implements
 
     @Override
     public void actionPerformed(ActionEvent event) {
+        
         Object source = event.getSource();
         
         if (source == cancelButton) {
@@ -195,12 +197,20 @@ public class GraphClassSelectionDialog extends JDialog implements
             Runnable drawGraph = new Runnable() {
 
                 @Override
-                public void run() {                   
+                public void run() {   
+                    Mode m = null;
+                    if (superCheck.isSelected() && subCheck.isSelected()) {
+                        m = Mode.BOTH;
+                    } else if (superCheck.isSelected()) {
+                        m = Mode.SUP;
+                    } else if (subCheck.isSelected()) {
+                        m = Mode.SUB;
+                    }                
                     SimpleDirectedGraph<Set<GraphClass>, DefaultEdge> graph 
                     = getGraph();
                     
                     parent.getTabbedPane().drawInActiveTab(graph,
-                            classesList.getSelectedValue().toString());
+                            classesList.getSelectedValue().toString(), m);
                     closeDialog();
                 }
 
@@ -230,11 +240,19 @@ public class GraphClassSelectionDialog extends JDialog implements
 
                 @Override
                 public void run() {
+                    Mode m = null;
+                    if (superCheck.isSelected() && subCheck.isSelected()) {
+                        m = Mode.BOTH;
+                    } else if (superCheck.isSelected()) {
+                        m = Mode.SUP;
+                    } else if (subCheck.isSelected()) {
+                        m = Mode.SUB;
+                    }
                     SimpleDirectedGraph<Set<GraphClass>, DefaultEdge> graph 
                         = getGraph();
                     
                     parent.getTabbedPane().drawInNewTab(graph,
-                            classesList.getSelectedValue().toString());
+                            classesList.getSelectedValue().toString(), m);
                     closeDialog();
                 }
 

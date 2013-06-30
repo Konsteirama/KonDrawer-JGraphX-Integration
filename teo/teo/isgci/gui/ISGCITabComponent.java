@@ -75,6 +75,16 @@ public class ISGCITabComponent extends JPanel {
     
     /** Parent. */
     private final JTabbedPane parent;
+    
+    /**
+     * The mode of the graph. 
+     * SUB means the graph is drawn with its subclasses.
+     * SUP means the graph is drawn with its superclasses.
+     * BOTH means the graph is drawn with its sub- and superclasses.
+     */
+    public static enum Mode {
+        SUB,SUP,BOTH
+    }
 
     /** 
      * Creates a new tabbedcomponent with close button and name.
@@ -83,9 +93,12 @@ public class ISGCITabComponent extends JPanel {
      *          The parent.
      * @param name
      *          The name that will be next to the close button, compiled with
-     *          LaTeX.
+     *          LaTeX.               
+     * @param m
+     *          The chosen mode (with subclasses or superclasses or both).
+     *          Null if no mode was chosen.
      */
-    public ISGCITabComponent(final JTabbedPane pane, String name) {
+    public ISGCITabComponent(final JTabbedPane pane, String name, Mode m) {
         // unset default FlowLayout' gaps
         super(new FlowLayout(FlowLayout.LEFT, 0, 0));
         if (pane == null) {
@@ -93,9 +106,20 @@ public class ISGCITabComponent extends JPanel {
         }
         this.parent = pane;
         setOpaque(false);
+        
+        String titel = Utility.getShortName(name);
+        if (m != null) {
+            if (m.equals(Mode.SUB)) {
+                titel += "  \u2193";             
+            } else if (m.equals(Mode.SUP)) {
+                titel += "  \u2191";            
+            } else if (m.equals(Mode.BOTH)) {
+                titel += "  \u2195";            
+            }
+        }
 
         // transform titles of JTabbedPane to their LaTeX text
-        LatexLabel label = new LatexLabel(Utility.getShortName(name));
+        LatexLabel label = new LatexLabel(titel);
         // make background transparent
         label.setBackground(new Color(0, 0, 0, 0));
         

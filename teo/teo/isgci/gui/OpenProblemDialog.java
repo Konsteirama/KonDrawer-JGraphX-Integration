@@ -289,8 +289,8 @@ public class OpenProblemDialog extends JDialog implements ItemListener,
                                 getNodes(lists.getSelectedNode()));
                     parent.getTabbedPane().drawInActiveTab(
                             graph,
-                            problem.getName() + " - "
-                                    + lists.getSelectedNode().toString());
+                            problem.getName() + " - " + lists.
+                                        getSelectedNode().toString(), null);
                     closeDialog();
                 }
             };
@@ -315,8 +315,8 @@ public class OpenProblemDialog extends JDialog implements ItemListener,
                         = Algo.createHierarchySubgraph(
                                 getNodes(lists.getSelectedNode()));
                     parent.getTabbedPane().drawInNewTab(graph,
-                            problem.getName() + " - "
-                                    + lists.getSelectedNode().toString());
+                            problem.getName() + " - " + lists.
+                                        getSelectedNode().toString(), null);
                     closeDialog();
                 }
             };
