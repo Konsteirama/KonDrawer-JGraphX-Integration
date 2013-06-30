@@ -57,7 +57,7 @@ class StartPanel extends JPanel {
      * The website containing the news.
      */
     private static final String NEWSPAGE 
-        = "http://92.51.130.117/news.html";
+        = "http://www.graphclasses.org/new-app.html";
     
     /**
      * The ISGCI Homepage.
