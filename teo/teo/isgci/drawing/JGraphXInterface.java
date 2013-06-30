@@ -603,7 +603,7 @@ class JGraphXInterface<V, E> implements DrawingLibraryInterface<V, E> {
     @Override
     public List<V> getVisibleNodes() {
         Object[] cells
-                = graphAdapter.getChildVertices(graphAdapter.getDefaultParent());
+            = graphAdapter.getChildVertices(graphAdapter.getDefaultParent());
 
         HashMap<mxICell, V> cellToVertex = graphAdapter.getCellToVertexMap();
         List<V> visibleNodes = new ArrayList<V>(cellToVertex.size());

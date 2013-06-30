@@ -13,25 +13,34 @@
 
 package teo.isgci.drawing;
 
-import com.mxgraph.layout.hierarchical.mxHierarchicalLayout;
-import com.mxgraph.model.mxGeometry;
-import com.mxgraph.model.mxICell;
-import com.mxgraph.swing.mxGraphComponent;
-import com.mxgraph.util.*;
-import com.mxgraph.util.mxEventSource.mxIEventListener;
-import com.mxgraph.view.mxGraph;
-import com.mxgraph.view.mxGraphView;
-import org.jgrapht.Graph;
-import teo.isgci.util.UserSettings;
-
-import javax.swing.*;
-import java.awt.*;
+import java.awt.Color;
+import java.awt.Rectangle;
 import java.awt.event.ComponentEvent;
 import java.awt.event.ComponentListener;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Set;
+
+import javax.swing.SwingUtilities;
+
+import org.jgrapht.Graph;
+
+import teo.isgci.util.UserSettings;
+
+import com.mxgraph.layout.hierarchical.mxHierarchicalLayout;
+import com.mxgraph.model.mxGeometry;
+import com.mxgraph.model.mxICell;
+import com.mxgraph.swing.mxGraphComponent;
+import com.mxgraph.util.mxConstants;
+import com.mxgraph.util.mxEvent;
+import com.mxgraph.util.mxEventObject;
+import com.mxgraph.util.mxEventSource.mxIEventListener;
+import com.mxgraph.util.mxUndoManager;
+import com.mxgraph.util.mxUndoableEdit;
+import com.mxgraph.util.mxUtils;
+import com.mxgraph.view.mxGraph;
+import com.mxgraph.view.mxGraphView;
 
 /**
  * This class implements the GraphManipulationInterface. It handles
@@ -153,7 +162,8 @@ class GraphManipulation<V, E> implements GraphManipulationInterface<V, E> {
      * class that operates on a given graphComponent from the given
      * JGraphXInterface.
      *
-     * @param drawingLibraryInterface The drawingLibraryInterface from which this object originated
+     * @param drawingLibraryInterface 
+     *          The drawingLibraryInterface from which this object originated
      */
     public GraphManipulation(
             JGraphXInterface<V, E> drawingLibraryInterface) {
@@ -184,15 +194,16 @@ class GraphManipulation<V, E> implements GraphManipulationInterface<V, E> {
     }
 
     /**
-     * Unregisters all eventlisteners
+     * Unregisters all eventlisteners.
      */
     public void unregisterEventListener() {
-        drawingLibrary.getGraphComponent().getGraph().getModel().removeListener(
-                undoHandler, mxEvent.UNDO);
+        drawingLibrary.getGraphComponent().getGraph().getModel()
+            .removeListener(undoHandler, mxEvent.UNDO);
         drawingLibrary.getGraphComponent().getGraph().getView().removeListener(
                 undoHandler, mxEvent.UNDO);
 
-        drawingLibrary.getGraphComponent().removeComponentListener(zoomListener);
+        drawingLibrary.getGraphComponent()
+            .removeComponentListener(zoomListener);
     }
 
     /**
@@ -201,7 +212,8 @@ class GraphManipulation<V, E> implements GraphManipulationInterface<V, E> {
      * @return The current graph adapter
      */
     private JGraphXAdapter<V, E> getGraphAdapter() {
-        return (JGraphXAdapter<V, E>) drawingLibrary.getGraphComponent().getGraph();
+        return (JGraphXAdapter<V, E>) drawingLibrary
+                    .getGraphComponent().getGraph();
     }
 
     /**
@@ -342,7 +354,8 @@ class GraphManipulation<V, E> implements GraphManipulationInterface<V, E> {
     public void setBackgroundColor(Color color) {
         beginUpdate();
         try {
-            drawingLibrary.getGraphComponent().getViewport().setBackground(color);
+            drawingLibrary.getGraphComponent()
+                .getViewport().setBackground(color);
         } finally {
             endUpdate();
         }
