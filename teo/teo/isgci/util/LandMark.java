@@ -79,7 +79,7 @@ public class LandMark {
         //---- Create the map
         SimpleDirectedGraph<Set<GraphClass>, DefaultEdge> graph =
                 Algo.createHierarchySubgraph(landmarks);
-        parent.getTabbedPane().drawInNewTab(graph, landmarks.get(0).toString());
+        parent.getTabbedPane().drawInNewTab(graph, landmarks.get(0).toString(), null);
         //---- Export it as png
         parent.getTabbedPane().getActiveDrawingLibraryInterface().export("png", path);
         //---- Close the map
