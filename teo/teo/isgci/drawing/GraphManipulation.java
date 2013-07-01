@@ -274,15 +274,22 @@ class GraphManipulation<V, E> implements GraphManipulationInterface<V, E> {
         return undoManager.canUndo();
     }
 
+    @Override
     public void centerNode(V node) {
         drawingLibrary.getGraphComponent().scrollCellToVisible(
                 getCellFromNode(node), true);
     }
 
     @Override
-    public void centerNodes(V[] nodes) {
+    public void centerNodes(List<V> nodes) {
+        mxICell[] cells = new mxICell[nodes.size()];
+        
+        for (int i = 0; i < nodes.size(); i++) {
+            cells[i] = getCellFromNode(nodes.get(i));
+        }
+        
         drawingLibrary.getGraphComponent().scrollRectToVisible(
-                determineViewBounds(getCellsFromNodes(nodes), true));
+                determineViewBounds(cells, true));
     }
 
 

@@ -51,7 +51,7 @@ public interface GraphManipulationInterface<V, E> {
      *
      * @param nodes : nodes of the graph
      */
-    void centerNodes(V[] nodes);
+    void centerNodes(List<V> nodes);
 
     /**
      * Colors a given node in a given color.
