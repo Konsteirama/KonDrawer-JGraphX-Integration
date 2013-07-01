@@ -1,4 +1,16 @@
+/*
+ * Reads a svg file and converts all raw latex strings into svg-readable
+ * and displayable text.
+ *
+ * $Header$
+ *
+ * This file is part of the Information System on Graph Classes and their
+ * Inclusions (ISGCI) at http://www.graphclasses.org.
+ * Email: isgci@graphclasses.org
+ */
+
 package teo.isgci.util;
+
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.util.ArrayList;
@@ -114,3 +126,5 @@ public class SVGLatexConverter {
         CO;
     }
 }
+
+/* EOF */
