@@ -211,7 +211,7 @@ public class ISGCITabbedPane extends JTabbedPane implements Updatable {
         StartPanel addTabTab = new StartPanel(mainframe);
         addTab("", addTabTab);
         setSelectedComponent(addTabTab);
-        addTabComponent = new AddTabComponent(this);
+        addTabComponent = new AddTabComponent(this, mainframe);
         setTabComponentAt(getSelectedIndex(), addTabComponent);
         setSelectedIndex(0);
         
@@ -222,7 +222,7 @@ public class ISGCITabbedPane extends JTabbedPane implements Updatable {
 
     /**
      * Adds a Startpage to the ISGCITabbedPane.
-     */
+     */ 
     public void addStartpage() {
         StartPanel startpage = new StartPanel(mainframe);
         addTab("", startpage);

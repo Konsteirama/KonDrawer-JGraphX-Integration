@@ -87,7 +87,7 @@ public class AddTabComponent extends JPanel {
      * @param pane
      *          The parent.
      */
-    public AddTabComponent(final JTabbedPane pane) {
+    public AddTabComponent(final JTabbedPane pane, final ISGCIMainFrame mainframe) {
         // unset default FlowLayout' gaps
         super(new FlowLayout(FlowLayout.LEFT, 0, 0));
         if (pane == null) {
@@ -95,11 +95,7 @@ public class AddTabComponent extends JPanel {
         }
         this.parent = pane;
         setOpaque(false);
-        Container mframe = parent;
-        while (mframe != null && !(mframe instanceof ISGCIMainFrame)) {
-            mframe = mframe.getParent();
-        }
-        mainframe = (ISGCIMainFrame) mframe;
+        this.mainframe = mainframe;
         
         // tab button
         JButton button = new TabButton();
