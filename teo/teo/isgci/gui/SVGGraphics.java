@@ -20,7 +20,6 @@ import java.awt.Rectangle;
 import java.awt.Shape;
 import java.awt.Toolkit;
 import java.awt.image.ImageObserver;
-import java.util.Calendar;
 import java.util.Vector;
 
 
@@ -38,52 +37,34 @@ import java.util.Vector;
  */
 public class SVGGraphics extends SmartGraphics {
 
-    protected static final String defaultprolog = 
-        "<?xml version=\"1.0\" encoding=\"utf-8\"?>\n" +
-        "<!DOCTYPE svg PUBLIC \"-//W3C//DTD SVG 1.1//EN\" \n" +
-        "\"http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd\">\n" +
-        "<svg>\n" +
-        "<defs>\n" +
-        " <marker id=\"arrow\" orient=\"auto\" markerUnits=\"strokeWidth\"" +
-        " markerWidth=\"8\" markerHeight=\"6\">\n" +
-        "  <path fill=\"black\" d=\"M1 0 l -8 3 2 -3 -2 -3 z\"/>\n" +
-        " </marker>\n" +
-        " <marker id=\"unproper\" orient=\"auto\"" +
-        " markerUnits=\"strokeWidth\" markerWidth=\"8\" markerHeight=\"6\">\n"+
-        "  <path fill=\"silver\" d=\"M-1 0 l 8 3 -2 -3 2 -3 z\"/>\n" +
-        " </marker>\n" +
-        "</defs>\n";
-
-    /** Parent Graphics if this one was created using create() */
-    private SVGGraphics parent;
-
     /** dispose() already called? */
     private boolean disposed;
 
-    /** Contents */
+    /** Contents. */
     private StringBuffer content;
 
-    /** Current color */
+    /** Current color. */
     private Color color;
-    /** Current font */
+    /** Current font. */
     private Font font;
-    /** clip rectangle (AWT coords) (not used) */
+    /** clip rectangle (AWT coords) (not used). */
     private Rectangle clip;
-    /** Toolkit for calculating font metrics */
-    protected Toolkit kit;
+    
+    /** Toolkit for calculating font metrics. */
+    private Toolkit kit;
 
-    /** x translation (AWT coords) */
+    /** x translation (AWT coords). */
     private int translatex;
-    /** y translation (AWT coords) */
+    /** y translation (AWT coords). */
     private int translatey;
 
+    /**
+     * Converts data (mainly LaTeX) into the suitable SVG representation.
+     */
     public SVGGraphics() {
-        parent = null;
         disposed = false;
         content = new StringBuffer(16*1024);
-        content.append(defaultprolog);
-        appendDesc();
-        font = null;
+        font = LatexGraphics.getInstance().getFont();
         color = Color.black;
         translatex = 0;
         translatey = 0;
@@ -91,9 +72,13 @@ public class SVGGraphics extends SmartGraphics {
         kit = Toolkit.getDefaultToolkit();
     }
 
-    /** Not all attributes make sense for derived graphics */
+    /** 
+     * Not all attributes make sense for derived graphics.
+     * 
+     *  @param g
+     *          The graphics which values are copied
+     */
     private SVGGraphics(SVGGraphics g) {
-        parent = g;
         disposed = false;
         content = g.content;
         color = g.color;
@@ -105,21 +90,17 @@ public class SVGGraphics extends SmartGraphics {
     }
 
 
-    /**
-     * Derives a new, independent SVGGraphics object from this one.
-     */
+    @Override
     public Graphics create() {
         return new SVGGraphics(this);
     }
 
-    /**
-     * Ends the drawing on this graphics context.
-     */
+    @Override
     public void dispose() {
-        if (disposed)
+        if (disposed) {
             return;
+        }
         content = null;
-        parent = null;
         disposed = true;
     }
 
@@ -127,20 +108,16 @@ public class SVGGraphics extends SmartGraphics {
     /**
      * Return the created content. After this, the graphics is not usable
      * anymore.
+     * @return The created content.
      */
     public String getContent() {
-        if (parent == null) {
-            content.append("</svg>\n");
-        }
         String result = content.toString();
         dispose();
         return result;
     }
 
 
-    /**
-     * Translate over (x,y)
-     */
+    @Override
     public void translate(int x, int y) {
         translatex += x;
         translatey += y;
@@ -149,25 +126,20 @@ public class SVGGraphics extends SmartGraphics {
     }
 
 
-    /**
-     * Get current color
-     */
+    @Override
     public Color getColor() {
         return color;
     }
 
-    /**
-     * Sets the color.
-     */
+    @Override
     public void setColor(Color c) {
-        if (c==null || c.equals(color))
+        if (c == null || c.equals(color)) {
             return;
+        }
         color = c;
     }
 
-    /**
-     * Return the current font.
-     */
+    @Override
     public Font getFont() {
         return font;
     }
@@ -175,63 +147,52 @@ public class SVGGraphics extends SmartGraphics {
 
     /**
      * Sets the font. Only 'SansSerif' supported.
-     * @param font new font
+     * @param newFont new font
      */
-    public void setFont(Font font) {
-        if (font==null || font.equals(this.font))
+    public void setFont(Font newFont) {
+        if (newFont == null || newFont.equals(this.font)) {
             return;
-        if (!Font.SANS_SERIF.equals(font.getFamily()))
-            throw new IllegalArgumentException(font.getFamily());
-        this.font = font;
+        }
+        
+        if (!Font.SANS_SERIF.equals(newFont.getFamily())) {
+            throw new IllegalArgumentException(newFont.getFamily());
+        }
+        this.font = newFont;
     }
     
     /**
      * Return the metrics for the given font.
+     * @param f for which font the metrics should be retrieved.
+     * @return The metrics for the given font.
      */
     public FontMetrics getFontMetrics(Font f) {
         return kit.getFontMetrics(f);
     }
 
+    @Override
     public Rectangle getClipBounds() {
         return new Rectangle(clip);
     }
 
-    /**
-     * Intersect the clipping area.
-     */
+    @Override
     public void clipRect(int x, int y, int width, int height) {
-        clip = clip.intersection(new Rectangle(x,y,width,height));
+        clip = clip.intersection(new Rectangle(x, y, width, height));
     }
 
-    /**
-     * Sets the clip.
-     */
+    @Override
     public void setClip(int x, int y, int width, int height) {
-        clip = new Rectangle(x,y,width,height);
+        clip = new Rectangle(x, y, width, height);
     }
 
-    public void setClip(Shape clip) {
-        this.clip = clip.getBounds();
+    @Override
+    public void setClip(Shape sclip) {
+        clip = sclip.getBounds();
     }
-
-
 
     /**
-     * Append a title and description element for the drawing.
-     */
-    private void appendDesc() {
-        Calendar cal = Calendar.getInstance();
-
-        content.append("<title>ISGCI graph class diagram</title>\n");
-        content.append("<desc>Generated ");
-        content.append(String.format("%1$tF %1$tR", cal));
-        content.append(
-                " by http://www.graphclasses.org</desc>\n");
-    }
-
-
-    /*
      * Appends an argument ' name="value"' to content.
+     * @param name The name of the argument
+     * @param value The value of the argument
      */
     private void arg(String name, String value) {
         content.append(" ");
@@ -241,51 +202,51 @@ public class SVGGraphics extends SmartGraphics {
         content.append("\"");
     }
 
-    /*
+    /**
      * Appends an argument ' name="value"' to content.
+     * @param name The name of the argument
+     * @param value The value of the argument
      */
     private void arg(String name, int value) {
         arg(name, Integer.toString(value));
     }
 
-    /*
+    /**
      * Appends an argument ' name="value"' to content.
+     * @param name The name of the argument
+     * @param value The value of the argument
      */
     private void arg(String name, float value) {
         arg(name, Float.toString(value));
     }
 
 
-    /**
-     * Draws a arrow (more or less) through the given points.
-     * @param vec Points of the arrow
-     */
+    @Override
     public void drawArrow(Vector vec, boolean unproper) {
-        if (vec==null || vec.size()<2)
+        if (vec == null || vec.size() < 2) {
             return;
+        }
 
         content.append("<polyline");
-        arg("stroke","black");
+        arg("stroke", "black");
         arg("stroke-width", 1);
         content.append(" points=\"");
-        for (int i=0; i<vec.size(); i++) {
+        for (int i = 0; i < vec.size(); i++) {
             Point p = (Point) vec.elementAt(i);
             int x = translatex + p.x;
             int y = translatey + p.y;
             content.append(x).append(',').append(y).append(' ');
         }
         content.append("\"");
-        arg("style", "fill: none;" +
-            (unproper ?
+        arg("style", "fill: none;"
+            + (unproper ?
                 "marker-end:url(#arrow);marker-start:url(#unproper)" :
                 "marker-end:url(#arrow)"));
         content.append("/>\n");
 
     }
 
-    /**
-     * Draw an node filled with the current color.
-     */
+    @Override
     public void drawNode(int x, int y, int width, int height) {
         float rx = (float) width / 2;
         float ry = (float) height / 2;
@@ -302,9 +263,7 @@ public class SVGGraphics extends SmartGraphics {
         content.append("/>\n");
     }
 
-    /**
-     * Draws a line.
-     */
+    @Override
     public void drawLine(int x1, int y1, int x2, int y2) {
         content.append("<line");
         arg("x1", translatex + x1);
@@ -317,95 +276,136 @@ public class SVGGraphics extends SmartGraphics {
     }
 
 
-    /** 
-     * Paints a string at the given coordinates.
-     */
+    @Override
     public void drawString(String str, int x, int y) {
-        if (font==null)
+        if (font == null) {
             return;
+        }
 
         content.append("<text");
         arg("x", translatex + x);
         arg("y", translatey + y);
-        arg("style", "font-family:"+ font.getFamily() +
-                ";font-size:"+ font.getSize() +
-                ";fill:black");
+        arg("style", "font-family:" + font.getFamily()
+                + ";font-size:" + font.getSize()
+                + ";fill:black");
         content.append(">");
         content.append(str);
         content.append("</text>\n");
         return;
     }
 
-
+    @Override
     public void setPaintMode() {
         throw new RuntimeException("Unsupported operation");
     }
+    
+    @Override
     public void setXORMode(Color c1) {
         throw new RuntimeException("Unsupported operation");
     }
+    
+    @Override
     public Shape getClip() {
         throw new RuntimeException("Unsupported operation");
     }
+    
+    @Override
     public void copyArea(int x, int y, int w, int h, int dx, int dy) {
         throw new RuntimeException("Unsupported operation");
     }
+    
+    @Override
     public void fillRect(int x, int y, int width, int height) {
         throw new RuntimeException("Unsupported operation");
     }
+    
+    @Override
     public void clearRect(int x, int y, int width, int height) {
         throw new RuntimeException("Unsupported operation");
     }
+    
+    @Override
     public void drawRoundRect(int x, int y, int w, int h, int aw, int ah) {
         throw new RuntimeException("Unsupported operation");
     }
+    
+    @Override
     public void fillRoundRect(int x, int y, int w, int h, int aw, int ah) {
         throw new RuntimeException("Unsupported operation");
     }
+    
+    @Override
     public void drawArc(int x, int y, int width, int height, int sA, int aA) {
         throw new RuntimeException("Unsupported operation");
     }
+    
+    @Override
     public void fillArc(int x, int y, int w, int h, int start, int arc) {
         throw new RuntimeException("Unsupported operation");
     }
+    
+    @Override
     public void drawOval(int x, int y, int width, int height) {
         throw new RuntimeException("Unsupported operation");
     }
+    
+    @Override
     public void fillOval(int x, int y, int width, int height) {
         throw new RuntimeException("Unsupported operation");
     }
+    
+    @Override
     public void drawPolyline(int xPoints[], int yPoints[], int nPoints) {
         throw new RuntimeException("Unsupported operation");
     }
+    
+    @Override
     public void drawPolygon(int xPoints[], int yPoints[], int nPoints) {
         throw new RuntimeException("Unsupported operation");
     }
+    
+    @Override
     public void fillPolygon(int xPoints[], int yPoints[], int nPoints) {
         throw new RuntimeException("Unsupported operation");
     }
+    
+    @Override
     public boolean drawImage(Image i, int x, int y, ImageObserver o) {
         throw new RuntimeException("Unsupported operation");
     }
+    
+    @Override
     public boolean drawImage(Image img, int x, int y, int w, int h,
             ImageObserver observer) {
         throw new RuntimeException("Unsupported operation");
     }
+    
+    @Override
     public boolean drawImage(Image img, int x, int y, Color bgcolor,
             ImageObserver observer) {
         throw new RuntimeException("Unsupported operation");
     }
+
+    @Override
     public boolean drawImage(Image img, int x, int y, int width, int height,
             Color bgcolor, ImageObserver observer) {
         throw new RuntimeException("Unsupported operation");
     }
+    
+    @Override
     public boolean drawImage(Image img, int dx1, int dy1, int dx2, int dy2,
             int sx1, int sy1, int sx2, int sy2, ImageObserver observer) {
         throw new RuntimeException("Unsupported operation");
     }
+    
+    @Override
     public boolean drawImage(Image img, int dx1, int dy1, int dx2, int dy2,
             int sx1, int sy1, int sx2, int sy2, Color bgcolor,
             ImageObserver observer) {
         throw new RuntimeException("Unsupported operation");
     }
+    
+    @Override
     public void drawString(java.text.AttributedCharacterIterator i,
             int x, int y) {
         throw new RuntimeException("Unsupported operation");

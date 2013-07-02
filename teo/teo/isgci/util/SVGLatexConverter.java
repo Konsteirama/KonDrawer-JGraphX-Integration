@@ -12,12 +12,16 @@
 package teo.isgci.util;
 
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.File;
 import java.io.FileReader;
-import java.util.ArrayList;
+import java.io.FileWriter;
 import java.util.HashMap;
-import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import teo.isgci.gui.LatexGraphics;
+import teo.isgci.gui.SVGGraphics;
 
 /**
  * Reads a svg file and converts all raw latex strings into svg-readable
@@ -25,28 +29,22 @@ import java.util.regex.Pattern;
  * 
  * TODO: static >= object?
  */
-public class SVGLatexConverter {
-    
-    /**
-     * Which latexmodes are currently active. The "most current" one is always
-     * the last entry, so for example co(x_{abc^3}) : CO -> SUB -> SUPER
-     */
-    private List<LatexMode> currentModes 
-        = new ArrayList<LatexMode>(LatexMode.values().length);
+public final class SVGLatexConverter {
     
     /** The contents of the svg file. */
-    private String svgContent;
+    private static String svgContent;
     
-    /** The current position where the text needs to be drawn. */
-    private int positionX, positionY;
+    /** Block constructor for utility class. */
+    @SuppressWarnings("unused")
+    private SVGLatexConverter() { };
     
     /**
-     * Creates a new latexconverter that converts all latexstring in the svg 
-     * file on the given path to suitable, svg-drawable graphics.
+     * Converts all latexstring in the svg file on the given path to suitable, 
+     * svg-drawable text-graphic.
      * @param path
      *          The path to the svg file
      */
-    public SVGLatexConverter(String path) {
+    public static void convertSVGToLatex(String path) {
         
         // read content of file
         BufferedReader br = null;
@@ -90,33 +88,31 @@ public class SVGLatexConverter {
             svgContent = svgContent.replace(matcher.group(), parsedText);
         }
         
-//      TODO: enable this if implementation is complete
-//        
-//        BufferedWriter bw = null;
-//        
-//        try {
-//            File file = new File(path);
-//
-//            // file should exist, but still
-//            if (!file.exists()) {
-//                file.createNewFile();
-//            }
-//
-//            FileWriter fw = new FileWriter(file.getAbsoluteFile());
-//            bw = new BufferedWriter(fw);
-//            bw.write(svgContent);
-//
-//        } catch (Exception e) {
-//            System.err.println("Error writing to file!");
-//            e.printStackTrace();
-//        } finally {
-//            try {
-//                if (bw != null) { bw.close(); }
-//            } catch (Exception e) {
-//                System.err.println("Error closing writer filestream!");
-//                e.printStackTrace();
-//            }
-//        }
+        BufferedWriter bw = null;
+        
+        try {
+            File file = new File(path);
+
+            // file should exist, but still
+            if (!file.exists()) {
+                file.createNewFile();
+            }
+
+            FileWriter fw = new FileWriter(file.getAbsoluteFile());
+            bw = new BufferedWriter(fw);
+            bw.write(svgContent);
+
+        } catch (Exception e) {
+            System.err.println("Error writing to file!");
+            e.printStackTrace();
+        } finally {
+            try {
+                if (bw != null) { bw.close(); }
+            } catch (Exception e) {
+                System.err.println("Error closing writer filestream!");
+                e.printStackTrace();
+            }
+        }
         
     }
     
@@ -130,7 +126,7 @@ public class SVGLatexConverter {
      *          A string with suitable svg tags for displaying latex data
      *          correctly.
      */
-    private String parseLatexText(String tag) {
+    private static String parseLatexText(String tag) {
         // extract latex-text from svg texttags in the form 
         // <text ..><tspan..>LATEX</tspan></text>
         Pattern latexTag = Pattern.compile("<text [^>]*><tspan [^>]*>"
@@ -141,28 +137,28 @@ public class SVGLatexConverter {
         if (contentMatcher.find()) {
             String latexContent = contentMatcher.group(1);
 
-            // extract the attributes out of the <text> tag
-            Pattern textTag = Pattern.compile("<text ([^>]*)>");
-            Matcher textMatcher = textTag.matcher(tag);
-            
-            if (textMatcher.find()) {
-                // save attributes in hashmap
-                HashMap<String, String> attributes 
-                    = new HashMap<String, String>();
-
-                for (String attribute : textMatcher.group(1).split(" ")) {
-                    String[] content = attribute.split("=");
-
-                    // invalid attribute? should be of form attr="val"
-                    if (content.length != 2) {
-                        System.err.println("Encountered wrong attribute: " 
-                                           + attribute);
-                        continue;
-                    }
-
-                    attributes.put(content[0], content[1]);
-                }
-            }
+//            // extract the attributes out of the <text> tag
+//            Pattern textTag = Pattern.compile("<text ([^>]*)>");
+//            Matcher textMatcher = textTag.matcher(tag);
+//            
+//            if (textMatcher.find()) {
+//                // save attributes in hashmap
+//                HashMap<String, String> attributes 
+//                    = new HashMap<String, String>();
+//
+//                for (String attribute : textMatcher.group(1).split(" ")) {
+//                    String[] content = attribute.split("=");
+//
+//                    // invalid attribute? should be of form attr="val"
+//                    if (content.length != 2) {
+//                        System.err.println("Encountered wrong attribute: " 
+//                                           + attribute);
+//                        continue;
+//                    }
+//
+//                    attributes.put(content[0], content[1]);
+//                }
+//            }
             
             // extract position from tspan tag
             Pattern xTag = Pattern.compile("<tspan[^x]*x=\"([^\"]+).*");
@@ -177,6 +173,8 @@ public class SVGLatexConverter {
             }
             
             // try to set position
+            int positionX, positionY;
+            
             try {
                 positionX = Integer.parseInt(xMatcher.group(1));
                 positionY = Integer.parseInt(yMatcher.group(1));
@@ -186,30 +184,18 @@ public class SVGLatexConverter {
             }
             
             
-            // begin building the latex string
-            StringBuilder parsedText = new StringBuilder();
-            // TODO: parse text into svg tags like the old ISGCI did
+            // build the latex string 
+            SVGGraphics graphics = new SVGGraphics();
+            
+            LatexGraphics lg = LatexGraphics.getInstance();
+            lg.drawLatexString(graphics, latexContent, positionX, positionY);
+            return graphics.getContent();
         } else {
             // should not happen
             return tag;
         }
-        
-        // TODO
-        return tag;
     }
     
-    /**
-     * The modes in which the latexstring can be in.
-     */
-    private enum LatexMode {
-        /** x_3 . */
-        SUB, 
-        /** x^3 .*/
-        SUPER, 
-        /** co(x) with line over x.*/
-        CO;
-    }
-
 }
 
 /* EOF */
