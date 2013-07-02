@@ -78,6 +78,11 @@ public class SettingsDialog extends JDialog {
      * actually deployed.
      */
     private static final long serialVersionUID = 4L;
+    
+    /**
+     * The value which was selected before the current value in the colorList.
+     */
+    private Object lastSelectedValue;
 
     /**
      * Creates a new options dialogue.
@@ -148,6 +153,7 @@ public class SettingsDialog extends JDialog {
         // COLOR LIST
         colorList = new JList(getColorNames());
         colorList.setSelectedIndex(0);
+        lastSelectedValue = colorList.getSelectedValue();
 
         colorChooser.setColor(nameToColor.get(colorList.getSelectedValue()));
 
@@ -163,14 +169,14 @@ public class SettingsDialog extends JDialog {
                 String name = (String) colorList.getSelectedValue();
 
                 if (name.equals(SEPARATOR)) {
-                    colorChooser.setEnabled(false);
-                } else {
-                    colorChooser.setEnabled(true);
+                    colorList.setSelectedValue(lastSelectedValue, false);
+                    return;
                 }
                 
                 disableApply = true;
                 colorChooser.setColor(nameToColor.get(name));
                 disableApply = false;
+                lastSelectedValue = colorList.getSelectedValue();
             }
         });
 
