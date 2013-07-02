@@ -159,6 +159,7 @@ class JGraphXInterface<V, E> implements DrawingLibraryInterface<V, E> {
 
             @Override
             public void mousePressed(MouseEvent e) {
+                begin = e.getWhen();
                 try {
                     Toolkit toolkit = Toolkit.getDefaultToolkit();
                     URL url = getClass().getResource("/icons/Grabbing.gif");
@@ -182,8 +183,6 @@ class JGraphXInterface<V, E> implements DrawingLibraryInterface<V, E> {
 
 
                 selectedNodes = getSelectedNodes();
-                begin = e.getWhen();
-
                 // set black border around cells
                 graphManipulation.updateSelectedCells();
 
@@ -199,7 +198,7 @@ class JGraphXInterface<V, E> implements DrawingLibraryInterface<V, E> {
                 if ((e.getWhen() - begin) > epsilon) {
                     setSelectedNodes(selectedNodes);
                 }
-
+                
                 graphManipulation.updateSelectedCells();
                 super.mouseReleased(e);
             }
