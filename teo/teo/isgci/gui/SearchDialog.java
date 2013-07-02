@@ -141,18 +141,12 @@ public class SearchDialog extends JDialog implements ActionListener {
                 return;
             }
 
-            final double searchZoomLevel = 2;
-
             final GraphManipulationInterface manipulationInterface
                     = drawLib.getGraphManipulationInterface();
 
             manipulationInterface.beginNotUndoable();
 
             try {
-                if (searchZoomLevel > manipulationInterface.getZoomLevel()) {
-                    manipulationInterface.zoomTo(searchZoomLevel);
-                }
-
                 List selectedNodes = new ArrayList();
                 selectedNodes.add(node);
                 drawLib.setSelectedNodes(selectedNodes);
