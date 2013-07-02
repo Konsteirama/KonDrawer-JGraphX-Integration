@@ -147,22 +147,19 @@ public class SearchDialog extends JDialog implements ActionListener {
                     = drawLib.getGraphManipulationInterface();
 
             manipulationInterface.beginNotUndoable();
-            manipulationInterface.beginUpdate();
 
             try {
                 if (searchZoomLevel > manipulationInterface.getZoomLevel()) {
                     manipulationInterface.zoomTo(searchZoomLevel);
                 }
 
-                manipulationInterface.unHighlightAll();
-
                 List selectedNodes = new ArrayList();
                 selectedNodes.add(node);
                 drawLib.setSelectedNodes(selectedNodes);
+                
 
             } finally {
                 manipulationInterface.endNotUndoable();
-                manipulationInterface.endUpdate();
             }
 
             // Invoke later to prevent centering bug
