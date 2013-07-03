@@ -245,7 +245,8 @@ public class ISGCIToolBar extends JToolBar {
             @Override
             public void actionPerformed(ActionEvent e) {
                 DrawingLibraryInterface<V, E> drawLib
-                        = mainframe.getTabbedPane().getActiveDrawingLibraryInterface();
+                        = mainframe.getTabbedPane()
+                            .getActiveDrawingLibraryInterface();
 
                 if (drawLib == null) {
                     return;
@@ -341,6 +342,8 @@ public class ISGCIToolBar extends JToolBar {
                 "50%", "75%", "100%", "150%", "200%", "300%", zoomToFit});
         add(zoomBox);
 
+        zoomBox.setToolTipText("Choose a zoom-level.");
+        
         // make sure zoombox doesn't get bigger
         final Dimension zoomBoxSize = new Dimension(80, 36);
         zoomBox.setMaximumSize(zoomBoxSize);
@@ -439,6 +442,11 @@ public class ISGCIToolBar extends JToolBar {
     private void addProblemChooser() {
         problemBox = new JComboBox();
 
+        problemBox.setToolTipText("Choose a problem to colour the nodes "
+                                + "in this tab in a specific colour "
+                                + "corresponding to the problem that was"
+                                + "chosen.");
+        
         problemBox.addItem(NOPROBLEMSELECTED);
 
         for (Problem problem : DataSet.problems) {
