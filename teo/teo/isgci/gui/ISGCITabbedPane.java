@@ -199,6 +199,8 @@ public class ISGCITabbedPane extends JTabbedPane implements Updatable {
      * tab component which adds a new tab if clicked.
      */
     private AddTabComponent addTabComponent;
+
+    private Object[] namingException = new Object[0];
     
     /**
      * Creates a new Tabbed pane with a startpage as only active tab.
@@ -247,6 +249,30 @@ public class ISGCITabbedPane extends JTabbedPane implements Updatable {
         if (getSelectedComponent() instanceof StartPanel) {
             remove(getSelectedComponent());
         }
+    }
+    
+    /**
+     * Adds a new tab with a graph that is drawn via the DrawingInterface.
+     * Will close the startpage if it's still open.
+     * @param <V>
+     *          The class of the vertices.
+     * @param <E>
+     *          The class of the edges.
+     * @param graph
+     *          The graph that will be drawn and interacted with within 
+     *          this tab.
+     * @param name
+     *          The name of the Tab 
+     * @param m
+     *          The chosen mode (with subclasses or superclasses or both)
+     * @param namingExceptions
+     *          The names of these nodes won't be changed according to the 
+     *          naming preferences, in the initial layout.
+     */
+    public <V, E> void drawInNewTab(Graph<V, E> graph, String name
+                                    , Mode m, Object[] namingExceptions) {
+        this.namingException = namingExceptions;
+        drawInNewTab(graph, name, m);
     }
     
     /**
@@ -356,6 +382,37 @@ public class ISGCITabbedPane extends JTabbedPane implements Updatable {
         addTabComponent.resetTabPosition();
         mainframe.closeDialogs();
     }
+    /**
+     * Draws the graph in the currently active tab. If the startpage is still
+     * active, the startpage will be closed and a new tab will be created
+     * instead.
+     * 
+     * @param graph
+     *          The graph that will be drawn.
+     *          
+     * @param <V>
+     *          The class of the vertex.
+     *          
+     * @param <E>
+     *          The class of the edge.
+     *          
+     * @param name
+     *          The name of the Tab
+     *          
+     * @param m
+     *          The chosen mode (with subclasses or superclasses or both).
+     *          Null if no mode was chosen.
+     * @param namingExceptions
+     *          The names of these nodes won't be changed according to the 
+     *          naming preferences, in the initial layout.
+     */
+    public <V, E> void drawInActiveTab(Graph<V, E> graph, String name
+                                        , Mode m, Object[] namingExceptions) {
+        this.namingException = namingExceptions;
+        drawInActiveTab(graph, name, m);
+    
+    }
+    
     
     /**
      * Draws the graph in the currently active tab. If the startpage is still
@@ -499,11 +556,25 @@ public class ISGCITabbedPane extends JTabbedPane implements Updatable {
         }
         
         graphInterface.getGraphManipulationInterface().beginUpdate();
-        for (Object node : graph.vertexSet()) {
-            String newName = Algo.getName((Set<GraphClass>) node, namePref);
+        for (Object o : graph.vertexSet()) {
+            boolean exceptionNode = false;
+            Set<GraphClass> node = (Set<GraphClass>) o;
+            String newName = "";
+            
+            for (int i = 0; i < namingException.length; i++) {
+                if (node.contains(namingException[i])) {
+                    newName = namingException[i].toString();
+                    exceptionNode = true;
+                }
+            }            
+            if (!exceptionNode) {
+                newName = Algo.getName(node, namePref);
+            } 
+            
             graphInterface.getGraphManipulationInterface()
-                .renameNode(node, newName);
+            .renameNode(o, newName);
         }
+        namingException = new GraphClass[0];
         graphInterface.getGraphManipulationInterface().endUpdate();
     }
 

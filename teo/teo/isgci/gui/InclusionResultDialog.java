@@ -613,9 +613,12 @@ public class InclusionResultDialog extends JDialog implements ActionListener {
                     SimpleDirectedGraph<Set<GraphClass>, DefaultEdge> graph 
                         = Algo.createHierarchySubgraph(
                                 Algo.nodesBetween(upper, lower));
-                    parent.getTabbedPane().drawInActiveTab(graph,
-                            upper.toString() + "-" + lower.toString(), null);
                     
+                    Object[] node = new Object[2];
+                    node[0] = upper.iterator().next();
+                    node[1] = lower.iterator().next();
+                    parent.getTabbedPane().drawInActiveTab(graph, upper
+                            .toString() + "-" + lower.toString(), null, node);                   
                     
                     drawButton.setText(text);
                     closeDialog();
@@ -643,8 +646,12 @@ public class InclusionResultDialog extends JDialog implements ActionListener {
                     SimpleDirectedGraph<Set<GraphClass>, DefaultEdge> graph 
                         = Algo.createHierarchySubgraph(
                                 Algo.nodesBetween(upper, lower));
-                    parent.getTabbedPane().drawInNewTab(graph,
-                            upper.toString() + "-" + lower.toString(), null);
+
+                    Object[] node = new Object[2];
+                    node[0] = upper.iterator().next();
+                    node[1] = lower.iterator().next();
+                    parent.getTabbedPane().drawInNewTab(graph, upper
+                            .toString() + "-" + lower.toString(), null, node);
                     
                     // restore buttons
                     okButton.setEnabled(true);

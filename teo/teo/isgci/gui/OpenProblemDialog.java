@@ -287,10 +287,12 @@ public class OpenProblemDialog extends JDialog implements ItemListener,
                     SimpleDirectedGraph<Set<GraphClass>, DefaultEdge> graph 
                         = Algo.createHierarchySubgraph(
                                 getNodes(lists.getSelectedNode()));
-                    parent.getTabbedPane().drawInActiveTab(
-                            graph,
-                            problem.getName() + " - " + lists.
-                                        getSelectedNode().toString(), null);
+                    
+                    Object[] node = new Object[1];
+                    node [0] = lists.getSelectedNode();
+                    parent.getTabbedPane().drawInActiveTab(graph,
+                            problem.getName() + " - " + lists.getSelectedNode()
+                            .toString(), null, node);
                     closeDialog();
                 }
             };
@@ -314,9 +316,12 @@ public class OpenProblemDialog extends JDialog implements ItemListener,
                     SimpleDirectedGraph<Set<GraphClass>, DefaultEdge> graph 
                         = Algo.createHierarchySubgraph(
                                 getNodes(lists.getSelectedNode()));
+                    
+                    Object[] node = new Object[1];
+                    node [0] = lists.getSelectedNode();
                     parent.getTabbedPane().drawInNewTab(graph,
-                            problem.getName() + " - " + lists.
-                                        getSelectedNode().toString(), null);
+                            problem.getName() + " - " + lists.getSelectedNode()
+                            .toString(), null, node);
                     closeDialog();
                 }
             };

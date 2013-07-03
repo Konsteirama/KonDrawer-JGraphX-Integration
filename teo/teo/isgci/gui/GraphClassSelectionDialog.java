@@ -209,8 +209,9 @@ public class GraphClassSelectionDialog extends JDialog implements
                     SimpleDirectedGraph<Set<GraphClass>, DefaultEdge> graph 
                     = getGraph();
                     
-                    parent.getTabbedPane().drawInActiveTab(graph,
-                            classesList.getSelectedValue().toString(), m);
+                    parent.getTabbedPane().drawInActiveTab(graph
+                            , classesList.getSelectedValue().toString(), m
+                            , classesList.getSelectedValues());
                     closeDialog();
                 }
 
@@ -251,8 +252,9 @@ public class GraphClassSelectionDialog extends JDialog implements
                     SimpleDirectedGraph<Set<GraphClass>, DefaultEdge> graph 
                         = getGraph();
                     
-                    parent.getTabbedPane().drawInNewTab(graph,
-                            classesList.getSelectedValue().toString(), m);
+                    parent.getTabbedPane().drawInNewTab(graph
+                            , classesList.getSelectedValue().toString(), m
+                            , (Object[]) classesList.getSelectedValues());
                     closeDialog();
                 }
 
