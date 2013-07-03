@@ -28,13 +28,16 @@ import com.mxgraph.util.mxConstants;
 import com.mxgraph.util.mxEvent;
 import com.mxgraph.util.mxEventObject;
 import com.mxgraph.util.mxEventSource.mxIEventListener;
+import com.mxgraph.util.mxPoint;
 import com.mxgraph.util.mxRectangle;
 import com.mxgraph.util.mxUndoManager;
 import com.mxgraph.util.mxUndoableEdit;
 import com.mxgraph.util.mxUtils;
 import com.mxgraph.view.mxGraph;
 import com.mxgraph.view.mxGraphView;
+
 import org.jgrapht.Graph;
+
 import teo.isgci.util.UserSettings;
 
 /**
@@ -215,6 +218,11 @@ class GraphManipulation<V, E> implements GraphManipulationInterface<V, E> {
             setThickness("4");
         }
         endNotUndoable();
+        
+        // Sets a mxGraphViewMargin
+        drawingLibrary.getGraphComponent().getGraph().getView().setTranslate(
+                new mxPoint(JGraphXInterface.MXGRAPHVIEW_MARGIN,
+                        JGraphXInterface.MXGRAPHVIEW_MARGIN));
     }
 
     /**
