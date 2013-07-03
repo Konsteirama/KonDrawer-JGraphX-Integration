@@ -225,9 +225,9 @@ public class LatexGraphics extends Latex {
             String unicode = glyph.getUnicode();
             if (!unicode.isEmpty() 
                     && g.getFont().canDisplayUpTo(unicode) == -1) {
-                //if (state.dopaint) {
+                if (state.dopaint) {
                     g.drawString(unicode, state.x, state.y);
-                //}
+                }
                 state.x += g.getFontMetrics().stringWidth(unicode);
             } else if (g instanceof SVGGraphics) { // We don't do SVG imgs
                 if (state.dopaint) {
