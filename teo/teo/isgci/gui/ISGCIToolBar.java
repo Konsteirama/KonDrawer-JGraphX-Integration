@@ -295,7 +295,7 @@ public class ISGCIToolBar extends JToolBar {
         });
 
         // make sure zoombox doesn't get bigger
-        final Dimension problemBoxSize = new Dimension(175, 36);
+        final Dimension problemBoxSize = new Dimension(220, 36);
         problemBox.setMaximumSize(problemBoxSize);
         problemBox.setPreferredSize(problemBoxSize);
 
