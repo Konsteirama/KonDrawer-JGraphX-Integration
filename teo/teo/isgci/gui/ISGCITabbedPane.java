@@ -263,8 +263,10 @@ public class ISGCITabbedPane extends JTabbedPane implements Updatable {
                 instanceof AddTabComponent) {
             drawInNewTab(graph, name, m);
         } else if (getSelectedComponent() instanceof StartPanel) {
+            Problem p = UserSettings.getProblem();
             remove(getSelectedComponent());
             drawInNewTab(graph, name, m);
+            UserSettings.setProblem(p);
         } else {
 
             final DrawingLibraryInterface dLib
