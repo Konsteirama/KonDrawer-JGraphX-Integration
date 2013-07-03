@@ -21,7 +21,6 @@ import java.util.List;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JToolBar;
-
 import teo.isgci.db.DataSet;
 import teo.isgci.drawing.DrawingLibraryInterface;
 import teo.isgci.drawing.GraphManipulationInterface;
@@ -42,7 +41,7 @@ public class ISGCIToolBar extends JToolBar {
      * Name for no selected problem.
      */
     private static final String NOPROBLEMSELECTED = "None";
-    
+
     /**
      * Reference to parent-ISGCI Mainframe for opening dialogs etc.
      */
@@ -68,7 +67,7 @@ public class ISGCIToolBar extends JToolBar {
      * {@link setProblem}.
      */
     private boolean setProblem = true;
-    
+
     /**
      * Creates a toolbar with icons that influence both ISGCI and the currently
      * active drawinglibraryinterface (the active tab). The parent needs an
@@ -81,24 +80,23 @@ public class ISGCIToolBar extends JToolBar {
         setFloatable(false);
         setRollover(true);
         addButtons();
-        
+
         mainframe = parent;
     }
 
     /**
      * Sets the currently active problem.
-     * 
-     * @param problem
-     *          The currently active problem.
+     *
+     * @param problem The currently active problem.
      */
-    public void setProblem(String problem) {       
+    public void setProblem(String problem) {
         setProblem = false;
         if (!problem.equals(problemBox.getSelectedItem())) {
             problemBox.setSelectedItem(problem);
         }
         setProblem = true;
     }
-    
+
     /**
      * Returns the drawinglibraryinterface.
      *
@@ -133,7 +131,7 @@ public class ISGCIToolBar extends JToolBar {
 
         addMiscButtons();
         addSeparator(separatorSize);
-        
+
         addProblemChooser();
     }
 
@@ -198,7 +196,8 @@ public class ISGCIToolBar extends JToolBar {
                 if (selectedNodes.size() == 1) {
                     manipulationInterface.centerNode(selectedNodes.get(0));
                 } else if (selectedNodes.size() > 1) {
-                    manipulationInterface.centerNodes(selectedNodes);
+                    manipulationInterface.centerNodes((V[]) selectedNodes
+                            .toArray());
                 }
             }
         });
@@ -246,7 +245,7 @@ public class ISGCIToolBar extends JToolBar {
             @Override
             public void actionPerformed(ActionEvent e) {
                 DrawingLibraryInterface<V, E> drawLib
-                = mainframe.getTabbedPane().getActiveDrawingLibraryInterface();
+                        = mainframe.getTabbedPane().getActiveDrawingLibraryInterface();
 
                 if (drawLib == null) {
                     return;
@@ -433,21 +432,21 @@ public class ISGCIToolBar extends JToolBar {
         });
     }
 
-    
+
     /**
      * Adds a combobox for choosing and displaying the current problem.
      */
     private void addProblemChooser() {
         problemBox = new JComboBox();
-        
+
         problemBox.addItem(NOPROBLEMSELECTED);
-        
+
         for (Problem problem : DataSet.problems) {
             problemBox.addItem(problem.getName());
         }
-        
+
         problemBox.addItemListener(new ItemListener() {
-            
+
             @Override
             public void itemStateChanged(ItemEvent e) {
                 if (setProblem) {
@@ -456,12 +455,12 @@ public class ISGCIToolBar extends JToolBar {
                 }
             }
         });
-        
+
         // make sure zoombox doesn't get bigger
         final Dimension problemBoxSize = new Dimension(175, 36);
         problemBox.setMaximumSize(problemBoxSize);
         problemBox.setPreferredSize(problemBoxSize);
-        
+
         add(problemBox);
     }
 }

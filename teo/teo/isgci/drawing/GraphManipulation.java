@@ -14,7 +14,6 @@
 package teo.isgci.drawing;
 
 import java.awt.Color;
-import java.awt.Rectangle;
 import java.awt.event.ComponentEvent;
 import java.awt.event.ComponentListener;
 import java.util.ArrayList;
@@ -22,25 +21,21 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Set;
 
-import javax.swing.SwingUtilities;
-
-import org.jgrapht.Graph;
-
-import teo.isgci.util.UserSettings;
-
 import com.mxgraph.layout.hierarchical.mxHierarchicalLayout;
-import com.mxgraph.model.mxGeometry;
 import com.mxgraph.model.mxICell;
 import com.mxgraph.swing.mxGraphComponent;
 import com.mxgraph.util.mxConstants;
 import com.mxgraph.util.mxEvent;
 import com.mxgraph.util.mxEventObject;
 import com.mxgraph.util.mxEventSource.mxIEventListener;
+import com.mxgraph.util.mxRectangle;
 import com.mxgraph.util.mxUndoManager;
 import com.mxgraph.util.mxUndoableEdit;
 import com.mxgraph.util.mxUtils;
 import com.mxgraph.view.mxGraph;
 import com.mxgraph.view.mxGraphView;
+import org.jgrapht.Graph;
+import teo.isgci.util.UserSettings;
 
 /**
  * This class implements the GraphManipulationInterface. It handles
@@ -57,32 +52,26 @@ class GraphManipulation<V, E> implements GraphManipulationInterface<V, E> {
      * How far the user can zoom in.
      */
     private static final double MAXZOOMLEVEL = 8;
-
     /**
      * Defines the original edge color.
      */
     private static final Color EDGECOLOR = new Color(100, 130, 185);
-
     /**
      * Defines the color with which improper edges are marked.
      */
     private static final Color MARKEDCOLOR = Color.black;
-
     /**
      * Defines the color that should be used for highlighting.
      */
     private Color highlightColor;
-
     /**
      * Defines the color that should be used for selection.
      */
     private Color selectionColor;
-
     /**
      * Defines the thickness for highlighting.
      */
     private String cellThickness = "4";
-
     /**
      * Handles undo events in jgraphx.
      */
@@ -94,7 +83,6 @@ class GraphManipulation<V, E> implements GraphManipulationInterface<V, E> {
             }
         }
     };
-
     private ComponentListener zoomListener = new ComponentListener() {
 
         @Override
@@ -114,43 +102,35 @@ class GraphManipulation<V, E> implements GraphManipulationInterface<V, E> {
         public void componentHidden(ComponentEvent e) {
         }
     };
-
     /**
      * Defines whether or not the undoHandler should record actions.
      */
     private int recordUndoableActions;
-
     /**
      * The parent interface from which this object was created.
      */
     private JGraphXInterface<V, E> drawingLibrary;
-
     /**
      * Manages the undo-operations on the calling graph.
      */
     private mxUndoManager undoManager;
-
     /**
      * Currently highlighted cells with their previous color.
      */
     private HashMap<mxICell, Color> highlightedCellsColor;
-
     /**
      * Currently highlighted cells with their previous thickness.
      */
     private HashMap<mxICell, String> highlightedCellsThickness;
-
     /**
      * List of currently selected cells.
      */
     private List<mxICell> selectedCells;
-
     /**
      * How deep the parents were highlighted.
      */
     private HashMap<mxICell, Integer> parentHighlightingDepth
             = new HashMap<mxICell, Integer>();
-
     /**
      * How deep the children were highlighted.
      */
@@ -162,8 +142,7 @@ class GraphManipulation<V, E> implements GraphManipulationInterface<V, E> {
      * class that operates on a given graphComponent from the given
      * JGraphXInterface.
      *
-     * @param drawingLibraryInterface 
-     *          The drawingLibraryInterface from which this object originated
+     * @param drawingLibraryInterface The drawingLibraryInterface from which this object originated
      */
     public GraphManipulation(
             JGraphXInterface<V, E> drawingLibraryInterface) {
@@ -198,12 +177,12 @@ class GraphManipulation<V, E> implements GraphManipulationInterface<V, E> {
      */
     public void unregisterEventListener() {
         drawingLibrary.getGraphComponent().getGraph().getModel()
-            .removeListener(undoHandler, mxEvent.UNDO);
+                .removeListener(undoHandler, mxEvent.UNDO);
         drawingLibrary.getGraphComponent().getGraph().getView().removeListener(
                 undoHandler, mxEvent.UNDO);
 
         drawingLibrary.getGraphComponent()
-            .removeComponentListener(zoomListener);
+                .removeComponentListener(zoomListener);
     }
 
     /**
@@ -213,7 +192,7 @@ class GraphManipulation<V, E> implements GraphManipulationInterface<V, E> {
      */
     private JGraphXAdapter<V, E> getGraphAdapter() {
         return (JGraphXAdapter<V, E>) drawingLibrary
-                    .getGraphComponent().getGraph();
+                .getGraphComponent().getGraph();
     }
 
     /**
@@ -281,47 +260,42 @@ class GraphManipulation<V, E> implements GraphManipulationInterface<V, E> {
     }
 
     @Override
-    public void centerNodes(List<V> nodes) {
-        mxICell[] cells = new mxICell[nodes.size()];
-        
-        for (int i = 0; i < nodes.size(); i++) {
-            cells[i] = getCellFromNode(nodes.get(i));
-        }
-        
-        drawingLibrary.getGraphComponent().scrollRectToVisible(
-                determineViewBounds(cells, true));
+    public void centerNodes(V[] nodes) {
+
+        mxGraphComponent graphComponent = drawingLibrary.getGraphComponent();
+
+        mxRectangle bounds = determineViewBounds(getCellsFromNodes(nodes),
+                true);
+
+        graphComponent.getGraphControl()
+                .scrollRectToVisible(bounds.getRectangle());
     }
 
+    private mxRectangle determineViewBounds(mxICell[] cells, boolean center) {
 
-    private Rectangle determineViewBounds(mxICell[] cells, boolean center) {
+        mxGraphComponent graphComponent = drawingLibrary.getGraphComponent();
+
         if (cells == null || cells.length == 0) {
             return null;
         }
 
-        Rectangle rect = null;
-        for (int i = 0; i < cells.length; i++) {
-            if (cells[i] == null) {
-                continue;
-            }
-            mxGeometry geo = cells[i].getGeometry();
-            Rectangle r = geo.getRectangle();
+        mxRectangle rect = null;
 
-            if (rect == null) {
-                rect = new Rectangle(r);
-            } else {
-                SwingUtilities.computeUnion(r.x, r.y, r.width, r.height, rect);
-            }
+        for (mxICell cell : cells) {
+            if (rect == null)
+                rect = getGraphAdapter().getCellBounds(cell);
+            else
+                rect.add(getGraphAdapter().getCellBounds(cell));
         }
 
-        if (center && rect != null) {
-            int wd = drawingLibrary.getGraphComponent().getWidth();
-            int ht = drawingLibrary.getGraphComponent().getHeight();
+        if (center) {
 
-            int cx = rect.x + rect.width / 2;
-            int cy = rect.y + rect.height / 2;
+            rect = (mxRectangle) rect.clone();
 
-            rect.x = cx - wd / 2;
-            rect.y = cy - ht / 2;
+            rect.setX(rect.getCenterX() - graphComponent.getWidth() / 2);
+            rect.setWidth(graphComponent.getWidth());
+            rect.setY(rect.getCenterY() - graphComponent.getHeight() / 2);
+            rect.setHeight(graphComponent.getHeight());
         }
         return rect;
     }
@@ -362,7 +336,7 @@ class GraphManipulation<V, E> implements GraphManipulationInterface<V, E> {
         beginUpdate();
         try {
             drawingLibrary.getGraphComponent()
-                .getViewport().setBackground(color);
+                    .getViewport().setBackground(color);
         } finally {
             endUpdate();
         }
@@ -800,7 +774,6 @@ class GraphManipulation<V, E> implements GraphManipulationInterface<V, E> {
         reapplyHighlighting();
         endNotUndoable();
     }
-
 
     /**
      * Restores highlighting with the current depth.

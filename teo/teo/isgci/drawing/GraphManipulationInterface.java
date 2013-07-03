@@ -11,7 +11,7 @@
 
 package teo.isgci.drawing;
 
-import java.awt.*;
+import java.awt.Color;
 import java.util.List;
 
 /**
@@ -51,7 +51,7 @@ public interface GraphManipulationInterface<V, E> {
      *
      * @param nodes : nodes of the graph
      */
-    void centerNodes(List<V> nodes);
+    void centerNodes(V[] nodes);
 
     /**
      * Colors a given node in a given color.
