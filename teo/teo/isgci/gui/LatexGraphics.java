@@ -24,7 +24,7 @@ public class LatexGraphics extends Latex {
     /**
      * The font used for drawing latex strings.
      */
-    protected Font font;
+    private Font font;
 
     /**
      * The singleton instance of this class.
@@ -97,7 +97,6 @@ public class LatexGraphics extends Latex {
         }
     }
 
-
     public Font getFont() {
         return font;
     }
@@ -111,8 +110,9 @@ public class LatexGraphics extends Latex {
      * @param y where to paint
      */
     public int drawLatexString(Graphics g, String str, int x, int y) {
-        if (str == null)
+        if (str == null) {
             return 0;
+        }
         GraphicsState state = new GraphicsState(str, g, x, y, true);
         drawLatexPart(state, true);
         return state.x - x;
@@ -124,14 +124,15 @@ public class LatexGraphics extends Latex {
      * @param g the graphics context to measure in
      */
     public int getLatexWidth(Graphics g, String str) {
-        if (str == null)
+        if (str == null) {
             return 0;
+        }
         GraphicsState state = new GraphicsState(str, g, 0, 0, false);
         drawLatexPart(state, true);
         return state.x;
     }
 
-
+    @Override
     protected State startSuper(State s) {
         GraphicsState state = (GraphicsState) s;
         if (state.s.charAt(state.i) == '*')     // * is superscript already
@@ -140,12 +141,13 @@ public class LatexGraphics extends Latex {
         Font f = state.graphics.getFont();
         GraphicsState substate = (GraphicsState) super.startSuper(state);
 
-        substate.graphics.setFont(f.deriveFont((float)(f.getSize()*0.75)));
+        substate.graphics.setFont(f.deriveFont((float) (f.getSize() * 0.75)));
         substate.y = state.y -
                 substate.graphics.getFontMetrics().getMaxDescent();
         return substate;
     }
 
+    @Override
     protected void endSuper(State s) {
         GraphicsState state = (GraphicsState) s;
         state.graphics.dispose();
@@ -153,6 +155,7 @@ public class LatexGraphics extends Latex {
         super.endSuper(s);
     }
 
+    @Override
     protected State startSub(State s) {
         GraphicsState state = (GraphicsState) s;
         Font f = state.graphics.getFont();
@@ -164,6 +167,7 @@ public class LatexGraphics extends Latex {
         return substate;
     }
 
+    @Override
     protected void endSub(State s) {
         GraphicsState state = (GraphicsState) s;
         state.graphics.dispose();
@@ -171,10 +175,12 @@ public class LatexGraphics extends Latex {
         super.endSub(s);
     }
 
+    @Override
     protected State startCo(State s) {
         return super.startCo(s);
     }
 
+    @Override
     protected void endCo(State s) {
         GraphicsState state = (GraphicsState) s;
         if (state.dopaint) {
@@ -188,15 +194,18 @@ public class LatexGraphics extends Latex {
         super.endCo(s);
     }
 
+    @Override
     protected void drawPlainString(State s, String str) {
         GraphicsState state = (GraphicsState) s;
         if (str != null  &&  str.length() > 0) {
-            if (state.dopaint)
+            if (state.dopaint) {
                 state.graphics.drawString(str, state.x, state.y);
+            }
             state.x += state.graphics.getFontMetrics().stringWidth(str);
         }
     }
 
+    @Override
     protected void drawGlyph(State s, LatexGlyph glyph) {
         GraphicsState state = (GraphicsState) s;
         Graphics g = state.graphics;
@@ -214,14 +223,16 @@ public class LatexGraphics extends Latex {
                     glyph.getIsgcichar());
         } else {
             String unicode = glyph.getUnicode();
-            if (!unicode.equals("")  &&
-                        g.getFont().canDisplayUpTo(unicode) == -1) {
-                if (state.dopaint)
+            if (!unicode.isEmpty() 
+                    && g.getFont().canDisplayUpTo(unicode) == -1) {
+                //if (state.dopaint) {
                     g.drawString(unicode, state.x, state.y);
+                //}
                 state.x += g.getFontMetrics().stringWidth(unicode);
             } else if (g instanceof SVGGraphics) { // We don't do SVG imgs
-                if (state.dopaint)
+                if (state.dopaint) {
                     g.drawString(glyph.getName(), state.x, state.y);
+                }
                 state.x += g.getFontMetrics().stringWidth(glyph.getName());
             } else {
                 FontMetrics f = g.getFontMetrics();
@@ -236,8 +247,8 @@ public class LatexGraphics extends Latex {
 
                 dx1 = state.x;
                 dy2 = state.y;
-                dy1 = dy2 - (int)(sy2 * scale);
-                dx2 = dx1 + (int)(sx2 * scale);
+                dy1 = dy2 - (int) (sy2 * scale);
+                dx2 = dx1 + (int) (sx2 * scale);
 
                 /*System.err.println( f.getHeight());
                 System.err.print(x); System.err.print(" ");
@@ -251,13 +262,14 @@ public class LatexGraphics extends Latex {
                 System.err.print(dx2); System.err.print(" ");
                 System.err.println(dy2);*/
 
-                if (state.dopaint)
-                    g.drawImage(image,dx1,dy1,dx2,dy2, sx1,sy1,sx2,sy2,null);
+                if (state.dopaint) {
+                    g.drawImage(image, dx1, dy1, dx2, dy2, 
+                            sx1, sy1, sx2, sy2, null);
+                }
                 state.x += dx2 - dx1;
             }
         }
     }
-
 
 
     protected class GraphicsState extends Latex.State {

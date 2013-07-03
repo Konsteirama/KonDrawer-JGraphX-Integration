@@ -117,6 +117,7 @@ public class SearchDialog extends JDialog implements ActionListener {
         dispose();
     }
 
+    @Override
     public void actionPerformed(ActionEvent event) {
         Object source = event.getSource();
         if (source == cancelButton) {

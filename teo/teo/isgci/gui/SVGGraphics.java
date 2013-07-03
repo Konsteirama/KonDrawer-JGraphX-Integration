@@ -64,7 +64,7 @@ public class SVGGraphics extends SmartGraphics {
     public SVGGraphics() {
         disposed = false;
         content = new StringBuffer(16*1024);
-        font = LatexGraphics.getInstance().getFont();
+        font = new Font(Font.SANS_SERIF, Font.PLAIN, 11);
         color = Color.black;
         translatex = 0;
         translatey = 0;

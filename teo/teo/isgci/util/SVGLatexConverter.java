@@ -14,9 +14,13 @@ package teo.isgci.util;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.FileWriter;
-import java.util.HashMap;
+import java.io.OutputStreamWriter;
+import java.nio.charset.Charset;
+import java.nio.charset.CharsetEncoder;
+import java.nio.charset.CodingErrorAction;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -26,8 +30,6 @@ import teo.isgci.gui.SVGGraphics;
 /**
  * Reads a svg file and converts all raw latex strings into svg-readable
  * and displayable text.
- * 
- * TODO: static >= object?
  */
 public final class SVGLatexConverter {
     
@@ -35,7 +37,6 @@ public final class SVGLatexConverter {
     private static String svgContent;
     
     /** Block constructor for utility class. */
-    @SuppressWarnings("unused")
     private SVGLatexConverter() { };
     
     /**
@@ -78,11 +79,11 @@ public final class SVGLatexConverter {
         }
         
         
-        // extract all texttags
-        Pattern textTag = Pattern.compile("<text [^>]*><tspan [^>]*>"
-                                        + "[^<]*</tspan></text>");
+        // extract all texttags and their rectangles for position
+        Pattern completeTag = Pattern.compile("<rect[^>]*><text [^>]*>"
+                                        + "<tspan [^>]*>[^<]*</tspan></text>");
         
-        Matcher matcher = textTag.matcher(svgContent);
+        Matcher matcher = completeTag.matcher(svgContent);
         while (matcher.find())  {
             String parsedText = parseLatexText(matcher.group());
             svgContent = svgContent.replace(matcher.group(), parsedText);
@@ -91,6 +92,11 @@ public final class SVGLatexConverter {
         BufferedWriter bw = null;
         
         try {
+            // filestream MUST use utf-8 for $\cap$ etc
+            CharsetEncoder encoder = Charset.forName("UTF-8").newEncoder();
+            encoder.onMalformedInput(CodingErrorAction.REPORT);
+            encoder.onUnmappableCharacter(CodingErrorAction.REPORT);
+            
             File file = new File(path);
 
             // file should exist, but still
@@ -98,8 +104,9 @@ public final class SVGLatexConverter {
                 file.createNewFile();
             }
 
-            FileWriter fw = new FileWriter(file.getAbsoluteFile());
-            bw = new BufferedWriter(fw);
+            bw = new BufferedWriter(new OutputStreamWriter(
+                    new FileOutputStream(file), encoder));
+            
             bw.write(svgContent);
 
         } catch (Exception e) {
@@ -160,36 +167,51 @@ public final class SVGLatexConverter {
 //                }
 //            }
             
-            // extract position from tspan tag
-            Pattern xTag = Pattern.compile("<tspan[^x]*x=\"([^\"]+).*");
-            Pattern yTag = Pattern.compile("<tspan[^y]*y=\"([^\"]+).*");
+            // extract position from rectangle
+            Pattern xTag = Pattern.compile("<rect[^>]* x=\"([^\"]+).*");
+            Pattern yTag = Pattern.compile("<rect[^>]* y=\"([^\"]+).*");
+            Pattern heightTag 
+                = Pattern.compile("<rect[^>]* height=\"([^\"]+).*");
             Matcher xMatcher = xTag.matcher(tag);
             Matcher yMatcher = yTag.matcher(tag);
+            Matcher heightMatcher = heightTag.matcher(tag);
             
             // no position found
-            if (!xMatcher.find() || !yMatcher.find()) {
+            if (!xMatcher.find() || !yMatcher.find() 
+                    || !heightMatcher.find()) {
                 System.err.println("No valid position found!");
                 return tag;
             }
             
             // try to set position
-            int positionX, positionY;
+            int positionX, positionY, height;
             
             try {
                 positionX = Integer.parseInt(xMatcher.group(1));
                 positionY = Integer.parseInt(yMatcher.group(1));
+                height = Integer.parseInt(heightMatcher.group(1));
             } catch (Exception e) {
                 System.err.println("Error parsing the svg document!");
                 return tag;
             }
             
+            // prepend complete rectangle tag so it's not overwritten
+            Pattern rectTag = Pattern.compile("<rect[^>]*>");
+            Matcher rectMatcher = rectTag.matcher(tag);
+            rectMatcher.find();
             
             // build the latex string 
             SVGGraphics graphics = new SVGGraphics();
             
+            final int padding = 5;
+            
             LatexGraphics lg = LatexGraphics.getInstance();
-            lg.drawLatexString(graphics, latexContent, positionX, positionY);
-            return graphics.getContent();
+            lg.drawLatexString(graphics, latexContent,
+                    positionX + padding,
+                    positionY + height / 2 + padding);
+            String parsedText = graphics.getContent();
+            
+            return rectMatcher.group() + parsedText;
         } else {
             // should not happen
             return tag;

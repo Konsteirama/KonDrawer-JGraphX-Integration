@@ -74,7 +74,7 @@ public abstract class Latex {
 
 
     /**
-     * Draws a string (without latex codes) and updates the painting
+     * Draws a string (without latex codes) and updates the painting.
      * information in state
      * @param state the parsing/painting state
      * @param str the string to draw
@@ -82,7 +82,7 @@ public abstract class Latex {
     protected abstract void drawPlainString(State state, String str);
 
     /**
-     * Draws a single Glyph and updates the painting information in state
+     * Draws a single Glyph and updates the painting information in state.
      * @param state the parsing/painting state
      * @param g the Glyph to draw
      */
@@ -102,8 +102,9 @@ public abstract class Latex {
         int bracelevel = 0;
         boolean justone = false;
 
-        if (!fullString)
+        if (!fullString) {
             justone = state.s.charAt(state.i) != '{';
+        }
         
         while (state.i < state.s.length()) {
             c = state.s.charAt(state.i++);
@@ -146,25 +147,28 @@ public abstract class Latex {
                         drawLatexPart(substate, false);
                         endCo(substate);
                         break;
-                    } else if ( (glyph =
-                            LatexGlyph.parseGlyph(state.s, state.i)) != null ){
+                    } else if ((glyph =
+                            LatexGlyph.parseGlyph(state.s, state.i)) != null) {
                         state.i += glyph.getName().length();
                         drawGlyph(state, glyph);
-                    } else
-                        System.err.println("Unknown latex code at "+
-                                state.s.substring(state.i, 10));
+                    } else {
+                        System.err.println("Unknown latex code at "
+                                + state.s.substring(state.i, 10));
+                    }
                     break;
                 case '-' :              // Maybe --
                     b.append('-');
-                    if (state.s.charAt(state.i) == '-')
+                    if (state.s.charAt(state.i) == '-') {
                         state.i++;
+                    }
                     break;
                 default :               // Plain char
                     b.append(c);
                     
             }
-            if (!fullString  &&  (justone || bracelevel==0))
+            if (!fullString  &&  (justone || bracelevel == 0)) {
                 break;
+            }
         }
 
         if (b.length() > 0) {
