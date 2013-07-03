@@ -53,44 +53,49 @@ public class ISGCIMainFrame extends JFrame implements WindowListener {
      * The applicationname displayed in the titlebar.
      */
     public static final String APPLICATIONNAME = "ISGCI";
+    
     /**
      * The location where new windows will be positioned.
      */
     private static final Point DEFAULTPOSITION = new Point(50, 50);
+    
     /**
      * The location where new mainframes will be positioned.
      */
     private static final Point MAINPOSITION = new Point(20, 20);
+    
     /**
      * This should change each time the mainframe is changed.
      */
     private static final long serialVersionUID = 1L;
+    
     /**
      * Needed for MediaTracker (hack).
      */
     public static ISGCIMainFrame tracker;
     // public static Font font;
+    
     /**
      * The loader which initialized the mainframe.
      */
     protected teo.Loader loader;
+    
     /**
      * Saves jdialogs to close them if they need to be closed from here.
      */
     private Vector<JDialog> dialogs = new Vector<JDialog>();
+    
     /**
      * Needed so that menubar will not disappear on linux if maximized.
      */
     private JMenuBar mainMenuBar;
+    
     /**
      * Needed for startpanel animation.
      */
     private JMenuItem miCheckInclusion, miOpenProblem, miGraphClassInformation,
             miSelectGraphClasses;
-    /**
-     * Shows a list from which a problem can be chosen.
-     */
-    private JMenuItem miColourProblem;
+    
     /**
      * Indicates whether or not the graph should draw unproper edges.
      */
@@ -98,7 +103,7 @@ public class ISGCIMainFrame extends JFrame implements WindowListener {
     /**
      * Needed for startpanel animation.
      */
-    private JMenu problemsMenu, graphMenu;
+    private JMenu graphMenu;
     /**
      * The tabbed Pane which handles all tabs and their creation / deletion.
      */
@@ -261,15 +266,6 @@ public class ISGCIMainFrame extends JFrame implements WindowListener {
     }
 
     /**
-     * Getter for the menu for the problems.
-     *
-     * @return The menu for the problems menu.
-     */
-    public JMenu getProblemsMenu() {
-        return problemsMenu;
-    }
-
-    /**
      * Getter for {@link #tabbedPane}.
      *
      * @return Returns {@link #tabbedPane}.
@@ -389,7 +385,6 @@ public class ISGCIMainFrame extends JFrame implements WindowListener {
             name = problem.getName();
         }
 
-        ((ProblemsMenu) miColourProblem).setProblem(name);
         toolbar.setProblem(name);
     }
 
@@ -504,6 +499,23 @@ public class ISGCIMainFrame extends JFrame implements WindowListener {
             }
         });
 
+        miOpenProblem = new JMenu("Boundary/Open classes");
+        for (int i = 0; i < DataSet.problems.size(); i++) {
+            JMenuItem menu = new JMenuItem(
+                    ((Problem) DataSet.problems.elementAt(i)).getName());
+            miOpenProblem.add(menu);
+            menu.addActionListener(new ActionListener() {
+
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    JDialog open = new OpenProblemDialog(mainframe,
+                            ((JMenuItem) e.getSource()).getText());
+                    open.setLocation(DEFAULTPOSITION);
+                    open.setVisible(true);
+                }
+            });
+        }
+        
         miSelectGraphClasses = new JMenuItem("Draw...");
         miSelectGraphClasses.addActionListener(new ActionListener() {
 
@@ -516,6 +528,7 @@ public class ISGCIMainFrame extends JFrame implements WindowListener {
         graphMenu = new JMenu("Graph classes");
         graphMenu.add(miGraphClassInformation);
         graphMenu.add(miCheckInclusion);
+        graphMenu.add(miOpenProblem);
         graphMenu.add(miSelectGraphClasses);
         mainMenuBar.add(graphMenu);
     }
@@ -561,41 +574,6 @@ public class ISGCIMainFrame extends JFrame implements WindowListener {
 
         // mainMenuBar.add(Box.createHorizontalGlue());
         mainMenuBar.add(helpMenu);
-    }
-
-    /**
-     * Adds Problems to the menu.
-     */
-    private void addProblemsMenu() {
-
-        // needed to reference this in actionlistener
-        final ISGCIMainFrame mainframe = this;
-
-        miOpenProblem = new JMenu("Boundary/Open classes");
-        miColourProblem = new ProblemsMenu(this,
-                "Colour for problem");
-
-        problemsMenu = new JMenu("Problems");
-
-        problemsMenu.add(miOpenProblem);
-        for (int i = 0; i < DataSet.problems.size(); i++) {
-            JMenuItem menu = new JMenuItem(
-                    ((Problem) DataSet.problems.elementAt(i)).getName());
-            miOpenProblem.add(menu);
-            menu.addActionListener(new ActionListener() {
-
-                @Override
-                public void actionPerformed(ActionEvent e) {
-                    JDialog open = new OpenProblemDialog(mainframe,
-                            ((JMenuItem) e.getSource()).getText());
-                    open.setLocation(DEFAULTPOSITION);
-                    open.setVisible(true);
-                }
-            });
-        }
-
-        problemsMenu.add(miColourProblem);
-        mainMenuBar.add(problemsMenu);
     }
 
     /**
@@ -669,7 +647,7 @@ public class ISGCIMainFrame extends JFrame implements WindowListener {
         OutputStreamWriter out = null;
 
         SimpleDirectedGraph<GraphClass, Inclusion> g
-                = new SimpleDirectedGraph<GraphClass, Inclusion>(Inclusion.class);
+            = new SimpleDirectedGraph<GraphClass, Inclusion>(Inclusion.class);
         Graphs.addGraph(g, DataSet.inclGraph);
         GAlg.transitiveReductionBruteForce(g);
 
@@ -705,7 +683,6 @@ public class ISGCIMainFrame extends JFrame implements WindowListener {
         addFileMenu();
         addViewMenu();
         addGraphMenu();
-        addProblemsMenu();
         addHelpMenu();
 
         return mainMenuBar;

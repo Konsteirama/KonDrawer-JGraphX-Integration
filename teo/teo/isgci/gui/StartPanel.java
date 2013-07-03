@@ -173,9 +173,9 @@ class StartPanel extends JPanel {
                 }
                 try {
                     // Open the problemMenu
-                    JMenu problemMenu = mainframe.getProblemsMenu();
-                    moveMouseTo(mouseRobot, problemMenu);
-                    problemMenu.doClick(1);
+                    JMenu graphMenu = mainframe.getGraphMenu();
+                    moveMouseTo(mouseRobot, graphMenu);
+                    graphMenu.doClick(1);
                     mouseRobot.delay(CLICKDELAY);
                 } catch (Exception ex) {
                     // ignoring exception
