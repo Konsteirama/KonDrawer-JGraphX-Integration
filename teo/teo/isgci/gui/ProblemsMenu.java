@@ -10,7 +10,6 @@
 
 package teo.isgci.gui;
 
-//import.java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.Enumeration;
@@ -26,20 +25,22 @@ import teo.isgci.problem.Problem;
 import teo.isgci.util.UserSettings;
 
 public class ProblemsMenu extends JMenu implements ActionListener {
-    protected Vector items;
+    protected Vector<JRadioButtonMenuItem> items;
     protected ISGCIMainFrame parent;
     protected ButtonGroup group;
 
     public ProblemsMenu(ISGCIMainFrame parent, String label) {
         super(label);
         this.parent = parent;
-        items = new Vector();
+        items = new Vector<JRadioButtonMenuItem>();
         group = new ButtonGroup();
 
         addRadio("None", true);
 
-        for (int i = 0; i < DataSet.problems.size(); i++)
-            addRadio(((Problem)DataSet.problems.elementAt(i)).getName(),false);
+        for (int i = 0; i < DataSet.problems.size(); i++) {
+            addRadio(((Problem) DataSet.problems.elementAt(i))
+                    .getName(), false);
+        }
     }
 
     /**
@@ -56,20 +57,21 @@ public class ProblemsMenu extends JMenu implements ActionListener {
     }
     
     /**
-     * Sets the active radio button to the given problem
+     * Sets the active radio button to the given problem.
      * @param problem
      *              the name of the new problem
      */
-    public void setProblem(String problem){
+    public void setProblem(String problem) {
         Enumeration<AbstractButton> buttons = group.getElements();
         for (int i = 0; i < group.getButtonCount(); i++) {
             AbstractButton b = buttons.nextElement();
-            if(b.getText().equals(problem)) {
+            if (b.getText().equals(problem)) {
                 group.setSelected(b.getModel(), true);
             }
         }
     }
 
+    @Override
     public void actionPerformed(ActionEvent event) {
         UserSettings.setProblem(DataSet.getProblem(event.getActionCommand()));
     }

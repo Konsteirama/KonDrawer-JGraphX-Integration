@@ -14,14 +14,19 @@ package teo.isgci.gui;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
 import java.util.List;
 
 import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JToolBar;
 
+import teo.isgci.db.DataSet;
 import teo.isgci.drawing.DrawingLibraryInterface;
 import teo.isgci.drawing.GraphManipulationInterface;
+import teo.isgci.problem.Problem;
+import teo.isgci.util.UserSettings;
 
 /**
  * ISGCI-specific implementation of the JToolBar that modifies the application
@@ -31,8 +36,13 @@ public class ISGCIToolBar extends JToolBar {
     /**
      * Change this every time this class is changed.
      */
-    private static final long serialVersionUID = 4L;
+    private static final long serialVersionUID = 5L;
 
+    /**
+     * Name for no selected problem.
+     */
+    private static final String NOPROBLEMSELECTED = "None";
+    
     /**
      * Reference to parent-ISGCI Mainframe for opening dialogs etc.
      */
@@ -48,7 +58,17 @@ public class ISGCIToolBar extends JToolBar {
      */
     private JButton redoButton;
 
+    /**
+     * Problem combobox, reference here to set the currently active problem.
+     */
+    private JComboBox problemBox;
 
+    /**
+     * True if user changes problembox, false if it was checked via
+     * {@link setProblem}.
+     */
+    private boolean setProblem = true;
+    
     /**
      * Creates a toolbar with icons that influence both ISGCI and the currently
      * active drawinglibraryinterface (the active tab). The parent needs an
@@ -61,10 +81,24 @@ public class ISGCIToolBar extends JToolBar {
         setFloatable(false);
         setRollover(true);
         addButtons();
-
+        
         mainframe = parent;
     }
 
+    /**
+     * Sets the currently active problem.
+     * 
+     * @param problem
+     *          The currently active problem.
+     */
+    public void setProblem(String problem) {       
+        setProblem = false;
+        if (!problem.equals(problemBox.getSelectedItem())) {
+            problemBox.setSelectedItem(problem);
+        }
+        setProblem = true;
+    }
+    
     /**
      * Returns the drawinglibraryinterface.
      *
@@ -98,6 +132,9 @@ public class ISGCIToolBar extends JToolBar {
         addSeparator(separatorSize);
 
         addMiscButtons();
+        addSeparator(separatorSize);
+        
+        addProblemChooser();
     }
 
     /**
@@ -166,7 +203,7 @@ public class ISGCIToolBar extends JToolBar {
             }
         });
 
-        // HIGHLIGHT PARENT TODO
+        // HIGHLIGHT PARENT
         String highlightParentTooltip =
                 "Highlights the parent-nodes of the selected nodes."
                         + " Clicking multiple times will increase the depth.";
@@ -195,7 +232,7 @@ public class ISGCIToolBar extends JToolBar {
             }
         });
 
-        // HIGHLIGHT CHILDREN TODO
+        // HIGHLIGHT CHILDREN
         String highlightChildTooltip =
                 "Highlights the child-nodes of the selected nodes."
                         + " Clicking multiple times will increase the depth.";
@@ -306,8 +343,9 @@ public class ISGCIToolBar extends JToolBar {
         add(zoomBox);
 
         // make sure zoombox doesn't get bigger
-        final Dimension zoomBoxSize = new Dimension(100, 50);
+        final Dimension zoomBoxSize = new Dimension(80, 36);
         zoomBox.setMaximumSize(zoomBoxSize);
+        zoomBox.setPreferredSize(zoomBoxSize);
 
 
         zoomBox.addActionListener(new ActionListener() {
@@ -395,6 +433,37 @@ public class ISGCIToolBar extends JToolBar {
         });
     }
 
+    
+    /**
+     * Adds a combobox for choosing and displaying the current problem.
+     */
+    private void addProblemChooser() {
+        problemBox = new JComboBox();
+        
+        problemBox.addItem(NOPROBLEMSELECTED);
+        
+        for (Problem problem : DataSet.problems) {
+            problemBox.addItem(problem.getName());
+        }
+        
+        problemBox.addItemListener(new ItemListener() {
+            
+            @Override
+            public void itemStateChanged(ItemEvent e) {
+                if (setProblem) {
+                    UserSettings.setProblem(DataSet.getProblem(
+                            (String) problemBox.getSelectedItem()));
+                }
+            }
+        });
+        
+        // make sure zoombox doesn't get bigger
+        final Dimension problemBoxSize = new Dimension(175, 36);
+        problemBox.setMaximumSize(problemBoxSize);
+        problemBox.setPreferredSize(problemBoxSize);
+        
+        add(problemBox);
+    }
 }
 
 /* EOF */

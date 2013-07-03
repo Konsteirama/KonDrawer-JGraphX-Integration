@@ -175,9 +175,10 @@ public class ISGCIMainFrame extends JFrame implements WindowListener {
         setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
         addWindowListener(this);
         
-        // preferredsize.height is too small, so we need to add 20
+        // preferredsize is a bit too small, so increase it a bit
         Dimension prefSize = getPreferredSize();
-        setMinimumSize(new Dimension(prefSize.width, prefSize.height + 20));
+        setMinimumSize(new Dimension(prefSize.width + 10,
+                                     prefSize.height + 20));
 
         setLocation(MAINPOSITION);
         pack();
@@ -537,7 +538,9 @@ public class ISGCIMainFrame extends JFrame implements WindowListener {
         } else {
             name = problem.getName();
         }
-        ((ProblemsMenu) miColourProblem).setProblem(name);        
+        
+        ((ProblemsMenu) miColourProblem).setProblem(name);     
+        toolbar.setProblem(name);
     }
 
     /**
