@@ -45,7 +45,7 @@ public class SettingsDialog extends JDialog {
     private static final String SEPARATOR = "-----------";
     
     /** Fontname. */
-    private static final String FONT = "Font";
+    private static final String FONT = "Text";
     
     /** Backgroundname. */
     private static final String BACKGROUND = "Background";
