@@ -29,7 +29,7 @@ public enum Complexity {
     P      ("Polynomial",    "P",     "Bounded", Color.green.darker()),
     
     /** GI-complete. */
-    GIC    ("GI-complete",   "GIC",   "Unbounded", Color.red.brighter()),
+    GIC    ("GI-complete",   "GIC",   "Unbounded", new Color(255, 100, 100)),
     
     /** NP-complete. */
     NPC    ("NP-complete",   "NPC",   "Unbounded", Color.red),

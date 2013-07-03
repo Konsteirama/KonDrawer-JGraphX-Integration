@@ -53,6 +53,12 @@ public final class Latex2Html extends Latex {
 
     /**
      * Return s as an html string.
+     * 
+     * @param s
+     *          The string to convert to html
+     * 
+     * @return
+     *          The converted string in html format
      */
     public String html(String s) {
         HtmlState state = new HtmlState(s);
