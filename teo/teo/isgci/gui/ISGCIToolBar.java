@@ -163,8 +163,6 @@ public class ISGCIToolBar extends JToolBar {
                 } else if (selectedNodes.size() > 1) {
                     manipulationInterface.centerNodes(selectedNodes);
                 }
-                
-                System.out.println(selectedNodes.size());
             }
         });
 
