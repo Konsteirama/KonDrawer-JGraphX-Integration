@@ -270,7 +270,7 @@ public class ISGCIToolBar extends JToolBar {
 
         problemBox.setToolTipText("Choose a problem to colour the nodes "
                 + "in this tab in a specific colour "
-                + "corresponding to the problem that was"
+                + "corresponding to the problem that was "
                 + "chosen.");
 
         problemBox.addItem(NOPROBLEMSELECTED);
@@ -382,7 +382,7 @@ public class ISGCIToolBar extends JToolBar {
         zoomBox.setToolTipText("Choose a zoom-level.");
 
         // make sure zoombox doesn't get bigger
-        final Dimension zoomBoxSize = new Dimension(80, 36);
+        final Dimension zoomBoxSize = new Dimension(100, 36);
         zoomBox.setMaximumSize(zoomBoxSize);
         zoomBox.setPreferredSize(zoomBoxSize);
 
