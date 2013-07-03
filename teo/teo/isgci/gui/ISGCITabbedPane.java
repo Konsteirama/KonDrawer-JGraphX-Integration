@@ -125,6 +125,9 @@ public class ISGCITabbedPane extends JTabbedPane implements Updatable {
                 mainframe.setDrawUnproper(
                         getDrawUnproper(getSelectedComponent()));
                 mainframe.setColorProblem(UserSettings.getProblem());
+            } else {
+                mainframe.setDrawUnproper(true);
+                mainframe.setColorProblem(null);                
             }
         }
     };
