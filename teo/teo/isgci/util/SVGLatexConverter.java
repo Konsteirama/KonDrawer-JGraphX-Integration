@@ -211,13 +211,24 @@ public final class SVGLatexConverter {
                     positionY + height / 2 + padding);
             String parsedText = graphics.getContent();
             
-            return rectMatcher.group() + parsedText;
+            return fixRectTag(rectMatcher.group()) + parsedText;
         } else {
             // should not happen
             return tag;
         }
     }
     
+    /**
+     * Fixes a bug with jgraphx where - upon undoing a node deletion -
+     * the node has the strokecolor FF000000 instead of #000000.
+     * @param tag
+     *          The tag that will be fixed
+     * @return
+     *          The fixed tag
+     */
+    private static String fixRectTag(String tag) {
+        return tag.replace("stroke=\"ff", "stroke=\"#");
+    }
 }
 
 /* EOF */
