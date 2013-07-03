@@ -188,8 +188,8 @@ public class ISGCIMainFrame extends JFrame implements WindowListener {
 
         // preferredsize is a bit too small, so increase it a bit
         Dimension prefSize = getPreferredSize();
-        setMinimumSize(new Dimension(prefSize.width + 10,
-                prefSize.height + 20));
+        setMinimumSize(new Dimension(prefSize.width + 30,
+                prefSize.height + 40));
 
         setLocation(MAINPOSITION);
         pack();
