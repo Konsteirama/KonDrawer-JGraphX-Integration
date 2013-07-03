@@ -25,12 +25,6 @@ public final class Latex2Html extends Latex {
      */
     private static final Latex2Html INSTANCE = new Latex2Html();
     
-    /**
-     * Since java can't display CSS overlines, we have to use a special
-     * unicode character to display overlines. This is the character.
-     */
-    private static final String OVERLINE = "&#x305;";
-    
     /** Starting tags. */
     private static final String START_TAGS 
                         = "<html><div style=\"padding:5px\">";
@@ -39,13 +33,7 @@ public final class Latex2Html extends Latex {
     private static final String CLOSING_TAGS = "</div></html>";
     
     /**
-     * Indicates whether parser is in overline/co mode so _6 will not be drawn
-     * with a bar over the 6.
-     */
-    private boolean isInOverline;
-    
-    /**
-     * Create a new latex->html converter. Private because of singleton
+     * Create a new latex to html converter. Private because of singleton
      * pattern.
      */
     private Latex2Html() {
@@ -102,23 +90,19 @@ public final class Latex2Html extends Latex {
 
     @Override
     protected State startCo(State s) {
-        isInOverline = true;
+        ((HtmlState) s).target.append("co{");
         return super.startCo(s);
     }
 
     @Override
     protected void endCo(State s) {
-        isInOverline = false;
+        ((HtmlState) s).target.append("}");
         super.endCo(s);
     }
 
     @Override
     protected void drawPlainString(State state, String str) {
         ((HtmlState) state).target.append(str);
-        
-        if (isInOverline) {
-            ((HtmlState) state).target.append(OVERLINE); 
-        }
     }
 
     @Override
