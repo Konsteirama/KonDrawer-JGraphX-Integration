@@ -481,24 +481,6 @@ public class ISGCIMainFrame extends JFrame implements WindowListener {
             }
         });
 
-        miCheckInclusion = new JMenuItem("Find Relation...");
-        miCheckInclusion.addActionListener(new ActionListener() {
-
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                final int width = 700;
-                final int height = 400;
-
-                JDialog check = new CheckInclusionDialog(mainframe);
-                check.setLocation(DEFAULTPOSITION);
-                check.pack();
-                check.setSize(width, height);
-                check.setVisible(true);
-
-                dialogs.add(check);
-            }
-        });
-
         miOpenProblem = new JMenu("Boundary/Open classes");
         for (int i = 0; i < DataSet.problems.size(); i++) {
             JMenuItem menu = new JMenuItem(
@@ -516,6 +498,24 @@ public class ISGCIMainFrame extends JFrame implements WindowListener {
             });
         }
         
+        miCheckInclusion = new JMenuItem("Find Relation...");
+        miCheckInclusion.addActionListener(new ActionListener() {
+
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                final int width = 700;
+                final int height = 400;
+
+                JDialog check = new CheckInclusionDialog(mainframe);
+                check.setLocation(DEFAULTPOSITION);
+                check.pack();
+                check.setSize(width, height);
+                check.setVisible(true);
+
+                dialogs.add(check);
+            }
+        });
+        
         miSelectGraphClasses = new JMenuItem("Draw...");
         miSelectGraphClasses.addActionListener(new ActionListener() {
 
@@ -527,8 +527,8 @@ public class ISGCIMainFrame extends JFrame implements WindowListener {
 
         graphMenu = new JMenu("Graph classes");
         graphMenu.add(miGraphClassInformation);
-        graphMenu.add(miCheckInclusion);
         graphMenu.add(miOpenProblem);
+        graphMenu.add(miCheckInclusion);
         graphMenu.add(miSelectGraphClasses);
         mainMenuBar.add(graphMenu);
     }
