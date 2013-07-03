@@ -23,15 +23,20 @@ import com.mxgraph.util.*;
 import com.mxgraph.util.mxCellRenderer.CanvasFactory;
 import com.mxgraph.view.mxCellState;
 import com.mxgraph.view.mxGraph;
+
 import net.sf.epsgraphics.ColorMode;
 import net.sf.epsgraphics.EpsGraphics;
+
 import org.jgrapht.Graph;
 import org.jgrapht.ext.GraphMLExporter;
 import org.xml.sax.SAXException;
 
+import teo.isgci.util.SVGLatexConverter;
+
 import javax.imageio.ImageIO;
 import javax.swing.*;
 import javax.xml.transform.TransformerConfigurationException;
+
 import java.awt.*;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
@@ -389,6 +394,9 @@ class JGraphXInterface<V, E> implements DrawingLibraryInterface<V, E> {
         } catch (IOException e) {
             e.printStackTrace();
         }
+                
+        // Convert Latex to SVG
+        SVGLatexConverter.convertSVGToLatex(path);
     }
 
     /**
