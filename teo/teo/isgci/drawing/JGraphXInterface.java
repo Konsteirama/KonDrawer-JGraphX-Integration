@@ -113,7 +113,7 @@ class JGraphXInterface<V, E> implements DrawingLibraryInterface<V, E> {
 
     static {
         mxUtils.setDefaultTextRenderer(
-                LightweightLatexLabel.getSharedInstance());
+                lightweightLatexLabel.getSharedInstance());
         mxGraphics2DCanvas.putTextShape(mxGraphics2DCanvas.TEXT_SHAPE_DEFAULT,
                 new mxDefaultLatexShape());
     }

@@ -95,7 +95,7 @@ public class mxDefaultLatexShape implements mxITextShape {
             }
             int dx = 0;
 
-            int sw = LightweightLatexLabel.getSharedInstance()
+            int sw = lightweightLatexLabel.getSharedInstance()
                     .getLatexWidth(g, text);
 
             if (align.equals(mxConstants.ALIGN_CENTER)) {
@@ -108,7 +108,7 @@ public class mxDefaultLatexShape implements mxITextShape {
                 dx = ((horizontal) ? w : h) - sw;
             }
 
-            LightweightLatexLabel.getSharedInstance().drawLatexString(g,
+            lightweightLatexLabel.getSharedInstance().drawLatexString(g,
                     text, x + dx, y);
         }
     }

@@ -20,7 +20,7 @@ import teo.isgci.gui.LatexLabel;
 /**
  * A lightweight latex label.
  */
-public class LightweightLatexLabel extends LatexLabel {
+public class lightweightLatexLabel extends LatexLabel {
 
     /** Serial version. */
     private static final long serialVersionUID = 1L;
@@ -29,14 +29,14 @@ public class LightweightLatexLabel extends LatexLabel {
     /**
      * The shared instance of this object.
      */
-    protected static LightweightLatexLabel sharedInstance;
+    protected static lightweightLatexLabel sharedInstance;
 
     /**
      * Initializes the shared instance.
      */
     static {
         try {
-            sharedInstance = new LightweightLatexLabel();
+            sharedInstance = new lightweightLatexLabel();
         } catch (Exception e) {
             System.err.println("Failed to create lightweightlatexlabel!");
         }
@@ -46,7 +46,7 @@ public class LightweightLatexLabel extends LatexLabel {
      *
      *
      */
-    public LightweightLatexLabel() {
+    public lightweightLatexLabel() {
         setFont(new Font(mxConstants.DEFAULT_FONTFAMILY, 0,
                 mxConstants.DEFAULT_FONTSIZE));
         setVerticalAlignment(SwingConstants.TOP);
@@ -56,7 +56,7 @@ public class LightweightLatexLabel extends LatexLabel {
      * Returns the shared instance of this label.
      * @return The shared instance
      */
-    public static LightweightLatexLabel getSharedInstance() {
+    public static lightweightLatexLabel getSharedInstance() {
         return sharedInstance;
     }
 
