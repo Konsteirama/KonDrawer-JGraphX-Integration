@@ -37,48 +37,55 @@ import teo.isgci.util.UserSettings;
  */
 public class SettingsDialog extends JDialog {
 
+    /** Serial version. */
+    private static final long serialVersionUID = -3135892620972258872L;
+
     /**
      * Backgroundname.
      */
     private static final String BACKGROUND = "Background";
+    
     /**
      * Fontname.
      */
     private static final String FONT = "Text";
+    
     /**
      * Highlightname.
      */
     private static final String HIGHLIGHT = "Highlight";
+    
     /**
      * Selectionname.
      */
     private static final String SELECTION = "Selection";
+    
     /**
      * Separator for colorlist.
      */
     private static final String SEPARATOR = "-----------";
-    /**
-     * This field should change every time the class is changed - once it is
-     * actually deployed.
-     */
-    private static final long serialVersionUID = 4L;
+    
     /**
      * A button to save changes. Only enabled if there are any changes.
      * Does not close the dialogue.
      */
     private JButton applyButton;
+    
     /**
      * A list with all possible options for which the colours can be changed.
      */
     private JList colorList;
+    
     /**
      * Disables enabling the apply button during "internal" changes.
      */
     private boolean disableApply;
+    
     /**
      * The value which was selected before the current value in the colorList.
      */
     private Object lastSelectedValue;
+    
     /**
      * Maps a name to a specific color, includes all complexities.
      */

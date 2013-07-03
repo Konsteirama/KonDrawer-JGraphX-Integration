@@ -67,6 +67,9 @@ import teo.isgci.util.Utility;
  * a JButton to close the tab it belongs to.
  */
 public class ISGCITabComponent extends JPanel {
+    /** Serial version. */
+    private static final long serialVersionUID = -3891403659637576182L;
+
     /**
      * Listener for tab component.
      */
@@ -88,10 +91,7 @@ public class ISGCITabComponent extends JPanel {
             }
         }
     };
-    /**
-     * Should be changed every time the class is changed.
-     */
-    private static final long serialVersionUID = 1L;
+
     /**
      * Parent.
      */
@@ -101,8 +101,8 @@ public class ISGCITabComponent extends JPanel {
      * Creates a new tabbedcomponent with close button and name.
      *
      * @param pane The parent.
-     * @param name The name that will be next to the close button, compiled with
-     *             LaTeX.
+     * @param name The name that will be next to the close button, 
+     *             compiled with LaTeX.
      * @param m    The chosen mode (with subclasses or superclasses or both).
      *             Null if no mode was chosen.
      */
@@ -174,12 +174,14 @@ public class ISGCITabComponent extends JPanel {
 
     /**
      * The mode of the graph.
-     * SUB means the graph is drawn with its subclasses.
-     * SUP means the graph is drawn with its superclasses.
-     * BOTH means the graph is drawn with its sub- and superclasses.
      */
     public static enum Mode {
-        SUB, SUP, BOTH
+        /** the graph is drawn with its subclasses. */
+        SUB, 
+        /** the graph is drawn with its superclasses. */
+        SUP, 
+        /** the graph is drawn with its sub- and superclasses. */
+        BOTH
     }
 
     /**

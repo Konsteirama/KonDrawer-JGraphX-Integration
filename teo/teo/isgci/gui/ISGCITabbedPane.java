@@ -58,15 +58,15 @@ import teo.isgci.util.UserSettings;
  */
 public class ISGCITabbedPane extends JTabbedPane implements Updatable {
 
-    /**
-     * The version of this class. Should be changed every time
-     * this class is modified.
-     */
-    private static final long serialVersionUID = 3L;
+
+    /** Serial version. */
+    private static final long serialVersionUID = 5571419346674454606L;
+    
     /**
      * tab component which adds a new tab if clicked.
      */
     private AddTabComponent addTabComponent;
+    
     /**
      * A listener which triggers if a tab is changed and then adjusts the
      * state of the drawUnproper menu item in the mainframe to match the
@@ -85,18 +85,22 @@ public class ISGCITabbedPane extends JTabbedPane implements Updatable {
             }
         }
     };
+    
     /**
      * The mode which indicates the default preferred name of a Node.
      */
     private Algo.NamePref defaultMode = UserSettings.getDefaultNamingPref();
+    
     /**
      * A popup menu which is shown after right-clicking an edge.
      */
     private EdgePopup edgePopup;
+    
     /**
      * The reference to the mainframe that contains this panel.
      */
     private ISGCIMainFrame mainframe;
+    
     /**
      * A mouse listener.
      * On right-click it opens a popup window if the clicked object is a node
@@ -151,8 +155,6 @@ public class ISGCITabbedPane extends JTabbedPane implements Updatable {
             }
         }
 
-        ;
-
         @Override
         public void mousePressed(MouseEvent e) {
             if (getTabComponentAt(getSelectedIndex())
@@ -161,16 +163,21 @@ public class ISGCITabbedPane extends JTabbedPane implements Updatable {
             }
         }
     };
+    
+    /** Naming exceptions. */
     private Object[] namingException = new Object[0];
+    
     /**
      * A popup menu which is shown after right-clicking a node.
      */
     private NodePopup nodePopup;
+    
     /**
      * Maps the tab to their corresponding drawUnproper state.
      */
     private HashMap<JComponent, Boolean> panelToDrawUnproper
             = new HashMap<JComponent, Boolean>();
+    
     /**
      * Maps the content of the tabs to their corresponding
      * DrawingLibraryInterface.
@@ -187,7 +194,8 @@ public class ISGCITabbedPane extends JTabbedPane implements Updatable {
     /**
      * Creates a new Tabbed pane with a startpage as only active tab.
      *
-     * @param parent The reference to the ISGCIMainFrame that contains this pane.
+     * @param parent The reference to the ISGCIMainFrame that 
+     *               contains this pane.
      */
     public ISGCITabbedPane(ISGCIMainFrame parent) {
         mainframe = parent;
@@ -233,10 +241,12 @@ public class ISGCITabbedPane extends JTabbedPane implements Updatable {
      * @param <V>              The class of the vertex.
      * @param <E>              The class of the edge.
      * @param name             The name of the Tab
-     * @param m                The chosen mode (with subclasses or superclasses or both).
+     * @param m                The chosen mode (with subclasses or 
+     *                         superclasses or both).
      *                         Null if no mode was chosen.
-     * @param namingExceptions The names of these nodes won't be changed according to the
-     *                         naming preferences, in the initial layout.
+     * @param namingExceptions The names of these nodes won't be changed 
+     *                         according to the naming preferences, in the 
+     *                         initial layout.
      */
     public <V, E> void drawInActiveTab(Graph<V, E> graph, String name
             , Mode m, Object[] namingExceptions) {
@@ -257,7 +267,8 @@ public class ISGCITabbedPane extends JTabbedPane implements Updatable {
      * @param m     The chosen mode (with subclasses or superclasses or both).
      *              Null if no mode was chosen.
      */
-    public <V, E> void drawInActiveTab(Graph<V, E> graph, String name, Mode m) {
+    public <V, E> void drawInActiveTab(Graph<V, E> graph, 
+            String name, Mode m) {
         if (getSelectedComponent() == null || getTabCount() == 1
                 || getTabComponentAt(getSelectedIndex())
                 instanceof AddTabComponent) {
@@ -311,12 +322,14 @@ public class ISGCITabbedPane extends JTabbedPane implements Updatable {
      *
      * @param <V>              The class of the vertices.
      * @param <E>              The class of the edges.
-     * @param graph            The graph that will be drawn and interacted with within
-     *                         this tab.
+     * @param graph            The graph that will be drawn and 
+     *                         interacted with within this tab.
      * @param name             The name of the Tab
-     * @param m                The chosen mode (with subclasses or superclasses or both)
-     * @param namingExceptions The names of these nodes won't be changed according to the
-     *                         naming preferences, in the initial layout.
+     * @param m                The chosen mode (with subclasses or 
+     *                         superclasses or both)
+     * @param namingExceptions The names of these nodes won't be changed 
+     *                         according to the naming preferences, in the 
+     *                         initial layout.
      */
     public <V, E> void drawInNewTab(Graph<V, E> graph, String name
             , Mode m, Object[] namingExceptions) {
@@ -645,8 +658,8 @@ public class ISGCITabbedPane extends JTabbedPane implements Updatable {
 
 
         // Color all lists with their color
-        GraphManipulationInterface gmi
-                = getActiveDrawingLibraryInterface().getGraphManipulationInterface();
+        GraphManipulationInterface gmi = getActiveDrawingLibraryInterface()
+                .getGraphManipulationInterface();
 
         gmi.beginNotUndoable();
         gmi.beginUpdate();
@@ -696,10 +709,12 @@ public class ISGCITabbedPane extends JTabbedPane implements Updatable {
         }
         if (markEdges.size() > 0) {
             getActiveDrawingLibraryInterface().
-                    getGraphManipulationInterface().markEdge(markEdges.toArray());
+                    getGraphManipulationInterface()
+                    .markEdge(markEdges.toArray());
         } else if (unmarkEdges.size() > 0) {
             getActiveDrawingLibraryInterface().
-                    getGraphManipulationInterface().unmarkEdge(unmarkEdges.toArray());
+                    getGraphManipulationInterface()
+                    .unmarkEdge(unmarkEdges.toArray());
         }
     }
 

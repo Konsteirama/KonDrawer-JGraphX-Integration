@@ -191,7 +191,7 @@ public class JGraphXAdapter<V, E> extends mxGraph implements
                 V target = graphT.getEdgeTarget(edge);
                 if (source instanceof Set && target instanceof Set) {
                     returnValue += ((Set) source).iterator().next().toString();
-                    returnValue += "->";
+                    returnValue += " \u21A6 ";
                     returnValue += ((Set) target).iterator().next().toString();
                 }
             } else if (cellToVertexMap.containsKey(cell)) {
@@ -280,8 +280,8 @@ public class JGraphXAdapter<V, E> extends mxGraph implements
     /**
      * Draws a new egde into the graph.
      *
-     * @param edge edge to be added to the graph. Source and target vertices are
-     *             needed.
+     * @param edge 
+     * edge to be added to the graph. Source and target vertices are needed.
      */
     private void addJGraphTEdge(E edge) {
 

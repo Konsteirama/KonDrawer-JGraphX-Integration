@@ -49,6 +49,9 @@ import teo.isgci.xml.GraphMLWriter;
  */
 public class ISGCIMainFrame extends JFrame implements WindowListener {
 
+    /** Serial version. */
+    private static final long serialVersionUID = 1810764243275425573L;
+
     /**
      * The applicationname displayed in the titlebar.
      */
@@ -63,11 +66,6 @@ public class ISGCIMainFrame extends JFrame implements WindowListener {
      * The location where new mainframes will be positioned.
      */
     private static final Point MAINPOSITION = new Point(20, 20);
-    
-    /**
-     * This should change each time the mainframe is changed.
-     */
-    private static final long serialVersionUID = 1L;
     
     /**
      * Needed for MediaTracker (hack).

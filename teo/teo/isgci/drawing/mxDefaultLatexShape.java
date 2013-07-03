@@ -1,3 +1,13 @@
+/*
+ * Draws a node with a latexlabel.
+ *
+ * $Header$
+ *
+ * This file is part of the Information System on Graph Classes and their
+ * Inclusions (ISGCI) at http://www.graphclasses.org.
+ * Email: isgci@graphclasses.org
+ */
+
 package teo.isgci.drawing;
 
 import java.awt.Color;
@@ -13,10 +23,12 @@ import com.mxgraph.util.mxConstants;
 import com.mxgraph.util.mxUtils;
 import com.mxgraph.view.mxCellState;
 
+/**
+ * Draws a node with a latexlabel.
+ */
 public class mxDefaultLatexShape implements mxITextShape {
-    /**
-     *
-     */
+    
+    @Override
     public void paintShape(mxGraphics2DCanvas canvas, String text,
                            mxCellState state, Map<String, Object> style) {
         Rectangle rect = state.getLabelBounds().getRectangle();
@@ -60,7 +72,8 @@ public class mxDefaultLatexShape implements mxITextShape {
                     .getMaxAscent();
 
             Object vertAlign = mxUtils.getString(style,
-                    mxConstants.STYLE_VERTICAL_ALIGN, mxConstants.ALIGN_MIDDLE);
+                    mxConstants.STYLE_VERTICAL_ALIGN, 
+                    mxConstants.ALIGN_MIDDLE);
             double vertAlignProportion = 0.5;
 
             if (vertAlign.equals(mxConstants.ALIGN_TOP)) {
@@ -82,7 +95,7 @@ public class mxDefaultLatexShape implements mxITextShape {
             }
             int dx = 0;
 
-            int sw = lightweightLatexLabel.getSharedInstance()
+            int sw = LightweightLatexLabel.getSharedInstance()
                     .getLatexWidth(g, text);
 
             if (align.equals(mxConstants.ALIGN_CENTER)) {
@@ -95,13 +108,13 @@ public class mxDefaultLatexShape implements mxITextShape {
                 dx = ((horizontal) ? w : h) - sw;
             }
 
-            lightweightLatexLabel.getSharedInstance().drawLatexString(g,
+            LightweightLatexLabel.getSharedInstance().drawLatexString(g,
                     text, x + dx, y);
         }
     }
 
     /**
-     * Hook to add functionality after a line has been drawn
+     * Hook to add functionality after a line has been drawn.
      *
      * @param text   the entire label text
      * @param line   the line at the specified location
@@ -110,7 +123,9 @@ public class mxDefaultLatexShape implements mxITextShape {
      * @param x      the x co-ord of the baseline of the text line
      * @param y      the y co-ord of the baseline of the text line
      */
-    protected void postProcessLine(String text, String line, FontMetrics fm, mxGraphics2DCanvas canvas, int x, int y) {
+    protected void postProcessLine(String text, String line, 
+            FontMetrics fm, mxGraphics2DCanvas canvas, int x, int y) {
     }
 }
 
+/* EOF */

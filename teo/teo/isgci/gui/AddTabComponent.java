@@ -70,15 +70,14 @@ import org.jgrapht.graph.DefaultEdge;
  * a JButton to close the tab it belongs to.
  */
 public class AddTabComponent extends JPanel {
-    /**
-     * Should be changed every time the class is changed.
-     */
-    private static final long serialVersionUID = 1L;
     
+    /** Serial version. */
+    private static final long serialVersionUID = 1691394458932685270L;
+
     /** Parent. */
     private final JTabbedPane parent;
     
-    /** mainframe */
+    /** mainframe. */
     private final ISGCIMainFrame mainframe;
     
     /** 

@@ -13,17 +13,13 @@ package teo.isgci.drawing;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseWheelEvent;
 
-import com.mxgraph.swing.mxGraphComponent;
-
 /**
  * Internal mouse adapter for double and right click support.
+ * @param <V> Vertexclass
+ * @param <E> Edgeclass
  */
 class InternalMouseAdapter<V, E> extends MouseAdapter {
 
-    /**
-     * the actual canvas.
-     */
-    private mxGraphComponent graphComponent;
     /**
      * The parent object.
      */
@@ -32,12 +28,10 @@ class InternalMouseAdapter<V, E> extends MouseAdapter {
     /**
      * Constructor of the InternalMouseAdapter.
      *
-     * @param pGraphComponent    : The actual canvas
      * @param pGraphManipulation : The Interface to interact with the canvas
      */
-    protected InternalMouseAdapter(mxGraphComponent pGraphComponent,
-                                   GraphManipulation<V, E> pGraphManipulation) {
-        this.graphComponent = pGraphComponent;
+    protected InternalMouseAdapter(
+            GraphManipulation<V, E> pGraphManipulation) {
         this.graphManipulation = pGraphManipulation;
     }
 

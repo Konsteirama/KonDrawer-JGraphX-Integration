@@ -32,31 +32,35 @@ import teo.isgci.util.UserSettings;
  * and the current DrawingLibraryInterface.
  */
 public class ISGCIToolBar extends JToolBar {
+    /** Serial version. */
+    private static final long serialVersionUID = 3213244622786066394L;
+
     /**
      * Name for no selected problem.
      */
     private static final String NOPROBLEMSELECTED = "None";
-    /**
-     * Change this every time this class is changed.
-     */
-    private static final long serialVersionUID = 5L;
+
     /**
      * Reference to parent-ISGCI Mainframe for opening dialogs etc.
      */
     private ISGCIMainFrame mainframe;
+    
     /**
      * Problem combobox, reference here to set the currently active problem.
      */
     private JComboBox problemBox;
+    
     /**
      * Redo button, reference here to disable/enable.
      */
     private JButton redoButton;
+    
     /**
      * True if user changes problembox, false if it was checked via
      * {@link setProblem}.
      */
     private boolean setProblem = true;
+    
     /**
      * Undo button, reference here to disable/enable.
      */

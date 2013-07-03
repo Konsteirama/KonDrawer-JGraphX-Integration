@@ -120,6 +120,10 @@ class GraphManipulation<V, E> implements GraphManipulationInterface<V, E> {
      * Manages the undo-operations on the calling graph.
      */
     private mxUndoManager undoManager;
+    
+    /**
+     * Handles showing the minimap on zoom or hiding it.
+     */
     private ComponentListener zoomListener = new ComponentListener() {
 
         @Override
@@ -145,7 +149,8 @@ class GraphManipulation<V, E> implements GraphManipulationInterface<V, E> {
      * class that operates on a given graphComponent from the given
      * JGraphXInterface.
      *
-     * @param drawingLibraryInterface The drawingLibraryInterface from which this object originated
+     * @param drawingLibraryInterface The drawingLibraryInterface from 
+     *                                which this object originated
      */
     public GraphManipulation(
             JGraphXInterface<V, E> drawingLibraryInterface) {
@@ -181,7 +186,8 @@ class GraphManipulation<V, E> implements GraphManipulationInterface<V, E> {
      */
     public void applyZoomSettings() {
         // check minimap visibility
-        mxGraphView view = drawingLibrary.getGraphComponent().getGraph().getView();
+        mxGraphView view = drawingLibrary.getGraphComponent()
+                .getGraph().getView();
 
         // Get the component and view heights/widths
         int compWidth = drawingLibrary.getGraphComponent().getWidth();
@@ -301,7 +307,8 @@ class GraphManipulation<V, E> implements GraphManipulationInterface<V, E> {
 
     @Override
     public double getZoomLevel() {
-        return drawingLibrary.getGraphComponent().getGraph().getView().getScale();
+        return drawingLibrary.getGraphComponent().getGraph()
+                .getView().getScale();
     }
 
     @Override
@@ -403,7 +410,8 @@ class GraphManipulation<V, E> implements GraphManipulationInterface<V, E> {
     public void removeHighlightedNodes() {
         // get a copy of the list before removing everything
         List<mxICell> cells
-                = new ArrayList<mxICell>(highlightedCellsColor.keySet().size());
+                = new ArrayList<mxICell>(highlightedCellsColor
+                        .keySet().size());
 
         for (mxICell cell : highlightedCellsColor.keySet()) {
             cells.add(cell);
@@ -604,7 +612,8 @@ class GraphManipulation<V, E> implements GraphManipulationInterface<V, E> {
 
         // build difference between old cells and new cells
         Object[] newCells
-                = drawingLibrary.getGraphComponent().getGraph().getSelectionCells();
+                = drawingLibrary.getGraphComponent()
+                        .getGraph().getSelectionCells();
 
         // convert new cells to list
         List<mxICell> currentCells = new ArrayList<mxICell>(newCells.length);
@@ -674,7 +683,8 @@ class GraphManipulation<V, E> implements GraphManipulationInterface<V, E> {
 
     @Override
     public void zoomToFit() {
-        mxGraphView view = drawingLibrary.getGraphComponent().getGraph().getView();
+        mxGraphView view = drawingLibrary.getGraphComponent()
+                .getGraph().getView();
 
         // Get the component and view heights/widths
         int compWidth = drawingLibrary.getGraphComponent().getWidth();
@@ -696,6 +706,15 @@ class GraphManipulation<V, E> implements GraphManipulationInterface<V, E> {
         applyZoomSettings();
     }
 
+    /**
+     * Determines the viewBounds and returns it in a mxRectangle.
+     * @param cells
+     *          The cells which should be in view
+     * @param center
+     *          Whether to center the view
+     * @return
+     *          A mxRectangle where the view should be
+     */
     private mxRectangle determineViewBounds(mxICell[] cells, boolean center) {
 
         mxGraphComponent graphComponent = drawingLibrary.getGraphComponent();
@@ -707,10 +726,11 @@ class GraphManipulation<V, E> implements GraphManipulationInterface<V, E> {
         mxRectangle rect = null;
 
         for (mxICell cell : cells) {
-            if (rect == null)
+            if (rect == null) {
                 rect = getGraphAdapter().getCellBounds(cell);
-            else
+            } else {
                 rect.add(getGraphAdapter().getCellBounds(cell));
+            }
         }
 
         if (center) {
@@ -929,7 +949,8 @@ class GraphManipulation<V, E> implements GraphManipulationInterface<V, E> {
     /**
      * Unhighlights all nodes.
      *
-     * @param clear Determines whether or not highlighting depth should be deleted.
+     * @param clear Determines whether or not highlighting depth 
+     *              should be deleted.
      *              Use false if this method is followed by reapplyHighlighting
      */
     private void unHighlightAll(boolean clear) {

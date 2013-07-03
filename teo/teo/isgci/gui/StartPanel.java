@@ -64,6 +64,13 @@ class StartPanel extends JPanel {
      */
     private static final String NEWSPAGE
             = "http://www.graphclasses.org/new-app.html";
+    
+    /**
+     * The error that is printed if automatic mousemovement fails.
+     */
+    private static final String MOUSEERROR = "Error while controlling the "
+                                           + "mouse - Aborting!";
+    
     /**
      * Should be changed each time this class changes.
      */
@@ -156,10 +163,10 @@ class StartPanel extends JPanel {
         JButton button = IconButtonFactory.createImageButton(
                 IconButtonFactory.TIP_ICON,
                 "<html> <br/> Look at the boundary of a   <br/>"
-                        + "problem <br/>  <br/> </html>",
+                + "problem <br/>  <br/> </html>",
                 "Guides you through the process of looking at the "
-                        + "boundary of a problem. Will take over "
-                        + "your mouse for a short time!");
+                + "boundary of a problem. Will take over "
+                + "your mouse for a short time!");
 
         button.addActionListener(new ActionListener() {
 
@@ -178,7 +185,8 @@ class StartPanel extends JPanel {
                     graphMenu.doClick(1);
                     mouseRobot.delay(CLICKDELAY);
                 } catch (Exception ex) {
-                    // ignoring exception
+                    System.err.println(MOUSEERROR);
+                    return;
                 }
                 // let the ui build the dialog
                 SwingUtilities.invokeLater(new Runnable() {
@@ -192,7 +200,8 @@ class StartPanel extends JPanel {
 
                             moveMouseTo(mouseRobot, problemItem);
                         } catch (Exception ex) {
-                            // ignoring exception
+                            System.err.println(MOUSEERROR);
+                            return;
                         }
                     }
                 });
@@ -213,10 +222,10 @@ class StartPanel extends JPanel {
         JButton button = IconButtonFactory.createImageButton(
                 IconButtonFactory.TIP_ICON,
                 "<html> <br/> Determine common super- and <br/> "
-                        + "subclasses of two classes <br/> <br/> </html>",
+                + "subclasses of two classes <br/> <br/> </html>",
                 "Guides you through the process of determining "
-                        + "super- and subclasses of two classes. Will take over "
-                        + "your mouse for a short time!");
+                + "super- and subclasses of two classes. Will take over "
+                + "your mouse for a short time!");
 
         button.addActionListener(new ActionListener() {
 
@@ -236,7 +245,8 @@ class StartPanel extends JPanel {
                     graphMenu.doClick(1);
                     mouseRobot.delay(CLICKDELAY);
                 } catch (Exception ex) {
-                    // ignoring exception
+                    System.err.println(MOUSEERROR);
+                    return;
                 }
 
                 // let the ui build the dialog
@@ -254,7 +264,8 @@ class StartPanel extends JPanel {
                             mouseRobot.delay(CLICKDELAY);
                             inclusionProblem.doClick(1);
                         } catch (Exception ex) {
-                            // ignoring exception
+                            System.err.println(MOUSEERROR);
+                            return;
                         }
                     }
                 });
@@ -276,10 +287,10 @@ class StartPanel extends JPanel {
         JButton button = IconButtonFactory.createImageButton(
                 IconButtonFactory.TIP_ICON,
                 "<html> <br/> Draw a hierarchy of super-  <br/> "
-                        + "and/or subclasses <br/> <br/> </html>",
+                + "and/or subclasses <br/> <br/> </html>",
                 "Guides you through the process of drawing a hierarchy of "
-                        + "super- and/or subclasses of some class(es). Will take over "
-                        + "your mouse for a short time!");
+                + "super- and/or subclasses of some class(es). Will take over "
+                + "your mouse for a short time!");
 
         button.addActionListener(new ActionListener() {
             @Override
@@ -298,7 +309,8 @@ class StartPanel extends JPanel {
                     graphMenu.doClick(1);
                     mouseRobot.delay(CLICKDELAY);
                 } catch (Exception ex) {
-                    // ignoring exception
+                    System.err.println(MOUSEERROR);
+                    return;
                 }
                 // let the ui build the dialog
                 SwingUtilities.invokeLater(new Runnable() {
@@ -315,7 +327,8 @@ class StartPanel extends JPanel {
                             mouseRobot.delay(CLICKDELAY);
                             drawItem.doClick(1);
                         } catch (Exception e) {
-                            // ignoring exception
+                            System.err.println(MOUSEERROR);
+                            return;
                         }
                     }
                 });
@@ -338,10 +351,10 @@ class StartPanel extends JPanel {
         JButton button = IconButtonFactory.createImageButton(
                 IconButtonFactory.TIP_ICON,
                 "<html> <br/> Find the inclusion relation <br/> "
-                        + "between two classes <br/>  <br/> </html>",
+                + "between two classes <br/>  <br/> </html>",
                 "Guides you through the process of determining the "
-                        + "inclusion relation between two classes. Will take over "
-                        + "your mouse for a short time!");
+                + "inclusion relation between two classes. Will take over "
+                + "your mouse for a short time!");
 
         button.addActionListener(new ActionListener() {
 
@@ -361,7 +374,8 @@ class StartPanel extends JPanel {
                     graphMenu.doClick(1);
                     mouseRobot.delay(CLICKDELAY);
                 } catch (Exception ex) {
-                    // ignoring exception
+                    System.err.println(MOUSEERROR);
+                    return;
                 }
 
                 // let the ui build the dialog
@@ -379,7 +393,8 @@ class StartPanel extends JPanel {
                             mouseRobot.delay(CLICKDELAY);
                             inclusionProblem.doClick(1);
                         } catch (Exception ex) {
-                            // ignoring exception
+                            System.err.println(MOUSEERROR);
+                            return;
                         }
                     }
                 });

@@ -11,33 +11,12 @@
 
 package teo.isgci.drawing;
 
-import com.mxgraph.canvas.mxGraphics2DCanvas;
-import com.mxgraph.canvas.mxICanvas;
-import com.mxgraph.canvas.mxSvgCanvas;
-import com.mxgraph.model.mxICell;
-import com.mxgraph.swing.handler.mxCellHandler;
-import com.mxgraph.swing.handler.mxPanningHandler;
-import com.mxgraph.swing.mxGraphComponent;
-import com.mxgraph.swing.mxGraphOutline;
-import com.mxgraph.util.*;
-import com.mxgraph.util.mxCellRenderer.CanvasFactory;
-import com.mxgraph.view.mxCellState;
-import com.mxgraph.view.mxGraph;
-
-import net.sf.epsgraphics.ColorMode;
-import net.sf.epsgraphics.EpsGraphics;
-
-import org.jgrapht.Graph;
-import org.jgrapht.ext.GraphMLExporter;
-import org.xml.sax.SAXException;
-
-import teo.isgci.util.SVGLatexConverter;
-
-import javax.imageio.ImageIO;
-import javax.swing.*;
-import javax.xml.transform.TransformerConfigurationException;
-
-import java.awt.*;
+import java.awt.Cursor;
+import java.awt.Dimension;
+import java.awt.Graphics2D;
+import java.awt.Image;
+import java.awt.Point;
+import java.awt.Toolkit;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseWheelEvent;
@@ -52,6 +31,38 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
+
+import javax.imageio.ImageIO;
+import javax.swing.JComponent;
+import javax.swing.JScrollBar;
+import javax.xml.transform.TransformerConfigurationException;
+
+import net.sf.epsgraphics.ColorMode;
+import net.sf.epsgraphics.EpsGraphics;
+
+import org.jgrapht.Graph;
+import org.jgrapht.ext.GraphMLExporter;
+import org.xml.sax.SAXException;
+
+import teo.isgci.util.SVGLatexConverter;
+
+import com.mxgraph.canvas.mxGraphics2DCanvas;
+import com.mxgraph.canvas.mxICanvas;
+import com.mxgraph.canvas.mxSvgCanvas;
+import com.mxgraph.model.mxICell;
+import com.mxgraph.swing.mxGraphComponent;
+import com.mxgraph.swing.mxGraphOutline;
+import com.mxgraph.swing.handler.mxCellHandler;
+import com.mxgraph.swing.handler.mxPanningHandler;
+import com.mxgraph.util.mxCellRenderer;
+import com.mxgraph.util.mxCellRenderer.CanvasFactory;
+import com.mxgraph.util.mxConstants;
+import com.mxgraph.util.mxDomUtils;
+import com.mxgraph.util.mxPoint;
+import com.mxgraph.util.mxUtils;
+import com.mxgraph.util.mxXmlUtils;
+import com.mxgraph.view.mxCellState;
+import com.mxgraph.view.mxGraph;
 
 /**
  * The actual implementation of a DrawingLibraryInterface,
@@ -102,11 +113,16 @@ class JGraphXInterface<V, E> implements DrawingLibraryInterface<V, E> {
 
     static {
         mxUtils.setDefaultTextRenderer(
-                lightweightLatexLabel.getSharedInstance());
+                LightweightLatexLabel.getSharedInstance());
         mxGraphics2DCanvas.putTextShape(mxGraphics2DCanvas.TEXT_SHAPE_DEFAULT,
                 new mxDefaultLatexShape());
     }
 
+    /**
+     * Creates a new JGraphXInterface with which ISGCI can interact
+     * with the JGraphX library without needing to reference it directly.
+     * @param g The graph which should be visualized
+     */
     public JGraphXInterface(Graph<V, E> g) {
         // Convert to JGraphT-Graph
         graphAdapter = createNewAdapter(g);
@@ -118,6 +134,9 @@ class JGraphXInterface<V, E> implements DrawingLibraryInterface<V, E> {
         // implementation so the users are not required to hold down shift
         // and ctrl
         graphComponent = new mxGraphComponent(graphAdapter) {
+
+            /** Serial version. */
+            private static final long serialVersionUID = 1L;
 
             @Override
             public boolean isPanningEvent(MouseEvent event) {
@@ -155,8 +174,7 @@ class JGraphXInterface<V, E> implements DrawingLibraryInterface<V, E> {
         graphComponent.getViewport().setOpaque(true);
 
         graphEvent.registerMouseAdapter(
-                new InternalMouseAdapter<V, E>(graphComponent,
-                        graphManipulation));
+                new InternalMouseAdapter<V, E>(graphManipulation));
 
         graphManipulation.endNotUndoable();
 
@@ -569,7 +587,7 @@ class JGraphXInterface<V, E> implements DrawingLibraryInterface<V, E> {
 
         graphComponent.setGraph(graphAdapter);
 
-        graphManipulation = new GraphManipulation(this);
+        graphManipulation = new GraphManipulation<V, E>(this);
 
         graphManipulation.beginNotUndoable();
         graphManipulation.reapplyHierarchicalLayout();
