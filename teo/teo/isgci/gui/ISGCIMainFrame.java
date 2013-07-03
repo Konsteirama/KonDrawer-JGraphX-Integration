@@ -12,6 +12,7 @@ package teo.isgci.gui;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
+import java.awt.Dimension;
 import java.awt.Point;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -174,6 +175,10 @@ public class ISGCIMainFrame extends JFrame implements WindowListener {
         setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
         addWindowListener(this);
         
+        // preferredsize.height is too small, so we need to add 20
+        Dimension prefSize = getPreferredSize();
+        setMinimumSize(new Dimension(prefSize.width, prefSize.height + 20));
+
         setLocation(MAINPOSITION);
         pack();
         setVisible(true);
