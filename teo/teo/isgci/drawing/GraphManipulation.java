@@ -49,10 +49,6 @@ import teo.isgci.util.UserSettings;
 class GraphManipulation<V, E> implements GraphManipulationInterface<V, E> {
 
     /**
-     * How far the user can zoom in.
-     */
-    private static final double MAXZOOMLEVEL = 8;
-    /**
      * Defines the original edge color.
      */
     private static final Color EDGECOLOR = new Color(100, 130, 185);
@@ -61,17 +57,51 @@ class GraphManipulation<V, E> implements GraphManipulationInterface<V, E> {
      */
     private static final Color MARKEDCOLOR = Color.black;
     /**
-     * Defines the color that should be used for highlighting.
+     * How far the user can zoom in.
      */
-    private Color highlightColor;
-    /**
-     * Defines the color that should be used for selection.
-     */
-    private Color selectionColor;
+    private static final double MAXZOOMLEVEL = 8;
     /**
      * Defines the thickness for highlighting.
      */
     private String cellThickness = "4";
+    /**
+     * How deep the children were highlighted.
+     */
+    private HashMap<mxICell, Integer> childHighlightingDepth
+            = new HashMap<mxICell, Integer>();
+    /**
+     * The parent interface from which this object was created.
+     */
+    private JGraphXInterface<V, E> drawingLibrary;
+    /**
+     * Defines the color that should be used for highlighting.
+     */
+    private Color highlightColor;
+    /**
+     * Currently highlighted cells with their previous color.
+     */
+    private HashMap<mxICell, Color> highlightedCellsColor;
+    /**
+     * Currently highlighted cells with their previous thickness.
+     */
+    private HashMap<mxICell, String> highlightedCellsThickness;
+    /**
+     * How deep the parents were highlighted.
+     */
+    private HashMap<mxICell, Integer> parentHighlightingDepth
+            = new HashMap<mxICell, Integer>();
+    /**
+     * Defines whether or not the undoHandler should record actions.
+     */
+    private int recordUndoableActions;
+    /**
+     * List of currently selected cells.
+     */
+    private List<mxICell> selectedCells;
+    /**
+     * Defines the color that should be used for selection.
+     */
+    private Color selectionColor;
     /**
      * Handles undo events in jgraphx.
      */
@@ -83,10 +113,18 @@ class GraphManipulation<V, E> implements GraphManipulationInterface<V, E> {
             }
         }
     };
+    /**
+     * Manages the undo-operations on the calling graph.
+     */
+    private mxUndoManager undoManager;
     private ComponentListener zoomListener = new ComponentListener() {
 
         @Override
-        public void componentShown(ComponentEvent e) {
+        public void componentHidden(ComponentEvent e) {
+        }
+
+        @Override
+        public void componentMoved(ComponentEvent e) {
         }
 
         @Override
@@ -95,47 +133,9 @@ class GraphManipulation<V, E> implements GraphManipulationInterface<V, E> {
         }
 
         @Override
-        public void componentMoved(ComponentEvent e) {
-        }
-
-        @Override
-        public void componentHidden(ComponentEvent e) {
+        public void componentShown(ComponentEvent e) {
         }
     };
-    /**
-     * Defines whether or not the undoHandler should record actions.
-     */
-    private int recordUndoableActions;
-    /**
-     * The parent interface from which this object was created.
-     */
-    private JGraphXInterface<V, E> drawingLibrary;
-    /**
-     * Manages the undo-operations on the calling graph.
-     */
-    private mxUndoManager undoManager;
-    /**
-     * Currently highlighted cells with their previous color.
-     */
-    private HashMap<mxICell, Color> highlightedCellsColor;
-    /**
-     * Currently highlighted cells with their previous thickness.
-     */
-    private HashMap<mxICell, String> highlightedCellsThickness;
-    /**
-     * List of currently selected cells.
-     */
-    private List<mxICell> selectedCells;
-    /**
-     * How deep the parents were highlighted.
-     */
-    private HashMap<mxICell, Integer> parentHighlightingDepth
-            = new HashMap<mxICell, Integer>();
-    /**
-     * How deep the children were highlighted.
-     */
-    private HashMap<mxICell, Integer> childHighlightingDepth
-            = new HashMap<mxICell, Integer>();
 
     /**
      * Constructor of the class. Creates an instance of the GraphManipulation
@@ -170,408 +170,6 @@ class GraphManipulation<V, E> implements GraphManipulationInterface<V, E> {
         highlightedCellsColor = new HashMap<mxICell, Color>();
         highlightedCellsThickness = new HashMap<mxICell, String>();
         selectedCells = new ArrayList<mxICell>();
-    }
-
-    /**
-     * Unregisters all eventlisteners.
-     */
-    public void unregisterEventListener() {
-        drawingLibrary.getGraphComponent().getGraph().getModel()
-                .removeListener(undoHandler, mxEvent.UNDO);
-        drawingLibrary.getGraphComponent().getGraph().getView().removeListener(
-                undoHandler, mxEvent.UNDO);
-
-        drawingLibrary.getGraphComponent()
-                .removeComponentListener(zoomListener);
-    }
-
-    /**
-     * Returns the current graph adapter.
-     *
-     * @return The current graph adapter
-     */
-    private JGraphXAdapter<V, E> getGraphAdapter() {
-        return (JGraphXAdapter<V, E>) drawingLibrary
-                .getGraphComponent().getGraph();
-    }
-
-    /**
-     * Returns the cell associated with the given node.
-     *
-     * @param node The node for which the cell should be returned
-     * @return The cell associated with the node
-     */
-    private mxICell getCellFromNode(V node) {
-        return getGraphAdapter().getVertexToCellMap().get(node);
-    }
-
-    /**
-     * Returns the cell associated with the given edge.
-     *
-     * @param edge The edge for which the cell should be returned
-     * @return The cell associated with the edge
-     */
-    private mxICell getCellFromEdge(E edge) {
-        return getGraphAdapter().getEdgeToCellMap().get(edge);
-    }
-
-    /**
-     * Returns the cells associated with the given nodes.
-     *
-     * @param nodes The nodes for which the cells should be returned
-     * @return The cells associated with the nodes
-     */
-    private mxICell[] getCellsFromNodes(V[] nodes) {
-        mxICell[] cells = new mxICell[nodes.length];
-        for (int i = 0; i < nodes.length; i++) {
-            cells[i] = getCellFromNode(nodes[i]);
-        }
-        return cells;
-    }
-
-    /**
-     * Returns the cells associated with the given edges.
-     *
-     * @param edges The edges for which the cells should be returned
-     * @return The cells associated with the edges
-     */
-    private mxICell[] getCellsFromEdges(E[] edges) {
-        mxICell[] cells = new mxICell[edges.length];
-        for (int i = 0; i < edges.length; i++) {
-            cells[i] = getCellFromEdge(edges[i]);
-        }
-        return cells;
-    }
-
-    @Override
-    public boolean canRedo() {
-        return undoManager.canRedo();
-    }
-
-    @Override
-    public boolean canUndo() {
-        return undoManager.canUndo();
-    }
-
-    @Override
-    public void centerNode(V node) {
-        drawingLibrary.getGraphComponent().scrollCellToVisible(
-                getCellFromNode(node), true);
-    }
-
-    @Override
-    public void centerNodes(V[] nodes) {
-
-        mxGraphComponent graphComponent = drawingLibrary.getGraphComponent();
-
-        mxRectangle bounds = determineViewBounds(getCellsFromNodes(nodes),
-                true);
-
-        graphComponent.getGraphControl()
-                .scrollRectToVisible(bounds.getRectangle());
-    }
-
-    private mxRectangle determineViewBounds(mxICell[] cells, boolean center) {
-
-        mxGraphComponent graphComponent = drawingLibrary.getGraphComponent();
-
-        if (cells == null || cells.length == 0) {
-            return null;
-        }
-
-        mxRectangle rect = null;
-
-        for (mxICell cell : cells) {
-            if (rect == null)
-                rect = getGraphAdapter().getCellBounds(cell);
-            else
-                rect.add(getGraphAdapter().getCellBounds(cell));
-        }
-
-        if (center) {
-
-            rect = (mxRectangle) rect.clone();
-
-            rect.setX(rect.getCenterX() - graphComponent.getWidth() / 2);
-            rect.setWidth(graphComponent.getWidth());
-            rect.setY(rect.getCenterY() - graphComponent.getHeight() / 2);
-            rect.setHeight(graphComponent.getHeight());
-        }
-        return rect;
-    }
-
-    @Override
-    public void colorNode(V[] nodes, Color color) {
-
-        mxGraph graph = drawingLibrary.getGraphComponent().getGraph();
-
-        beginUpdate();
-        try {
-            graph.setCellStyles(mxConstants.STYLE_FILLCOLOR,
-                    mxUtils.hexString(color), getCellsFromNodes(nodes));
-        } finally {
-            endUpdate();
-        }
-    }
-
-    @Override
-    public void setFontColor(Color color) {
-
-        mxGraph graph = drawingLibrary.getGraphComponent().getGraph();
-
-        beginUpdate();
-        try {
-
-            graph.setCellStyles(mxConstants.STYLE_FONTCOLOR,
-                    mxUtils.hexString(color),
-                    graph.getChildVertices(graph.getDefaultParent()));
-
-        } finally {
-            endUpdate();
-        }
-    }
-
-    @Override
-    public void setBackgroundColor(Color color) {
-        beginUpdate();
-        try {
-            drawingLibrary.getGraphComponent()
-                    .getViewport().setBackground(color);
-        } finally {
-            endUpdate();
-        }
-    }
-
-    @Override
-    public void markEdge(E[] edges) {
-        mxGraph graph = drawingLibrary.getGraphComponent().getGraph();
-        mxICell[] cells = getCellsFromEdges(edges);
-
-        beginUpdate();
-        try {
-            for (mxICell edge : cells) {
-                graph.setCellStyles(mxConstants.STYLE_STARTARROW,
-                        mxConstants.ARROW_CLASSIC, new Object[]{edge});
-
-                // update original values of highlighted cells
-                if (highlightedCellsColor.containsKey(edge)) {
-                    highlightedCellsColor.put(edge, MARKEDCOLOR);
-                } else { // or update cell directly
-                    graph.setCellStyles(mxConstants.STYLE_STROKECOLOR,
-                            mxUtils.hexString(MARKEDCOLOR),
-                            new Object[]{edge});
-                }
-            }
-        } finally {
-            endUpdate();
-        }
-    }
-
-    @Override
-    public void unmarkEdge(E[] edges) {
-        mxGraph graph = drawingLibrary.getGraphComponent().getGraph();
-        mxICell[] cells = getCellsFromEdges(edges);
-
-
-        beginUpdate();
-        try {
-            for (mxICell edge : cells) {
-
-                graph.setCellStyles(mxConstants.STYLE_STARTARROW, "",
-                        new Object[]{edge});
-
-                // update original values of highlighted cells and 
-                if (highlightedCellsColor.containsKey(edge)) {
-                    highlightedCellsColor.put(edge, EDGECOLOR);
-                } else { // or update cell directly
-                    graph.setCellStyles(mxConstants.STYLE_STROKECOLOR,
-                            mxUtils.hexString(EDGECOLOR),
-                            new Object[]{edge});
-                }
-            }
-        } finally {
-            endUpdate();
-        }
-    }
-
-    @Override
-    public void reapplyHierarchicalLayout() {
-        mxGraph graph = drawingLibrary.getGraphComponent().getGraph();
-
-        beginUpdate();
-        try {
-            mxHierarchicalLayout layout = new mxHierarchicalLayout(graph);
-            layout.setFineTuning(true);
-            layout.setInterHierarchySpacing(150);
-            layout.setInterRankCellSpacing(100);
-            layout.execute(graph.getDefaultParent());
-
-        } finally {
-            endUpdate();
-        }
-
-        applyZoomSettings();
-    }
-
-    @Override
-    public void redo() {
-        undoManager.redo();
-
-        applyZoomSettings();
-    }
-
-    @Override
-    public void removeNode(V node) {
-        mxGraph graph = drawingLibrary.getGraphComponent().getGraph();
-
-        Object[] cells = new Object[]{getCellFromNode(node)};
-
-        // Adds all edges connected to the node
-        cells = graph.addAllEdges(cells);
-
-        unHighlightNode(node);
-
-        beginUpdate();
-        try {
-            // Deletes every cell
-            for (Object object : cells) {
-                graph.getModel().remove(object);
-            }
-        } finally {
-            endUpdate();
-        }
-
-        applyZoomSettings();
-        updateSelectedCells();
-    }
-
-    /**
-     * Starts the recording of actions to the undo history.
-     */
-    @Override
-    public void endNotUndoable() {
-        recordUndoableActions--;
-    }
-
-    /**
-     * Stops the recording of actions to the undo history.
-     */
-    @Override
-    public void beginNotUndoable() {
-        recordUndoableActions++;
-    }
-
-    @Override
-    public void unHighlightAll() {
-        unHighlightAll(true);
-    }
-
-    @Override
-    public void unHighlightNode(V tnode) {
-        mxICell node = getCellFromNode(tnode);
-        parentHighlightingDepth.remove(node);
-        childHighlightingDepth.remove(node);
-
-        beginNotUndoable();
-        unHighlightAll(false);
-        reapplyHighlighting();
-        endNotUndoable();
-        
-        /*
-         * graphOutline sometimes won't take changes from this method, to
-         * ensure that it properly shows all changes it's visibility is 
-         * turned off and on again.
-         * FIXME graphOutline should react properly to this method
-         */
-        drawingLibrary.getGraphOutline().setVisible(false);
-        applyZoomSettings();
-    }
-
-    /**
-     * Call to start a block of updates.
-     */
-    @Override
-    public void beginUpdate() {
-        getGraphAdapter().getModel().beginUpdate();
-    }
-
-    /**
-     * Call to end and execute a block of updates.
-     */
-    @Override
-    public void endUpdate() {
-        getGraphAdapter().getModel().endUpdate();
-    }
-
-    @Override
-    public void renameNode(V node, String newName) {
-        mxGraph graph = drawingLibrary.getGraphComponent().getGraph();
-
-        mxICell cell = getCellFromNode(node);
-
-        graph.getModel().setValue(cell, newName);
-        graph.updateCellSize(cell);
-
-        applyZoomSettings();
-    }
-
-    @Override
-    public void undo() {
-        undoManager.undo();
-        applyZoomSettings();
-    }
-
-    @Override
-    public double getZoomLevel() {
-        return drawingLibrary.getGraphComponent().getGraph().getView().getScale();
-    }
-
-    @Override
-    public void zoomTo(double factor) {
-        factor = Math.min(MAXZOOMLEVEL, factor);
-
-        drawingLibrary.getGraphComponent().zoomTo(factor, true);
-
-        applyZoomSettings();
-    }
-
-    @Override
-    public void zoom(boolean zoomIn) {
-        drawingLibrary.getGraphComponent().setCenterZoom(true);
-
-        if (zoomIn) {
-            if (getZoomLevel() < MAXZOOMLEVEL) {
-                drawingLibrary.getGraphComponent().zoomIn();
-            }
-        } else {
-            drawingLibrary.getGraphComponent().zoomOut();
-        }
-
-        applyZoomSettings();
-    }
-
-    @Override
-    public void zoomToFit() {
-        mxGraphView view = drawingLibrary.getGraphComponent().getGraph().getView();
-
-        // Get the component and view heights/widths
-        int compWidth = drawingLibrary.getGraphComponent().getWidth();
-        int viewWidth = (int) view.getGraphBounds().getWidth();
-        int compHeight = drawingLibrary.getGraphComponent().getHeight();
-        int viewHeight = (int) view.getGraphBounds().getHeight();
-
-        double relWidth = (double) compWidth / viewWidth;
-        double relHeight = (double) compHeight / viewHeight;
-
-        // If the relative Width is greater than the rel. height
-        // set the scale to fit the width and vice versa
-        if (relWidth <= relHeight) {
-            view.setScale(relWidth * view.getScale());
-        } else {
-            view.setScale(relHeight * view.getScale());
-        }
-
-        applyZoomSettings();
     }
 
     /**
@@ -619,6 +217,180 @@ class GraphManipulation<V, E> implements GraphManipulationInterface<V, E> {
         endNotUndoable();
     }
 
+    /**
+     * Stops the recording of actions to the undo history.
+     */
+    @Override
+    public void beginNotUndoable() {
+        recordUndoableActions++;
+    }
+
+    /**
+     * Call to start a block of updates.
+     */
+    @Override
+    public void beginUpdate() {
+        getGraphAdapter().getModel().beginUpdate();
+    }
+
+    @Override
+    public boolean canRedo() {
+        return undoManager.canRedo();
+    }
+
+    @Override
+    public boolean canUndo() {
+        return undoManager.canUndo();
+    }
+
+    @Override
+    public void centerNode(V node) {
+        drawingLibrary.getGraphComponent().scrollCellToVisible(
+                getCellFromNode(node), true);
+    }
+
+    @Override
+    public void centerNodes(V[] nodes) {
+
+        mxGraphComponent graphComponent = drawingLibrary.getGraphComponent();
+
+        mxRectangle bounds = determineViewBounds(getCellsFromNodes(nodes),
+                true);
+
+        graphComponent.getGraphControl()
+                .scrollRectToVisible(bounds.getRectangle());
+    }
+
+    @Override
+    public void colorNode(V[] nodes, Color color) {
+
+        mxGraph graph = drawingLibrary.getGraphComponent().getGraph();
+
+        beginUpdate();
+        try {
+            graph.setCellStyles(mxConstants.STYLE_FILLCOLOR,
+                    mxUtils.hexString(color), getCellsFromNodes(nodes));
+        } finally {
+            endUpdate();
+        }
+    }
+
+    /**
+     * Starts the recording of actions to the undo history.
+     */
+    @Override
+    public void endNotUndoable() {
+        recordUndoableActions--;
+    }
+
+    /**
+     * Call to end and execute a block of updates.
+     */
+    @Override
+    public void endUpdate() {
+        getGraphAdapter().getModel().endUpdate();
+    }
+
+    @Override
+    public double getZoomLevel() {
+        return drawingLibrary.getGraphComponent().getGraph().getView().getScale();
+    }
+
+    @Override
+    public void highlightChildren(List<V> roots) {
+        beginNotUndoable();
+        for (V root : roots) {
+            mxICell mxRoot = getCellFromNode(root);
+
+            childHighlightingDepth.put(mxRoot,
+                    new Integer(childHighlightingDepth.get(mxRoot) + 1));
+            highlightChildren(root, childHighlightingDepth.get(mxRoot));
+        }
+        endNotUndoable();
+
+        /*
+         * graphOutline sometimes won't take changes from this method, to
+         * ensure that it properly shows all changes it's visibility is
+         * turned off and on again.
+         * FIXME graphOutline should react properly to this method
+         */
+        drawingLibrary.getGraphOutline().setVisible(false);
+        applyZoomSettings();
+    }
+
+    @Override
+    public void highlightParents(List<V> roots) {
+        beginNotUndoable();
+        for (V root : roots) {
+            mxICell mxRoot = getCellFromNode(root);
+
+            parentHighlightingDepth.put(mxRoot,
+                    new Integer(parentHighlightingDepth.get(mxRoot) + 1));
+            highlightParents(root, parentHighlightingDepth.get(mxRoot));
+        }
+        endNotUndoable();
+
+        /*
+         * graphOutline sometimes won't take changes from this method, to
+         * ensure that it properly shows all changes it's visibility is
+         * turned off and on again.
+         * FIXME graphOutline should react properly to this method
+         */
+        drawingLibrary.getGraphOutline().setVisible(false);
+        applyZoomSettings();
+    }
+
+    @Override
+    public void markEdge(E[] edges) {
+        mxGraph graph = drawingLibrary.getGraphComponent().getGraph();
+        mxICell[] cells = getCellsFromEdges(edges);
+
+        beginUpdate();
+        try {
+            for (mxICell edge : cells) {
+                graph.setCellStyles(mxConstants.STYLE_STARTARROW,
+                        mxConstants.ARROW_CLASSIC, new Object[]{edge});
+
+                // update original values of highlighted cells
+                if (highlightedCellsColor.containsKey(edge)) {
+                    highlightedCellsColor.put(edge, MARKEDCOLOR);
+                } else { // or update cell directly
+                    graph.setCellStyles(mxConstants.STYLE_STROKECOLOR,
+                            mxUtils.hexString(MARKEDCOLOR),
+                            new Object[]{edge});
+                }
+            }
+        } finally {
+            endUpdate();
+        }
+    }
+
+    @Override
+    public void reapplyHierarchicalLayout() {
+        mxGraph graph = drawingLibrary.getGraphComponent().getGraph();
+
+        beginUpdate();
+        try {
+            mxHierarchicalLayout layout = new mxHierarchicalLayout(graph);
+            layout.setFineTuning(true);
+            layout.setInterHierarchySpacing(150);
+            layout.setInterRankCellSpacing(100);
+            layout.execute(graph.getDefaultParent());
+
+        } finally {
+            endUpdate();
+        }
+
+        applyZoomSettings();
+    }
+
+    @Override
+    public void redo() {
+        undoManager.redo();
+
+        applyZoomSettings();
+    }
+
     @Override
     public void removeHighlightedNodes() {
         // get a copy of the list before removing everything
@@ -629,7 +401,7 @@ class GraphManipulation<V, E> implements GraphManipulationInterface<V, E> {
             cells.add(cell);
         }
 
-        // unhighlighting everything (thats why we need the copy) 
+        // unhighlighting everything (thats why we need the copy)
         beginNotUndoable();
         unHighlightAll(false);
         endNotUndoable();
@@ -654,47 +426,68 @@ class GraphManipulation<V, E> implements GraphManipulationInterface<V, E> {
     }
 
     @Override
-    public void highlightParents(List<V> roots) {
-        beginNotUndoable();
-        for (V root : roots) {
-            mxICell mxRoot = getCellFromNode(root);
+    public void removeNode(V node) {
+        mxGraph graph = drawingLibrary.getGraphComponent().getGraph();
 
-            parentHighlightingDepth.put(mxRoot,
-                    new Integer(parentHighlightingDepth.get(mxRoot) + 1));
-            highlightParents(root, parentHighlightingDepth.get(mxRoot));
+        Object[] cells = new Object[]{getCellFromNode(node)};
+
+        // Adds all edges connected to the node
+        cells = graph.addAllEdges(cells);
+
+        unHighlightNode(node);
+
+        beginUpdate();
+        try {
+            // Deletes every cell
+            for (Object object : cells) {
+                graph.getModel().remove(object);
+            }
+        } finally {
+            endUpdate();
         }
-        endNotUndoable();
-        
-        /*
-         * graphOutline sometimes won't take changes from this method, to
-         * ensure that it properly shows all changes it's visibility is 
-         * turned off and on again.
-         * FIXME graphOutline should react properly to this method
-         */
-        drawingLibrary.getGraphOutline().setVisible(false);
+
+        applyZoomSettings();
+        updateSelectedCells();
+    }
+
+    @Override
+    public void renameNode(V node, String newName) {
+        mxGraph graph = drawingLibrary.getGraphComponent().getGraph();
+
+        mxICell cell = getCellFromNode(node);
+
+        graph.getModel().setValue(cell, newName);
+        graph.updateCellSize(cell);
+
         applyZoomSettings();
     }
 
     @Override
-    public void highlightChildren(List<V> roots) {
-        beginNotUndoable();
-        for (V root : roots) {
-            mxICell mxRoot = getCellFromNode(root);
-
-            childHighlightingDepth.put(mxRoot,
-                    new Integer(childHighlightingDepth.get(mxRoot) + 1));
-            highlightChildren(root, childHighlightingDepth.get(mxRoot));
+    public void setBackgroundColor(Color color) {
+        beginUpdate();
+        try {
+            drawingLibrary.getGraphComponent()
+                    .getViewport().setBackground(color);
+        } finally {
+            endUpdate();
         }
-        endNotUndoable();
-        
-        /*
-         * graphOutline sometimes won't take changes from this method, to
-         * ensure that it properly shows all changes it's visibility is 
-         * turned off and on again.
-         * FIXME graphOutline should react properly to this method
-         */
-        drawingLibrary.getGraphOutline().setVisible(false);
-        applyZoomSettings();
+    }
+
+    @Override
+    public void setFontColor(Color color) {
+
+        mxGraph graph = drawingLibrary.getGraphComponent().getGraph();
+
+        beginUpdate();
+        try {
+
+            graph.setCellStyles(mxConstants.STYLE_FONTCOLOR,
+                    mxUtils.hexString(color),
+                    graph.getChildVertices(graph.getDefaultParent()));
+
+        } finally {
+            endUpdate();
+        }
     }
 
     @Override
@@ -723,6 +516,78 @@ class GraphManipulation<V, E> implements GraphManipulationInterface<V, E> {
         }
     }
 
+    @Override
+    public void unHighlightAll() {
+        unHighlightAll(true);
+    }
+
+    @Override
+    public void unHighlightNode(V tnode) {
+        mxICell node = getCellFromNode(tnode);
+        parentHighlightingDepth.remove(node);
+        childHighlightingDepth.remove(node);
+
+        beginNotUndoable();
+        unHighlightAll(false);
+        reapplyHighlighting();
+        endNotUndoable();
+
+        /*
+         * graphOutline sometimes won't take changes from this method, to
+         * ensure that it properly shows all changes it's visibility is
+         * turned off and on again.
+         * FIXME graphOutline should react properly to this method
+         */
+        drawingLibrary.getGraphOutline().setVisible(false);
+        applyZoomSettings();
+    }
+
+    @Override
+    public void undo() {
+        undoManager.undo();
+        applyZoomSettings();
+    }
+
+    @Override
+    public void unmarkEdge(E[] edges) {
+        mxGraph graph = drawingLibrary.getGraphComponent().getGraph();
+        mxICell[] cells = getCellsFromEdges(edges);
+
+
+        beginUpdate();
+        try {
+            for (mxICell edge : cells) {
+
+                graph.setCellStyles(mxConstants.STYLE_STARTARROW, "",
+                        new Object[]{edge});
+
+                // update original values of highlighted cells and
+                if (highlightedCellsColor.containsKey(edge)) {
+                    highlightedCellsColor.put(edge, EDGECOLOR);
+                } else { // or update cell directly
+                    graph.setCellStyles(mxConstants.STYLE_STROKECOLOR,
+                            mxUtils.hexString(EDGECOLOR),
+                            new Object[]{edge});
+                }
+            }
+        } finally {
+            endUpdate();
+        }
+    }
+
+    /**
+     * Unregisters all eventlisteners.
+     */
+    public void unregisterEventListener() {
+        drawingLibrary.getGraphComponent().getGraph().getModel()
+                .removeListener(undoHandler, mxEvent.UNDO);
+        drawingLibrary.getGraphComponent().getGraph().getView().removeListener(
+                undoHandler, mxEvent.UNDO);
+
+        drawingLibrary.getGraphComponent()
+                .removeComponentListener(zoomListener);
+    }
+
     /**
      * Updates all selected cells and adds a border around them.
      */
@@ -733,7 +598,7 @@ class GraphManipulation<V, E> implements GraphManipulationInterface<V, E> {
         Object[] newCells
                 = drawingLibrary.getGraphComponent().getGraph().getSelectionCells();
 
-        // convert new cells to list     
+        // convert new cells to list
         List<mxICell> currentCells = new ArrayList<mxICell>(newCells.length);
 
         for (Object obj : newCells) {
@@ -775,22 +640,139 @@ class GraphManipulation<V, E> implements GraphManipulationInterface<V, E> {
         endNotUndoable();
     }
 
+    @Override
+    public void zoom(boolean zoomIn) {
+        drawingLibrary.getGraphComponent().setCenterZoom(true);
+
+        if (zoomIn) {
+            if (getZoomLevel() < MAXZOOMLEVEL) {
+                drawingLibrary.getGraphComponent().zoomIn();
+            }
+        } else {
+            drawingLibrary.getGraphComponent().zoomOut();
+        }
+
+        applyZoomSettings();
+    }
+
+    @Override
+    public void zoomTo(double factor) {
+        factor = Math.min(MAXZOOMLEVEL, factor);
+
+        drawingLibrary.getGraphComponent().zoomTo(factor, true);
+
+        applyZoomSettings();
+    }
+
+    @Override
+    public void zoomToFit() {
+        mxGraphView view = drawingLibrary.getGraphComponent().getGraph().getView();
+
+        // Get the component and view heights/widths
+        int compWidth = drawingLibrary.getGraphComponent().getWidth();
+        int viewWidth = (int) view.getGraphBounds().getWidth();
+        int compHeight = drawingLibrary.getGraphComponent().getHeight();
+        int viewHeight = (int) view.getGraphBounds().getHeight();
+
+        double relWidth = (double) compWidth / viewWidth;
+        double relHeight = (double) compHeight / viewHeight;
+
+        // If the relative Width is greater than the rel. height
+        // set the scale to fit the width and vice versa
+        if (relWidth <= relHeight) {
+            view.setScale(relWidth * view.getScale());
+        } else {
+            view.setScale(relHeight * view.getScale());
+        }
+
+        applyZoomSettings();
+    }
+
+    private mxRectangle determineViewBounds(mxICell[] cells, boolean center) {
+
+        mxGraphComponent graphComponent = drawingLibrary.getGraphComponent();
+
+        if (cells == null || cells.length == 0) {
+            return null;
+        }
+
+        mxRectangle rect = null;
+
+        for (mxICell cell : cells) {
+            if (rect == null)
+                rect = getGraphAdapter().getCellBounds(cell);
+            else
+                rect.add(getGraphAdapter().getCellBounds(cell));
+        }
+
+        if (center) {
+
+            rect = (mxRectangle) rect.clone();
+
+            rect.setX(rect.getCenterX() - graphComponent.getWidth() / 2);
+            rect.setWidth(graphComponent.getWidth());
+            rect.setY(rect.getCenterY() - graphComponent.getHeight() / 2);
+            rect.setHeight(graphComponent.getHeight());
+        }
+        return rect;
+    }
+
     /**
-     * Restores highlighting with the current depth.
+     * Returns the cell associated with the given edge.
+     *
+     * @param edge The edge for which the cell should be returned
+     * @return The cell associated with the edge
      */
-    private void reapplyHighlighting() {
-        HashMap<mxICell, V> cellToNode
-                = getGraphAdapter().getCellToVertexMap();
+    private mxICell getCellFromEdge(E edge) {
+        return getGraphAdapter().getEdgeToCellMap().get(edge);
+    }
 
-        for (mxICell cell : parentHighlightingDepth.keySet()) {
-            highlightParents(cellToNode.get(cell),
-                    parentHighlightingDepth.get(cell));
-        }
+    /**
+     * Returns the cell associated with the given node.
+     *
+     * @param node The node for which the cell should be returned
+     * @return The cell associated with the node
+     */
+    private mxICell getCellFromNode(V node) {
+        return getGraphAdapter().getVertexToCellMap().get(node);
+    }
 
-        for (mxICell cell : childHighlightingDepth.keySet()) {
-            highlightChildren(cellToNode.get(cell),
-                    childHighlightingDepth.get(cell));
+    /**
+     * Returns the cells associated with the given edges.
+     *
+     * @param edges The edges for which the cells should be returned
+     * @return The cells associated with the edges
+     */
+    private mxICell[] getCellsFromEdges(E[] edges) {
+        mxICell[] cells = new mxICell[edges.length];
+        for (int i = 0; i < edges.length; i++) {
+            cells[i] = getCellFromEdge(edges[i]);
         }
+        return cells;
+    }
+
+    /**
+     * Returns the cells associated with the given nodes.
+     *
+     * @param nodes The nodes for which the cells should be returned
+     * @return The cells associated with the nodes
+     */
+    private mxICell[] getCellsFromNodes(V[] nodes) {
+        mxICell[] cells = new mxICell[nodes.length];
+        for (int i = 0; i < nodes.length; i++) {
+            cells[i] = getCellFromNode(nodes[i]);
+        }
+        return cells;
+    }
+
+    /**
+     * Returns the current graph adapter.
+     *
+     * @return The current graph adapter
+     */
+    private JGraphXAdapter<V, E> getGraphAdapter() {
+        return (JGraphXAdapter<V, E>) drawingLibrary
+                .getGraphComponent().getGraph();
     }
 
     /**
@@ -823,25 +805,6 @@ class GraphManipulation<V, E> implements GraphManipulationInterface<V, E> {
                 cellThickness, new Object[]{cell});
 
         endNotUndoable();
-    }
-
-    /**
-     * Sets the thickness of highlighting and selection.
-     *
-     * @param value The thickness that should be applied.
-     */
-    private void setThickness(String value) {
-        // nothing to do
-        if (cellThickness.equals(value)) {
-            return;
-        }
-
-        cellThickness = value;
-
-        for (mxICell cell : highlightedCellsThickness.keySet()) {
-            getGraphAdapter().setCellStyles(mxConstants.STYLE_STROKEWIDTH,
-                    value, new Object[]{cell});
-        }
     }
 
     /**
@@ -916,6 +879,43 @@ class GraphManipulation<V, E> implements GraphManipulationInterface<V, E> {
             highlightParents(parent, depth - 1);
         }
 
+    }
+
+    /**
+     * Restores highlighting with the current depth.
+     */
+    private void reapplyHighlighting() {
+        HashMap<mxICell, V> cellToNode
+                = getGraphAdapter().getCellToVertexMap();
+
+        for (mxICell cell : parentHighlightingDepth.keySet()) {
+            highlightParents(cellToNode.get(cell),
+                    parentHighlightingDepth.get(cell));
+        }
+
+        for (mxICell cell : childHighlightingDepth.keySet()) {
+            highlightChildren(cellToNode.get(cell),
+                    childHighlightingDepth.get(cell));
+        }
+    }
+
+    /**
+     * Sets the thickness of highlighting and selection.
+     *
+     * @param value The thickness that should be applied.
+     */
+    private void setThickness(String value) {
+        // nothing to do
+        if (cellThickness.equals(value)) {
+            return;
+        }
+
+        cellThickness = value;
+
+        for (mxICell cell : highlightedCellsThickness.keySet()) {
+            getGraphAdapter().setCellStyles(mxConstants.STYLE_STROKEWIDTH,
+                    value, new Object[]{cell});
+        }
     }
 
     /**

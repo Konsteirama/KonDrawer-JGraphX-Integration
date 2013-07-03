@@ -11,21 +11,23 @@
 
 package teo.isgci.drawing;
 
-import com.mxgraph.swing.mxGraphComponent;
-
 import java.awt.event.MouseAdapter;
+
+import com.mxgraph.swing.mxGraphComponent;
 
 /**
  * Implementation of the GraphEventInterface.
  */
 class GraphEvent implements GraphEventInterface {
 
-    /** The actual canvas. */
+    /**
+     * The actual canvas.
+     */
     private mxGraphComponent graphComponent;
 
     /**
      * Gets a canvas and saves it.
-     * 
+     *
      * @param pGraphComponent : The canvas
      */
     protected GraphEvent(mxGraphComponent pGraphComponent) {

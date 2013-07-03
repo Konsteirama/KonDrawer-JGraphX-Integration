@@ -20,6 +20,7 @@ public interface GraphEventInterface {
 
     /**
      * Register a MouseAdapter to receive events from the graph panel.
+     *
      * @param adapter MouseAdapter
      */
     void registerMouseAdapter(MouseAdapter adapter);

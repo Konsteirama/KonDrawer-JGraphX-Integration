@@ -1,13 +1,17 @@
 package teo.isgci.drawing;
 
+import java.awt.Color;
+import java.awt.Font;
+import java.awt.FontMetrics;
+import java.awt.Graphics2D;
+import java.awt.Rectangle;
+import java.util.Map;
+
 import com.mxgraph.canvas.mxGraphics2DCanvas;
 import com.mxgraph.shape.mxITextShape;
 import com.mxgraph.util.mxConstants;
 import com.mxgraph.util.mxUtils;
 import com.mxgraph.view.mxCellState;
-
-import java.awt.*;
-import java.util.Map;
 
 public class mxDefaultLatexShape implements mxITextShape {
     /**

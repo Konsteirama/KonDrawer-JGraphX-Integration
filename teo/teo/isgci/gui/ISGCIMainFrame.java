@@ -30,10 +30,8 @@ import javax.swing.JFrame;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
-
 import org.jgrapht.Graphs;
 import org.jgrapht.graph.SimpleDirectedGraph;
-
 import teo.isgci.db.DataSet;
 import teo.isgci.gc.ForbiddenClass;
 import teo.isgci.gc.GraphClass;
@@ -52,64 +50,72 @@ import teo.isgci.xml.GraphMLWriter;
 public class ISGCIMainFrame extends JFrame implements WindowListener {
 
     /**
+     * The applicationname displayed in the titlebar.
+     */
+    public static final String APPLICATIONNAME = "ISGCI";
+    /**
+     * The location where new windows will be positioned.
+     */
+    private static final Point DEFAULTPOSITION = new Point(50, 50);
+    /**
+     * The location where new mainframes will be positioned.
+     */
+    private static final Point MAINPOSITION = new Point(20, 20);
+    /**
      * This should change each time the mainframe is changed.
      */
     private static final long serialVersionUID = 1L;
-
-    /** The applicationname displayed in the titlebar. */
-    public static final String APPLICATIONNAME = "ISGCI";
-
-    /** The location where new mainframes will be positioned. */
-    private static final Point MAINPOSITION = new Point(20, 20);
-
-    /** The location where new windows will be positioned. */
-    private static final Point DEFAULTPOSITION = new Point(50, 50);
-    
-    /** Needed for MediaTracker (hack). */
+    /**
+     * Needed for MediaTracker (hack).
+     */
     public static ISGCIMainFrame tracker;
     // public static Font font;
-
-    /** The loader which initialized the mainframe. */
+    /**
+     * The loader which initialized the mainframe.
+     */
     protected teo.Loader loader;
-
+    /**
+     * Saves jdialogs to close them if they need to be closed from here.
+     */
+    private Vector<JDialog> dialogs = new Vector<JDialog>();
+    /**
+     * Needed so that menubar will not disappear on linux if maximized.
+     */
+    private JMenuBar mainMenuBar;
+    /**
+     * Needed for startpanel animation.
+     */
+    private JMenuItem miCheckInclusion, miOpenProblem, miGraphClassInformation,
+            miSelectGraphClasses;
+    /**
+     * Shows a list from which a problem can be chosen.
+     */
+    private JMenuItem miColourProblem;
+    /**
+     * Indicates whether or not the graph should draw unproper edges.
+     */
+    private JMenuItem miDrawUnproper;
+    /**
+     * Needed for startpanel animation.
+     */
+    private JMenu problemsMenu, graphMenu;
     /**
      * The tabbed Pane which handles all tabs and their creation / deletion.
      */
     private ISGCITabbedPane tabbedPane;
-
     /**
      * The toolbar, needed to for some startpanel animations.
      */
     private ISGCIToolBar toolbar;
-    
-    /** Needed so that menubar will not disappear on linux if maximized. */
-    private JMenuBar mainMenuBar;
-    
-    /** Needed for startpanel animation. */
-    private JMenu problemsMenu, graphMenu;
-    
-    /** Needed for startpanel animation. */
-    private JMenuItem miCheckInclusion, miOpenProblem, miGraphClassInformation,
-                      miSelectGraphClasses;
-    
-    /** Indicates whether or not the graph should draw unproper edges. */
-    private JMenuItem miDrawUnproper;
-    
-    /** Shows a list from which a problem can be chosen. */
-    private JMenuItem miColourProblem;
-    
-    /** Saves jdialogs to close them if they need to be closed from here. */
-    private Vector<JDialog> dialogs = new Vector<JDialog>();
-    
+
     /**
      * Creates the frame.
-     * 
+     * <p/>
      * Old documentation: * param locationURL The path/URL to the
      * applet/application. * param isApplet true iff the program runs as an
      * applet.
-     * 
-     * @param teoloader
-     *            The loader which initializes this mainframe.
+     *
+     * @param teoloader The loader which initializes this mainframe.
      */
     public ISGCIMainFrame(teo.Loader teoloader) {
         super(APPLICATIONNAME);
@@ -174,11 +180,11 @@ public class ISGCIMainFrame extends JFrame implements WindowListener {
 
         setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
         addWindowListener(this);
-        
+
         // preferredsize is a bit too small, so increase it a bit
         Dimension prefSize = getPreferredSize();
         setMinimumSize(new Dimension(prefSize.width + 10,
-                                     prefSize.height + 20));
+                prefSize.height + 20));
 
         setLocation(MAINPOSITION);
         pack();
@@ -186,8 +192,86 @@ public class ISGCIMainFrame extends JFrame implements WindowListener {
     }
 
     /**
+     * Closes all dialogs to bring the graphtab to front.
+     */
+    public void closeDialogs() {
+        for (JDialog dialog : dialogs) {
+            dialog.setVisible(false);
+            dialog.dispose();
+        }
+
+        dialogs.clear();
+
+        toFront();
+    }
+
+    /**
+     * Closes the window and possibly terminates the program.
+     */
+    public void closeWindow() {
+        UserSettings.unsubscribeFromOptionChanges(tabbedPane);
+        setVisible(false);
+        dispose();
+        loader.unregister();
+    }
+
+    /**
+     * Getter for the menu for drawing graphs.
+     *
+     * @return The menu for drawing graphs.
+     */
+    public JMenuItem getDrawItem() {
+        return miSelectGraphClasses;
+    }
+
+    /**
+     * Getter for the menu for the graph class selection menu.
+     *
+     * @return The menu for the graph class selection menu.
+     */
+    public JMenuItem getGraphClassInformationItem() {
+        return miGraphClassInformation;
+    }
+
+    /**
+     * Getter for the menu for the graph classes.
+     *
+     * @return The menu for the graph classes menu.
+     */
+    public JMenu getGraphMenu() {
+        return graphMenu;
+    }
+
+    /**
+     * Getter for the menuitem of search for inclusion.
+     *
+     * @return The menuitem for inclusions.
+     */
+    public JMenuItem getInclusionMenuItem() {
+        return miCheckInclusion;
+    }
+
+    /**
+     * Getter for the menu for the open problem menu.
+     *
+     * @return The menu for the open problem menu.
+     */
+    public JMenuItem getOpenProblemMenuItem() {
+        return miOpenProblem;
+    }
+
+    /**
+     * Getter for the menu for the problems.
+     *
+     * @return The menu for the problems menu.
+     */
+    public JMenu getProblemsMenu() {
+        return problemsMenu;
+    }
+
+    /**
      * Getter for {@link #tabbedPane}.
-     * 
+     *
      * @return Returns {@link #tabbedPane}.
      */
     public ISGCITabbedPane getTabbedPane() {
@@ -196,21 +280,396 @@ public class ISGCIMainFrame extends JFrame implements WindowListener {
 
     /**
      * Getter for {@link #toolbar}.
-     * 
+     *
      * @return Returns {@link #toolbar}.
      */
     public ISGCIToolBar getToolbar() {
         return toolbar;
     }
-    
+
+    /**
+     * Opens the about dialog.
+     */
+    public void openAboutDialog() {
+        JDialog about = new AboutDialog(this);
+        about.setLocation(DEFAULTPOSITION);
+        about.setVisible(true);
+
+        dialogs.add(about);
+    }
+
+    /**
+     * Opens the dialog to browse the database.
+     */
+    public void openBrowseDatabaseDialog() {
+        final int width = 800;
+        final int height = 600;
+
+        JDialog info = new GraphClassInformationDialog(this);
+        info.setLocation(DEFAULTPOSITION);
+        info.pack();
+        info.setSize(width, height);
+        info.setVisible(true);
+
+        dialogs.add(info);
+    }
+
+    /**
+     * Opens a new export dialog.
+     */
+    public void openExportDialog() {
+        if (getTabbedPane().getActiveDrawingLibraryInterface() == null) {
+            MessageDialog.error(this,
+                    "The active tab contains no graph to export.");
+            return;
+        }
+
+        JDialog export = new ExportDialog(this);
+        export.setLocation(DEFAULTPOSITION);
+        export.pack();
+        export.setVisible(true);
+
+        dialogs.add(export);
+    }
+
+    /**
+     * Opens the search in drawing dialog.
+     */
+    public void openSearchDialog() {
+        if (getTabbedPane().getActiveDrawingLibraryInterface() == null) {
+            MessageDialog.error(this,
+                    "The active tab contains no graph to search in.");
+            return;
+        }
+
+        JDialog search = new SearchDialog(this);
+        search.setLocation(DEFAULTPOSITION);
+        search.setVisible(true);
+
+        dialogs.add(search);
+    }
+
+    /**
+     * Opens a new SelectGraphClasses dialog.
+     */
+    public void openSelectGraphClassesDialog() {
+        final int width = 500;
+        final int height = 400;
+
+        JDialog select = new GraphClassSelectionDialog(this);
+        select.setLocation(DEFAULTPOSITION);
+        select.pack();
+        select.setSize(width, height);
+        select.setVisible(true);
+
+        dialogs.add(select);
+    }
+
+    /**
+     * Opens the settings dialog.
+     */
+    public void openSettingsDialog() {
+        JDialog settings = new SettingsDialog(this);
+        settings.setLocation(DEFAULTPOSITION);
+        settings.setVisible(true);
+
+        dialogs.add(settings);
+    }
+
+    /**
+     * Sets the state of the color for problem radiobox.
+     *
+     * @param problem the new problem which is active.
+     */
+    public void setColorProblem(Problem problem) {
+        String name;
+        if (problem == null) {
+            name = "None";
+        } else {
+            name = problem.getName();
+        }
+
+        ((ProblemsMenu) miColourProblem).setProblem(name);
+        toolbar.setProblem(name);
+    }
+
+    /**
+     * Sets whether the Draw Unproper checkbox is checked.
+     *
+     * @param state True if the checkbox should be checked, false if not.
+     */
+    public void setDrawUnproper(boolean state) {
+        miDrawUnproper.setSelected(state);
+    }
+
+    @Override
+    public void windowActivated(WindowEvent e) {
+    }
+
+    @Override
+    public void windowClosed(WindowEvent e) {
+    }
+
+    @Override
+    public void windowClosing(WindowEvent e) {
+        closeWindow();
+    }
+
+    @Override
+    public void windowDeactivated(WindowEvent e) {
+    }
+
+    @Override
+    public void windowDeiconified(WindowEvent e) {
+    }
+
+    @Override
+    public void windowIconified(WindowEvent e) {
+    }
+
+    @Override
+    public void windowOpened(WindowEvent e) {
+    }
+
+    /**
+     * Adds View to the menu.
+     */
+    private void addFileMenu() {
+
+        JMenuItem miNew = new JMenuItem("New window");
+        miNew.addActionListener(new ActionListener() {
+
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                new ISGCIMainFrame(loader);
+            }
+        });
+
+        JMenuItem miExport = new JMenuItem("Export drawing...");
+        miExport.addActionListener(new ActionListener() {
+
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                openExportDialog();
+            }
+        });
+
+        JMenuItem miExit = new JMenuItem("Exit");
+        miExit.addActionListener(new ActionListener() {
+
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                closeWindow();
+            }
+        });
+
+        JMenu fileMenu = new JMenu("File");
+        fileMenu.add(miNew);
+        fileMenu.add(miExport);
+        fileMenu.add(miExit);
+        mainMenuBar.add(fileMenu);
+    }
+
+    /**
+     * Adds Help to the menu.
+     */
+    private void addGraphMenu() {
+        // needed to reference this in actionlistener
+        final ISGCIMainFrame mainframe = this;
+
+        miGraphClassInformation = new JMenuItem("Browse Database");
+        miGraphClassInformation.addActionListener(new ActionListener() {
+
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                openBrowseDatabaseDialog();
+            }
+        });
+
+        miCheckInclusion = new JMenuItem("Find Relation...");
+        miCheckInclusion.addActionListener(new ActionListener() {
+
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                final int width = 700;
+                final int height = 400;
+
+                JDialog check = new CheckInclusionDialog(mainframe);
+                check.setLocation(DEFAULTPOSITION);
+                check.pack();
+                check.setSize(width, height);
+                check.setVisible(true);
+
+                dialogs.add(check);
+            }
+        });
+
+        miSelectGraphClasses = new JMenuItem("Draw...");
+        miSelectGraphClasses.addActionListener(new ActionListener() {
+
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                openSelectGraphClassesDialog();
+            }
+        });
+
+        graphMenu = new JMenu("Graph classes");
+        graphMenu.add(miGraphClassInformation);
+        graphMenu.add(miCheckInclusion);
+        graphMenu.add(miSelectGraphClasses);
+        mainMenuBar.add(graphMenu);
+    }
+
+    /**
+     * Adds Help to the menu.
+     */
+    private void addHelpMenu() {
+
+        JMenuItem miSmallgraphs = new JMenuItem("Small graphs");
+        miSmallgraphs.addActionListener(new ActionListener() {
+
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                loader.showDocument("smallgraphs.html");
+            }
+        });
+
+        JMenuItem miHelp = new JMenuItem("Help");
+        miHelp.addActionListener(new ActionListener() {
+
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                loader.showDocument("help.html");
+            }
+        });
+
+        JMenuItem miAbout = new JMenuItem("About");
+        miAbout.addActionListener(new ActionListener() {
+
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                openAboutDialog();
+            }
+        });
+
+
+        JMenu helpMenu = new JMenu("Help");
+
+        helpMenu.add(miSmallgraphs);
+        helpMenu.add(miHelp);
+        helpMenu.add(miAbout);
+
+        // mainMenuBar.add(Box.createHorizontalGlue());
+        mainMenuBar.add(helpMenu);
+    }
+
+    /**
+     * Adds Problems to the menu.
+     */
+    private void addProblemsMenu() {
+
+        // needed to reference this in actionlistener
+        final ISGCIMainFrame mainframe = this;
+
+        miOpenProblem = new JMenu("Boundary/Open classes");
+        miColourProblem = new ProblemsMenu(this,
+                "Colour for problem");
+
+        problemsMenu = new JMenu("Problems");
+
+        problemsMenu.add(miOpenProblem);
+        for (int i = 0; i < DataSet.problems.size(); i++) {
+            JMenuItem menu = new JMenuItem(
+                    ((Problem) DataSet.problems.elementAt(i)).getName());
+            miOpenProblem.add(menu);
+            menu.addActionListener(new ActionListener() {
+
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    JDialog open = new OpenProblemDialog(mainframe,
+                            ((JMenuItem) e.getSource()).getText());
+                    open.setLocation(DEFAULTPOSITION);
+                    open.setVisible(true);
+                }
+            });
+        }
+
+        problemsMenu.add(miColourProblem);
+        mainMenuBar.add(problemsMenu);
+    }
+
+    /**
+     * Adds View to the menu.
+     */
+    private void addViewMenu() {
+
+        // needed to reference this in actionlistener
+        final ISGCIMainFrame mainframe = this;
+
+        JMenuItem miSearching = new JMenuItem("Search in drawing...");
+        miSearching.addActionListener(new ActionListener() {
+
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                openSearchDialog();
+            }
+        });
+
+        JMenuItem miNaming = new JMenuItem("Naming preference...");
+        miNaming.addActionListener(new ActionListener() {
+
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                JDialog naming = new NamingDialog(mainframe);
+                naming.setLocation(DEFAULTPOSITION);
+                naming.pack();
+                naming.setVisible(true);
+
+                dialogs.add(naming);
+            }
+        });
+
+        miDrawUnproper = new JCheckBoxMenuItem("Mark unproper inclusions",
+                true);
+        miDrawUnproper.addItemListener(new ItemListener() {
+
+            @Override
+            public void itemStateChanged(ItemEvent e) {
+                Object object = e.getSource();
+                if (object == miDrawUnproper) {
+                    getTabbedPane().setDrawUnproper(
+                            ((JCheckBoxMenuItem) object).getState(),
+                            getTabbedPane().getSelectedComponent());
+                }
+            }
+        });
+
+        JMenuItem miColorSettings = new JMenuItem("Set colours...");
+        miColorSettings.addActionListener(new ActionListener() {
+
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                openSettingsDialog();
+            }
+        });
+
+        JMenu viewMenu = new JMenu("View");
+        viewMenu.add(miSearching);
+        viewMenu.add(miNaming);
+        viewMenu.add(miDrawUnproper);
+        viewMenu.add(miColorSettings);
+
+        mainMenuBar.add(viewMenu);
+    }
+
     /**
      * Write the entire database in GraphML to isgcifull.graphml.
      */
     private void writeGraphML() {
         OutputStreamWriter out = null;
 
-        SimpleDirectedGraph<GraphClass, Inclusion> g 
-            = new SimpleDirectedGraph<GraphClass, Inclusion>(Inclusion.class);
+        SimpleDirectedGraph<GraphClass, Inclusion> g
+                = new SimpleDirectedGraph<GraphClass, Inclusion>(Inclusion.class);
         Graphs.addGraph(g, DataSet.inclGraph);
         GAlg.transitiveReductionBruteForce(g);
 
@@ -236,7 +695,7 @@ public class ISGCIMainFrame extends JFrame implements WindowListener {
 
     /**
      * Creates the menu system.
-     * 
+     *
      * @return The created JMenuBar
      * @see JMenuBar
      */
@@ -250,455 +709,6 @@ public class ISGCIMainFrame extends JFrame implements WindowListener {
         addHelpMenu();
 
         return mainMenuBar;
-    }
-    
-    /**
-     *  Adds View to the menu.
-     */
-    private void addFileMenu() {
-
-        JMenuItem miNew = new JMenuItem("New window");
-        miNew.addActionListener(new ActionListener() {
-            
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                new ISGCIMainFrame(loader);
-            }
-        });
-        
-        JMenuItem miExport = new JMenuItem("Export drawing...");
-        miExport.addActionListener(new ActionListener() {
-            
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                openExportDialog();
-            }
-        });
-        
-        JMenuItem miExit = new JMenuItem("Exit");
-        miExit.addActionListener(new ActionListener() {
-            
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                closeWindow();
-            }
-        });
-
-        JMenu fileMenu = new JMenu("File");
-        fileMenu.add(miNew);
-        fileMenu.add(miExport);
-        fileMenu.add(miExit);
-        mainMenuBar.add(fileMenu);
-    }
-    
-    /**
-     *  Adds View to the menu.
-     */
-    private void addViewMenu() {
-
-        // needed to reference this in actionlistener
-        final ISGCIMainFrame mainframe = this;
-        
-        JMenuItem miSearching = new JMenuItem("Search in drawing...");
-        miSearching.addActionListener(new ActionListener() {
-            
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                openSearchDialog();
-            }
-        });
-        
-        JMenuItem miNaming = new JMenuItem("Naming preference...");
-        miNaming.addActionListener(new ActionListener() {
-            
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                JDialog naming = new NamingDialog(mainframe);
-                naming.setLocation(DEFAULTPOSITION);
-                naming.pack();
-                naming.setVisible(true);
-                
-                dialogs.add(naming);
-            }
-        });
-        
-        miDrawUnproper = new JCheckBoxMenuItem("Mark unproper inclusions",
-                true);
-        miDrawUnproper.addItemListener(new ItemListener() {
-            
-            @Override
-            public void itemStateChanged(ItemEvent e) {
-                Object object = e.getSource();
-                if (object == miDrawUnproper) {
-                    getTabbedPane().setDrawUnproper(
-                            ((JCheckBoxMenuItem) object).getState(),
-                            getTabbedPane().getSelectedComponent());
-                }
-            }
-        });
-        
-        JMenuItem miColorSettings = new JMenuItem("Set colours...");
-        miColorSettings.addActionListener(new ActionListener() {
-            
-            @Override
-            public void actionPerformed(ActionEvent e) {              
-                openSettingsDialog();
-            }
-        });
-
-        JMenu viewMenu = new JMenu("View");
-        viewMenu.add(miSearching);
-        viewMenu.add(miNaming);
-        viewMenu.add(miDrawUnproper);
-        viewMenu.add(miColorSettings);
-        
-        mainMenuBar.add(viewMenu);
-    }
-    
-    /**
-     *  Adds Help to the menu.
-     */
-    private void addGraphMenu() {
-        // needed to reference this in actionlistener
-        final ISGCIMainFrame mainframe = this;
-        
-        miGraphClassInformation = new JMenuItem("Browse Database");
-        miGraphClassInformation.addActionListener(new ActionListener() {
-            
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                openBrowseDatabaseDialog();
-            }
-        });
-        
-        miCheckInclusion = new JMenuItem("Find Relation...");
-        miCheckInclusion.addActionListener(new ActionListener() {
-            
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                final int width = 700;
-                final int height = 400;
-                
-                JDialog check = new CheckInclusionDialog(mainframe);
-                check.setLocation(DEFAULTPOSITION);
-                check.pack();
-                check.setSize(width, height);
-                check.setVisible(true);
-                
-                dialogs.add(check);
-            }
-        });
-        
-        miSelectGraphClasses = new JMenuItem("Draw...");
-        miSelectGraphClasses.addActionListener(new ActionListener() {
-            
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                openSelectGraphClassesDialog();
-            }
-        });
-
-        graphMenu = new JMenu("Graph classes");
-        graphMenu.add(miGraphClassInformation);
-        graphMenu.add(miCheckInclusion);
-        graphMenu.add(miSelectGraphClasses);
-        mainMenuBar.add(graphMenu);
-    }
-    
-    /**
-     *  Adds Problems to the menu.
-     */
-    private void addProblemsMenu() {
-
-        // needed to reference this in actionlistener
-        final ISGCIMainFrame mainframe = this;
-        
-        miOpenProblem = new JMenu("Boundary/Open classes");
-        miColourProblem = new ProblemsMenu(this,
-                "Colour for problem");
-        
-        problemsMenu = new JMenu("Problems");
-
-        problemsMenu.add(miOpenProblem);
-        for (int i = 0; i < DataSet.problems.size(); i++) {
-            JMenuItem menu = new JMenuItem(
-                    ((Problem) DataSet.problems.elementAt(i)).getName());
-            miOpenProblem.add(menu);
-            menu.addActionListener(new ActionListener() {
-                
-                @Override
-                public void actionPerformed(ActionEvent e) {
-                    JDialog open = new OpenProblemDialog(mainframe,
-                            ((JMenuItem) e.getSource()).getText());
-                    open.setLocation(DEFAULTPOSITION);
-                    open.setVisible(true);
-                }
-            });
-        }
-
-        problemsMenu.add(miColourProblem);
-        mainMenuBar.add(problemsMenu);
-    }
-    
-    /**
-     *  Adds Help to the menu.
-     */
-    private void addHelpMenu() {
-        
-        JMenuItem miSmallgraphs = new JMenuItem("Small graphs");
-        miSmallgraphs.addActionListener(new ActionListener() {
-            
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                loader.showDocument("smallgraphs.html");
-            }
-        });
-        
-        JMenuItem miHelp = new JMenuItem("Help");
-        miHelp.addActionListener(new ActionListener() {
-            
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                loader.showDocument("help.html");
-            }
-        });
-        
-        JMenuItem miAbout = new JMenuItem("About");
-        miAbout.addActionListener(new ActionListener() {
-            
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                openAboutDialog();
-            }
-        });
-        
-
-        JMenu helpMenu = new JMenu("Help");
-
-        helpMenu.add(miSmallgraphs);
-        helpMenu.add(miHelp);
-        helpMenu.add(miAbout);
-
-        // mainMenuBar.add(Box.createHorizontalGlue());
-        mainMenuBar.add(helpMenu);
-    }
-    
-  
-    /** Closes the window and possibly terminates the program. */
-    public void closeWindow() {
-        UserSettings.unsubscribeFromOptionChanges(tabbedPane);
-        setVisible(false);
-        dispose();
-        loader.unregister();
-    }
-
-    @Override
-    public void windowClosing(WindowEvent e) {
-        closeWindow();
-    }
-
-    @Override
-    public void windowOpened(WindowEvent e) { }
-
-    @Override
-    public void windowClosed(WindowEvent e) { }
-
-    @Override
-    public void windowIconified(WindowEvent e) { }
-
-    @Override
-    public void windowDeiconified(WindowEvent e) { }
-
-    @Override
-    public void windowDeactivated(WindowEvent e) { }
-
-    @Override
-    public void windowActivated(WindowEvent e) { }
-
-    /**
-     * Sets whether the Draw Unproper checkbox is checked.
-     * 
-     * @param state
-     *            True if the checkbox should be checked, false if not.
-     */
-    public void setDrawUnproper(boolean state) {
-        miDrawUnproper.setSelected(state);
-    }
-    
-    /**
-     * Sets the state of the color for problem radiobox.
-     * 
-     * @param problem
-     *            the new problem which is active.
-     */
-    public void setColorProblem(Problem problem) {
-        String name;
-        if (problem == null) {
-            name = "None";
-        } else {
-            name = problem.getName();
-        }
-        
-        ((ProblemsMenu) miColourProblem).setProblem(name);     
-        toolbar.setProblem(name);
-    }
-
-    /**
-     * Opens a new SelectGraphClasses dialog.
-     */
-    public void openSelectGraphClassesDialog() {
-        final int width = 500;
-        final int height = 400;
-        
-        JDialog select = new GraphClassSelectionDialog(this);
-        select.setLocation(DEFAULTPOSITION);
-        select.pack();
-        select.setSize(width, height);
-        select.setVisible(true);
-        
-        dialogs.add(select);
-    }
-
-    /**
-     * Opens a new export dialog.
-     */
-    public void openExportDialog() {
-        if (getTabbedPane().getActiveDrawingLibraryInterface() == null) {
-            MessageDialog.error(this,
-                    "The active tab contains no graph to export.");
-            return;
-        }
-        
-        JDialog export = new ExportDialog(this);
-        export.setLocation(DEFAULTPOSITION);
-        export.pack();
-        export.setVisible(true);
-        
-        dialogs.add(export);
-    }
-    
-    /**
-     *  Opens the dialog to browse the database.
-     */
-    public void openBrowseDatabaseDialog() {
-        final int width = 800;
-        final int height = 600;
-        
-        JDialog info = new GraphClassInformationDialog(this);
-        info.setLocation(DEFAULTPOSITION);
-        info.pack();
-        info.setSize(width, height);
-        info.setVisible(true);
-        
-        dialogs.add(info);
-    }
-    
-    /**
-     * Opens the settings dialog.
-     */
-    public void openSettingsDialog() {
-        JDialog settings = new SettingsDialog(this);
-        settings.setLocation(DEFAULTPOSITION);
-        settings.setVisible(true);
-        
-        dialogs.add(settings);
-    }
-    
-    /**
-     * Opens the about dialog.
-     */
-    public void openAboutDialog() {
-        JDialog about = new AboutDialog(this);
-        about.setLocation(DEFAULTPOSITION);
-        about.setVisible(true);
-        
-        dialogs.add(about);
-    }
-    
-    /**
-     * Opens the search in drawing dialog.
-     */
-    public void openSearchDialog() {
-        if (getTabbedPane().getActiveDrawingLibraryInterface() == null) {
-            MessageDialog.error(this,
-                    "The active tab contains no graph to search in.");
-            return;
-        }
-        
-        JDialog search = new SearchDialog(this);
-        search.setLocation(DEFAULTPOSITION);
-        search.setVisible(true);
-        
-        dialogs.add(search);
-    }
-    
-    /**
-     * Getter for the menu for the problems.
-     * @return
-     *          The menu for the problems menu.
-     */
-    public JMenu getProblemsMenu() {
-        return problemsMenu;
-    }
-    
-    /**
-     * Getter for the menu for the graph classes.
-     * @return
-     *          The menu for the graph classes menu.
-     */
-    public JMenu getGraphMenu() {
-        return graphMenu;
-    }
-    
-    /**
-     * Getter for the menuitem of search for inclusion.
-     * @return
-     *          The menuitem for inclusions.
-     */
-    public JMenuItem getInclusionMenuItem() {
-        return miCheckInclusion;
-    }
-    
-    /**
-     * Getter for the menu for the open problem menu.
-     * @return
-     *          The menu for the open problem menu.
-     */
-    public JMenuItem getOpenProblemMenuItem() {
-        return miOpenProblem;
-    }
-    
-    
-    /**
-     * Getter for the menu for the graph class selection menu.
-     * @return
-     *          The menu for the graph class selection menu.
-     */
-    public JMenuItem getGraphClassInformationItem() {
-        return miGraphClassInformation;
-    }
-    /**
-     * Getter for the menu for drawing graphs.
-     * @return
-     *          The menu for drawing graphs.
-     */
-    public JMenuItem getDrawItem() {
-        return miSelectGraphClasses;
-    }
-    
-    
-    /**
-     * Closes all dialogs to bring the graphtab to front.
-     */
-    public void closeDialogs() {
-        for (JDialog dialog : dialogs) {           
-            dialog.setVisible(false);
-            dialog.dispose();
-        }
-        
-        dialogs.clear();
-        
-        toFront();
     }
 }
 

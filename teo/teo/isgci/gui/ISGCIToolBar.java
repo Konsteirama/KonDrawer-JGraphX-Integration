@@ -33,40 +33,34 @@ import teo.isgci.util.UserSettings;
  */
 public class ISGCIToolBar extends JToolBar {
     /**
-     * Change this every time this class is changed.
-     */
-    private static final long serialVersionUID = 5L;
-
-    /**
      * Name for no selected problem.
      */
     private static final String NOPROBLEMSELECTED = "None";
-
+    /**
+     * Change this every time this class is changed.
+     */
+    private static final long serialVersionUID = 5L;
     /**
      * Reference to parent-ISGCI Mainframe for opening dialogs etc.
      */
     private ISGCIMainFrame mainframe;
-
-    /**
-     * Undo button, reference here to disable/enable.
-     */
-    private JButton undoButton;
-
-    /**
-     * Redo button, reference here to disable/enable.
-     */
-    private JButton redoButton;
-
     /**
      * Problem combobox, reference here to set the currently active problem.
      */
     private JComboBox problemBox;
-
+    /**
+     * Redo button, reference here to disable/enable.
+     */
+    private JButton redoButton;
     /**
      * True if user changes problembox, false if it was checked via
      * {@link setProblem}.
      */
     private boolean setProblem = true;
+    /**
+     * Undo button, reference here to disable/enable.
+     */
+    private JButton undoButton;
 
     /**
      * Creates a toolbar with icons that influence both ISGCI and the currently
@@ -95,23 +89,6 @@ public class ISGCIToolBar extends JToolBar {
             problemBox.setSelectedItem(problem);
         }
         setProblem = true;
-    }
-
-    /**
-     * Returns the drawinglibraryinterface.
-     *
-     * @return The currently active graphmanipulationinterface or null.
-     */
-    private GraphManipulationInterface<?, ?> getManipulationInterface() {
-        DrawingLibraryInterface<?, ?> drawinglib = mainframe.getTabbedPane()
-                .getActiveDrawingLibraryInterface();
-
-        // no tab active
-        if (drawinglib == null) {
-            return null;
-        }
-
-        return drawinglib.getGraphManipulationInterface();
     }
 
     /**
@@ -246,7 +223,7 @@ public class ISGCIToolBar extends JToolBar {
             public void actionPerformed(ActionEvent e) {
                 DrawingLibraryInterface<V, E> drawLib
                         = mainframe.getTabbedPane()
-                            .getActiveDrawingLibraryInterface();
+                        .getActiveDrawingLibraryInterface();
 
                 if (drawLib == null) {
                     return;
@@ -259,6 +236,66 @@ public class ISGCIToolBar extends JToolBar {
                 manipulationInterface.highlightChildren(selectedNodes);
             }
         });
+    }
+
+    /**
+     * Add controls that have no specific group.
+     *
+     * @param <V> The vertex class.
+     * @param <E> The edge class.
+     */
+    private <V, E> void addMiscButtons() {
+
+        // SEARCH
+        String searchTooltip = "Opens a dialogue to search for a specific "
+                + "graphclass in the drawing.";
+        JButton searchbutton = IconButtonFactory.createImageButton(
+                IconButtonFactory.SEARCH_ICON, searchTooltip);
+        add(searchbutton);
+
+        searchbutton.addActionListener(new ActionListener() {
+
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                mainframe.openSearchDialog();
+            }
+        });
+    }
+
+    /**
+     * Adds a combobox for choosing and displaying the current problem.
+     */
+    private void addProblemChooser() {
+        problemBox = new JComboBox();
+
+        problemBox.setToolTipText("Choose a problem to colour the nodes "
+                + "in this tab in a specific colour "
+                + "corresponding to the problem that was"
+                + "chosen.");
+
+        problemBox.addItem(NOPROBLEMSELECTED);
+
+        for (Problem problem : DataSet.problems) {
+            problemBox.addItem(problem.getName());
+        }
+
+        problemBox.addItemListener(new ItemListener() {
+
+            @Override
+            public void itemStateChanged(ItemEvent e) {
+                if (setProblem) {
+                    UserSettings.setProblem(DataSet.getProblem(
+                            (String) problemBox.getSelectedItem()));
+                }
+            }
+        });
+
+        // make sure zoombox doesn't get bigger
+        final Dimension problemBoxSize = new Dimension(175, 36);
+        problemBox.setMaximumSize(problemBoxSize);
+        problemBox.setPreferredSize(problemBoxSize);
+
+        add(problemBox);
     }
 
     /**
@@ -343,7 +380,7 @@ public class ISGCIToolBar extends JToolBar {
         add(zoomBox);
 
         zoomBox.setToolTipText("Choose a zoom-level.");
-        
+
         // make sure zoombox doesn't get bigger
         final Dimension zoomBoxSize = new Dimension(80, 36);
         zoomBox.setMaximumSize(zoomBoxSize);
@@ -412,64 +449,20 @@ public class ISGCIToolBar extends JToolBar {
     }
 
     /**
-     * Add controls that have no specific group.
+     * Returns the drawinglibraryinterface.
      *
-     * @param <V> The vertex class.
-     * @param <E> The edge class.
+     * @return The currently active graphmanipulationinterface or null.
      */
-    private <V, E> void addMiscButtons() {
+    private GraphManipulationInterface<?, ?> getManipulationInterface() {
+        DrawingLibraryInterface<?, ?> drawinglib = mainframe.getTabbedPane()
+                .getActiveDrawingLibraryInterface();
 
-        // SEARCH
-        String searchTooltip = "Opens a dialogue to search for a specific "
-                + "graphclass in the drawing.";
-        JButton searchbutton = IconButtonFactory.createImageButton(
-                IconButtonFactory.SEARCH_ICON, searchTooltip);
-        add(searchbutton);
-
-        searchbutton.addActionListener(new ActionListener() {
-
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                mainframe.openSearchDialog();
-            }
-        });
-    }
-
-
-    /**
-     * Adds a combobox for choosing and displaying the current problem.
-     */
-    private void addProblemChooser() {
-        problemBox = new JComboBox();
-
-        problemBox.setToolTipText("Choose a problem to colour the nodes "
-                                + "in this tab in a specific colour "
-                                + "corresponding to the problem that was"
-                                + "chosen.");
-        
-        problemBox.addItem(NOPROBLEMSELECTED);
-
-        for (Problem problem : DataSet.problems) {
-            problemBox.addItem(problem.getName());
+        // no tab active
+        if (drawinglib == null) {
+            return null;
         }
 
-        problemBox.addItemListener(new ItemListener() {
-
-            @Override
-            public void itemStateChanged(ItemEvent e) {
-                if (setProblem) {
-                    UserSettings.setProblem(DataSet.getProblem(
-                            (String) problemBox.getSelectedItem()));
-                }
-            }
-        });
-
-        // make sure zoombox doesn't get bigger
-        final Dimension problemBoxSize = new Dimension(175, 36);
-        problemBox.setMaximumSize(problemBoxSize);
-        problemBox.setPreferredSize(problemBoxSize);
-
-        add(problemBox);
+        return drawinglib.getGraphManipulationInterface();
     }
 }
 

@@ -1,10 +1,11 @@
 package teo.isgci.drawing;
 
-import com.mxgraph.util.mxConstants;
-import teo.isgci.gui.LatexLabel;
+import java.awt.Font;
+import java.awt.Rectangle;
 
-import javax.swing.*;
-import java.awt.*;
+import com.mxgraph.util.mxConstants;
+import javax.swing.SwingConstants;
+import teo.isgci.gui.LatexLabel;
 
 /**
  * A lightweight latex label
@@ -42,41 +43,6 @@ public class lightweightLatexLabel extends LatexLabel {
      */
     public static lightweightLatexLabel getSharedInstance() {
         return sharedInstance;
-    }
-
-    /**
-     * Overridden for performance reasons.
-     */
-    public void validate() {
-    }
-
-    /**
-     * Overridden for performance reasons.
-     */
-    public void revalidate() {
-    }
-
-    /**
-     * Overridden for performance reasons.
-     */
-    public void repaint(long tm, int x, int y, int width, int height) {
-    }
-
-    /**
-     * Overridden for performance reasons.
-     */
-    public void repaint(Rectangle r) {
-    }
-
-    /**
-     * Overridden for performance reasons.
-     */
-    protected void firePropertyChange(String propertyName, Object oldValue,
-                                      Object newValue) {
-        // Strings get interned...
-        if (propertyName == "text" || propertyName == "font") {
-            super.firePropertyChange(propertyName, oldValue, newValue);
-        }
     }
 
     /**
@@ -133,6 +99,41 @@ public class lightweightLatexLabel extends LatexLabel {
      */
     public void firePropertyChange(String propertyName, boolean oldValue,
                                    boolean newValue) {
+    }
+
+    /**
+     * Overridden for performance reasons.
+     */
+    public void repaint(long tm, int x, int y, int width, int height) {
+    }
+
+    /**
+     * Overridden for performance reasons.
+     */
+    public void repaint(Rectangle r) {
+    }
+
+    /**
+     * Overridden for performance reasons.
+     */
+    public void revalidate() {
+    }
+
+    /**
+     * Overridden for performance reasons.
+     */
+    public void validate() {
+    }
+
+    /**
+     * Overridden for performance reasons.
+     */
+    protected void firePropertyChange(String propertyName, Object oldValue,
+                                      Object newValue) {
+        // Strings get interned...
+        if (propertyName == "text" || propertyName == "font") {
+            super.firePropertyChange(propertyName, oldValue, newValue);
+        }
     }
 
 }

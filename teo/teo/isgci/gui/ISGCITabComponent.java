@@ -60,7 +60,6 @@ import javax.swing.JButton;
 import javax.swing.JPanel;
 import javax.swing.JTabbedPane;
 import javax.swing.plaf.basic.BasicButtonUI;
-
 import teo.isgci.util.Utility;
 
 /**
@@ -69,34 +68,43 @@ import teo.isgci.util.Utility;
  */
 public class ISGCITabComponent extends JPanel {
     /**
+     * Listener for tab component.
+     */
+    private static final MouseListener BUTTONMOUSELISTENER
+            = new MouseAdapter() {
+        public void mouseEntered(MouseEvent e) {
+            Component component = e.getComponent();
+            if (component instanceof AbstractButton) {
+                AbstractButton button = (AbstractButton) component;
+                button.setBorderPainted(true);
+            }
+        }
+
+        public void mouseExited(MouseEvent e) {
+            Component component = e.getComponent();
+            if (component instanceof AbstractButton) {
+                AbstractButton button = (AbstractButton) component;
+                button.setBorderPainted(false);
+            }
+        }
+    };
+    /**
      * Should be changed every time the class is changed.
      */
     private static final long serialVersionUID = 1L;
-    
-    /** Parent. */
-    private final JTabbedPane parent;
-    
     /**
-     * The mode of the graph. 
-     * SUB means the graph is drawn with its subclasses.
-     * SUP means the graph is drawn with its superclasses.
-     * BOTH means the graph is drawn with its sub- and superclasses.
+     * Parent.
      */
-    public static enum Mode {
-        SUB,SUP,BOTH
-    }
+    private final JTabbedPane parent;
 
-    /** 
+    /**
      * Creates a new tabbedcomponent with close button and name.
-     * 
-     * @param pane
-     *          The parent.
-     * @param name
-     *          The name that will be next to the close button, compiled with
-     *          LaTeX.               
-     * @param m
-     *          The chosen mode (with subclasses or superclasses or both).
-     *          Null if no mode was chosen.
+     *
+     * @param pane The parent.
+     * @param name The name that will be next to the close button, compiled with
+     *             LaTeX.
+     * @param m    The chosen mode (with subclasses or superclasses or both).
+     *             Null if no mode was chosen.
      */
     public ISGCITabComponent(final JTabbedPane pane, String name, Mode m) {
         // unset default FlowLayout' gaps
@@ -106,15 +114,15 @@ public class ISGCITabComponent extends JPanel {
         }
         this.parent = pane;
         setOpaque(false);
-        
+
         String titel = Utility.getShortName(name);
         if (m != null) {
             if (m.equals(Mode.SUB)) {
-                titel += "  \u2193";             
+                titel += "  \u2193";
             } else if (m.equals(Mode.SUP)) {
-                titel += "  \u2191";            
+                titel += "  \u2191";
             } else if (m.equals(Mode.BOTH)) {
-                titel += "  \u2195";            
+                titel += "  \u2195";
             }
         }
 
@@ -122,52 +130,70 @@ public class ISGCITabComponent extends JPanel {
         LatexLabel label = new LatexLabel(titel);
         // make background transparent
         label.setBackground(new Color(0, 0, 0, 0));
-        
+
         // prevent nullpointerexceptions
         label.addMouseListener(new MouseListener() {
-            
+
             @Override
-            public void mouseReleased(MouseEvent e) { }
-            
+            public void mouseClicked(MouseEvent e) {
+            }
+
+            @Override
+            public void mouseEntered(MouseEvent e) {
+            }
+
+            @Override
+            public void mouseExited(MouseEvent e) {
+            }
+
             @Override
             public void mousePressed(MouseEvent e) {
                 int i = parent.indexOfTabComponent(ISGCITabComponent.this);
                 parent.setSelectedIndex(i);
             }
-            
+
             @Override
-            public void mouseExited(MouseEvent e) { }
-            
-            @Override
-            public void mouseEntered(MouseEvent e) { }
-            
-            @Override
-            public void mouseClicked(MouseEvent e) { }
+            public void mouseReleased(MouseEvent e) {
+            }
         });
-        
+
         add(label);
-        
+
         // add more space between the label and the button
         final int gap = 5;
         label.setBorder(BorderFactory.createEmptyBorder(0, 0, 0, gap));
-        
+
         // tab button
         JButton button = new TabButton();
         add(button);
-        
+
         // add more space to the top of the component
         setBorder(BorderFactory.createEmptyBorder(2, 0, 0, 0));
 
     }
 
-    /** Close button. */
+    /**
+     * The mode of the graph.
+     * SUB means the graph is drawn with its subclasses.
+     * SUP means the graph is drawn with its superclasses.
+     * BOTH means the graph is drawn with its sub- and superclasses.
+     */
+    public static enum Mode {
+        SUB, SUP, BOTH
+    }
+
+    /**
+     * Close button.
+     */
     private class TabButton extends JButton implements ActionListener {
         /**
          * Should be changed every time the class is changed.
          */
         private static final long serialVersionUID = 1L;
 
-        /** Creates a new close button for the tab. */
+        /**
+         * Creates a new close button for the tab.
+         */
         public TabButton() {
             final int size = 17;
             setPreferredSize(new Dimension(size, size));
@@ -191,11 +217,11 @@ public class ISGCITabComponent extends JPanel {
         @Override
         public void actionPerformed(ActionEvent e) {
             int i = parent.indexOfTabComponent(ISGCITabComponent.this);
-            
-            
+
+
             if (i != -1) {
-                parent.remove(i);                
-                if (parent.getTabCount() > 1 
+                parent.remove(i);
+                if (parent.getTabCount() > 1
                         && i == parent.getTabCount() - 1) {
                     parent.setSelectedIndex(parent.getTabCount() - 2);
                 }
@@ -204,7 +230,8 @@ public class ISGCITabComponent extends JPanel {
 
         // we don't want to update UI for this button
         @Override
-        public void updateUI() { }
+        public void updateUI() {
+        }
 
         // paint the cross
         @Override
@@ -230,28 +257,6 @@ public class ISGCITabComponent extends JPanel {
             g2.dispose();
         }
     }
-
-    /**
-     * Listener for tab component.
-     */
-    private static final MouseListener BUTTONMOUSELISTENER
-        = new MouseAdapter() {
-        public void mouseEntered(MouseEvent e) {
-            Component component = e.getComponent();
-            if (component instanceof AbstractButton) {
-                AbstractButton button = (AbstractButton) component;
-                button.setBorderPainted(true);
-            }
-        }
-
-        public void mouseExited(MouseEvent e) {
-            Component component = e.getComponent();
-            if (component instanceof AbstractButton) {
-                AbstractButton button = (AbstractButton) component;
-                button.setBorderPainted(false);
-            }
-        }
-    };
 }
 
 /* EOF */

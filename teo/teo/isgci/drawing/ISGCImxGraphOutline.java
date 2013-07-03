@@ -20,11 +20,10 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
 
-import javax.swing.JScrollBar;
-
 import com.mxgraph.swing.mxGraphComponent;
 import com.mxgraph.swing.mxGraphOutline;
 import com.mxgraph.view.mxGraphView;
+import javax.swing.JScrollBar;
 
 /**
  * An outline view for a specific graph component.
@@ -33,63 +32,63 @@ import com.mxgraph.view.mxGraphView;
  */
 class ISGCImxGraphOutline extends mxGraphOutline {
 
-    /** serial version. */
+    /**
+     * serial version.
+     */
     private static final long serialVersionUID = 1L;
 
 
     /**
      * Creates a custom isgci graphoutline with maximum zoomlevels.
-     * @param graphComponent
-     *          The corresponding graphComponent
+     *
+     * @param graphComponent The corresponding graphComponent
      */
     public ISGCImxGraphOutline(mxGraphComponent graphComponent) {
         super(graphComponent);
-        
+
         // remove mousemotionlistener and mouselistener
         MouseListener[] mouseListeners = getMouseListeners();
         for (MouseListener ml : mouseListeners) {
             removeMouseListener(ml);
         }
-        
+
         MouseMotionListener[] mouseMotionListeners = getMouseMotionListeners();
         for (MouseMotionListener mml : mouseMotionListeners) {
             removeMouseMotionListener(mml);
         }
-        
+
         // add bug-free listeners
         BuglessMouseTracker bugFreeTracker = new BuglessMouseTracker();
-        
+
         addMouseMotionListener(bugFreeTracker);
         addMouseListener(bugFreeTracker);
     }
 
-
     /**
-         *
+     *
+     */
+    class BuglessMouseTracker implements MouseListener, MouseMotionListener {
+        /**
+         * startpoint.
          */
-   class BuglessMouseTracker implements MouseListener, MouseMotionListener {
-        /** startpoint. */
         protected Point start = null;
 
-        @Override
-        public void mousePressed(MouseEvent e) {
-            zoomGesture = hitZoomHandle(e.getX(), e.getY());
+        /**
+         * Taken from mxGraphOutline.
+         *
+         * @param x Parameter x.
+         * @param y Parameter y.
+         * @return a boolean.
+         */
+        public boolean hitZoomHandle(int x, int y) {
+            return new Rectangle(finderBounds.x + finderBounds.width - 6,
+                    finderBounds.y + finderBounds.height - 6, 8, 8).contains(
+                    x, y);
+        }
 
-            if (graphComponent != null && !e.isConsumed()
-                    && !e.isPopupTrigger()
-                    && (finderBounds.contains(e.getPoint()) || zoomGesture)) {
-                start = e.getPoint();
-            } else { 
-                int dx = (int) ((e.getX() - translate.x 
-                        - finderBounds.getWidth() / 2) / scale);
-                int dy = (int) ((e.getY() - translate.y 
-                        - finderBounds.getHeight() / 2) / scale);
-                
-                // Moves scrollbars to the right position.
-                
-                graphComponent.getHorizontalScrollBar().setValue(dx);
-                graphComponent.getVerticalScrollBar().setValue(dy);
-            }
+        @Override
+        public void mouseClicked(MouseEvent e) {
+            // ignore
         }
 
         @Override
@@ -127,6 +126,48 @@ class ISGCImxGraphOutline extends mxGraphOutline {
                             graphComponent.getVerticalScrollBar().getValue()
                                     + dy);
                 }
+            }
+        }
+
+        @Override
+        public void mouseEntered(MouseEvent e) {
+            // ignore
+        }
+
+        @Override
+        public void mouseExited(MouseEvent e) {
+            // ignore
+        }
+
+        @Override
+        public void mouseMoved(MouseEvent e) {
+            if (hitZoomHandle(e.getX(), e.getY())) {
+                setCursor(new Cursor(Cursor.HAND_CURSOR));
+            } else if (finderBounds.contains(e.getPoint())) {
+                setCursor(new Cursor(Cursor.MOVE_CURSOR));
+            } else {
+                setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
+            }
+        }
+
+        @Override
+        public void mousePressed(MouseEvent e) {
+            zoomGesture = hitZoomHandle(e.getX(), e.getY());
+
+            if (graphComponent != null && !e.isConsumed()
+                    && !e.isPopupTrigger()
+                    && (finderBounds.contains(e.getPoint()) || zoomGesture)) {
+                start = e.getPoint();
+            } else {
+                int dx = (int) ((e.getX() - translate.x
+                        - finderBounds.getWidth() / 2) / scale);
+                int dy = (int) ((e.getY() - translate.y
+                        - finderBounds.getHeight() / 2) / scale);
+
+                // Moves scrollbars to the right position.
+
+                graphComponent.getHorizontalScrollBar().setValue(dx);
+                graphComponent.getVerticalScrollBar().setValue(dy);
             }
         }
 
@@ -177,44 +218,6 @@ class ISGCImxGraphOutline extends mxGraphOutline {
                 zoomGesture = false;
                 start = null;
             }
-        }
-
-        /**
-         *  Taken from mxGraphOutline.
-         * @param x Parameter x.
-         * @param y Parameter y.
-         * @return a boolean.
-         */
-        public boolean hitZoomHandle(int x, int y) {
-            return new Rectangle(finderBounds.x + finderBounds.width - 6,
-                    finderBounds.y + finderBounds.height - 6, 8, 8).contains(
-                    x, y);
-        }
-
-        @Override
-        public void mouseMoved(MouseEvent e) {
-            if (hitZoomHandle(e.getX(), e.getY())) {
-                setCursor(new Cursor(Cursor.HAND_CURSOR));
-            } else if (finderBounds.contains(e.getPoint())) {
-                setCursor(new Cursor(Cursor.MOVE_CURSOR));
-            } else {
-                setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
-            }
-        }
-
-        @Override
-        public void mouseClicked(MouseEvent e) {
-            // ignore
-        }
-
-        @Override
-        public void mouseEntered(MouseEvent e) {
-            // ignore
-        }
-
-        @Override
-        public void mouseExited(MouseEvent e) {
-            // ignore
         }
 
     }
