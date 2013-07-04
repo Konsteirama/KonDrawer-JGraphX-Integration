@@ -76,7 +76,7 @@ public class ISGCIMainFrame extends JFrame implements WindowListener {
     /**
      * The loader which initialized the mainframe.
      */
-    protected teo.Loader loader;
+    private teo.Loader loader;
     
     /**
      * Saves jdialogs to close them if they need to be closed from here.
@@ -218,6 +218,14 @@ public class ISGCIMainFrame extends JFrame implements WindowListener {
         loader.unregister();
     }
 
+    /**
+     * Returns the current loader.
+     * @return the current loader.
+     */
+    public teo.Loader getLoader() {
+        return loader;
+    }
+    
     /**
      * Getter for the menu for drawing graphs.
      *

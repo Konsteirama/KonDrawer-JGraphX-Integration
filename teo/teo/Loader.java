@@ -62,7 +62,7 @@ public class Loader {
     //-------------------------- Input stuff -------------------------------
 
     /**
-     * Display a document in a new browser window
+     * Display a document in a new browser window.
      * @param url the document to display (relative to documentbase)
      * @param name the name of the window to display the document in.
      */
@@ -78,7 +78,7 @@ public class Loader {
 
 
     /**
-     * Open a stream to filename
+     * Open a stream to filename/
      */
     public InputStream openStream(String filename) {
         InputStream is = null;

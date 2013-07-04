@@ -51,14 +51,12 @@ class StartPanel extends JPanel {
      * How much time should pass between clicks.
      */
     private static final int CLICKDELAY = 600;
+    
     /**
      * How much time should pass between animationframes.
      */
     private static final int DELAY = 4;
-    /**
-     * The ISGCI Homepage.
-     */
-    private static final String ISGCIHOME = "www.graphclasses.org";
+
     /**
      * The website containing the news.
      */
@@ -523,18 +521,18 @@ class StartPanel extends JPanel {
 
         moveMouseTo(robot, to);
     }
-
+    
     /**
      * Eats up all mouseevents, so nullpointerexceptions will not be thrown
      * if a label or image is clicked within the startpanel.
      */
-    static class MouseEater implements MouseListener {
+    private class MouseEater implements MouseListener {
 
         @Override
         public void mouseClicked(MouseEvent e) {
             try {
                 if (e.getSource() instanceof JPanel) {
-                    java.awt.Desktop.getDesktop().browse(new URI(ISGCIHOME));
+                    StartPanel.this.mainframe.getLoader().showDocument("");
                 }
             } catch (Exception err) {
                 System.err.println("Error opening weppage!");

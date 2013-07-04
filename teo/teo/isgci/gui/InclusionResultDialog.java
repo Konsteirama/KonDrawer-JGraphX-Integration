@@ -669,7 +669,7 @@ public class InclusionResultDialog extends JDialog implements ActionListener {
             
 
         } else if (source == refButton) {
-            parent.loader.showDocument("classes/refs00.html");
+            parent.getLoader().showDocument("classes/refs00.html");
         }
     }
 
