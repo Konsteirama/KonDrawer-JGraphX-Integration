@@ -55,56 +55,76 @@ class GraphManipulation<V, E> implements GraphManipulationInterface<V, E> {
      * Defines the original edge color.
      */
     private static final Color EDGECOLOR = new Color(100, 130, 185);
+    
     /**
      * Defines the color with which improper edges are marked.
      */
     private static final Color MARKEDCOLOR = Color.black;
+    
     /**
      * How far the user can zoom in.
      */
     private static final double MAXZOOMLEVEL = 8;
+    
     /**
      * Defines the thickness for highlighting.
      */
     private String cellThickness = "4";
+    
     /**
      * How deep the children were highlighted.
      */
     private HashMap<mxICell, Integer> childHighlightingDepth
             = new HashMap<mxICell, Integer>();
+    
     /**
      * The parent interface from which this object was created.
      */
     private JGraphXInterface<V, E> drawingLibrary;
+    
     /**
      * Defines the color that should be used for highlighting.
      */
     private Color highlightColor;
+    
     /**
      * Currently highlighted cells with their previous color.
      */
     private HashMap<mxICell, Color> highlightedCellsColor;
+    
     /**
      * Currently highlighted cells with their previous thickness.
      */
     private HashMap<mxICell, String> highlightedCellsThickness;
+    
     /**
      * How deep the parents were highlighted.
      */
     private HashMap<mxICell, Integer> parentHighlightingDepth
             = new HashMap<mxICell, Integer>();
+    
     /**
      * Defines whether or not the undoHandler should record actions.
      */
     private int recordUndoableActions;
+    
     /**
      * List of currently selected cells.
      */
     private List<mxICell> selectedCells;
+    
+    /**
+     * Keeps track of which nodes were already visitied by 
+     * {@link hasSignificantParents} and {@link hasSignificantChildren} to
+     * prevent infinite loops.
+     */
+    private final List<V> visitedNodes = new ArrayList<V>();
+    
     /**
      * Defines the color that should be used for selection.
      */
     private Color selectionColor;
+    
     /**
      * Handles undo events in jgraphx.
      */
@@ -116,6 +136,7 @@ class GraphManipulation<V, E> implements GraphManipulationInterface<V, E> {
             }
         }
     };
+    
     /**
      * Manages the undo-operations on the calling graph.
      */
@@ -432,7 +453,9 @@ class GraphManipulation<V, E> implements GraphManipulationInterface<V, E> {
                     = getGraphAdapter().getCellToVertexMap();
 
             for (mxICell cell : cells) {
-                removeNode(cellToVertex.get(cell));
+                if (cell.isVertex() && !cell.isCollapsed()) {
+                    removeNode(cellToVertex.get(cell));
+                }
             }
 
         } finally {
@@ -442,22 +465,37 @@ class GraphManipulation<V, E> implements GraphManipulationInterface<V, E> {
     }
 
     @Override
-    public void removeNode(V node) {
+    public void removeNode(V node) {       
         mxGraph graph = drawingLibrary.getGraphComponent().getGraph();
-
-        Object[] cells = new Object[]{getCellFromNode(node)};
-
-        // Adds all edges connected to the node
-        cells = graph.addAllEdges(cells);
 
         unHighlightNode(node);
 
         beginUpdate();
         try {
-            // Deletes every cell
-            for (Object object : cells) {
-                graph.getModel().remove(object);
-            }
+            // Deletes every cell but leaves a small node for displaying
+            // the edges
+            mxICell cell = getCellFromNode(node);
+
+            // move cells so the tiny cells are still in the middle
+            graph.moveCells(new Object[] { cell }, cell.getGeometry()
+                    .getWidth() / 2, cell.getGeometry().getHeight() / 2);
+
+            // make cells nearly invisible
+            cell.getGeometry().setAlternateBounds(new mxRectangle(0, 0, 0, 0));
+
+            // set label to one space to make it undoable
+            graph.getModel().setValue(cell, " ");
+
+            // fold cells so only edges are still visible
+            graph.cellsFolded(new Object[] { cell }, true, false);
+            
+            // diable cell movement
+            graph.setCellStyles(mxConstants.STYLE_MOVABLE, "0", 
+                    new Object[] { cell });
+            
+            // remove all cells without "visible" parents/children
+            removeLooseNodes(cell, true, true);
+            
         } finally {
             endUpdate();
         }
@@ -928,6 +966,218 @@ class GraphManipulation<V, E> implements GraphManipulationInterface<V, E> {
     }
 
     /**
+     * Removes a node from the canvas.
+     * 
+     * @param node
+     *            The node that should be removed.
+     */
+    private void deleteNode(mxICell node) {
+        mxGraph graph = drawingLibrary.getGraphComponent().getGraph();
+        Object[] cells = new Object[]{node};
+    
+        // Adds all edges connected to the node
+        cells = graph.addAllEdges(cells);
+    
+        // remove
+        for (Object object : cells) {
+            graph.getModel().remove(object);
+        }
+    
+    }
+
+    /** 
+     * Removes loose nodes. "Loose" is refering to nodes that have been
+     * collapsed via {@link removeNode} and have no visible parents/children.
+     * 
+     * @param node
+     *          Where to begin
+     * @param removeParents
+     *          Whether to recurse into parentnodes
+     * @param removeChildren
+     *          Whether to recurse into childnodes
+     */
+    private void removeLooseNodes(mxICell node, 
+                                  boolean removeParents, 
+                                  boolean removeChildren) {
+        V tnode = getGraphAdapter().getCellToVertexMap().get(node);
+        
+        visitedNodes.clear();
+        boolean hasSignificantChildren = hasSignificantChildren(tnode);
+        visitedNodes.clear();
+        boolean hasSignificantParents = hasSignificantParents(tnode);
+        
+        if (hasSignificantChildren && hasSignificantParents) {
+            return;
+        }
+        
+        deleteNode(node);
+
+        if (removeParents) {
+            List<V> parents = getNodeParents(tnode);
+
+            for (V parent : parents) {
+                if (!getCellFromNode(parent).isCollapsed()) {
+                    continue;
+                }
+
+                removeLooseNodes(getCellFromNode(parent), true, false);
+            }
+        }
+
+        if (removeChildren) {
+            List<V> children = getNodeChildren(tnode);
+
+            for (V child : children) {
+                if (!getCellFromNode(child).isCollapsed()) {
+                    continue;
+                }
+
+                removeLooseNodes(getCellFromNode(child), false, true);
+            }
+        }
+
+    }
+    
+    /**
+     * Checks whether the given node has significant children.
+     * Significant means: - The node has children
+     *                    - These children are neither collapsed nor deleted
+     * 
+     * @param start
+     *          Where to start searching
+     * @return
+     *          Whether the node has significant children.
+     */
+    private boolean hasSignificantChildren(V start) {
+        // prevent endless circles
+        if (visitedNodes.contains(start)) {
+            return false;
+        }
+        
+        visitedNodes.add(start);
+
+        List<V> children = getNodeChildren(start);
+        ArrayList<mxICell> mxChildren 
+            = new ArrayList<mxICell>(children.size());
+
+        // fill mxList
+        for (V child : children) {
+            mxChildren.add(getCellFromNode(child));
+        }    
+            
+        // check all nodes first if one was found already
+        for (mxICell cell : mxChildren) {
+            if (!cell.isCollapsed() && cell.isVisible()) {
+                return true;
+            }
+        }
+        
+        // check all parents
+        for (V parent : children) {
+            if (hasSignificantParents(parent)) {
+                return true;
+            }
+        }
+        
+        // nothing found
+        return false;
+    }
+    
+    /**
+     * Checks whether the given node has significant parents.
+     * Significant means: - The node has parents
+     *                    - These parents are neither collapsed nor deleted 
+     * 
+     * @param start
+     *          Where to start searching
+     * @return
+     *          Whether the node has significant parents.
+     */
+    private boolean hasSignificantParents(V start) {
+        // prevent endless circles
+        if (visitedNodes.contains(start)) {
+            return false;
+        }
+        
+        visitedNodes.add(start);
+
+        List<V> parents = getNodeParents(start);
+        ArrayList<mxICell> mxParents = new ArrayList<mxICell>(parents.size());
+        
+        // fill mxList
+        for (V parent : parents) {
+            mxParents.add(getCellFromNode(parent));
+        }
+        
+        // check all nodes first if one was found already
+        for (mxICell cell : mxParents) {
+            if (!cell.isCollapsed() && cell.isVisible()) {
+                return true;
+            }
+        }
+        
+        // check all parents
+        for (V parent : parents) {
+            if (hasSignificantParents(parent)) {
+                return true;
+            }
+        }
+        
+        // nothing found
+        return false;
+    }
+    
+    /**
+     * Collects all parents of a jgrapht node.
+     * @param node
+     *          The node which parents are returned.
+     * @return
+     *          The parents of the given node.
+     */
+    private List<V> getNodeParents(V node) {
+        Graph<V, E> graph = drawingLibrary.getGraph();
+        Set<E> edges = graph.edgesOf(node);
+        
+        ArrayList<V> parents = new ArrayList<V>();
+        
+        // gather all parents/children
+        for (E edge : edges) {
+            V parent = graph.getEdgeSource(edge);
+            
+            if (parent != node) {
+                parents.add(parent);
+            }
+        }
+        
+        return parents;
+    }
+
+    /**
+     * Collects all children of a jgrapht node.
+     * @param node
+     *          The node which the children are returned.
+     * @return
+     *          The children of the given node.
+     */
+    private List<V> getNodeChildren(V node) {
+        Graph<V, E> graph = drawingLibrary.getGraph();
+        Set<E> edges = graph.edgesOf(node);
+        
+        ArrayList<V> children = new ArrayList<V>();
+        
+        // gather all parents/children
+        for (E edge : edges) {
+            V child = graph.getEdgeTarget(edge);
+            
+            if (child != node) {
+                children.add(child);
+            }
+        }
+        
+        return children;
+    }
+    
+    /**
      * Sets the thickness of highlighting and selection.
      *
      * @param value The thickness that should be applied.
@@ -959,12 +1209,6 @@ class GraphManipulation<V, E> implements GraphManipulationInterface<V, E> {
         try {
             for (mxICell cell : highlightedCellsColor.keySet()) {
 
-                // ignore cells that are selected
-//                if (selectedCells.contains(cell)) {
-//                    continue;
-//                }
-
-
                 getGraphAdapter().setCellStyles(mxConstants.STYLE_STROKECOLOR,
                         mxUtils.getHexColorString(
                                 highlightedCellsColor.get(cell)),
@@ -979,18 +1223,6 @@ class GraphManipulation<V, E> implements GraphManipulationInterface<V, E> {
             highlightedCellsColor.clear();
             highlightedCellsThickness.clear();
 
-            // second iteration is needed so we don't delete from the keyset
-            // while deleting from it - same reason why we use .toArray here
-//            for (Object obj : highlightedCellsColor.keySet().toArray()) {
-//                
-//                // ignore cells that are selected
-//                if (selectedCells.contains(obj)) {
-//                    continue;
-//                }
-//                
-//                highlightedCellsColor.remove(obj);
-//                highlightedCellsThickness.remove(obj);
-//            }
         } finally {
             endUpdate();
             endNotUndoable();
