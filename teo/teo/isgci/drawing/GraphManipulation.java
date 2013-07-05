@@ -321,6 +321,7 @@ class GraphManipulation<V, E> implements GraphManipulationInterface<V, E> {
         }
 
         if (factor < 1.0) {
+            factor *= 0.95;
             graphComponent.zoom(factor);
             applyZoomSettings();
         }
