@@ -21,6 +21,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Set;
 
+import javax.swing.SwingUtilities;
+
 import com.mxgraph.layout.hierarchical.mxHierarchicalLayout;
 import com.mxgraph.model.mxICell;
 import com.mxgraph.swing.mxGraphComponent;
@@ -425,6 +427,11 @@ class GraphManipulation<V, E> implements GraphManipulationInterface<V, E> {
         undoManager.redo();
 
         applyZoomSettings();
+        
+        // reapply highlighting completely
+        unHighlightAll(false);
+        reapplyHighlighting();
+        updateSelectedCells();
     }
 
     @Override
@@ -481,8 +488,8 @@ class GraphManipulation<V, E> implements GraphManipulationInterface<V, E> {
                     .getWidth() / 2, cell.getGeometry().getHeight() / 2);
 
             // make cells nearly invisible
-            cell.getGeometry().setAlternateBounds(new mxRectangle(0, 0, 0, 0));
-
+            //cell.getGeometry().setAlternateBounds(new mxRectangle(0, 0, 0, 0));
+            
             // set label to one space to make it undoable
             graph.getModel().setValue(cell, " ");
 
@@ -600,6 +607,11 @@ class GraphManipulation<V, E> implements GraphManipulationInterface<V, E> {
     public void undo() {
         undoManager.undo();
         applyZoomSettings();
+        
+        // reapply highlighting completely
+        unHighlightAll(false);
+        reapplyHighlighting();
+        updateSelectedCells();
     }
 
     @Override
@@ -982,7 +994,6 @@ class GraphManipulation<V, E> implements GraphManipulationInterface<V, E> {
         for (Object object : cells) {
             graph.getModel().remove(object);
         }
-    
     }
 
     /** 
@@ -1016,11 +1027,9 @@ class GraphManipulation<V, E> implements GraphManipulationInterface<V, E> {
             List<V> parents = getNodeParents(tnode);
 
             for (V parent : parents) {
-                if (!getCellFromNode(parent).isCollapsed()) {
-                    continue;
+                if (getCellFromNode(parent).isCollapsed()) {
+                    removeLooseNodes(getCellFromNode(parent), true, false);
                 }
-
-                removeLooseNodes(getCellFromNode(parent), true, false);
             }
         }
 
@@ -1028,11 +1037,9 @@ class GraphManipulation<V, E> implements GraphManipulationInterface<V, E> {
             List<V> children = getNodeChildren(tnode);
 
             for (V child : children) {
-                if (!getCellFromNode(child).isCollapsed()) {
-                    continue;
+                if (getCellFromNode(child).isCollapsed()) {
+                    removeLooseNodes(getCellFromNode(child), false, true);
                 }
-
-                removeLooseNodes(getCellFromNode(child), false, true);
             }
         }
 
@@ -1072,9 +1079,9 @@ class GraphManipulation<V, E> implements GraphManipulationInterface<V, E> {
             }
         }
         
-        // check all parents
-        for (V parent : children) {
-            if (hasSignificantParents(parent)) {
+        // check all children
+        for (V child : children) {
+            if (hasSignificantChildren(child)) {
                 return true;
             }
         }
