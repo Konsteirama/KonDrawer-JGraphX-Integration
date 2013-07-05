@@ -105,8 +105,8 @@ public interface GraphManipulationInterface<V, E> {
     void highlightParents(List<V> roots);
 
     /**
-     * Marks the edge between two given nodes by adding a small grey arrow and
-     * coloring the edge.
+     * Marks the given edge displaying it as bidirectional and
+     * coloring it.
      *
      * @param edges : an array of edges of the graph
      */
