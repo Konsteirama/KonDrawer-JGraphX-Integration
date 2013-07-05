@@ -34,7 +34,7 @@ public abstract class UserSettings {
     /**
      * The colorblind color for highlighting.
      */
-    public static final Color BLINDHIGHTLIGHTCOLOR = new Color(240, 39, 100);
+    public static final Color BLINDHIGHTLIGHTCOLOR = new Color(102, 153, 255);
     /**
      * The currently active tab.
      */
