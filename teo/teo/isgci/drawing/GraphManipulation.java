@@ -486,7 +486,7 @@ class GraphManipulation<V, E> implements GraphManipulationInterface<V, E> {
                     .getWidth() / 2, cell.getGeometry().getHeight() / 2);
 
             // make cells nearly invisible
-            //cell.getGeometry().setAlternateBounds(new mxRectangle(0, 0, 0, 0));
+            cell.getGeometry().setAlternateBounds(new mxRectangle(0, 0, 0, 0));
             
             // set label to one space to make it undoable
             graph.getModel().setValue(cell, " ");
