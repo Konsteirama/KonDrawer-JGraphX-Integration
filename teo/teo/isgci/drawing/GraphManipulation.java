@@ -506,6 +506,12 @@ class GraphManipulation<V, E> implements GraphManipulationInterface<V, E> {
         }
 
         applyZoomSettings();
+        
+        // remove node from selected nodes
+        List<V> selectedNodes = drawingLibrary.getSelectedNodes();
+        selectedNodes.remove(node);
+        drawingLibrary.setSelectedNodes(selectedNodes);
+        
         updateSelectedCells();
     }
 
