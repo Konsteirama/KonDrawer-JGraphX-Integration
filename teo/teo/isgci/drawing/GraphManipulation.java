@@ -21,7 +21,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Set;
 
-import javax.swing.SwingUtilities;
+import org.jgrapht.Graph;
+
+import teo.isgci.util.UserSettings;
 
 import com.mxgraph.layout.hierarchical.mxHierarchicalLayout;
 import com.mxgraph.model.mxICell;
@@ -37,10 +39,6 @@ import com.mxgraph.util.mxUndoableEdit;
 import com.mxgraph.util.mxUtils;
 import com.mxgraph.view.mxGraph;
 import com.mxgraph.view.mxGraphView;
-
-import org.jgrapht.Graph;
-
-import teo.isgci.util.UserSettings;
 
 /**
  * This class implements the GraphManipulationInterface. It handles
