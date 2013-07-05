@@ -289,12 +289,62 @@ class GraphManipulation<V, E> implements GraphManipulationInterface<V, E> {
 
         mxGraphComponent graphComponent = drawingLibrary.getGraphComponent();
 
-        mxRectangle bounds = determineViewBounds(getCellsFromNodes(nodes),
-                true);
+        mxRectangle bounds = determineViewBounds(getCellsFromNodes(nodes));
+
+        // Get the component and view heights/widths
+        int compWidth = drawingLibrary.getGraphComponent().getWidth();
+        int boundsWidth = (int) bounds.getWidth();
+        int compHeight = drawingLibrary.getGraphComponent().getHeight();
+        int boundsHeight = (int) bounds.getHeight();
+
+        double relWidth = (double) compWidth / boundsWidth;
+        double relHeight = (double) compHeight / boundsHeight;
+
+        // If the relative Width is greater than the rel. height
+        // set the scale to fit the width and vice versa
+
+        double factor = 1.0;
+
+        if (relWidth <= relHeight) {
+            factor = relWidth;
+        } else {
+            factor = relHeight;
+        }
+
+        if(factor < 1.0){
+            graphComponent.zoom(factor);
+            applyZoomSettings();
+        }
+
+        bounds = determineViewBounds(getCellsFromNodes(nodes));
 
         graphComponent.getGraphControl()
-                .scrollRectToVisible(bounds.getRectangle());
+                .scrollRectToVisible(getCenteredRectangle(bounds)
+                        .getRectangle());
     }
+
+    private mxRectangle getCenteredRectangle(mxRectangle rect){
+
+        mxGraphComponent graphComponent = drawingLibrary.getGraphComponent();
+
+        mxRectangle centeredRect = (mxRectangle) rect.clone();
+
+        centeredRect.setX(rect.getCenterX() - graphComponent.getWidth() / 2);
+        centeredRect.setWidth(graphComponent.getWidth());
+        centeredRect.setY(rect.getCenterY() - graphComponent.getHeight() / 2);
+        centeredRect.setHeight(graphComponent.getHeight());
+
+        if(!centeredRect.getRectangle().contains(rect.getRectangle()))
+        {
+            rect.grow(10);
+            rect.setX(rect.getX() - 5);
+            rect.setY(rect.getY() - 5);
+            centeredRect = rect;
+        }
+
+        return centeredRect;
+    }
+
 
     @Override
     public void colorNode(V[] nodes, Color color) {
@@ -769,7 +819,7 @@ class GraphManipulation<V, E> implements GraphManipulationInterface<V, E> {
      * @return
      *          A mxRectangle where the view should be
      */
-    private mxRectangle determineViewBounds(mxICell[] cells, boolean center) {
+    private mxRectangle determineViewBounds(mxICell[] cells) {
 
         mxGraphComponent graphComponent = drawingLibrary.getGraphComponent();
 
@@ -797,6 +847,8 @@ class GraphManipulation<V, E> implements GraphManipulationInterface<V, E> {
             rect.setHeight(graphComponent.getHeight());
         }
         return rect;
+        return getGraphAdapter().getBoundsForCells(cells, false,
+                false, true);
     }
 
     /**
