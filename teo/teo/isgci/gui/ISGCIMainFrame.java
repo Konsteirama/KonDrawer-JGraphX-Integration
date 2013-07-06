@@ -379,7 +379,7 @@ public class ISGCIMainFrame extends JFrame implements WindowListener {
     }
 
     /**
-     * Sets the state of the color for problem radiobox.
+     * Sets the state of the color for problem listbox in the toolbar.
      *
      * @param problem the new problem which is active.
      */
