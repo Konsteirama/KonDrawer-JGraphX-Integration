@@ -42,7 +42,8 @@ public class ExportDialog extends JDialog implements ActionListener {
     /**
      * The card titles (and ids)
      */
-    protected static final String CARD_FORMAT = "Please choose the file format";
+    protected static final String CARD_FORMAT 
+        = "Please choose the file format";
     protected JButton backButton, nextButton, cancelButton;
     protected CardLayout cardLayout;
     protected JPanel cardPanel;
@@ -167,31 +168,31 @@ public class ExportDialog extends JDialog implements ActionListener {
             // adding description
             if (format.equals("ps") || format.equals("eps")) {
                 box.add(explText(
-                        "A Postscript file can be included immediately in e.g. LaTeX\n"
-                                + "documents, but it cannot easily be edited."));
+                "A Postscript file can be included immediately in e.g. LaTeX\n"
+                + "documents, but it cannot easily be edited."));
             } else if (format.equals("svg")) {
                 box.add(explText(
-                        "An SVG file is suitable for editing the diagram, e.g. with\n"
-                                + "inkscape (http://www.inkscape.org), but cannot be included\n"
-                                + "directly in LaTeX."));
+         "An SVG file is suitable for editing the diagram, e.g. with\n"
+         + "inkscape (http://www.inkscape.org), but cannot be included\n"
+         + "directly in LaTeX."));
             } else if (format.equals("graphml")) {
                 box.add(explText(
-                        "A graphml file contains the structure of the graph and is\n"
-                                + "suitable for processing by many graph tools, but does not\n"
-                                + "contain layout information and cannot be included directly\n"
-                                + "in LaTeX. Editing and laying out can be done with e.g. yEd.\n"
+         "A graphml file contains the structure of the graph and is\n"
+         + "suitable for processing by many graph tools, but does not\n"
+         + "contain layout information and cannot be included directly\n"
+         + "in LaTeX. Editing and laying out can be done with e.g. yEd.\n"
                                 + "(http://www.yworks.com)"));
             } else if (format.equals("jpg")) {
                 box.add(explText(
-                        "A JPG file is one of the current standard file formats for\n"
-                                + "images. It can be viewed and processed on nearly any device\n"
-                                + "or any image-processing application. It is more comprimated\n"
+         "A JPG file is one of the current standard file formats for\n"
+         + "images. It can be viewed and processed on nearly any device\n"
+         + "or any image-processing application. It is more comprimated\n"
                                 + "than the PNG format."));
             } else if (format.equals("png")) {
                 box.add(explText(
-                        "A PNG file is one of the current standard file formats for\n"
-                                + "images. It can be viewed and processed on nearly any device\n"
-                                + "or any image-processing application. It can be transparent.\n"));
+         "A PNG file is one of the current standard file formats for\n"
+         + "images. It can be viewed and processed on nearly any device\n"
+         + "or any image-processing application. It can be transparent.\n"));
             }
         }
 

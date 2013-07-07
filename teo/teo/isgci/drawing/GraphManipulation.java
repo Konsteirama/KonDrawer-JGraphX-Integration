@@ -1276,10 +1276,14 @@ class GraphManipulation<V, E> implements GraphManipulationInterface<V, E> {
         try {
             for (mxICell cell : highlightedCellsColor.keySet()) {
 
-                getGraphAdapter().setCellStyles(mxConstants
-                        .STYLE_STROKECOLOR, mxUtils.getHexColorString(highlightedCellsColor.get(cell)), new Object[]{cell});
+                getGraphAdapter().setCellStyles(
+                        mxConstants.STYLE_STROKECOLOR,
+                        mxUtils.getHexColorString(highlightedCellsColor
+                                .get(cell)), new Object[] { cell });
 
-                getGraphAdapter().setCellStyles(mxConstants.STYLE_STROKEWIDTH, highlightedCellsThickness.get(cell), new Object[]{cell});
+                getGraphAdapter().setCellStyles(mxConstants.STYLE_STROKEWIDTH,
+                        highlightedCellsThickness.get(cell),
+                        new Object[] { cell });
 
             }
 

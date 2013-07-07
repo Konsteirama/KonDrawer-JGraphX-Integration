@@ -618,7 +618,7 @@ public class InclusionResultDialog extends JDialog implements ActionListener {
                     node[0] = upper.iterator().next();
                     node[1] = lower.iterator().next();
                     parent.getTabbedPane().drawInActiveTab(graph, upper
-                            .toString() + "-" + lower.toString(), null, node);                   
+                            .toString() + "-" + lower.toString(), null, node);
                     
                     drawButton.setText(text);
                     closeDialog();

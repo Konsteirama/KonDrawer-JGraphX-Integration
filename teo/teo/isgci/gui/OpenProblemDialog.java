@@ -399,8 +399,8 @@ public class OpenProblemDialog extends JDialog implements ItemListener,
     private Collection<GraphClass> getNodesOpen(GraphClass node,
             final Problem problem) {
         /*
-         * final ArrayList<GraphClass> result = new ArrayList<GraphClass>(); new
-         * UBFSWalker<GraphClass,Inclusion>( DataSet.inclGraph, node, null,
+         * final ArrayList<GraphClass> result = new ArrayList<GraphClass>(); 
+         * new UBFSWalker<GraphClass,Inclusion>( DataSet.inclGraph, node, null,
          * GraphWalker.InitCode.DYNAMIC) { public void visit(GraphClass v) {
          * result.add(v); Complexity c = problem.getComplexity(v); if
          * (c.isUnknown()) super.visit(v); else finish(v); } }.run();
@@ -436,9 +436,9 @@ public class OpenProblemDialog extends JDialog implements ItemListener,
     }
 
     /**
-     * Fills in a vector with the environment of the given node. The environment
-     * is found by walking over open superclasses until the first non-polynomial
-     * node is reached.
+     * Fills in a vector with the environment of the given node. 
+     * The environment is found by walking over open superclasses until 
+     * the first non-polynomial node is reached.
      */
     private Collection<GraphClass> getNodesP(GraphClass node,
             final Problem problem) {
