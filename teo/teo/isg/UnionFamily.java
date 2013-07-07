@@ -50,11 +50,11 @@ public class UnionFamily extends Family{
     
     public String toString(){
         int i;
-	String s = "Name: "+getName()+"\nSubfamilies: ";
-	for (i=0; i<subfamilies.size(); i++)
-	    s+=((SmallGraph) subfamilies.elementAt(i)).getName()+"; ";
-	s+="\nLink: "+link+"\nComplement: "+complement.getName();
-	return s;
+        String s = "Name: " + getName() + "\nSubfamilies: ";
+        for (i = 0; i < subfamilies.size(); i++)
+            s += ((SmallGraph) subfamilies.elementAt(i)).getName() + "; ";
+        s += "\nLink: " + link + "\nComplement: " + complement.getName();
+        return s;
     }
 }
     

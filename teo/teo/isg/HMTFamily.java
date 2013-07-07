@@ -24,10 +24,10 @@ public class HMTFamily extends Family{
     /** Creates a new HMTFamily without Graphs */
     public HMTFamily(){
         super();
-	hmtg = null;
+        hmtg = null;
         index = null;
         induced = null;
-	smallmembers = null;
+        smallmembers = null;
     }
     
     
@@ -39,12 +39,12 @@ public class HMTFamily extends Family{
         super.copyFromComplement();
 
         HMTFamily f = (HMTFamily) complement;
-	if (f.smallmembers != null) {
-            //---- First copy the complement
-	    smallmembers = (Vector) f.smallmembers.clone();
+        if (f.smallmembers != null) {
+            // ---- First copy the complement
+            smallmembers = (Vector) f.smallmembers.clone();
 
             //---- Then complement
-            for (int i=0; i<smallmembers.size(); i++) {
+            for (int i = 0; i < smallmembers.size(); i++) {
                 smallmembers.setElementAt(
                         smallmembers.elementAt(i).getComplement(), i);
             }
@@ -69,7 +69,7 @@ public class HMTFamily extends Family{
         else {
             smallmembers = new Vector();
             IndexExpr ie = new IndexExpr(index);
-            for (int i=0; i<=smSize; i++)
+            for (int i = 0; i <= smSize; i++)
                 smallmembers.addElement(hmtg.getElement(ie.eval(i)));
         }
     }
@@ -104,33 +104,36 @@ public class HMTFamily extends Family{
     
     public String toString(){
         int i, j;
-	Vector v = null;
-	String s = "Name: "+getName();
+        Vector v = null;
+        String s = "Name: " + getName();
         if (hmtg != null) {
-            if (index != null)
-                if (hmtg.getName() != null)
-                    s+="\n"+index+"\n"+hmtg.getName();
-                else
+            if (index != null) {
+                if (hmtg.getName() != null) {
+                    s += "\n" + index + "\n" + hmtg.getName();
+                } else {
                     System.err.println("\nIndex for a grammar without name!");
-            else
-                s+="\nHMTGrammar:\n"+hmtg.toString();
+                }
+            } else {
+                s += "\nHMTGrammar:\n" + hmtg.toString();
+            }
         }
         if (smallmembers != null) {
-            s+="\nSmallmembers: ";
-            for (i=0; i<smallmembers.size(); i++) {
-                s+=((Graph)smallmembers.elementAt(i)).getName()+", ";
+            s += "\nSmallmembers: ";
+            for (i = 0; i < smallmembers.size(); i++) {
+                s += ((Graph) smallmembers.elementAt(i)).getName() + ", ";
             }
-	}
+        }
         if (induced != null) {
-            s+="\nInduced: ";
-	    for (i=0; i<induced.size(); i++) {
-	        v = (Vector) induced.elementAt(i);
-	        for (j=0; j<v.size()-1; j++)
-	            s+=((SmallGraph) v.elementAt(j)).getName()+"; ";
-	    }
-	}
-        s+="\nLink: "+link+"\nComplement: "+complement.getName();
-	return s;
+            s += "\nInduced: ";
+            for (i = 0; i < induced.size(); i++) {
+                v = (Vector) induced.elementAt(i);
+                for (j = 0; j < v.size() - 1; j++) {
+                    s += ((SmallGraph) v.elementAt(j)).getName() + "; ";
+                }
+            }
+        }
+        s += "\nLink: " + link + "\nComplement: " + complement.getName();
+        return s;
     }
 }
     

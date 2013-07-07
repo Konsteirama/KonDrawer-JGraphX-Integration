@@ -53,7 +53,7 @@ public class Generate {
      */
     public static void show(Graph dg){
         System.err.print("Nodes: "+ dg.vertexSet().size());
-	System.err.println("     Edges: "+ dg.edgeSet().size());
+        System.err.println("     Edges: " + dg.edgeSet().size());
     }
 
 

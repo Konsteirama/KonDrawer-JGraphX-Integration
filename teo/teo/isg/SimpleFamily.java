@@ -93,31 +93,31 @@ public class SimpleFamily extends Family{
     
     public String toString(){
         int i, j;
-	Vector v = null;
-	String s = "Name: "+getName();
-	if (contains != null) {
-            s+="\nContains: ";
-	    for (i=0; i<contains.size(); i++)
-	        s+= contains.elementAt(i).getName()+"; ";
-	}
+        Vector v = null;
+        String s = "Name: " + getName();
+        if (contains != null) {
+            s += "\nContains: ";
+            for (i = 0; i < contains.size(); i++)
+                s += contains.elementAt(i).getName() + "; ";
+        }
         if (induced != null) {
-            s+="\nInduced: ";
-	    for (i=0; i<induced.size(); i++) {
-	        v = (Vector) induced.elementAt(i);
-	        for (j=0; j<v.size()-1; j++)
-	            s+=((SmallGraph) v.elementAt(j)).getName()+"; ";
-	    }
-	}
-	if (inducedRest != null) {
-            s+="\nInducedRest: ";
-	    for (i=0; i<inducedRest.size(); i++) {
-	        v = inducedRest.elementAt(i);
-	        for (j=0; j<v.size()-1; j++)
-	            s+=((SmallGraph) v.elementAt(j)).getName()+"; ";
-	    }
-	}
-        s+="\nLink: "+link+"\nComplement: "+complement.getName();
-	return s;
+            s += "\nInduced: ";
+            for (i = 0; i < induced.size(); i++) {
+                v = (Vector) induced.elementAt(i);
+                for (j = 0; j < v.size() - 1; j++)
+                    s += ((SmallGraph) v.elementAt(j)).getName() + "; ";
+            }
+        }
+        if (inducedRest != null) {
+            s += "\nInducedRest: ";
+            for (i = 0; i < inducedRest.size(); i++) {
+                v = inducedRest.elementAt(i);
+                for (j = 0; j < v.size() - 1; j++)
+                    s += ((SmallGraph) v.elementAt(j)).getName() + "; ";
+            }
+        }
+        s += "\nLink: " + link + "\nComplement: " + complement.getName();
+        return s;
     }
 }
     
