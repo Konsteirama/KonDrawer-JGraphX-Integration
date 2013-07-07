@@ -13,8 +13,10 @@ package teo.isgci.gui;
 import java.awt.Font;
 import java.awt.FontMetrics;
 import java.awt.Graphics;
+import java.awt.Graphics2D;
 import java.awt.Image;
 import java.awt.MediaTracker;
+import java.awt.RenderingHints;
 
 import teo.isgci.util.Latex;
 import teo.isgci.util.LatexGlyph;
@@ -295,6 +297,19 @@ public class LatexGraphics extends Latex {
             this.x = x;
             this.y = y;
             this.dopaint = dopaint;
+            
+            if (g instanceof Graphics2D) {
+                ((Graphics2D) g).setRenderingHint(
+                        RenderingHints.KEY_ANTIALIASING, 
+                        RenderingHints.VALUE_ANTIALIAS_ON);
+                ((Graphics2D) g).setRenderingHint(
+                        RenderingHints.KEY_TEXT_ANTIALIASING, 
+                        RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
+                ((Graphics2D) g).setRenderingHint(
+                        RenderingHints.KEY_RENDERING, 
+                        RenderingHints.VALUE_RENDER_QUALITY);
+            }
+
         }
 
         public GraphicsState(State parent) {

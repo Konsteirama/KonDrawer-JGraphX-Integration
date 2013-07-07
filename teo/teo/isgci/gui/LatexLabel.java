@@ -141,9 +141,12 @@ public class LatexLabel extends JLabel {
         }
         g.setFont(getFont());
         FontMetrics fm = g.getFontMetrics();
+        
+        final double paddedWidth = LatexGraphics.getInstance().getLatexWidth(
+                g, content) * 1.1;
+        
         Dimension d = new Dimension(
-                insets.left + insets.right 
-                + LatexGraphics.getInstance().getLatexWidth(g, content),
+                insets.left + insets.right + (int) paddedWidth,
                 insets.top + insets.bottom + fm.getHeight());
         g.dispose();
         return d;
