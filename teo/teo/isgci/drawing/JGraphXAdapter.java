@@ -53,11 +53,9 @@ public class JGraphXAdapter<V, E> extends mxGraph implements
     /**
      * CSS Style for Tooltips.
      */
-    private final String style = "<head><style type=\"text/css\">"
-            + " div.firstname{}"
-            + " div.name{margin-top: 5px;}"
-            + " div.problem{margin-top:15px}"
-            + "</style></head>";
+    private final String style = "<head><style type=\"text/css\">" + " div" +
+            ".firstname{}" + " div.name{margin-top: 5px;}" + " div" +
+            ".problem{margin-top:15px}" + "</style></head>";
     /**
      * Maps the JGraphX-mxICells onto JGraphT-Vertices.
      * {@link #vertexToCellMap} is for the opposite direction.
@@ -113,6 +111,7 @@ public class JGraphXAdapter<V, E> extends mxGraph implements
      * @param graph is a graph
      */
     public JGraphXAdapter(Graph<V, E> graph) {
+
         super();
 
         // Don't accept null as jgrapht graph
@@ -124,8 +123,6 @@ public class JGraphXAdapter<V, E> extends mxGraph implements
 
         // generate the drawing
         insertJGraphT(graph);
-
-        setAutoSizeCells(true);
     }
 
 
@@ -133,11 +130,13 @@ public class JGraphXAdapter<V, E> extends mxGraph implements
 
     @Override
     public void edgeAdded(GraphEdgeChangeEvent<V, E> e) {
+
         addJGraphTEdge(e.getEdge());
     }
 
     @Override
     public void edgeRemoved(GraphEdgeChangeEvent<V, E> e) {
+
         removeEdge(e.getEdge());
     }
 
@@ -147,6 +146,7 @@ public class JGraphXAdapter<V, E> extends mxGraph implements
      * @return {@link #cellToEdgeMap}
      */
     public HashMap<mxICell, E> getCellToEdgeMap() {
+
         return cellToEdgeMap;
     }
 
@@ -157,6 +157,7 @@ public class JGraphXAdapter<V, E> extends mxGraph implements
      * @return {@link #cellToVertexMap}
      */
     public HashMap<mxICell, V> getCellToVertexMap() {
+
         return cellToVertexMap;
     }
 
@@ -168,6 +169,7 @@ public class JGraphXAdapter<V, E> extends mxGraph implements
      * @return {@link #edgeToCellMap}
      */
     public HashMap<E, mxICell> getEdgeToCellMap() {
+
         return edgeToCellMap;
     }
 
@@ -177,11 +179,13 @@ public class JGraphXAdapter<V, E> extends mxGraph implements
      * @return the JGraphT representation of the internal graph
      */
     public final Graph<V, E> getGraph() {
+
         return this.graphT;
     }
 
     @Override
     public String getToolTipForCell(Object cell) {
+
         String returnValue = "";
         if (cell instanceof mxICell) {
             if (((mxICell) cell).isEdge() && cellToEdgeMap.containsKey(cell)) {
@@ -202,21 +206,21 @@ public class JGraphXAdapter<V, E> extends mxGraph implements
                     boolean firstName = true;
                     for (GraphClass graphClass : n) {
                         if (!firstName) {
-                            returnValue += "<div class=\"name\">"
-                                    + graphClass.toString() + "</div>";
+                            returnValue += "<div class=\"name\">" +
+                                    graphClass.toString() + "</div>";
                         } else {
-                            returnValue += "<div class=\"firstname\">"
-                                    + graphClass.toString() + "</div>";
+                            returnValue += "<div class=\"firstname\">" +
+                                    graphClass.toString() + "</div>";
                             firstName = false;
                         }
                     }
                     Problem problem = UserSettings.getProblem();
                     if (problem != null) {
-                        Complexity complexity =
-                                problem.getComplexity(n.iterator().next());
-                        returnValue += "<div class=\"problem\">"
-                                + problem.toString()
-                                + ": " + complexity.toString() + "</div>";
+                        Complexity complexity = problem.getComplexity(n
+                                .iterator().next());
+                        returnValue += "<div class=\"problem\">" + problem
+                                .toString() + ": " + complexity.toString() +
+                                "</div>";
                     }
                 }
             } else {
@@ -224,9 +228,8 @@ public class JGraphXAdapter<V, E> extends mxGraph implements
                 returnValue += super.getToolTipForCell(cell);
             }
         }
-        return "<html>" + style + "<body>"
-                + Latex2Html.getInstance().html(returnValue)
-                + "</body></html>";
+        return "<html>" + style + "<body>" + Latex2Html.getInstance().html
+                (returnValue) + "</body></html>";
     }
 
     /**
@@ -236,6 +239,7 @@ public class JGraphXAdapter<V, E> extends mxGraph implements
      * @return {@link #vertexToCellMap}
      */
     public HashMap<V, mxICell> getVertexToCellMap() {
+
         return vertexToCellMap;
     }
 
@@ -244,6 +248,7 @@ public class JGraphXAdapter<V, E> extends mxGraph implements
 
     @Override
     public void vertexAdded(GraphVertexChangeEvent<V> e) {
+
         addJGraphTVertex(e.getVertex());
     }
 
@@ -280,8 +285,8 @@ public class JGraphXAdapter<V, E> extends mxGraph implements
     /**
      * Draws a new egde into the graph.
      *
-     * @param edge 
-     * edge to be added to the graph. Source and target vertices are needed.
+     * @param edge edge to be added to the graph. Source and target vertices
+     *             are needed.
      */
     private void addJGraphTEdge(E edge) {
 
@@ -293,8 +298,8 @@ public class JGraphXAdapter<V, E> extends mxGraph implements
             V targetVertex = graphT.getEdgeTarget(edge);
 
             // if the one of the vertices is not drawn, don't draw the edge
-            if (!(vertexToCellMap.containsKey(sourceVertex) && vertexToCellMap
-                    .containsKey(targetVertex))) {
+            if (!(vertexToCellMap.containsKey(sourceVertex) &&
+                    vertexToCellMap.containsKey(targetVertex))) {
                 return;
             }
 
@@ -303,11 +308,8 @@ public class JGraphXAdapter<V, E> extends mxGraph implements
             Object targetCell = vertexToCellMap.get(targetVertex);
 
             // add edge between mxICells
-            mxICell cell = (mxICell) insertEdge(defaultParent, null,
-                    edge, sourceCell, targetCell);
-
-            // update cell size so cell isn't "above" graph
-            updateCellSize(cell);
+            mxICell cell = (mxICell) insertEdge(defaultParent, null, edge,
+                    sourceCell, targetCell);
 
             // Save reference between vertex and cell
             edgeToCellMap.put(edge, cell);
@@ -329,11 +331,8 @@ public class JGraphXAdapter<V, E> extends mxGraph implements
 
         try {
             // create a new JGraphX vertex at position 0
-            mxICell cell = (mxICell) insertVertex(defaultParent, null, vertex,
-                    0, 0, 0, 0);
-
-            // update cell size so cell isn't "above" graph
-            updateCellSize(cell);
+            mxICell cell = (mxICell) insertVertex(defaultParent, null,
+                    vertex, 0, 0, 180, 30);
 
             // Save reference between vertex and cell
             vertexToCellMap.put(vertex, cell);
@@ -368,6 +367,7 @@ public class JGraphXAdapter<V, E> extends mxGraph implements
      * @param edge The edge that will be removed
      */
     private void removeEdge(E edge) {
+
         mxICell cell = edgeToCellMap.remove(edge);
         removeCells(new Object[]{cell});
 

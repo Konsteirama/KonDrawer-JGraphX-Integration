@@ -37,6 +37,7 @@ import com.mxgraph.view.mxGraph;
 import com.mxgraph.view.mxGraphView;
 import org.jgrapht.Graph;
 import teo.isgci.util.UserSettings;
+import teo.isgci.util.Utility;
 
 /**
  * This class implements the GraphManipulationInterface. It handles
@@ -566,8 +567,7 @@ class GraphManipulation<V, E> implements GraphManipulationInterface<V, E> {
 
         mxICell cell = getCellFromNode(node);
 
-        graph.getModel().setValue(cell, newName);
-        graph.updateCellSize(cell);
+        graph.getModel().setValue(cell, Utility.getShortName(newName));
 
         applyZoomSettings();
     }
