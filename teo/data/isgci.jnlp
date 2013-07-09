@@ -16,7 +16,12 @@
    <resources>
       <j2se version="1.6+"/>
       <jar href="ISGCI.jar"/>
-      <jar href="jgrapht.jar"/>
+      <jar href="lib/epsgraphics.jar" />
+      <jar href="lib/getopt.jar" />
+      <jar href="lib/jgrapht.jar" />
+      <jar href="lib/jgraphx.jar" />
+      <jar href="lib/mouse.jar" />
+      <jar href="lib/saxon.jar" />
    </resources>
    <application-desc main-class="teo.Loader">
       <argument>@HOMEURL@</argument>

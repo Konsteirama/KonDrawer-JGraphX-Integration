@@ -265,13 +265,13 @@
                  keystore="${data.dir}/keystore"
                  storepass="graphclasses.org" />
         
-        <!--<signjar alias="isgci"
+        <signjar alias="isgci"
                  keystore="${data.dir}/keystore"
                  storepass="graphclasses.org">
             <path>
               <fileset dir="${web.lib.dir}" includes="*.jar" />
             </path>
-        </signjar> -->
+        </signjar>
         
     </target>
 
