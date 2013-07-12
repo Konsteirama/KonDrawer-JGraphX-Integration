@@ -27,10 +27,11 @@ import com.mxgraph.view.mxCellState;
  * Draws a node with a latexlabel.
  */
 public class mxDefaultLatexShape implements mxITextShape {
-    
+
     @Override
     public void paintShape(mxGraphics2DCanvas canvas, String text,
                            mxCellState state, Map<String, Object> style) {
+
         Rectangle rect = state.getLabelBounds().getRectangle();
         Graphics2D g = canvas.getGraphics();
 
@@ -60,8 +61,8 @@ public class mxDefaultLatexShape implements mxITextShape {
                     mxConstants.DEFAULT_FONTSIZE);
             FontMetrics fm = g.getFontMetrics();
             int scaledFontSize = scaledFont.getSize();
-            double fontScaleFactor = ((double) scaledFontSize)
-                    / ((double) fontSize);
+            double fontScaleFactor = ((double) scaledFontSize) / ((double)
+                    fontSize);
             // This factor is the amount by which the font is smaller/
             // larger than we expect for the given scale. 1 means it's
             // correct, 0.8 means the font is 0.8 the size we expected
@@ -72,7 +73,7 @@ public class mxDefaultLatexShape implements mxITextShape {
                     .getMaxAscent();
 
             Object vertAlign = mxUtils.getString(style,
-                    mxConstants.STYLE_VERTICAL_ALIGN, 
+                    mxConstants.STYLE_VERTICAL_ALIGN,
                     mxConstants.ALIGN_MIDDLE);
             double vertAlignProportion = 0.5;
 
@@ -95,8 +96,8 @@ public class mxDefaultLatexShape implements mxITextShape {
             }
             int dx = 0;
 
-            int sw = lightweightLatexLabel.getSharedInstance()
-                    .getLatexWidth(g, text);
+            int sw = lightweightLatexLabel.getSharedInstance().getLatexWidth
+                    (g, text);
 
             if (align.equals(mxConstants.ALIGN_CENTER)) {
                 if (horizontal) {
@@ -123,8 +124,8 @@ public class mxDefaultLatexShape implements mxITextShape {
      * @param x      the x co-ord of the baseline of the text line
      * @param y      the y co-ord of the baseline of the text line
      */
-    protected void postProcessLine(String text, String line, 
-            FontMetrics fm, mxGraphics2DCanvas canvas, int x, int y) {
+    protected void postProcessLine(String text, String line, FontMetrics fm, mxGraphics2DCanvas canvas, int x, int y) {
+
     }
 }
 

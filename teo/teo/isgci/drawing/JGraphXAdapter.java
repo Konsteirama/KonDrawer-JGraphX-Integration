@@ -332,7 +332,7 @@ public class JGraphXAdapter<V, E> extends mxGraph implements
         try {
             // create a new JGraphX vertex at position 0
             mxICell cell = (mxICell) insertVertex(defaultParent, null,
-                    vertex, 0, 0, 180, 30);
+                    vertex, 0, 0, 210, 30);
 
             // Save reference between vertex and cell
             vertexToCellMap.put(vertex, cell);
