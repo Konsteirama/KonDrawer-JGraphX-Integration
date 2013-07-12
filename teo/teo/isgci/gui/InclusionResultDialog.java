@@ -10,6 +10,7 @@
 
 package teo.isgci.gui;
 
+import java.awt.Component;
 import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.GridBagConstraints;
@@ -532,8 +533,8 @@ public class InclusionResultDialog extends JDialog implements ActionListener {
         constraints.fill = GridBagConstraints.NONE;
         constraints.anchor = GridBagConstraints.WEST;
         
-        for (int i = path.size()-1; i >= 0; i--) {
-            LatexLabel l = new LatexLabel(path.get(i).getSub().toString());
+        for (int i = 0; i < path.size(); i++) {
+            LatexLabel l = new LatexLabel(path.get(i).getSuper().toString());
             constraints.gridwidth = 1;
             gridbag.setConstraints(l, constraints);
             compo.add(l);
@@ -548,7 +549,7 @@ public class InclusionResultDialog extends JDialog implements ActionListener {
 
             LatexLabel subset;
             if (details  &&
-                        DataSet.getEquivalentClasses(sup).contains(sub)) {
+                        DataSet.getEquivalentClasses(sub).contains(sup)) {
                 subset = new LatexLabel("   $\\equiv$");
             } else if (details  &&  e.isProper()) {
                 subset = new LatexLabel("   $\\subset$");
@@ -569,7 +570,8 @@ public class InclusionResultDialog extends JDialog implements ActionListener {
             compo.add(label1);
         }
 
-        LatexLabel l = new LatexLabel(path.get(0).getSuper().toString());
+        LatexLabel l = new LatexLabel(path.get(path.size() - 1)
+                            .getSub().toString());
         constraints.gridwidth = 1;
         gridbag.setConstraints(l, constraints);
         compo.add(l);
@@ -577,7 +579,7 @@ public class InclusionResultDialog extends JDialog implements ActionListener {
             constraints.gridwidth = GridBagConstraints.REMAINDER;
         gridbag.setConstraints(label2, constraints);
         compo.add(label2);
-
+        
         return compo;
         
     }
